@@ -13,3 +13,5 @@ Dashboard XSMB hằng ngày dùng chuẩn **MB A1 Dual Core Volume Balance – G
 Nguồn dữ liệu vận hành: `XSMB_Source_2024_2026_MB_v1.3`.
 
 Trang tự tải lại mỗi 60 giây. Mỗi lần rà soát phải cập nhật đồng thời `index.html` và `data/current.json`.
+
+GitHub Pages được triển khai tự động từ nhánh `main`.

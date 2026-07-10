@@ -1,0 +1,253 @@
+{
+  "schema_version": "MB_DAILY_WEB_V1",
+  "report_run_id": "RPT_MB_20260711_A1_MAIN_WEB_V1",
+  "source_run_id": "RPT_MB_20260711_A1_MAIN",
+  "config_id": "MB_A1_DUAL_CORE_VOLUME_BALANCE_GAN21_12_CORE50_VOLUME30",
+  "target_date": "2026-07-11",
+  "generated_at": "2026-07-10T20:54:35+07:00",
+  "valid_until": "2026-07-11T18:15:00+07:00",
+  "data_snapshot_id": "MBH27_20260710_LOCKED_26U_R13X2",
+  "data": {
+    "locked_through": "2026-07-10",
+    "status": "LOCKED_CROSSCHECKED",
+    "count": 27,
+    "unique": 26,
+    "repeat_codes": [
+      "13×2"
+    ],
+    "max_frequency": 2,
+    "latest_27_codes": [
+      "67",
+      "60",
+      "37",
+      "81",
+      "62",
+      "66",
+      "36",
+      "45",
+      "13",
+      "61",
+      "50",
+      "19",
+      "53",
+      "83",
+      "54",
+      "13",
+      "82",
+      "34",
+      "27",
+      "94",
+      "16",
+      "02",
+      "43",
+      "96",
+      "20",
+      "31",
+      "73"
+    ],
+    "source_label": "XSMB_Source_2024_2026_MB_v1.3 · MB_History_27 · đã đối chiếu đủ 27 mã"
+  },
+  "portfolio": {
+    "decision": "VOLUME",
+    "tier": "A1 Volume Balanced",
+    "selection": "75",
+    "title": "Volume 30 — Chọn 75",
+    "points": 30,
+    "capital_vnd": 690000,
+    "miss_pnl_vnd": -690000,
+    "hit1_pnl_vnd": 1710000,
+    "hit2_pnl_vnd": 4110000,
+    "reason": "Không có Core. Mã 75 là ứng viên duy nhất đạt Volume theo chuẩn Gan 21/12, dữ liệu sạch và không bị phanh nhiễu."
+  },
+  "top_three": {
+    "mode": "PRODUCTION_WITH_WATCH",
+    "note": "75 đạt chuẩn Volume; 88 và 72 chỉ theo dõi, không vào tiền.",
+    "items": [
+      {
+        "rank": 1,
+        "number": "75",
+        "source_group": "MB A1",
+        "tier": "Volume 30",
+        "eligible": true,
+        "reason": "Gan 14 · Gmax 14 · Score 1,000"
+      },
+      {
+        "rank": 2,
+        "number": "88",
+        "source_group": "A1 Watch",
+        "tier": "Theo dõi",
+        "eligible": false,
+        "reason": "Gan 13 · Gmax 20 · Score 0,650"
+      },
+      {
+        "rank": 3,
+        "number": "72",
+        "source_group": "A1 Watch",
+        "tier": "Theo dõi",
+        "eligible": false,
+        "reason": "Gan 19 · Gmax 29 · Score 0,655"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "A1",
+      "status": "VOLUME",
+      "role": "PRODUCTION",
+      "layer": "Volume Balanced",
+      "selected_numbers": [
+        "75"
+      ],
+      "points": 30,
+      "capital_vnd": 690000,
+      "summary": "75 là mã duy nhất đạt Volume; không có mã đạt Core.",
+      "reason": "Gan 14 · Gmax 14 · Score 1,000 · vượt toàn bộ lớp lọc hiện hành.",
+      "note": "Trượt −690.000đ · 1 nháy +1.710.000đ · 2 nháy +4.110.000đ.",
+      "candidates": [
+        {
+          "code": "75",
+          "gan": 14,
+          "gmax": 14,
+          "score": 1,
+          "tier": "Volume",
+          "gate": true,
+          "status": "VOLUME30_REAL",
+          "points": 30,
+          "reason": "Ứng viên duy nhất đạt chuẩn Volume 30."
+        },
+        {
+          "code": "88",
+          "gan": 13,
+          "gmax": 20,
+          "score": 0.65,
+          "tier": "Watch",
+          "gate": false,
+          "status": "WAIT_12_07_IF_CLEAN",
+          "points": 0,
+          "reason": "Chưa đạt Score tối thiểu 0,70."
+        },
+        {
+          "code": "72",
+          "gan": 19,
+          "gmax": 29,
+          "score": 0.655,
+          "tier": "Watch",
+          "gate": false,
+          "status": "WAIT_13_07_IF_CLEAN",
+          "points": 0,
+          "reason": "Chưa đạt Score tối thiểu 0,70."
+        }
+      ]
+    },
+    {
+      "id": "X2",
+      "status": "A0 SHADOW",
+      "role": "SHADOW / RESEARCH",
+      "layer": "Không vào tiền",
+      "selected_numbers": [],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "Không có cặp X2 mới đã được xác thực cho ngày 11/07.",
+      "reason": "NO_FRESH_VALIDATED_PAIR",
+      "note": "Không tái sử dụng cặp của ngày trước.",
+      "candidates": []
+    },
+    {
+      "id": "X3",
+      "status": "A0 SHADOW",
+      "role": "SHADOW / RESEARCH",
+      "layer": "Không vào tiền",
+      "selected_numbers": [],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "Không có rổ X3 mới đã được xác thực cho ngày 11/07.",
+      "reason": "NO_FRESH_VALIDATED_BASKET",
+      "note": "Không tái sử dụng rổ 54–32–47 hoặc các rổ cũ.",
+      "candidates": []
+    },
+    {
+      "id": "XIEN",
+      "status": "A0 SHADOW",
+      "role": "PAPER ONLY",
+      "layer": "Không vào tiền",
+      "selected_numbers": [],
+      "selection": null,
+      "pairs": [],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "Không có cặp Xiên 2 hiện tại.",
+      "reason": "NO_CURRENT_CONFIRMED_PAIR",
+      "note": "Danh sách cặp được thay nguyên khối mỗi ngày; hôm nay đã xóa sạch cặp cũ.",
+      "candidates": []
+    },
+    {
+      "id": "DE",
+      "status": "A0 VALIDATION",
+      "role": "VALIDATION",
+      "layer": "Không vào tiền",
+      "selected_numbers": [],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "Không có đầu đề mới đủ điều kiện cho ngày 11/07.",
+      "reason": "NO_FRESH_VALIDATED_HEAD",
+      "note": "Không dùng lại điểm số Đầu 2 / Đuôi 0 của ngày cũ.",
+      "candidates": []
+    }
+  ],
+  "ledger": {
+    "start_date": "2026-06-30",
+    "confirmed_through": "2026-07-10",
+    "total_pnl_vnd": 17000000,
+    "note": "Tổng năm nhóm đang hoạt động. Số ngoài hệ thống = 0; Than Vo đã chuyển sang lưu trữ và không cộng vào website chính.",
+    "items": [
+      {
+        "id": "A1",
+        "label": "MB A1",
+        "pnl_vnd": 3870000,
+        "note": "Đã xác nhận đến 10/07"
+      },
+      {
+        "id": "X2",
+        "label": "MB X2",
+        "pnl_vnd": 5820000,
+        "note": "Đã xác nhận đến 10/07"
+      },
+      {
+        "id": "X3",
+        "label": "MB X3",
+        "pnl_vnd": 7910000,
+        "note": "Đã xác nhận đến 10/07"
+      },
+      {
+        "id": "XIEN",
+        "label": "Xiên 2",
+        "pnl_vnd": -600000,
+        "note": "Đã xác nhận đến 10/07"
+      },
+      {
+        "id": "DE",
+        "label": "Đề",
+        "pnl_vnd": 0,
+        "note": "Chưa có lệnh xác nhận"
+      }
+    ]
+  },
+  "backtest": {
+    "from": "2025-01-01",
+    "to": "2026-06-30",
+    "orders": 171,
+    "wins": 52,
+    "hits": 61,
+    "win_rate": "30,41%",
+    "hits_per_order": "0,3567",
+    "pnl_vnd": 41330000,
+    "max_drawdown_vnd": -12240000,
+    "orders_per_month": "9,53 lệnh/tháng"
+  },
+  "publication": {
+    "status": "BUILD_VERIFIED",
+    "status_label": "Tự đồng bộ đã bật",
+    "report_hash_sha256": "b180bdf48231349c17418461e54ad70d509bdc7774bea755d7113dc1ff764284",
+    "source_warning": "SOURCE_RUN_STAKE_TRANSLATED_FROM_OBSOLETE_60_TO_CURRENT_30"
+  }
+}

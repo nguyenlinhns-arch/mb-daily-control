@@ -6,7 +6,7 @@
 @media(prefers-reduced-motion:no-preference){.hero,.freshness,.method-card{animation:rise .45s ease both}.method-grid>div:nth-child(2){animation-delay:.04s}.method-grid>div:nth-child(3){animation-delay:.08s}.method-grid>div:nth-child(4){animation-delay:.12s}.method-grid>div:nth-child(5){animation-delay:.16s}}@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}@keyframes spin{to{transform:rotate(360deg)}}
 </style></head><body><div data-dashboard="safe"><div class="site-shell" data-runtime-expired="false">
     <header class="topbar">
-      <a class="brand" href="/" aria-label="MB Daily Dashboard">
+      <a class="brand" href="./" aria-label="MB Daily Dashboard">
         <span class="brand-mark">MB</span>
         <span><strong>Daily Control</strong><small>XSMB · Kỷ luật dữ liệu</small></span>
       </a>
@@ -227,4 +227,51 @@
       <div><strong>MB Daily Control</strong><span>Core 50 · Volume 30 · Không gấp thếp</span></div>
       <p>Chỉ ghi lãi/lỗ khi đã xác nhận đánh thật. Dữ liệu không chắc hoặc tín hiệu không sạch: A0.</p>
     </footer>
-  </div></div></body></html>
+  </div></div><div class="sync-toast" data-sync-toast="" role="status" aria-live="polite"></div><script>
+(()=>{"use strict";
+const status=document.querySelector("[data-public-readback]");
+const button=document.querySelector("[data-refresh]");
+const toast=document.querySelector("[data-sync-toast]");
+const live=document.querySelector("[data-live-state]");
+const expectedRun=(document.querySelector(".audit-grid dd")?.textContent||"").trim();
+const expectedSnapshot=(document.querySelectorAll(".audit-grid dd")[1]?.textContent||"").trim();
+const expectedTop=[...document.querySelectorAll(".top-three strong")].map(el=>(el.textContent||"").trim());
+function notify(message,isError=false){
+  if(!toast)return;
+  toast.textContent=message;
+  toast.classList.toggle("error",isError);
+  toast.classList.add("show");
+  window.setTimeout(()=>toast.classList.remove("show"),2600);
+}
+async function verifyPublic(){
+  if(status)status.textContent="Đang đối chiếu bản công khai…";
+  try{
+    const response=await fetch("./data/current.json?v="+Date.now(),{cache:"no-store"});
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    const data=await response.json();
+    const publicTop=(data.top_three?.items||[]).map(item=>String(item.number).padStart(2,"0"));
+    const matched=data.report_run_id===expectedRun &&
+      data.data_snapshot_id===expectedSnapshot &&
+      JSON.stringify(publicTop)===JSON.stringify(expectedTop) &&
+      Array.isArray(data.groups) && data.groups.length===5;
+    if(!matched)throw new Error("Dữ liệu HTML và JSON chưa khớp");
+    if(status)status.textContent="Bản công khai đã khớp";
+    if(live)live.classList.add("positive");
+    return true;
+  }catch(error){
+    if(status)status.textContent="Chưa xác minh được bản công khai";
+    notify("Không đọc được dữ liệu mới. Trang vẫn giữ bản đã khóa.",true);
+    return false;
+  }
+}
+button?.addEventListener("click",async()=>{
+  button.classList.add("is-loading");
+  button.disabled=true;
+  const ok=await verifyPublic();
+  button.classList.remove("is-loading");
+  button.disabled=false;
+  if(ok){notify("Dữ liệu công khai đã khớp.");window.setTimeout(()=>window.location.reload(),500);}
+});
+window.addEventListener("pageshow",verifyPublic,{once:true});
+})();
+</script></body></html>

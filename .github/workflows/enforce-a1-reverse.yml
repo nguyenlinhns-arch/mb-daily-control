@@ -39,6 +39,7 @@ jobs:
         with:
           python-version: "3.12"
 
+      # This post-processor is authoritative even when the canonical planner is rebuilt.
       - name: Apply A1 reverse50 and no-duplicate policy
         run: python scripts/enforce_a1_reverse.py
 

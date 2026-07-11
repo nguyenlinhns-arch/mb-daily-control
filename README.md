@@ -8,7 +8,7 @@ Dashboard XSMB hằng ngày dùng chuẩn **MB A1 Dual Core Volume Balance – G
 - Volume Balanced: 30 điểm/số; vốn chuẩn 690.000đ/mã.
 - Tối đa một mã tiền thật mỗi ngày; có Core thì dừng, không đánh thêm Volume.
 - X2, X3, Plus và các mã gần đạt chỉ hiển thị Shadow/Research khi chưa qua gate.
-- Khung X2 trên website không hiển thị số lệnh thắng, số lệnh thua hoặc tổng lãi/lỗ; chỉ giữ tổng lệnh, tỷ lệ thắng và Max DD.
+- Khung X2 trên website không hiển thị bất kỳ chỉ số hiệu suất/backtest nào: tổng lệnh, số lệnh thắng, số lệnh thua, tỷ lệ thắng, tổng lãi/lỗ, P/L hoặc Max DD đều bị loại vĩnh viễn.
 - Xiên 2 dùng sổ riêng; lãi/lỗ chỉ ghi khi người dùng đã xác nhận đánh thật.
 - Dữ liệu thiếu, lệch nguồn, chưa khóa hoặc không đủ 27 mã thì không tự suy đoán.
 

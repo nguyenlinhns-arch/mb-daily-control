@@ -5,9 +5,11 @@
 **Source:** `XSMB_Source_2024_2026_MB_v1.3`  
 **Protocol:** warm-up 2020; train 2021–2023; validation 2024; OOS 2025–2026; no look-ahead.
 
+**Reproducibility note:** the deterministic X2 reconstruction reproduced 128 of 130 recorded X2 signals in the 2024–2026 audit window. The two remaining discrepancies appear to come from historical tie/feature definitions. The results below are therefore a strong research reconstruction and are kept Shadow pending forward verification, not claimed as a mathematically exact replay of every historical X2 row.
+
 ## 1. Promoted Xiên method: XIEN2_X2_CONFLUENCE_V1
 
-The exact rank-1 pair from X2 Fusion is used only after X2 independently passes Core or Balanced. The Xiên overlay then requires:
+The reconstructed rank-1 pair from X2 Fusion is used only after X2 independently passes Core or Balanced. The Xiên overlay then requires:
 
 - prior-draw `repeat2_count <= 4`;
 - pair co-hit count over the previous 21 draws from 1 to 3;
@@ -27,7 +29,7 @@ Economics: 100,000 VND per pair; net +1,500,000 VND when both legs hit, -100,000
 
 The former independent `XIEN2_HOT90_PAIR21_V2` produced 109 orders, 15 wins, 13.76% WR, +13.10M P/L, -1.80M MaxDD and an 18-order longest loss streak.
 
-The new X2-confluence method has the same 15 wins with 26 fewer orders, improves WR by 4.31 percentage points, adds 2.60M P/L, improves MaxDD by 0.40M and shortens the longest losing streak by four orders. It therefore replaces HOT90 as the preferred Xiên Shadow method. HOT90 remains a secondary benchmark only.
+The new X2-confluence reconstruction has the same 15 wins with 26 fewer orders, improves WR by 4.31 percentage points, adds 2.60M P/L, improves MaxDD by 0.40M and shortens the longest losing streak by four orders. It therefore replaces HOT90 as the preferred Xiên Shadow research method. HOT90 remains a secondary benchmark only.
 
 ## 3. Current state for 11/07/2026
 
@@ -40,7 +42,7 @@ The current X2 rank-1 pair is `32-23`.
 
 ## 4. X3 internal Xiên overlay
 
-A secondary Quality Shadow was tested: X3 Growth must pass, and the maximum PairCount60 among its three internal pairs must be between 8 and 9. All three pairs are paper-tracked only.
+A secondary Quality Shadow was tested: X3 Growth must pass, and the maximum PairCount60 among its three internal pairs must be between 8 and 9. All three pairs are paper-tracked only. The training segment uses a reconstructed X3 generator; validation and OOS use the audited X3 Growth baskets.
 
 | Split | Days | Win days | WR | P/L | Max DD |
 |---|---:|---:|---:|---:|---:|
@@ -80,4 +82,4 @@ These features may qualify or veto a method. They must not override A1, X2 or X3
 
 ## 8. Forward lock
 
-The promoted Xiên method remains Shadow. Review for real money only after at least 30 new prospective signals with frozen parameters, WR at least 14%, positive P/L, MaxDD no worse than -1.80M and longest loss streak no more than 18.
+The promoted Xiên method remains Shadow. Review for real money only after at least 30 new prospective signals with frozen parameters, WR at least 14%, positive P/L, MaxDD no worse than -1.80M and longest loss streak no more than 18. The two unresolved historical reconstruction mismatches must also be audited before any real-money promotion.

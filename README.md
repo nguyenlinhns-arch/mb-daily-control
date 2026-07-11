@@ -25,7 +25,7 @@ Mọi lần rà soát và mọi payload website phải có mốc sớm nhất ch
 - `milestone_type`
 - Riêng X3 còn bắt buộc có `earliest_basket_date`.
 
-Mốc là **lower bound có điều kiện**, không phải cam kết. Mọi mốc phải được tính lại sau mỗi kỳ khóa đủ 27/27. Workflow sẽ dừng xuất tín hiệu hoặc chuyển sang `A0_DATA_FAIL` nếu thiếu bất kỳ trường mốc nào.
+Mốc là **lower bound có điều kiện**, không phải cam kết. Mọi mốc phải được tính lại sau mỗi kỳ khóa đủ 27/27. Workflow sẽ dừng xuất tín hiệu hoặc chuyển sang `A0_DATA_FAIL` nếu một bộ dữ liệu mới đã tải thành công nhưng không qua gate 27/27, đối chiếu nguồn hoặc thiếu bất kỳ trường mốc nào.
 
 ## Đồng bộ vĩnh viễn lên website
 
@@ -46,7 +46,15 @@ Mỗi lượt thành công thực hiện liền mạch:
    - `data/current.json` — payload website hiện hành;
    - `data/plans/YYYY-MM-DD.json` — bản kế hoạch theo ngày;
    - `data/review-ledger.json` — chỉ mục các lần rà soát;
-   - `data/automation-state.json` — trạng thái pipeline.
+   - `data/automation-status.json` — trạng thái pipeline và lỗi retry.
 7. Commit lên `main`; GitHub Pages tự xuất bản. Website tự nạp lại `data/current.json` không cache sau mỗi 120 giây.
 
-Nếu tải nguồn, khóa dữ liệu hoặc engine rà soát gặp lỗi, website chuyển thành **A0_DATA_FAIL** và vẫn ghi mốc lần khóa dữ liệu sớm nhất; tuyệt đối không giữ một lệnh cũ như thể còn hiệu lực.
+## Bảo vệ kế hoạch hợp lệ khi lỗi truy cập nguồn
+
+Lỗi mạng, lỗi export Google Sheet hoặc lỗi truy cập nguồn công khai là **lỗi vận chuyển**, không phải bằng chứng rằng bộ dữ liệu đang hiển thị sai. Vì vậy:
+
+- Không được ghi đè `data/current.json` bằng màn hình `A0_DATA_FAIL` chỉ vì một lượt tải nguồn thất bại.
+- Giữ nguyên kế hoạch hợp lệ gần nhất, gồm đầy đủ mốc A1/X2/X3.
+- Chỉ ghi lỗi vào `data/automation-status.json` và tự retry ở lượt kế tiếp.
+- Chỉ chuyển sang A0 khi một bộ dữ liệu mới đã tải được nhưng thật sự thiếu 27 mã, lệch nguồn, ngày không hợp lệ hoặc không qua kiểm tra mốc bắt buộc.
+- Khi lượt retry thành công, kế hoạch mới thay thế bản cũ và được GitHub Pages xuất bản.

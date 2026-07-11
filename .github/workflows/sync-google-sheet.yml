@@ -1,71 +1,92 @@
-name: Sync XSMB from Google Sheet
-# Production smoke trigger: 2026-07-11 20:25 VN
+name: Probe public XSMB sources
 
 on:
   workflow_dispatch:
   push:
     branches: ["main"]
     paths:
-      - "scripts/sync_from_google_sheet.py"
-      - "scripts/apply_crosschecked_correction.py"
       - ".github/workflows/sync-google-sheet.yml"
-  schedule:
-    # 19:15, 19:35 và 19:55 giờ Việt Nam (UTC+7).
-    # Các lượt sau là retry; sổ quyết toán bảo đảm không cộng trùng.
-    - cron: "15 12 * * *"
-    - cron: "35 12 * * *"
-    - cron: "55 12 * * *"
 
 permissions:
   contents: write
 
 concurrency:
-  group: sync-xsmb-sheet
+  group: probe-xsmb-sources
   cancel-in-progress: false
 
 jobs:
-  sync:
+  probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      GOOGLE_SHEET_ID: 1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w
-      SOURCE_XLSX_PATH: /tmp/xsmb-source.xlsx
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install parser
-        run: python -m pip install --disable-pip-version-check openpyxl==3.1.5
-
-      - name: Download one immutable source snapshot
+      - name: Probe candidate public result pages
         run: |
-          curl --fail --location --retry 3 --retry-delay 5 \
-            "https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/export?format=xlsx" \
-            --output "${SOURCE_XLSX_PATH}"
-          test -s "${SOURCE_XLSX_PATH}"
+          python3 - <<'PY'
+          import json
+          import re
+          import urllib.error
+          import urllib.request
+          from datetime import datetime, timezone
+          from pathlib import Path
 
-      - name: Apply explicitly authorized cross-checked correction
-        run: python scripts/apply_crosschecked_correction.py
+          urls = [
+              "https://xosodaiphat.com/xsmb-11-07-2026.html",
+              "https://xoso.com.vn/xsmb-11-07-2026.html",
+              "https://xoso.me/xsmb-11-07-2026.html",
+              "https://ketqua.net/xo-so-truyen-thong.php?ngay=11-07-2026",
+              "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/11-07-2026.html",
+              "https://xosothienphu.vn/xsmb-11-07-2026.html",
+              "https://xoso365.vn/xsmb-11-07-2026.html",
+              "https://kqxs.vn/mien-bac/xsmb-11-07-2026",
+          ]
+          tokens = ["09401", "36061", "77252", "60057", "51690", "28065"]
+          rows = []
+          for url in urls:
+              row = {"url": url}
+              try:
+                  req = urllib.request.Request(url, headers={
+                      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36",
+                      "Accept-Language": "vi-VN,vi;q=0.9,en;q=0.7",
+                  })
+                  with urllib.request.urlopen(req, timeout=25) as response:
+                      body = response.read(2_000_000)
+                      text = body.decode("utf-8", "replace")
+                      plain = re.sub(r"<[^>]+>", " ", text)
+                      plain = re.sub(r"\\s+", " ", plain)
+                      pos = plain.find("09401")
+                      row.update({
+                          "status": response.status,
+                          "final_url": response.geturl(),
+                          "content_type": response.headers.get("content-type"),
+                          "bytes": len(body),
+                          "token_hits": [token for token in tokens if token in text or token in plain],
+                          "snippet": plain[max(0, pos-120):pos+420] if pos >= 0 else plain[:300],
+                      })
+              except urllib.error.HTTPError as exc:
+                  row.update({"status": exc.code, "error": str(exc)})
+              except Exception as exc:
+                  row.update({"status": 0, "error": repr(exc)})
+              rows.append(row)
+          out = {
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "expected_tokens": tokens,
+              "sources": rows,
+          }
+          Path("data/source-probe.json").write_text(
+              json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+          )
+          PY
 
-      - name: Sync latest locked draw and settle confirmed orders
-        run: python scripts/sync_from_google_sheet.py
-
-      - name: Commit only when data changed
+      - name: Commit probe report
         run: |
-          if git diff --quiet -- data/current.json data/settlement-ledger.json; then
-            echo "Không có dữ liệu mới."
-            exit 0
-          fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/current.json data/settlement-ledger.json
-          git commit -m "data: auto sync XSMB $(TZ=Asia/Bangkok date +%F)"
+          git add data/source-probe.json
+          git commit -m "test: probe public XSMB sources"
           git pull --rebase origin main
           git push origin HEAD:main

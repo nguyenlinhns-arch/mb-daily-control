@@ -6,6 +6,7 @@ on:
     branches: ["main"]
     paths:
       - "data/current.json"
+      - "index.html"
       - ".github/workflows/enforce-x2-display-policy.yml"
 
 permissions:
@@ -76,15 +77,33 @@ jobs:
               )
           PY
 
+      - name: Enforce X2 frontend render guard
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8")
+          old = '${profile(g.historical_profile)}${quality(g.quality_benchmark)}'
+          guarded = '${String(g.id||"").toUpperCase()==="X2"?"":profile(g.historical_profile)}${String(g.id||"").toUpperCase()==="X2"?"":quality(g.quality_benchmark)}'
+
+          if guarded in text:
+              raise SystemExit(0)
+          if old not in text:
+              raise SystemExit("Could not find the profile render hook in index.html")
+
+          path.write_text(text.replace(old, guarded, 1), encoding="utf-8")
+          PY
+
       - name: Commit policy enforcement
         run: |
-          if git diff --quiet -- data/current.json; then
-            echo "X2 website payload already contains no performance metrics."
+          if git diff --quiet -- data/current.json index.html; then
+            echo "X2 website payload and frontend already contain no performance metrics."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/current.json
-          git commit -m "ui: strip all X2 performance metrics"
+          git add data/current.json index.html
+          git commit -m "ui: permanently hide all X2 performance metrics"
           git pull --rebase origin main
           git push origin HEAD:main

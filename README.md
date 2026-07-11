@@ -24,39 +24,42 @@ Mỗi ngày tối đa một lệnh tiền thật. Tín hiệu tự động chỉ
 - Tuyệt đối không được ghi hai dòng, cộng hai lần điểm, nhân đôi vốn hoặc quyết toán hai lần cùng một mã tự đảo.
 - Ví dụ: A1 Core 75 ⇒ `75 ×100 + 57 ×50`; A1 Volume 75 ⇒ `75 ×50 + 57 ×50`; A1 88 ⇒ chỉ `88` một lần, không có lệnh đảo thứ hai.
 
-## Khối đầu tiên — hai chế độ bắt buộc
+## Khối đầu tiên — A1 được ghim và X2/X3 luôn được thể hiện
 
-Khối đầu chỉ dùng candidate pool của ba phương pháp **A1, X2 và X3** trong cùng lần rà soát.
+Khối đầu dùng quy tắc `FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3` và luôn giữ ba khu vực theo thứ tự **A1 → X2 → X3**.
 
-### Chế độ 1: cả A1, X2 và X3 đều có số đạt
+### Khu vực A1
 
-Khi mỗi phương pháp đều có ít nhất một selection đạt gate, website phải:
+- Khi có A1 đạt, hiển thị toàn bộ selection A1 chính thức.
+- **Mã A1 chính phải được khoanh tròn** để phân biệt với số đảo.
+- Số đảo khác mã chính vẫn hiển thị cùng A1 theo luật 50 điểm.
+- Nếu không có A1, giữ ô A1 nhưng **để trống**, không thay bằng mã Watch của phương pháp khác.
 
-1. Hiển thị **toàn bộ số đạt**, không giới hạn 03 mã.
-2. Tách theo từng phương pháp.
-3. Giữ đúng thứ tự **A1 → X2 → X3**.
-4. Cho phép một mã xuất hiện ở nhiều phương pháp nếu đó là đồng thuận thật; không ép đổi sang mã khác.
-5. Chỉ phương pháp được controller chọn có điểm/vốn. Các phương pháp đạt còn lại ghi rõ `ĐẠT · SHADOW DO ƯU TIÊN`, điểm 0 và vốn 0đ.
+### Khu vực X2
 
-### Chế độ 2: còn lại
+- Luôn hiển thị đúng **02 số** của cặp X2 ưu tiên.
+- X2 đạt gate: hiển thị đúng hai số của cặp đạt.
+- X2 chưa đạt: vẫn hiển thị hai số của cặp rank-1 hiện hành để người dùng theo dõi, nhưng điểm/vốn bằng 0đ.
+- Tỷ lệ thắng tham chiếu hiện hành của X2 Rescue35 là **65,71%**.
 
-Khi ít nhất một trong A1, X2 hoặc X3 không có selection đạt gate, hệ thống rà soát và so sánh toàn bộ candidate pool, sau đó hiển thị **đúng 03 mã duy nhất có tỷ lệ thắng tham chiếu cao nhất**.
+### Khu vực X3
 
-Thứ tự fallback:
+- Luôn hiển thị đúng **03 số** của rổ X3 ưu tiên.
+- X3 đạt gate: hiển thị đủ ba số của rổ đạt.
+- X3 chưa đạt: vẫn hiển thị ba số top-ranked hiện hành để người dùng theo dõi, nhưng điểm/vốn bằng 0đ.
+- Tỷ lệ thắng tham chiếu hiện hành của X3 Growth32–34 OOS là **69,70%**.
 
-1. Tỷ lệ thắng tham chiếu đã khóa của phương pháp cao hơn.
-2. Nếu cùng tỷ lệ: mã đạt gate đứng trước.
-3. Sau đó ưu tiên mã đang được controller chọn.
-4. Nếu vẫn hòa: **A1 → X2 → X3**, rồi hạng nội bộ và mã nhỏ hơn.
+### Quy ước màu bắt buộc
 
-Các tỷ lệ thắng dùng để so sánh là **tham chiếu lịch sử cấp phương pháp**, không phải xác suất riêng từng mã và không bảo đảm kết quả:
+- **Xanh lá = Đạt**.
+- **Vàng chanh = Gần đạt**.
+- **Đỏ = Không đạt**.
 
-- A1 Core: 47,37%.
-- A1 Volume: 25,56%.
-- X3 Growth32–34 OOS: 69,70%.
-- X2 Rescue35: 65,71%.
+`Gần đạt` được dùng khi payload có nhãn GẦN/NEAR, candidate đã đạt cá thể nhưng bị lớp ưu tiên/phanh chặn, hoặc mốc sớm nhất có điều kiện không muộn hơn kỳ kế tiếp. Với X3, tổng HOT21 bằng 31 hoặc 35 cũng là cận gate 32–34.
 
-Mỗi mã phải ghi rõ phương pháp nguồn, trạng thái Đạt/Shadow/Watch, WR tham chiếu, điểm và vốn. Watch/Shadow luôn 0đ. Khung X2 riêng trên website vẫn không hiển thị bất kỳ chỉ số hiệu suất/backtest nào; WR trong khối đầu là dữ liệu so sánh chung, không phải khối hiệu suất X2.
+Tỷ lệ thắng chỉ là tham chiếu lịch sử **cấp phương pháp**, không phải xác suất riêng của từng mã và không bảo đảm kết quả. Chỉ phương pháp được controller chọn có điểm/vốn; các số X2/X3 đạt nhưng bị ưu tiên chặn, gần đạt hoặc không đạt vẫn hiển thị với vốn 0đ.
+
+Khung X2 chi tiết trên website tiếp tục không hiển thị bất kỳ chỉ số hiệu suất/backtest nào: tổng lệnh, thắng, thua, tỷ lệ thắng, lãi/lỗ hoặc Max DD đều bị loại vĩnh viễn. WR trong khối đầu là nhãn so sánh chung của phương pháp, không phải bảng hiệu suất X2.
 
 ## Mốc sớm nhất — bắt buộc tuyệt đối
 
@@ -78,13 +81,14 @@ Workflow `.github/workflows/sync-google-sheet.yml` chạy:
 - **19:15**, **19:35**, **19:55**: lấy kết quả mới, retry, quyết toán và lập kế hoạch ngày hôm sau.
 - Có thể chạy thủ công bằng `workflow_dispatch`.
 
-Workflow `.github/workflows/enforce-a1-reverse.yml` chạy ngay sau mỗi lần payload/kế hoạch thay đổi và có các lượt bảo vệ sau lịch chính. Workflow này buộc áp dụng đồng thời:
+Workflow `.github/workflows/enforce-a1-reverse.yml` và `.github/workflows/enforce-first-block.yml` chạy sau khi payload/kế hoạch thay đổi và có các lượt bảo vệ sau lịch chính. Hai workflow buộc áp dụng đồng thời:
 
 - số đảo A1 50 điểm, loại mã tự đảo trùng;
-- khối đầu theo `FIRST_BLOCK_ALL_PASS_ELSE_TOP3_WR_V2`;
-- nếu cả ba phương pháp đạt thì hiển thị toàn bộ theo A1 → X2 → X3;
-- nếu không thì hiển thị đúng 03 mã có WR tham chiếu cao nhất;
-- kiểm tra không nhân đôi vốn/P&L và không biến Shadow thành lệnh thật.
+- khối đầu theo `FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3`;
+- A1 chính được khoanh, không có A1 thì ô A1 để trống;
+- X2 đúng 02 số, X3 đúng 03 số;
+- màu Xanh lá/Vàng chanh/Đỏ đúng trạng thái;
+- không nhân đôi vốn/P&L và không biến Shadow thành lệnh thật.
 
 Mỗi lượt thành công thực hiện liền mạch:
 
@@ -93,7 +97,7 @@ Mỗi lượt thành công thực hiện liền mạch:
 3. Quyết toán lệnh đã được người dùng xác nhận, dùng `data/settlement-ledger.json` để chống cộng trùng và chỉ áp delta khi nguồn được sửa.
 4. Tính lại Gan/Gmax/Score cho 00–99, A1 Core/Volume, X3 Growth và X2 Rescue.
 5. Áp quy tắc số đảo A1 50 điểm; nếu đảo trùng mã chính thì không tạo lệnh thứ hai.
-6. Xây dựng khối đầu theo hai chế độ đã khóa ở trên.
+6. Xây dựng khối đầu A1/X2/X3 và gắn đúng màu trạng thái.
 7. Tính mốc sớm nhất cho mọi ứng viên A1/X2/X3 và kiểm tra bắt buộc trước khi ghi file.
 8. Ghi đồng thời:
    - `data/current.json` — payload website hiện hành;

@@ -131,8 +131,7 @@
     .facts,
     .pnl,
     .methods,
-    .groups,
-    .ledger {
+    .groups {
       display: grid;
       gap: 10px;
     }
@@ -178,9 +177,7 @@
     .signals h2,
     .section h2 { margin: 0; }
 
-    .section-title {
-      color: #64778e;
-    }
+    .section-title { color: #64778e; }
 
     .head {
       display: flex;
@@ -471,47 +468,6 @@
       line-height: 1.45;
     }
 
-    .panel {
-      margin-top: 22px;
-      padding: 17px;
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      background: #fff;
-    }
-
-    .ledger { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-
-    .ledger-item {
-      min-width: 0;
-      padding: 11px;
-      border-radius: 10px;
-      background: #f6f8fb;
-    }
-
-    .ledger-item span,
-    .ledger-item b,
-    .ledger-item small { display: block; }
-
-    .ledger-item span {
-      color: var(--muted);
-      font-size: 0.62rem;
-      text-transform: uppercase;
-    }
-
-    .ledger-item b {
-      margin: 4px 0;
-      line-height: 1.2;
-      overflow-wrap: anywhere;
-    }
-
-    .ledger-item small {
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .total { color: var(--green); font-size: 1.3rem; }
-    .mini { color: var(--muted); font-size: 0.72rem; }
-
     details {
       margin-top: 20px;
       border: 1px solid var(--line);
@@ -553,7 +509,6 @@
       .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .pnl { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .ledger { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     @media (max-width: 640px) {
@@ -582,16 +537,13 @@
       .method-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .pnl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .groups { grid-template-columns: minmax(0, 1fr); }
-      .ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .codes { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-      .panel { padding: 15px; }
     }
 
     @media (max-width: 390px) {
       .nums { grid-template-columns: minmax(0, 1fr); }
       .num { min-height: 174px; }
-      .pnl,
-      .ledger { grid-template-columns: minmax(0, 1fr); }
+      .pnl { grid-template-columns: minmax(0, 1fr); }
       .facts { grid-template-columns: minmax(0, 1fr); }
       .fact { min-height: 78px; }
     }
@@ -711,7 +663,6 @@
         const portfolio = data.portfolio || {};
         const topSignals = data.top_signals || {};
         const pnlSummary = data.pnl_summary || {};
-        const ledger = data.ledger || {};
         const sourceData = data.data || {};
 
         const pnlCards = [
@@ -767,23 +718,6 @@
               <p>Phương pháp fail vẫn có chi tiết nhưng 0 điểm.</p>
             </div>
             <div class="groups">${(data.groups || []).map(renderGroupCard).join("")}</div>
-          </section>
-
-          <section class="panel">
-            <div class="head">
-              <div><span class="tag section-title">SỔ 5 NHÓM</span><h2>Chi tiết đã xác nhận</h2></div>
-              <b class="total">${signedVnd(ledger.total_pnl_vnd)}</b>
-            </div>
-            <div class="ledger">
-              ${(ledger.items || []).map((item) => `
-                <div class="ledger-item">
-                  <span>${escapeHtml(item.label)}</span>
-                  <b class="${moneyClass(item.pnl_vnd)}">${signedVnd(item.pnl_vnd)}</b>
-                  <small>${escapeHtml(item.note)}</small>
-                </div>
-              `).join("")}
-            </div>
-            <p class="mini">${escapeHtml(ledger.note)}</p>
           </section>
 
           <details>

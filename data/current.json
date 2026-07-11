@@ -107,8 +107,8 @@
       "candidates":[
         {"code":"75","rank":1,"gan":14,"gmax":14,"score":1.0,"gate":true,"status":"REAL A1 VOLUME50","reason":"PASS_VOLUME; vốn1.150.000đ"},
         {"code":"57","rank":2,"gate":false,"status":"REAL MANUAL REVERSE50","reason":"Đảo theo xác nhận; vốn1.150.000đ"},
-        {"code":"88","rank":3,"gan":13,"gmax":21,"score":0.619048,"gate":false,"status":"WATCH","reason":"Chi tiết בלבד; Score<0.70"},
-        {"code":"72","rank":4,"gan":19,"gmax":30,"score":0.633333,"gate":false,"status":"WATCH","reason":"Chi tiết בלבד; Score<0.70"}
+        {"code":"88","rank":3,"gan":13,"gmax":21,"score":0.619048,"gate":false,"status":"WATCH","reason":"Chỉ ở phần chi tiết; Score<0.70"},
+        {"code":"72","rank":4,"gan":19,"gmax":30,"score":0.633333,"gate":false,"status":"WATCH","reason":"Chỉ ở phần chi tiết; Score<0.70"}
       ],
       "historical_profile":{"label":"A1 Volume","sample":"133 lệnh backtest tham chiếu","win_rate":"25,56%"}
     },

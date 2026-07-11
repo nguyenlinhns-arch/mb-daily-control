@@ -1,5 +1,5 @@
 {
-  "schema_version": "MB_AUTOMATION_POLICY_V1",
+  "schema_version": "MB_AUTOMATION_POLICY_V2",
   "status": "ACTIVE_PERMANENT",
   "source_spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
   "website_repository": "nguyenlinhns-arch/mb-daily-control",
@@ -62,6 +62,8 @@
       "update data/review-ledger.json",
       "commit and publish with GitHub Pages"
     ],
-    "data_failure_action": "A0_DATA_FAIL; never guess; preserve prior ledgers"
+    "source_access_failure_action": "Preserve the last valid data/current.json; write failure only to data/automation-status.json; retry on the next scheduled run.",
+    "invalid_fresh_dataset_action": "A0 only when a newly fetched dataset itself fails the 27/27 or cross-source validation gate; never guess.",
+    "last_valid_plan_must_not_be_replaced_by_transient_error": true
   }
 }

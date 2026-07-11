@@ -1,4 +1,5 @@
 name: Sync XSMB from Google Sheet
+# Production smoke trigger: 2026-07-11 20:25 VN
 
 on:
   workflow_dispatch:

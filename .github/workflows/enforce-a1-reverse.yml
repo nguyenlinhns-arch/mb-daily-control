@@ -1,0 +1,59 @@
+name: Enforce permanent A1 reverse50 rule
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Belt-and-suspenders runs after the canonical 14:00 / 19:15 / 19:35 / 19:55 pipeline.
+    - cron: "5 7 * * *"
+    - cron: "20 12 * * *"
+    - cron: "40 12 * * *"
+    - cron: "0 13 * * *"
+  push:
+    branches: ["main"]
+    paths:
+      - "data/current.json"
+      - "data/plans/**"
+      - "data/automation-policy.json"
+      - "scripts/enforce_a1_reverse.py"
+      - ".github/workflows/enforce-a1-reverse.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: enforce-a1-reverse50
+  cancel-in-progress: false
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply A1 reverse50 and no-duplicate policy
+        run: python scripts/enforce_a1_reverse.py
+
+      - name: Validate permanent invariant
+        run: python scripts/enforce_a1_reverse.py --check
+
+      - name: Commit only when enforcement changed files
+        run: |
+          if git diff --quiet -- data; then
+            echo "A1 reverse50 rule already enforced."
+            exit 0
+          fi
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          git commit -m "data: enforce A1 reverse50 no-duplicate rule"
+          git pull --rebase origin main
+          git push origin HEAD:main

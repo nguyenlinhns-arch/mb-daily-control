@@ -139,8 +139,50 @@ jobs:
           SOURCE_XLSX_PATH: /tmp/xsmb-source.xlsx
         run: |
           set +e
+
+          record_failure() {
+            export MB_FAIL_PHASE="$1"
+            export MB_FAIL_REASON="$2"
+            python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          vn = timezone(timedelta(hours=7))
+          current_path = Path("data/current.json")
+          current = {}
+          if current_path.exists():
+              try:
+                  current = json.loads(current_path.read_text(encoding="utf-8"))
+              except Exception:
+                  current = {}
+
+          status = {
+              "schema_version": "MB_AUTOMATION_STATUS_V2",
+              "status": "TRANSIENT_FAILURE_LAST_VALID_PLAN_PRESERVED",
+              "phase": os.environ.get("MB_FAIL_PHASE", "UNKNOWN"),
+              "reason": os.environ.get("MB_FAIL_REASON", "Unknown failure")[:1200],
+              "updated_at": datetime.now(vn).isoformat(timespec="seconds"),
+              "website_payload_overwritten": False,
+              "last_valid_report_run_id": current.get("report_run_id"),
+              "last_valid_target_date": current.get("target_date"),
+              "last_valid_locked_through": (current.get("data") or {}).get("locked_through"),
+              "last_valid_decision": (current.get("portfolio") or {}).get("decision"),
+              "last_valid_milestones_complete": (current.get("automation") or {}).get("milestones_complete"),
+              "retry_policy": "Keep data/current.json unchanged; retry at next scheduled run."
+          }
+          Path("data/automation-status.json").write_text(
+              json.dumps(status, ensure_ascii=False, separators=(",", ":")) + "\n",
+              encoding="utf-8"
+          )
+          print(json.dumps(status, ensure_ascii=False))
+          PY
+          }
+
           if [ "${{ steps.source.outcome }}" != "success" ] && [ "${{ steps.public_source.outcome }}" != "success" ]; then
-            python scripts/plan_next_day.py --data-fail "Không khóa được nguồn Google hoặc tối thiểu hai nguồn công khai; A0 bắt buộc."
+            reason="Không khóa được nguồn Google hoặc tối thiểu hai nguồn công khai. Giữ nguyên kế hoạch hợp lệ gần nhất; không thay website bằng A0 lỗi truy cập."
+            record_failure "SOURCE_ACCESS" "$reason"
             exit 0
           fi
 
@@ -148,8 +190,8 @@ jobs:
           sync_status=$?
           cat /tmp/mb-sync.log
           if [ $sync_status -ne 0 ]; then
-            reason=$(tail -n 8 /tmp/mb-sync.log | tr '\n' ' ' | cut -c1-480)
-            python scripts/plan_next_day.py --data-fail "Đồng bộ kết quả thất bại: ${reason}"
+            reason=$(tail -n 8 /tmp/mb-sync.log | tr '\n' ' ' | cut -c1-900)
+            record_failure "RESULT_SETTLEMENT" "Đồng bộ kết quả thất bại: ${reason}"
             exit 0
           fi
 
@@ -157,9 +199,35 @@ jobs:
           plan_status=$?
           cat /tmp/mb-plan.log
           if [ $plan_status -ne 0 ]; then
-            reason=$(tail -n 8 /tmp/mb-plan.log | tr '\n' ' ' | cut -c1-480)
-            python scripts/plan_next_day.py --data-fail "Rà soát ngày sau thất bại: ${reason}"
+            reason=$(tail -n 8 /tmp/mb-plan.log | tr '\n' ' ' | cut -c1-900)
+            record_failure "NEXT_DAY_REVIEW" "Rà soát ngày sau thất bại: ${reason}"
+            exit 0
           fi
+
+          python - <<'PY'
+          import json
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          vn = timezone(timedelta(hours=7))
+          doc = json.loads(Path("data/current.json").read_text(encoding="utf-8"))
+          status = {
+              "schema_version": "MB_AUTOMATION_STATUS_V2",
+              "status": "OK_LAST_VALID_PLAN_PUBLISHED",
+              "updated_at": datetime.now(vn).isoformat(timespec="seconds"),
+              "website_payload_overwritten": True,
+              "report_run_id": doc.get("report_run_id"),
+              "target_date": doc.get("target_date"),
+              "locked_through": (doc.get("data") or {}).get("locked_through"),
+              "decision": (doc.get("portfolio") or {}).get("decision"),
+              "milestones_complete": (doc.get("automation") or {}).get("milestones_complete")
+          }
+          Path("data/automation-status.json").write_text(
+              json.dumps(status, ensure_ascii=False, separators=(",", ":")) + "\n",
+              encoding="utf-8"
+          )
+          print(json.dumps(status, ensure_ascii=False))
+          PY
           exit 0
 
       - name: Validate absolute milestone and website invariants

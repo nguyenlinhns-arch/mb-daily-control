@@ -1,5 +1,5 @@
 {
-  "schema_version": "MB_AUTOMATION_POLICY_V3",
+  "schema_version": "MB_AUTOMATION_POLICY_V4",
   "status": "ACTIVE_PERMANENT",
   "source_spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
   "website_repository": "nguyenlinhns-arch/mb-daily-control",
@@ -54,6 +54,47 @@
     "rank_first_then_gate": true,
     "website_performance_metrics_hidden_permanently": true
   },
+  "top_block": {
+    "status": "ACTIVE_PERMANENT",
+    "rule_version": "TOP3_GATE_WR_DAILY_V1",
+    "first_block_must_use_top3": true,
+    "number_count": 3,
+    "unique_codes": true,
+    "candidate_scope": ["A1", "X3", "X2"],
+    "ranking_order": [
+      "controller_selected_and_gate_pass DESC",
+      "gate_pass DESC",
+      "validated_method_reference_win_rate DESC",
+      "method_priority A1>X3>X2",
+      "within_method_rank ASC",
+      "code ASC"
+    ],
+    "fill_policy": "Nếu chưa đủ 3 mã đạt, điền các vị trí còn lại bằng Watch/Shadow xếp hạng cao nhất; phải ghi đúng trạng thái và vốn thật 0đ.",
+    "method_reference_win_rates": {
+      "A1_CORE": {
+        "rate": 0.4737,
+        "label": "A1 Core backtest",
+        "sample": "38 lệnh Core"
+      },
+      "A1_VOLUME": {
+        "rate": 0.2556,
+        "label": "A1 Volume backtest",
+        "sample": "133 lệnh Volume"
+      },
+      "X3_GROWTH": {
+        "rate": 0.697,
+        "label": "X3 Growth32-34 OOS",
+        "sample": "99 lệnh OOS"
+      },
+      "X2_RESCUE": {
+        "rate": 0.6571,
+        "label": "X2 Rescue35",
+        "sample": "35 lệnh Rescue"
+      }
+    },
+    "display_disclaimer": "Tỷ lệ thắng chỉ là tham chiếu lịch sử cấp phương pháp, không phải xác suất riêng của từng mã và không bảo đảm kết quả.",
+    "real_money_rule": "Chỉ các mã có điểm lớn hơn 0 trong Top3 mới thuộc kế hoạch tiền thật chờ xác nhận; Watch/Shadow luôn 0đ."
+  },
   "milestones": {
     "status": "ACTIVE_MANDATORY_ABSOLUTE",
     "required_groups": ["A1", "X2", "X3"],
@@ -77,6 +118,7 @@
       "settle confirmed real orders idempotently",
       "recompute next-day A1/X3/X2",
       "apply A1 reverse50 without duplicate codes",
+      "build permanent daily Top3 first block",
       "validate all earliest-entry milestones",
       "write data/current.json",
       "write data/plans/YYYY-MM-DD.json",

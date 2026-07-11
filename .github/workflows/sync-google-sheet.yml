@@ -3,9 +3,9 @@ name: MB Daily result settlement and next-day plan
 on:
   workflow_dispatch:
   schedule:
-    # 14:00 giờ Việt Nam: kiểm tra lại kế hoạch từ dữ liệu đã khóa.
+    # 14:00 giờ Việt Nam: rà lại kế hoạch từ kỳ đã khóa.
     - cron: "0 7 * * *"
-    # 19:15, 19:35, 19:55 giờ Việt Nam: lấy kết quả, quyết toán và lập kế hoạch ngày sau.
+    # 19:15, 19:35, 19:55 giờ Việt Nam: khóa kết quả, quyết toán, lập kế hoạch ngày sau.
     - cron: "15 12 * * *"
     - cron: "35 12 * * *"
     - cron: "55 12 * * *"
@@ -13,9 +13,10 @@ on:
     branches: ["main"]
     paths:
       - "scripts/sync_from_google_sheet.py"
-      - "scripts/plan_next_day.py"
       - "scripts/plan_next_day.py.zlib.b64"
+      - "scripts/build_public_snapshot.py.zlib.b64"
       - "data/automation-policy.json"
+      - "data/history-bootstrap/**"
       - ".github/workflows/sync-google-sheet.yml"
 
 permissions:
@@ -28,7 +29,7 @@ concurrency:
 jobs:
   pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,7 +44,7 @@ jobs:
       - name: Install parser
         run: python -m pip install --disable-pip-version-check openpyxl==3.1.5
 
-      - name: Materialize permanent planning engine
+      - name: Materialize permanent engines
         run: |
           python - <<'PY'
           import base64
@@ -51,143 +52,86 @@ jobs:
           import zlib
           from pathlib import Path
 
-          packed = Path("scripts/plan_next_day.py.zlib.b64")
-          target = Path("scripts/plan_next_day.py")
-          source = zlib.decompress(base64.b64decode(packed.read_text(encoding="utf-8")))
-          if target.exists() and target.read_bytes() == source:
-              print("Planning engine already materialized.")
-          else:
-              target.write_bytes(source)
+          items = [
+              (Path("scripts/plan_next_day.py.zlib.b64"), Path("scripts/plan_next_day.py")),
+              (Path("scripts/build_public_snapshot.py.zlib.b64"), Path("scripts/build_public_snapshot.py")),
+          ]
+          for packed, target in items:
+              source = zlib.decompress(base64.b64decode(packed.read_text(encoding="utf-8")))
+              if not target.exists() or target.read_bytes() != source:
+                  target.write_bytes(source)
               target.chmod(0o755)
-              print("Materialized", target, hashlib.sha256(source).hexdigest())
+              print(target, hashlib.sha256(source).hexdigest())
           PY
 
-      - name: Validate planning engine
-        run: python scripts/plan_next_day.py --self-test
+      - name: Validate engines and history bootstrap
+        run: |
+          python scripts/plan_next_day.py --self-test
+          python scripts/build_public_snapshot.py --self-test
 
-      - name: Download Google Sheet snapshot
-        id: download
+      - name: Build locked source snapshot
+        id: source
         continue-on-error: true
         env:
           GOOGLE_SHEET_ID: 1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w
         run: |
+          set -e
           python - <<'PY'
-          import csv
-          import io
           import json
           import os
-          import urllib.parse
           import urllib.request
           from pathlib import Path
-
-          from openpyxl import Workbook, load_workbook
+          from openpyxl import load_workbook
 
           sheet_id = os.environ["GOOGLE_SHEET_ID"]
           output = Path("/tmp/xsmb-source.xlsx")
-          headers = {
-              "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36",
-              "Accept-Language": "vi-VN,vi;q=0.9,en;q=0.7",
-          }
-          attempts = []
-
-          def fetch(url, timeout=90):
-              request = urllib.request.Request(url, headers=headers)
-              with urllib.request.urlopen(request, timeout=timeout) as response:
-                  body = response.read()
-                  content_type = response.headers.get("content-type", "")
-                  final_url = response.geturl()
-              attempts.append({
-                  "url": url.split("?")[0],
-                  "status": "HTTP_OK",
-                  "bytes": len(body),
-                  "content_type": content_type,
-                  "final_host": urllib.parse.urlparse(final_url).netloc,
-              })
-              return body
-
-          xlsx_urls = [
+          urls = [
               f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx",
-              f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?exportFormat=xlsx&format=xlsx",
               f"https://docs.google.com/spreadsheets/u/0/d/{sheet_id}/export?format=xlsx",
-              f"https://drive.google.com/uc?export=download&id={sheet_id}",
           ]
           selected = None
-          for url in xlsx_urls:
+          errors = []
+          for url in urls:
               try:
-                  body = fetch(url)
+                  request = urllib.request.Request(url, headers={"User-Agent": "MB-Daily-Control/4.0"})
+                  with urllib.request.urlopen(request, timeout=75) as response:
+                      body = response.read()
                   if not body.startswith(b"PK") or len(body) < 50_000:
-                      raise RuntimeError(f"not a valid XLSX: {len(body)} bytes")
+                      raise RuntimeError(f"invalid XLSX size={len(body)}")
                   output.write_bytes(body)
                   wb = load_workbook(output, read_only=True, data_only=True)
                   names = set(wb.sheetnames)
                   wb.close()
                   if not ({"MB_History_27", "Raw_Results_IMPORT", "Raw_Results_2024_2026"} & names):
-                      raise RuntimeError("XLSX lacks a usable result/history tab")
-                  selected = "XLSX_EXPORT"
+                      raise RuntimeError("XLSX lacks canonical history/result tab")
+                  selected = "GOOGLE_SHEET_XLSX"
                   break
               except Exception as exc:
-                  attempts.append({"url": url.split("?")[0], "status": "FAILED", "error": repr(exc)[:240]})
-
-          def read_csv_sheet(sheet_name, gid):
-              urls = [
-                  f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?" + urllib.parse.urlencode({"tqx": "out:csv", "sheet": sheet_name}),
-                  f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?" + urllib.parse.urlencode({"tqx": "out:csv", "gid": gid}),
-                  f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?" + urllib.parse.urlencode({"format": "csv", "gid": gid}),
-              ]
-              last_error = None
-              for url in urls:
-                  try:
-                      body = fetch(url)
-                      text = body.decode("utf-8-sig")
-                      rows = list(csv.reader(io.StringIO(text)))
-                      if not rows or len(rows[0]) < 2:
-                          raise RuntimeError("CSV has no table")
-                      if "google" in text[:500].lower() and "sign in" in text[:1000].lower():
-                          raise RuntimeError("CSV endpoint returned sign-in HTML")
-                      return rows, url
-                  except Exception as exc:
-                      last_error = exc
-                      attempts.append({"url": url.split("?")[0], "status": "FAILED", "error": repr(exc)[:240]})
-              raise RuntimeError(f"No public CSV endpoint for {sheet_name}: {last_error!r}")
-
-          if selected is None:
-              history_rows, history_url = read_csv_sheet("MB_History_27", "2026070407")
-              valid_history = [row for row in history_rows[1:] if len(row) >= 28 and str(row[0]).strip()]
-              if len(valid_history) < 100:
-                  raise RuntimeError(f"History CSV too short: {len(valid_history)} rows")
-              try:
-                  x2_rows, x2_url = read_csv_sheet("X2_Live_Log_v1", "2026071012")
-              except Exception:
-                  x2_rows, x2_url = [["Date", "Brake_Remaining", "Loss_Streak", "Drawdown_VND", "Pilot_Status"]], "OPTIONAL_UNAVAILABLE"
-
-              wb = Workbook()
-              ws = wb.active
-              ws.title = "MB_History_27"
-              for row in history_rows:
-                  ws.append(row[:28])
-              raw = wb.create_sheet("Raw_Results_IMPORT")
-              for row in history_rows:
-                  raw.append(row[:28])
-              x2 = wb.create_sheet("X2_Live_Log_v1")
-              for row in x2_rows:
-                  x2.append(row)
-              wb.save(output)
-              selected = "PUBLIC_CSV_GVIZ"
-
-          access = {
-              "schema_version": "MB_SOURCE_ACCESS_V1",
-              "status": "OK",
-              "selected": selected,
-              "source_spreadsheet_id": sheet_id,
-              "snapshot_path": "/tmp/xsmb-source.xlsx"
-          }
-          Path("data/source-access.json").write_text(
-              json.dumps(access, ensure_ascii=False, separators=(",", ":")) + "\n",
-              encoding="utf-8"
-          )
-          print(json.dumps(access, ensure_ascii=False))
-          print(f"Snapshot size: {output.stat().st_size} bytes")
+                  errors.append(repr(exc)[:300])
+          if selected:
+              Path("data/source-access.json").write_text(
+                  json.dumps({
+                      "schema_version": "MB_SOURCE_ACCESS_V2",
+                      "status": "OK",
+                      "selected": selected,
+                      "source_spreadsheet_id": sheet_id,
+                      "milestone_requirement": "A1/X2/X3 candidates must include earliest date, condition, and type"
+                  }, ensure_ascii=False, separators=(",", ":")) + "\n",
+                  encoding="utf-8"
+              )
+              print(selected, output.stat().st_size)
+          else:
+              Path("/tmp/google-source-errors.txt").write_text("\n".join(errors), encoding="utf-8")
+              raise SystemExit(7)
           PY
+
+      - name: Use permanent public multi-source fallback
+        if: steps.source.outcome != 'success'
+        id: public_source
+        continue-on-error: true
+        run: |
+          cat /tmp/google-source-errors.txt 2>/dev/null || true
+          python scripts/build_public_snapshot.py --output /tmp/xsmb-source.xlsx
 
       - name: Settle result and build next-day plan
         env:
@@ -195,8 +139,8 @@ jobs:
           SOURCE_XLSX_PATH: /tmp/xsmb-source.xlsx
         run: |
           set +e
-          if [ "${{ steps.download.outcome }}" != "success" ]; then
-            python scripts/plan_next_day.py --data-fail "Không tải được Google Sheet XLSX/CSV; A0 bắt buộc."
+          if [ "${{ steps.source.outcome }}" != "success" ] && [ "${{ steps.public_source.outcome }}" != "success" ]; then
+            python scripts/plan_next_day.py --data-fail "Không khóa được nguồn Google hoặc tối thiểu hai nguồn công khai; A0 bắt buộc."
             exit 0
           fi
 
@@ -218,7 +162,7 @@ jobs:
           fi
           exit 0
 
-      - name: Validate website payload invariants
+      - name: Validate absolute milestone and website invariants
         run: |
           python - <<'PY'
           import json
@@ -227,6 +171,7 @@ jobs:
           doc = json.loads(Path("data/current.json").read_text(encoding="utf-8"))
           policy = doc.get("milestone_policy") or {}
           assert policy.get("status") == "ACTIVE_MANDATORY_ABSOLUTE", policy
+          assert policy.get("recalculate_after_each_locked_draw") is True
           groups = {str(g.get("id", "")).upper(): g for g in doc.get("groups", [])}
           for group_id in ("A1", "X2", "X3"):
               group = groups[group_id]
@@ -245,18 +190,19 @@ jobs:
           assert not forbidden.intersection(x2), "X2 performance metrics leaked"
           pending = doc.get("pending_order") or {}
           assert not pending.get("pnl_included"), "Pending plan must not include P/L"
-          print("PAYLOAD_INVARIANTS_OK")
+          assert (doc.get("automation") or {}).get("milestones_complete") is True
+          print("ABSOLUTE_MILESTONE_AND_PAYLOAD_INVARIANTS_OK")
           PY
 
       - name: Commit only when files changed
         run: |
-          if git diff --quiet -- data scripts/plan_next_day.py; then
+          if git diff --quiet -- data scripts/plan_next_day.py scripts/build_public_snapshot.py; then
             echo "Không có dữ liệu hoặc kế hoạch mới."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data scripts/plan_next_day.py
-          git commit -m "data: auto settle and plan $(TZ=Asia/Bangkok date +%F)"
+          git add data scripts/plan_next_day.py scripts/build_public_snapshot.py
+          git commit -m "data: auto settle, milestone and plan $(TZ=Asia/Bangkok date +%F)"
           git pull --rebase origin main
           git push origin HEAD:main

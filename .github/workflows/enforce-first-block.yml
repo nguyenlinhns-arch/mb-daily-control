@@ -1,4 +1,4 @@
-name: Enforce first-block all-pass or Top3-WR
+name: Enforce pinned A1 and X2/X3 status panels
 
 on:
   workflow_dispatch:
@@ -16,14 +16,16 @@ on:
       - "data/current.json"
       - "data/plans/**"
       - "data/automation-policy.json"
+      - "index.html"
       - "scripts/enforce_top3_first_block.py"
+      - "scripts/enforce_top3_first_block.py.zlib.b64"
       - ".github/workflows/enforce-first-block.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: enforce-first-block-v2
+  group: enforce-first-block-v3
   cancel-in-progress: false
 
 jobs:
@@ -43,7 +45,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Apply corrected first-block policy
+      - name: Build pinned A1 and X2/X3 status panels
         run: python scripts/enforce_top3_first_block.py
 
       - name: Validate first-block invariant
@@ -52,12 +54,12 @@ jobs:
       - name: Commit only when files changed
         run: |
           if git diff --quiet -- data; then
-            echo "First-block policy already enforced."
+            echo "Pinned A1 and X2/X3 panel policy already enforced."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git commit -m "data: enforce all-pass or Top3-WR first block"
+          git commit -m "data: enforce pinned A1 and X2/X3 status panels"
           git pull --rebase origin main
           git push origin HEAD:main

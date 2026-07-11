@@ -24,29 +24,39 @@ Mỗi ngày tối đa một lệnh tiền thật. Tín hiệu tự động chỉ
 - Tuyệt đối không được ghi hai dòng, cộng hai lần điểm, nhân đôi vốn hoặc quyết toán hai lần cùng một mã tự đảo.
 - Ví dụ: A1 Core 75 ⇒ `75 ×100 + 57 ×50`; A1 Volume 75 ⇒ `75 ×50 + 57 ×50`; A1 88 ⇒ chỉ `88` một lần, không có lệnh đảo thứ hai.
 
-## Khối đầu tiên — đúng 03 số xếp hạng hôm nay
+## Khối đầu tiên — hai chế độ bắt buộc
 
-Khối đầu website luôn hiển thị **đúng 03 mã duy nhất** lấy từ candidate pool A1, X3 và X2 của cùng lần rà soát.
+Khối đầu chỉ dùng candidate pool của ba phương pháp **A1, X2 và X3** trong cùng lần rà soát.
 
-Thứ tự xếp hạng cố định:
+### Chế độ 1: cả A1, X2 và X3 đều có số đạt
 
-1. Mã thuộc phương pháp được controller chọn và đã đạt gate.
-2. Các mã còn lại đã đạt gate.
-3. Trong cùng tầng trạng thái, phương pháp có tỷ lệ thắng tham chiếu đã khóa cao hơn đứng trước.
-4. Nếu vẫn hòa: ưu tiên A1 → X3 → X2, rồi hạng nội bộ của phương pháp và mã nhỏ hơn.
+Khi mỗi phương pháp đều có ít nhất một selection đạt gate, website phải:
 
-Nếu chưa đủ ba mã đạt, các ô còn lại lấy từ Watch/Shadow xếp hạng cao nhất. Những mã này phải ghi rõ `WATCH/SHADOW`, điểm bằng 0 và vốn thật bằng 0; tuyệt đối không biến thành lệnh tiền thật.
+1. Hiển thị **toàn bộ số đạt**, không giới hạn 03 mã.
+2. Tách theo từng phương pháp.
+3. Giữ đúng thứ tự **A1 → X2 → X3**.
+4. Cho phép một mã xuất hiện ở nhiều phương pháp nếu đó là đồng thuận thật; không ép đổi sang mã khác.
+5. Chỉ phương pháp được controller chọn có điểm/vốn. Các phương pháp đạt còn lại ghi rõ `ĐẠT · SHADOW DO ƯU TIÊN`, điểm 0 và vốn 0đ.
 
-Các tỷ lệ thắng dùng để xếp hạng là **tham chiếu lịch sử cấp phương pháp**, không phải xác suất riêng của từng mã và không bảo đảm kết quả:
+### Chế độ 2: còn lại
+
+Khi ít nhất một trong A1, X2 hoặc X3 không có selection đạt gate, hệ thống rà soát và so sánh toàn bộ candidate pool, sau đó hiển thị **đúng 03 mã duy nhất có tỷ lệ thắng tham chiếu cao nhất**.
+
+Thứ tự fallback:
+
+1. Tỷ lệ thắng tham chiếu đã khóa của phương pháp cao hơn.
+2. Nếu cùng tỷ lệ: mã đạt gate đứng trước.
+3. Sau đó ưu tiên mã đang được controller chọn.
+4. Nếu vẫn hòa: **A1 → X2 → X3**, rồi hạng nội bộ và mã nhỏ hơn.
+
+Các tỷ lệ thắng dùng để so sánh là **tham chiếu lịch sử cấp phương pháp**, không phải xác suất riêng từng mã và không bảo đảm kết quả:
 
 - A1 Core: 47,37%.
 - A1 Volume: 25,56%.
 - X3 Growth32–34 OOS: 69,70%.
 - X2 Rescue35: 65,71%.
 
-Khối đầu phải hiển thị với từng mã: hạng `#1/#2/#3`, trạng thái Đạt/Shadow/Watch, phương pháp nguồn, tỷ lệ thắng tham chiếu, điểm và vốn thực tế của ngày đó.
-
-Khung X2 riêng trên website không hiển thị bất kỳ chỉ số hiệu suất/backtest nào: tổng lệnh, thắng, thua, tỷ lệ thắng, lãi/lỗ hoặc Max DD đều bị loại vĩnh viễn. Tỷ lệ tham chiếu trong Top3 là thuộc **khối xếp hạng chung**, không phải khối X2.
+Mỗi mã phải ghi rõ phương pháp nguồn, trạng thái Đạt/Shadow/Watch, WR tham chiếu, điểm và vốn. Watch/Shadow luôn 0đ. Khung X2 riêng trên website vẫn không hiển thị bất kỳ chỉ số hiệu suất/backtest nào; WR trong khối đầu là dữ liệu so sánh chung, không phải khối hiệu suất X2.
 
 ## Mốc sớm nhất — bắt buộc tuyệt đối
 
@@ -71,7 +81,9 @@ Workflow `.github/workflows/sync-google-sheet.yml` chạy:
 Workflow `.github/workflows/enforce-a1-reverse.yml` chạy ngay sau mỗi lần payload/kế hoạch thay đổi và có các lượt bảo vệ sau lịch chính. Workflow này buộc áp dụng đồng thời:
 
 - số đảo A1 50 điểm, loại mã tự đảo trùng;
-- khối đầu đúng ba mã theo `TOP3_GATE_WR_DAILY_V1`;
+- khối đầu theo `FIRST_BLOCK_ALL_PASS_ELSE_TOP3_WR_V2`;
+- nếu cả ba phương pháp đạt thì hiển thị toàn bộ theo A1 → X2 → X3;
+- nếu không thì hiển thị đúng 03 mã có WR tham chiếu cao nhất;
 - kiểm tra không nhân đôi vốn/P&L và không biến Shadow thành lệnh thật.
 
 Mỗi lượt thành công thực hiện liền mạch:
@@ -81,7 +93,7 @@ Mỗi lượt thành công thực hiện liền mạch:
 3. Quyết toán lệnh đã được người dùng xác nhận, dùng `data/settlement-ledger.json` để chống cộng trùng và chỉ áp delta khi nguồn được sửa.
 4. Tính lại Gan/Gmax/Score cho 00–99, A1 Core/Volume, X3 Growth và X2 Rescue.
 5. Áp quy tắc số đảo A1 50 điểm; nếu đảo trùng mã chính thì không tạo lệnh thứ hai.
-6. Xây dựng đúng 03 số cho khối đầu theo trạng thái Đạt và tỷ lệ thắng tham chiếu.
+6. Xây dựng khối đầu theo hai chế độ đã khóa ở trên.
 7. Tính mốc sớm nhất cho mọi ứng viên A1/X2/X3 và kiểm tra bắt buộc trước khi ghi file.
 8. Ghi đồng thời:
    - `data/current.json` — payload website hiện hành;
@@ -95,7 +107,7 @@ Mỗi lượt thành công thực hiện liền mạch:
 Lỗi mạng, lỗi export Google Sheet hoặc lỗi truy cập nguồn công khai là **lỗi vận chuyển**, không phải bằng chứng rằng bộ dữ liệu đang hiển thị sai. Vì vậy:
 
 - Không được ghi đè `data/current.json` bằng màn hình `A0_DATA_FAIL` chỉ vì một lượt tải nguồn thất bại.
-- Giữ nguyên kế hoạch hợp lệ gần nhất, gồm đầy đủ mốc A1/X2/X3 và Top3.
+- Giữ nguyên kế hoạch hợp lệ gần nhất, gồm đầy đủ mốc A1/X2/X3 và khối đầu đã chuẩn hóa.
 - Chỉ ghi lỗi vào `data/automation-status.json` và tự retry ở lượt kế tiếp.
 - Chỉ chuyển sang A0 khi một bộ dữ liệu mới đã tải được nhưng thật sự thiếu 27 mã, lệch nguồn, ngày không hợp lệ hoặc không qua kiểm tra mốc bắt buộc.
 - Khi lượt retry thành công, kế hoạch mới thay thế bản cũ và được GitHub Pages xuất bản.

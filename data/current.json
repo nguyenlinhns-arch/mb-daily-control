@@ -1,10 +1,10 @@
 {
   "schema_version": "MB_DAILY_WEB_V5",
-  "report_run_id": "RPT_MB_20260711_XIEN_DE_SOURCE_REPRO_V8",
-  "source_run_id": "RPT_MB_20260711_A1_REVERSE_OFFICIAL_V6",
-  "config_id": "MB_CONTROLLER_A1_X2_X3_XIEN_DE_SOURCE_REPRO_V8",
+  "report_run_id": "RPT_MB_20260711_XIEN_DE_SOURCE_FINAL_V8",
+  "source_run_id": "RPT_MB_20260711_XIEN_DE_SOURCE_REPRO_V8",
+  "config_id": "MB_CONTROLLER_A1_X2_X3_XIEN_DE_SOURCE_FINAL_V8",
   "target_date": "2026-07-11",
-  "generated_at": "2026-07-11T14:00:00+07:00",
+  "generated_at": "2026-07-11T14:20:00+07:00",
   "valid_until": "2026-07-11T18:15:00+07:00",
   "data_snapshot_id": "MBH27_20260710_LOCKED_26U_R13X2",
   "official_url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
@@ -41,7 +41,7 @@
     "source": "Earliest_Entry_Current",
     "rule": "Mọi ứng viên chưa đạt trong list phải hiện mốc sớm nhất có thể vào và điều kiện đi kèm.",
     "recalculate_after_each_locked_draw": true,
-    "disclosure": "Mốc là thời điểm lý thuyết/điều kiện; rank và cửa sổ dữ liệu có thể đổi sau mỗi kỳ, không phải cam kết tín hiệu sẽ đạt."
+    "disclosure": "Mốc là thời điểm lý thuyết hoặc có điều kiện; rank và cửa sổ dữ liệu có thể đổi sau mỗi kỳ, không phải cam kết tín hiệu sẽ đạt."
   },
   "method_replacement": {
     "status": "SOURCE_REPRO_V2_ACTIVE",
@@ -125,12 +125,14 @@
       "selection": "Lấy top10 mã theo số kỳ xuất hiện trong 90 kỳ trước; xếp cặp bằng tích P90 chuẩn hóa × căn bậc hai của Lift180 đã chặn; chỉ lấy cặp hạng1.",
       "gate": "Hai chân Count90≥31; PairCount21 từ0 đến2; PairCount180 từ12 đến20; kỳ trước repeat2≤4 và maxfreq≤3; không dùng cặp hạng2 khi fail.",
       "economics": "100.000đ/cặp; trúng lãi ròng1.500.000đ, trượt -100.000đ.",
+      "baseline_comparison": "Tỷ lệ thắng toàn kỳ tăng từ 6,57% của rank1 không gate lên 13,76%.",
       "backtest": {
         "train": {"orders":70,"wins":8,"win_rate":0.114286,"pnl_vnd":5800000,"max_drawdown_vnd":-1600000,"longest_loss":16},
         "validation": {"orders":24,"wins":3,"win_rate":0.125,"pnl_vnd":2400000,"max_drawdown_vnd":-1800000,"longest_loss":18},
         "oos": {"orders":15,"wins":4,"win_rate":0.266667,"pnl_vnd":4900000,"max_drawdown_vnd":-500000,"longest_loss":5},
         "full": {"orders":109,"wins":15,"win_rate":0.137615,"pnl_vnd":13100000,"max_drawdown_vnd":-1800000,"longest_loss":18}
       },
+      "forward_gate": ">=30 tín hiệu mới; WR>=10%; P/L>0; MaxDD không xấu hơn -2,0M; chuỗi thua<=20; khóa tham số.",
       "warning": "OOS chỉ15 lệnh và giai đoạn2025–2026 đã được dùng; khóa Shadow trước khi xét tiền thật."
     },
     "de": {
@@ -140,12 +142,15 @@
       "head_gate": "Gan36–50; Score0.85–1.00; Occ30=0; repeat2 kỳ trước3–6; maxfreq≤3.",
       "tail_gate": "Gan40–60; Score0.90–1.40; Occ30=0; repeat2 kỳ trước0–4; maxfreq≤2.",
       "economics": "+6 đơn vị nếu trúng; -1 đơn vị nếu trượt.",
+      "baseline_comparison": "Tỷ lệ thắng toàn kỳ tăng từ 11,64% của baseline max-score tái tạo được lên 24,43%.",
+      "quality_benchmark": {"id":"DE_GAN_LEAD18_STRICT_V2","orders":44,"wins":16,"win_rate":0.363636,"pnl_units":68,"max_drawdown_units":-5,"status":"QUALITY_SHADOW_SMALL_N"},
       "backtest": {
         "train": {"orders":78,"wins":16,"win_rate":0.205128,"pnl_units":34,"max_drawdown_units":-17,"longest_loss":17},
         "validation": {"orders":29,"wins":7,"win_rate":0.241379,"pnl_units":20,"max_drawdown_units":-9,"longest_loss":9},
         "oos": {"orders":24,"wins":9,"win_rate":0.375,"pnl_units":39,"max_drawdown_units":-4,"longest_loss":4},
         "full": {"orders":131,"wins":32,"win_rate":0.244275,"pnl_units":93,"max_drawdown_units":-17,"longest_loss":17}
       },
+      "forward_gate": ">=30 tín hiệu mới và >=6 tháng; WR>=20%; P/L>0; MaxDD không xấu hơn -17 đơn vị; khóa tham số.",
       "warning": "Bản v1.1 WR44% không tái tạo được trên full-source causal audit; V2 là bản exact đang khóa Shadow."
     }
   },
@@ -158,8 +163,8 @@
       "candidates":[
         {"code":"75","rank":1,"gan":14,"gmax":14,"score":1.0,"gate":true,"status":"REAL A1 VOLUME50","reason":"PASS_VOLUME; vốn1.150.000đ","eligibility_status":"ACTIVE"},
         {"code":"57","rank":2,"gate":true,"status":"REAL A1 REVERSE50","reason":"Số đảo chính thức của75; vốn1.150.000đ","eligibility_status":"ACTIVE"},
-        {"code":"88","rank":3,"gan":13,"gmax":21,"score":0.619048,"gate":false,"status":"WATCH","reason":"Score<0.70","earliest_eligible_date":"2026-07-13","milestone_type":"CONDITIONAL","earliest_condition":"Nếu88 không về11–12/07 và dữ liệu/phanh nhiễu vẫn sạch."},
-        {"code":"72","rank":4,"gan":19,"gmax":30,"score":0.633333,"gate":false,"status":"WATCH","reason":"Score<0.70","earliest_eligible_date":"2026-07-13","milestone_type":"CONDITIONAL","earliest_condition":"Nếu72 không về11–12/07 và dữ liệu/phanh nhiễu vẫn sạch."}
+        {"code":"88","rank":3,"gan":13,"gmax":20,"score":0.65,"gate":false,"status":"WATCH","reason":"Score<0.70","earliest_eligible_date":"2026-07-12","milestone_type":"CONDITIONAL","earliest_condition":"Nếu88 không về11/07 và dữ liệu/phanh nhiễu vẫn sạch."},
+        {"code":"72","rank":4,"gan":19,"gmax":29,"score":0.655172,"gate":false,"status":"WATCH","reason":"Score<0.70","earliest_eligible_date":"2026-07-13","milestone_type":"CONDITIONAL","earliest_condition":"Nếu72 không về11–12/07 và dữ liệu/phanh nhiễu vẫn sạch."}
       ],
       "historical_profile":{"label":"Core100 / Volume50 / Reverse50","status":"BACKTESTED_USER_LOCKED"}
     },
@@ -167,8 +172,8 @@
       "id":"X2","label":"MB X2","status":"A0_SHADOW","role":"A0 RESCUE","method":"X2 Fusion A0 Rescue","layer":"Cặp rank1",
       "selected_numbers":["32","23"],"selection":"32-23","points":0,"capital_vnd":0,"summary":"Không đạt gate; chỉ hiển thị chi tiết.","reason":"23 có H21=3<5.",
       "candidates":[
-        {"code":"32","rank":1,"tier":"Main","gan":4,"h21":7,"gate":false,"status":"WATCH","reason":"Chờ cặp32-23 đạt rank1 gate","earliest_eligible_date":"2026-07-16","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"Lịch rolling H21/Gan thuận lợi và cặp vẫn giữ hạng1."},
-        {"code":"23","rank":2,"tier":"Cover","gan":4,"h21":3,"gate":false,"status":"WATCH","reason":"Chân giới hạn, H21 thiếu2","earliest_eligible_date":"2026-07-16","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"H21 đạt≥5; Gan/chênh Gan/H5 cùng đạt và cặp vẫn giữ hạng1."}
+        {"code":"32","rank":1,"tier":"Main","gan":4,"h21":7,"gate":false,"status":"WATCH","reason":"Chờ cặp32-23 đạt rank1 gate","earliest_eligible_date":"2026-07-17","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"Rolling H21/Gan thuận lợi và cặp vẫn giữ hạng1."},
+        {"code":"23","rank":2,"tier":"Cover","gan":4,"h21":3,"gate":false,"status":"WATCH","reason":"Chân giới hạn, H21 thiếu2","earliest_eligible_date":"2026-07-17","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"H21 đạt≥5; Gan/chênhGan/H5 cùng đạt và cặp vẫn giữ hạng1."}
       ],
       "historical_profile":{"label":"X2 Rescue35","orders":35,"wins":23,"win_rate":"65,71%"}
     },
@@ -176,9 +181,9 @@
       "id":"X3","label":"MB X3","status":"A0_SHADOW","role":"PRODUCTION SUPPORT","method":"X3 Growth32–34","layer":"Rổ generator top3",
       "selected_numbers":["32","47","80"],"selection":"32-47-80","points":0,"capital_vnd":0,"summary":"Không đạt Growth gate.","reason":"HOT21=10/10/10; tổng30, max10.",
       "candidates":[
-        {"code":"32","rank":1,"hot21":10,"gate":false,"status":"WATCH","reason":"Growth cần tổng32–34,max11–14","earliest_eligible_date":"2026-07-12","milestone_type":"THEORETICAL_DYNAMIC","earliest_condition":"Kết quả11/07 phải nâng đủ HOT21 sau khi trừ kỳ rời cửa sổ; rổ và thứ hạng không đổi."},
-        {"code":"47","rank":2,"hot21":10,"gate":false,"status":"WATCH","reason":"Growth cần tổng32–34,max11–14","earliest_eligible_date":"2026-07-12","milestone_type":"THEORETICAL_DYNAMIC","earliest_condition":"Phụ thuộc kết quả11/07 và rolling21; generator có thể đổi."},
-        {"code":"80","rank":3,"hot21":10,"gate":false,"status":"WATCH","reason":"Growth cần tổng32–34,max11–14","earliest_eligible_date":"2026-07-12","milestone_type":"THEORETICAL_DYNAMIC","earliest_condition":"Phụ thuộc kết quả11/07 và rolling21; generator có thể đổi."}
+        {"code":"32","rank":1,"hot21":10,"gate":false,"status":"WATCH","reason":"Growth cần tổng32–34,max11–14","earliest_eligible_date":"2026-07-13","milestone_type":"THEORETICAL_DYNAMIC","earliest_condition":"Phụ thuộc rolling21 và thứ hạng generator; có thể đổi sau kỳ mới."},
+        {"code":"47","rank":2,"hot21":10,"gate":false,"status":"WATCH","reason":"Growth cần tổng32–34,max11–14","earliest_eligible_date":"2026-07-13","milestone_type":"THEORETICAL_DYNAMIC","earliest_condition":"Phụ thuộc rolling21 và thứ hạng generator; có thể đổi sau kỳ mới."},
+        {"code":"80","rank":3,"hot21":10,"gate":false,"status":"WATCH","reason":"Growth cần tổng32–34,max11–14","earliest_eligible_date":"2026-07-13","milestone_type":"THEORETICAL_DYNAMIC","earliest_condition":"Phụ thuộc rolling21 và thứ hạng generator; có thể đổi sau kỳ mới."}
       ],
       "historical_profile":{"label":"X3 Growth OOS","orders":99,"wins":69,"win_rate":"69,70%"}
     },
@@ -186,8 +191,8 @@
       "id":"XIEN","label":"Xiên 2","status":"A0_SHADOW","role":"SEPARATE SHADOW","method":"Xiên HOT90 Pair21 v2","layer":"Cặp rank1 duy nhất",
       "selected_numbers":["91","06"],"selection":"91-06","points":0,"capital_vnd":0,"summary":"Phương pháp source-repro mới; hôm nay cặp hạng1 chưa đạt.","reason":"Count90=35/28, PairCount21=3, PairCount180=17; cần Count90 cả hai≥31 và C21≤2.",
       "candidates":[
-        {"code":"91","rank":1,"count90":35,"pair_count21":3,"pair_count180":17,"gate":false,"status":"WATCH","reason":"Cặp91-06 fail vì chân06 và C21","earliest_eligible_date":"2026-07-14","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"Rank1 không đổi; 06 tăng3 net lần xuất hiện trong cửa sổ90 và PairCount21 giảm≤2."},
-        {"code":"06","rank":2,"count90":28,"pair_count21":3,"pair_count180":17,"gate":false,"status":"WATCH","reason":"Chân giới hạn Count90<31","earliest_eligible_date":"2026-07-14","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"06 phải xuất hiện đủ3 lần mới trong các kỳ tới mà không làm C21 vượt gate; rank có thể thay đổi."}
+        {"code":"91","rank":1,"count90":35,"pair_count21":3,"pair_count180":17,"gate":false,"status":"WATCH","reason":"Cặp91-06 fail vì chân06 và C21","earliest_eligible_date":"2026-07-14","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"Rank1 không đổi;06 tăng3 net Count90 và PairCount21 giảm≤2."},
+        {"code":"06","rank":2,"count90":28,"pair_count21":3,"pair_count180":17,"gate":false,"status":"WATCH","reason":"Chân giới hạn Count90<31","earliest_eligible_date":"2026-07-14","milestone_type":"THEORETICAL_CONDITIONAL","earliest_condition":"Cần thêm3 net lần xuất hiện trong cửa sổ90 mà C21 không vượt gate; rank có thể đổi."}
       ],
       "historical_profile":{"label":"HOT90 Pair21 v2","orders":109,"wins":15,"win_rate":"13,76%","oos_win_rate":"26,67%","pnl_vnd":13100000,"max_drawdown_vnd":-1800000}
     },
@@ -195,8 +200,8 @@
       "id":"DE","label":"Đề đầu/đuôi","status":"A0_VALIDATION","role":"VALIDATION","method":"Đề HT Dual Strict v2","layer":"Head/Tail Gan leader",
       "selected_numbers":["Đầu 2","Đuôi 0"],"points":0,"capital_vnd":0,"summary":"Phương pháp source-repro exact; hôm nay cả hai nhánh chưa đạt.","reason":"Đầu2 thiếu Score và repeat2; Đuôi0 thiếu Gan và Score.",
       "candidates":[
-        {"code":"Đầu 2","rank":1,"side":"HEAD","gan":39,"gmax":54,"score":0.7222,"gate":false,"status":"WATCH","reason":"Head gate cần Score≥0.85 và repeat2 kỳ trước3–6","earliest_eligible_date":"2026-07-18","milestone_type":"CONDITIONAL","earliest_condition":"Nếu không ra Đầu2 đến hết17/07 và context trước kỳ có repeat2 3–6,maxfreq≤3; Occ30=0 vẫn giữ."},
-        {"code":"Đuôi 0","rank":2,"side":"TAIL","gan":21,"gmax":55,"score":0.3818,"gate":false,"status":"WATCH","reason":"Tail gate cần Gan≥40 và Score≥0.90","earliest_eligible_date":"2026-08-09","milestone_type":"NOT_BEFORE_CONDITIONAL","earliest_condition":"Nếu không ra Đuôi0 đến hết08/08 và context repeat2≤4,maxfreq≤2; Occ30=0 vẫn giữ."}
+        {"code":"Đầu 2","rank":1,"side":"HEAD","gan":39,"gmax":54,"score":0.7222,"occ30":0,"gate":false,"status":"WATCH","reason":"Head gate cần Score≥0.85 và repeat2 kỳ trước3–6","earliest_eligible_date":"2026-07-18","milestone_type":"CONDITIONAL","earliest_condition":"Nếu không ra Đầu2 đến hết17/07 và bối cảnh trước kỳ đạt; Occ30=0 vẫn giữ."},
+        {"code":"Đuôi 0","rank":2,"side":"TAIL","gan":21,"gmax":55,"score":0.3818,"occ30":0,"gate":false,"status":"WATCH","reason":"Tail gate cần Gan≥40 và Score≥0.90","earliest_eligible_date":"2026-08-09","milestone_type":"NOT_BEFORE_CONDITIONAL","earliest_condition":"Nếu không ra Đuôi0 đến hết08/08 và bối cảnh repeat2≤4,maxfreq≤2; Occ30=0 vẫn giữ."}
       ],
       "historical_profile":{"label":"HT Dual Strict v2","orders":131,"wins":32,"win_rate":"24,43%","oos_win_rate":"37,50%","pnl_units":93,"max_drawdown_units":-17}
     }
@@ -209,7 +214,7 @@
     {"id":"DE_HT_DUAL","label":"Đề HT Dual Strict v2","status":"PREFERRED_SOURCE_REPRO_SHADOW","period":"2021–10/07/2026","orders":131,"wins":32,"win_rate":"24,43%","oos_win_rate":"37,50%","pnl_units":93,"max_drawdown_units":-17}
   ],
   "publication": {
-    "status":"LIVE_SOURCE_REPRO_V8_MILESTONES",
+    "status":"LIVE_SOURCE_FINAL_V8_MILESTONES",
     "official_url":"https://nguyenlinhns-arch.github.io/mb-daily-control/",
     "auto_refresh_seconds":120,
     "source_warning":"Mốc sớm nhất là điều kiện lý thuyết và được tính lại sau mỗi kỳ khóa."

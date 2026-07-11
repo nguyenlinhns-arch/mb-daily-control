@@ -1,308 +1,133 @@
 {
-  "schema_version": "MB_DAILY_WEB_V1",
-  "report_run_id": "RPT_MB_20260711_A1_MAIN_WEB_V2",
-  "source_run_id": "RPT_MB_20260711_A1_MAIN",
-  "config_id": "MB_A1_DUAL_CORE_VOLUME_BALANCE_GAN21_12_CORE100_VOLUME50",
+  "schema_version": "MB_DAILY_WEB_V2",
+  "report_run_id": "RPT_MB_20260711_FULL_REVIEW_WEB_GH_V2",
+  "source_run_id": "RPT_MB_20260711_FULL_REVIEW_V1",
+  "config_id": "SYS_MB_5GROUP_V4_20260711",
   "target_date": "2026-07-11",
-  "generated_at": "2026-07-10T22:53:18.966+07:00",
+  "generated_at": "2026-07-11T09:17:13+07:00",
   "valid_until": "2026-07-11T18:15:00+07:00",
-  "data_snapshot_id": "MBH27_20260710_LOCKED_26U_R13X2",
+  "data_snapshot_id": "MBH27_20260710_FULL2333_SHA256_0C031C440C33",
+  "official_url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
   "data": {
     "locked_through": "2026-07-10",
     "status": "LOCKED_CROSSCHECKED",
     "count": 27,
     "unique": 26,
-    "repeat_codes": [
-      "13×2"
-    ],
+    "repeat2_count": 1,
+    "repeat_codes": ["13×2"],
     "max_frequency": 2,
-    "latest_27_codes": [
-      "67",
-      "60",
-      "37",
-      "81",
-      "62",
-      "66",
-      "36",
-      "45",
-      "13",
-      "61",
-      "50",
-      "19",
-      "53",
-      "83",
-      "54",
-      "13",
-      "82",
-      "34",
-      "27",
-      "94",
-      "16",
-      "02",
-      "43",
-      "96",
-      "20",
-      "31",
-      "73"
-    ],
-    "source_label": "XSMB_Source_2024_2026_MB_v1.3 · MB_History_27 · đã đối chiếu đủ 27 mã"
+    "latest_27_codes": ["67","60","37","81","62","66","36","45","13","61","50","19","53","83","54","13","82","34","27","94","16","02","43","96","20","31","73"],
+    "source_label": "XSMB_Source_2024_2026_MB_v1.3 · MB_History_27 · 2.333 kỳ · đủ 27/27",
+    "sha256": "0c031c440c33d8a1e88ec1083d9a2648f181ec691d1df5e2e6d1cc86515caf9e"
+  },
+  "replacement_policy": {
+    "status": "ACTIVE_USER_APPROVED",
+    "rule": "Phương pháp mới đã audit và cho hồ sơ tốt hơn sẽ mặc định thay phương pháp cũ; phải cùng dữ liệu/kinh tế, không look-ahead và lưu rõ phương pháp bị thay.",
+    "x3_active": "MB_X3_GROWTH_32_34_V1",
+    "x3_supersedes": "MB_X3_V23_OVERLAY_C",
+    "x2_active": "MB_X2_FUSION_A0_RESCUE_V1",
+    "note": "X3 Quality 32–34 là nhãn Q-Strong; không tạo lệnh thứ hai và không tự tăng điểm."
   },
   "portfolio": {
-    "decision": "VOLUME",
-    "tier": "A1 Volume Balanced",
-    "selection": "75",
-    "title": "Volume 50 — Chọn 75",
-    "points": 50,
-    "capital_vnd": 1150000,
-    "miss_pnl_vnd": -1150000,
-    "hit1_pnl_vnd": 2850000,
-    "hit2_pnl_vnd": 6850000,
-    "reason": "Không có Core. Mã 75 là ứng viên duy nhất đạt Volume theo chuẩn Gan 21/12; áp dụng đúng thang Core 100 – Volume 50."
+    "decision": "A0",
+    "tier": "KHÔNG ĐÁNH",
+    "selection": null,
+    "title": "A0 — Không có lệnh tiền thật",
+    "points": 0,
+    "capital_vnd": 0,
+    "reason": "Dữ liệu đủ và sạch, nhưng A1, X3 Growth và X2 Rescue đều không qua gate sau khi tái tính toàn lịch sử. Top 3 chỉ là xếp hạng hỗ trợ."
   },
   "top_three": {
-    "mode": "PRODUCTION_WITH_WATCH",
-    "note": "75 đạt chuẩn Volume 50; 88 và 72 chỉ theo dõi, không vào tiền.",
+    "mode": "SUPPORT_HPO_RANK",
+    "title": "03 SỐ XẾP HẠNG HỖ TRỢ CAO NHẤT",
+    "note": "80–47–32 là xếp hạng tương đối trong candidate pool. Tỷ lệ là mức hỗ trợ lịch sử, không phải xác suất chắc thắng riêng của từng số; cả ba đều 0 điểm hôm nay.",
     "items": [
-      {
-        "rank": 1,
-        "number": "75",
-        "source_group": "MB A1",
-        "tier": "Volume 50",
-        "eligible": true,
-        "reason": "Gan 14 · Gmax 14 · Score 1,000"
-      },
-      {
-        "rank": 2,
-        "number": "88",
-        "source_group": "A1 Watch",
-        "tier": "Theo dõi",
-        "eligible": false,
-        "reason": "Gan 13 · Gmax 20 · Score 0,650"
-      },
-      {
-        "rank": 3,
-        "number": "72",
-        "source_group": "A1 Watch",
-        "tier": "Theo dõi",
-        "eligible": false,
-        "reason": "Gan 19 · Gmax 29 · Score 0,655"
-      }
+      {"rank":1,"number":"80","support_hpo_pct":24.34,"source_group":"X3 fallback","tier":"WATCH","eligible":false,"reason":"X3 rank 3; HOT21=10; rổ fail max<11."},
+      {"rank":2,"number":"47","support_hpo_pct":24.22,"source_group":"X3 fallback","tier":"WATCH","eligible":false,"reason":"X3 rank 2; HOT21=10; rổ fail max<11."},
+      {"rank":3,"number":"32","support_hpo_pct":23.83,"source_group":"X2 main + X3 fallback","tier":"WATCH","eligible":false,"reason":"Giao thoa X2/X3; X2 fail minH21 và X3 fail max<11."}
     ]
   },
   "groups": [
     {
-      "id": "A1",
-      "status": "VOLUME",
-      "role": "PRODUCTION",
-      "layer": "Volume Balanced",
-      "selected_numbers": [
-        "75"
+      "id":"A1","label":"MB A1","status":"A0_WATCH","role":"PRODUCTION MAIN","method":"Core100 / Volume50","layer":"Watchlist tốt nhất",
+      "selected_numbers":["75","72","88"],"points":0,"capital_vnd":0,
+      "summary":"Không có Core hoặc Volume đạt chuẩn toàn lịch sử; vẫn hiển thị ba mã A1 tốt nhất.",
+      "reason":"75, 72 và 88 đều thiếu Score tối thiểu 0,70.",
+      "candidates":[
+        {"code":"75","rank":1,"gan":14,"gmax":21,"score":0.666667,"gate":false,"status":"WATCH","reason":"Score 0,6667 < 0,70"},
+        {"code":"72","rank":2,"gan":19,"gmax":29,"score":0.655172,"gate":false,"status":"WATCH","reason":"Score 0,6552 < 0,70"},
+        {"code":"88","rank":3,"gan":13,"gmax":20,"score":0.65,"gate":false,"status":"WATCH","reason":"Score 0,6500 < 0,70"}
       ],
-      "points": 50,
-      "capital_vnd": 1150000,
-      "summary": "75 là mã duy nhất đạt Volume 50; không có mã đạt Core 100.",
-      "reason": "Gan 14 · Gmax 14 · Score 1,000 · vượt toàn bộ lớp lọc hiện hành.",
-      "note": "Trượt −1.150.000đ · 1 nháy +2.850.000đ · 2 nháy +6.850.000đ.",
-      "candidates": [
-        {
-          "code": "75",
-          "gan": 14,
-          "gmax": 14,
-          "score": 1,
-          "tier": "Volume",
-          "gate": true,
-          "status": "VOLUME50_REAL",
-          "points": 50,
-          "reason": "Ứng viên duy nhất đạt chuẩn Volume 50."
-        },
-        {
-          "code": "88",
-          "gan": 13,
-          "gmax": 20,
-          "score": 0.65,
-          "tier": "Watch",
-          "gate": false,
-          "status": "WAIT_12_07_IF_CLEAN",
-          "points": 0,
-          "reason": "Chưa đạt Score tối thiểu 0,70."
-        },
-        {
-          "code": "72",
-          "gan": 19,
-          "gmax": 29,
-          "score": 0.655,
-          "tier": "Watch",
-          "gate": false,
-          "status": "WAIT_13_07_IF_CLEAN",
-          "points": 0,
-          "reason": "Chưa đạt Score tối thiểu 0,70."
-        }
-      ]
+      "historical_profile":{"label":"A1 Core100/Volume50","sample":"171 lệnh","win_rate":"30,41%","pnl_vnd":79650000,"max_drawdown_vnd":-20800000}
     },
     {
-      "id": "X2",
-      "status": "CHƯA ĐẠT",
-      "role": "SHADOW / STRONGEST FALLBACK",
-      "layer": "Chưa đạt, chọn số mạnh nhất",
-      "selected_numbers": [
-        "32",
-        "23"
+      "id":"X2","label":"MB X2","status":"A0_FALLBACK","role":"A0 RESCUE","method":"X2 Fusion A0 Rescue","layer":"Cặp rank-1",
+      "selected_numbers":["32","23"],"selection":"32-23","points":0,"capital_vnd":0,
+      "summary":"Cặp tốt nhất vẫn được liệt kê nhưng không qua gate.",
+      "reason":"Gan 4–4, ΔGan=0, H5 cặp=2; minH21=3 < 5.",
+      "candidates":[
+        {"code":"32","rank":1,"tier":"Main","gan":4,"gate":false,"status":"WATCH","reason":"Mã chính của cặp rank-1"},
+        {"code":"23","rank":2,"tier":"Cover","gan":4,"gate":false,"status":"WATCH","reason":"Mã phủ của cặp rank-1"}
       ],
-      "points": 0,
-      "capital_vnd": 0,
-      "summary": "Chưa đạt, chọn số mạnh nhất: 32–23.",
-      "reason": "Gate FAIL · minH21=3<5",
-      "note": "32 là số chính, 23 là số phủ. Chỉ hiển thị ứng viên mạnh nhất; chưa vào tiền.",
-      "candidates": [
-        {
-          "code": "32",
-          "tier": "Main",
-          "gate": false,
-          "status": "STRONGEST_FALLBACK",
-          "points": 0,
-          "reason": "Gan 4 · cặp có H5=2"
-        },
-        {
-          "code": "23",
-          "tier": "Cover",
-          "gate": false,
-          "status": "STRONGEST_FALLBACK",
-          "points": 0,
-          "reason": "Gan 4 · dGan=0"
-        }
-      ],
-      "selection": "32-23"
+      "historical_profile":{"label":"X2 Rescue35","sample":"35 lệnh","win_rate":"65,71%","hits_per_order":"0,9143","pnl_vnd":14250000,"max_drawdown_vnd":-1410000,"stake":"15/15"},
+      "risk_note":"Stress 2007–2023 âm; giữ phanh pilot và chỉ đứng sau A1/X3."
     },
     {
-      "id": "X3",
-      "status": "CHƯA ĐẠT",
-      "role": "SHADOW / STRONGEST FALLBACK",
-      "layer": "Chưa đạt, chọn số mạnh nhất",
-      "selected_numbers": [
-        "32",
-        "47",
-        "80"
+      "id":"X3","label":"MB X3","status":"A0_FALLBACK","role":"PRODUCTION SUPPORT","method":"X3 Growth 32–34","layer":"Rổ generator top-3",
+      "selected_numbers":["32","47","80"],"selection":"32-47-80","points":0,"capital_vnd":0,
+      "summary":"Rổ tốt nhất luôn được liệt kê; hôm nay fail Growth gate.",
+      "reason":"HOT21 10–10–10; tổng=30, max=10. Growth cần tổng 32–34 và max 11–14.",
+      "candidates":[
+        {"code":"32","rank":1,"hot21":10,"gate":false,"status":"WATCH","reason":"Generator top-1"},
+        {"code":"47","rank":2,"hot21":10,"gate":false,"status":"WATCH","reason":"Generator top-2"},
+        {"code":"80","rank":3,"hot21":10,"gate":false,"status":"WATCH","reason":"Generator top-3"}
       ],
-      "points": 0,
-      "capital_vnd": 0,
-      "summary": "Chưa đạt, chọn số mạnh nhất: 32–47–80.",
-      "reason": "Gate FAIL_MAX_LT_11 · HOT21 10–10–10 · Max 10",
-      "note": "Rổ mạnh nhất vẫn được hiển thị để theo dõi; chưa vào tiền.",
-      "candidates": [
-        {
-          "code": "32",
-          "tier": "Fallback",
-          "gate": false,
-          "status": "STRONGEST_FALLBACK",
-          "points": 0,
-          "reason": "HOT21 10"
-        },
-        {
-          "code": "47",
-          "tier": "Fallback",
-          "gate": false,
-          "status": "STRONGEST_FALLBACK",
-          "points": 0,
-          "reason": "HOT21 10"
-        },
-        {
-          "code": "80",
-          "tier": "Fallback",
-          "gate": false,
-          "status": "STRONGEST_FALLBACK",
-          "points": 0,
-          "reason": "HOT21 10"
-        }
-      ],
-      "selection": "32-47-80"
+      "historical_profile":{"label":"X3 Growth 32–34 OOS","sample":"99 lệnh","win_rate":"69,70%","pnl_vnd":74450000,"roi":"21,80%","max_drawdown_vnd":-13250000,"longest_loss":3},
+      "quality_profile":{"label":"Q-Strong 32–34 OOS","sample":"59 lệnh","win_rate":"72,88%","pnl_vnd":36450000,"max_drawdown_vnd":-9800000}
     },
     {
-      "id": "XIEN",
-      "status": "A0 SHADOW",
-      "role": "PAPER ONLY",
-      "layer": "Không vào tiền",
-      "selected_numbers": [],
-      "selection": null,
-      "pairs": [],
-      "points": 0,
-      "capital_vnd": 0,
-      "summary": "Không có cặp Xiên 2 hiện tại.",
-      "reason": "NO_CURRENT_CONFIRMED_PAIR",
-      "note": "Danh sách cặp được thay nguyên khối mỗi ngày; hôm nay đã xóa sạch cặp cũ.",
-      "candidates": []
+      "id":"XIEN","label":"Xiên 2","status":"A0_SHADOW","role":"SEPARATE SHADOW","method":"Xiên 2","layer":"Không có cặp xác nhận",
+      "selected_numbers":["80","47","32"],"pairs":[],"reference_pairs":["80-47","80-32","47-32"],"points":0,"capital_vnd":0,
+      "summary":"Không có lệnh Xiên; vẫn liệt kê ba số nền và ba cặp tham khảo mạnh nhất.",
+      "reason":"Không có xác nhận trước quay; không tự mở Xiên từ X2/X3.",
+      "note":"Các cặp tham khảo không phải lệnh và không tính vào vốn/P&L.",
+      "candidates":[
+        {"code":"80","rank":1,"status":"REFERENCE","reason":"Top hỗ trợ #1"},
+        {"code":"47","rank":2,"status":"REFERENCE","reason":"Top hỗ trợ #2"},
+        {"code":"32","rank":3,"status":"REFERENCE","reason":"Top hỗ trợ #3"}
+      ],
+      "ledger":{"wins":0,"losses":6,"pnl_vnd":-600000}
     },
     {
-      "id": "DE",
-      "status": "A0 VALIDATION",
-      "role": "VALIDATION",
-      "layer": "Không vào tiền",
-      "selected_numbers": [],
-      "points": 0,
-      "capital_vnd": 0,
-      "summary": "Không có đầu đề mới đủ điều kiện cho ngày 11/07.",
-      "reason": "NO_FRESH_VALIDATED_HEAD",
-      "note": "Không dùng lại điểm số Đầu 2 / Đuôi 0 của ngày cũ.",
-      "candidates": []
+      "id":"DE","label":"Đề theo đầu","status":"A0_VALIDATION","role":"VALIDATION","method":"Đề Digit Expansion Clean v1.1","layer":"Ứng viên tốt nhất",
+      "selected_numbers":["20","21","22","23","24","25","26","27","28","29"],"points":0,"capital_vnd":0,
+      "summary":"Không có lệnh; ứng viên tốt nhất là Đầu 2, tương ứng dải 20–29.",
+      "reason":"Gan 38, Gmax 53, Score 0,717, Occ30=0 nhưng môi trường repeat2=1 ngoài vùng 4–6.",
+      "candidates":[{"code":"Đầu 2","rank":1,"gan":38,"gmax":53,"score":0.717,"gate":false,"status":"WATCH","reason":"Fail môi trường repeat2"}],
+      "historical_profile":{"label":"Expansion Clean v1.1","sample":"50 lệnh","win_rate":"44,00%","pnl_units":104,"max_drawdown_units":-6}
     }
   ],
   "ledger": {
-    "start_date": "2026-06-30",
-    "confirmed_through": "2026-07-10",
-    "total_pnl_vnd": 17000000,
-    "note": "Tổng năm nhóm đang hoạt động. Số ngoài hệ thống = 0; Than Vo đã chuyển sang lưu trữ và không cộng vào website chính.",
-    "items": [
-      {
-        "id": "A1",
-        "label": "MB A1",
-        "pnl_vnd": 3870000,
-        "note": "Đã xác nhận đến 10/07"
-      },
-      {
-        "id": "X2",
-        "label": "MB X2",
-        "pnl_vnd": 5820000,
-        "note": "Đã xác nhận đến 10/07"
-      },
-      {
-        "id": "X3",
-        "label": "MB X3",
-        "pnl_vnd": 7910000,
-        "note": "Đã xác nhận đến 10/07"
-      },
-      {
-        "id": "XIEN",
-        "label": "Xiên 2",
-        "pnl_vnd": -600000,
-        "note": "Đã xác nhận đến 10/07"
-      },
-      {
-        "id": "DE",
-        "label": "Đề",
-        "pnl_vnd": 0,
-        "note": "Chưa có lệnh xác nhận"
-      }
+    "start_date":"2026-06-30","confirmed_through":"2026-07-10","total_pnl_vnd":17000000,
+    "note":"Chỉ gồm năm nhóm hoạt động; đã cộng settlement xác nhận ngày 10/07 (+8.550.000đ).",
+    "items":[
+      {"id":"A1","label":"MB A1","pnl_vnd":3870000,"note":"Lũy kế xác nhận"},
+      {"id":"X2","label":"MB X2","pnl_vnd":5820000,"note":"Lũy kế xác nhận"},
+      {"id":"X3","label":"MB X3","pnl_vnd":7910000,"note":"Lũy kế xác nhận"},
+      {"id":"XIEN","label":"Xiên 2","pnl_vnd":-600000,"note":"0 thắng / 6 thua"},
+      {"id":"DE","label":"Đề","pnl_vnd":0,"note":"Chưa có lệnh xác nhận"}
     ]
   },
-  "backtest": {
-    "from": "2025-01-01",
-    "to": "2026-06-30",
-    "orders": 171,
-    "wins": 52,
-    "hits": 61,
-    "win_rate": "30,41%",
-    "hits_per_order": "0,3567",
-    "pnl_vnd": null,
-    "max_drawdown_vnd": null,
-    "orders_per_month": "9,53 lệnh/tháng",
-    "legacy_pnl_vnd": 41330000,
-    "legacy_max_drawdown_vnd": -12240000,
-    "points_standard": "CORE100_VOLUME50",
-    "monetary_recalculation_required": true
-  },
+  "backtests": [
+    {"id":"X3_GROWTH","label":"X3 Growth 32–34","status":"ACTIVE_REPLACEMENT","period":"OOS 2025–09/07/2026","orders":99,"wins":69,"win_rate":"69,70%","pnl_vnd":74450000,"roi":"21,80%","max_drawdown_vnd":-13250000,"longest_loss":3},
+    {"id":"X3_QUALITY","label":"X3 Q-Strong 32–34","status":"QUALITY_TAG","period":"OOS 2025–09/07/2026","orders":59,"wins":43,"win_rate":"72,88%","pnl_vnd":36450000,"max_drawdown_vnd":-9800000,"longest_loss":2},
+    {"id":"X2_RESCUE35","label":"X2 Rescue35","status":"ACTIVE_GUARDED","period":"2025–29/06/2026","orders":35,"wins":23,"win_rate":"65,71%","pnl_vnd":14250000,"max_drawdown_vnd":-1410000,"longest_loss":2},
+    {"id":"A1","label":"A1 Core100/Volume50","status":"BASELINE","period":"01/01/2025–29/06/2026","orders":171,"wins":52,"win_rate":"30,41%","pnl_vnd":79650000,"max_drawdown_vnd":-20800000,"longest_loss":13}
+  ],
   "publication": {
-    "status": "BUILD_VERIFIED",
-    "status_label": "Tự đồng bộ đã bật",
-    "report_hash_sha256": "20b471e98867620970a75eb111efe0020f617e307fb8f213e2af9b9a1e655175",
-    "source_warning": "POINT_STANDARD_CORRECTED_TO_CORE100_VOLUME50"
+    "status":"READY_FOR_GITHUB_PAGES",
+    "official_url":"https://nguyenlinhns-arch.github.io/mb-daily-control/",
+    "auto_refresh_seconds":120,
+    "source_warning":"Top3 support rates are historical support metrics, not calibrated single-code probabilities."
   }
 }

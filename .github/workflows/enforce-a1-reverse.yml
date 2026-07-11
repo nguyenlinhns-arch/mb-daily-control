@@ -1,4 +1,4 @@
-name: Enforce permanent A1 reverse50 and first-block policy
+name: Enforce A1 reverse50 and top status panels
 
 on:
   workflow_dispatch:
@@ -20,13 +20,14 @@ on:
       - "index.html"
       - "scripts/enforce_a1_reverse.py"
       - "scripts/enforce_top3_first_block.py"
+      - "scripts/enforce_top3_first_block.py.zlib.b64"
       - ".github/workflows/enforce-a1-reverse.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: enforce-a1-reverse50-and-first-block
+  group: enforce-a1-reverse50-and-top-panels-v3
   cancel-in-progress: false
 
 jobs:
@@ -49,7 +50,7 @@ jobs:
       - name: Apply A1 reverse50 and no-duplicate policy
         run: python scripts/enforce_a1_reverse.py
 
-      - name: Apply corrected first-block policy
+      - name: Build pinned A1 and X2/X3 status panels
         run: python scripts/enforce_top3_first_block.py
 
       - name: Validate permanent invariants
@@ -60,12 +61,12 @@ jobs:
       - name: Commit only when enforcement changed files
         run: |
           if git diff --quiet -- data; then
-            echo "A1 reverse50 and first-block rules already enforced."
+            echo "A1 reverse50 and top-panel rules already enforced."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git commit -m "data: enforce A1 reverse50 and first-block policy"
+          git commit -m "data: enforce A1 reverse50 and top status panels"
           git pull --rebase origin main
           git push origin HEAD:main

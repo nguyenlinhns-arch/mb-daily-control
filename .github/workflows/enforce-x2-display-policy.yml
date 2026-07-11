@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Remove X2 outcome metrics from website payload
+      - name: Remove all X2 performance metrics from website payload
         run: |
           python3 - <<'PY'
           import json
@@ -35,21 +35,35 @@ jobs:
           data = json.loads(path.read_text(encoding="utf-8"))
           changed = False
 
+          hidden_fields = [
+              "historical_profile",
+              "quality_benchmark",
+              "orders",
+              "wins",
+              "losses",
+              "win_rate",
+              "oos_win_rate",
+              "pnl_vnd",
+              "pnl_units",
+              "max_drawdown_vnd",
+              "max_drawdown_units",
+          ]
+
           for group in data.get("groups", []):
               if str(group.get("id", "")).upper() != "X2":
                   continue
 
-              profile = group.get("historical_profile")
-              if isinstance(profile, dict):
-                  for key in ("wins", "losses", "pnl_vnd", "pnl_units"):
-                      if key in profile:
-                          profile.pop(key)
-                          changed = True
+              # X2 is a Shadow Validation block. Its website card must never
+              # expose backtest counts, win rate, profit/loss or drawdown.
+              for key in hidden_fields:
+                  if key in group:
+                      group.pop(key)
+                      changed = True
 
               policy = {
-                  "hide_fields": ["wins", "losses", "pnl_vnd", "pnl_units"],
-                  "keep_fields": ["orders", "win_rate", "max_drawdown_vnd", "max_drawdown_units"],
-                  "scope": "WEBSITE_X2_PERMANENT",
+                  "hide_fields": hidden_fields,
+                  "keep_fields": [],
+                  "scope": "WEBSITE_X2_NO_PERFORMANCE_METRICS_PERMANENT",
               }
               if group.get("display_policy") != policy:
                   group["display_policy"] = policy
@@ -65,12 +79,12 @@ jobs:
       - name: Commit policy enforcement
         run: |
           if git diff --quiet -- data/current.json; then
-            echo "X2 website payload already follows the permanent display policy."
+            echo "X2 website payload already contains no performance metrics."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data/current.json
-          git commit -m "ui: hide X2 wins losses and profit metrics"
+          git commit -m "ui: strip all X2 performance metrics"
           git pull --rebase origin main
           git push origin HEAD:main

@@ -1,0 +1,63 @@
+{
+  "schema_version": "MB_X2_RBK_BACKTEST_V1",
+  "run_id": "BT_RBK_X2_FILTER_FIRST_NO_FALLBACK_V1_20260712",
+  "method_id": "RBK_X2_FILTER_FIRST_NO_FALLBACK_V1",
+  "generated_at": "2026-07-12T03:33:37+07:00",
+  "source": {
+    "spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
+    "history_range": "2020-01-01..2026-07-11",
+    "locked_through": "2026-07-11",
+    "draws": 2334
+  },
+  "economics": {
+    "points_per_code": 15,
+    "code_count": 2,
+    "capital_vnd": 690000,
+    "payout_per_hit_vnd": 1200000,
+    "break_even_hits_per_order": 0.575
+  },
+  "spec": {
+    "rbk_gate": "Gan each 0-10; abs(dGan)<=2; H5pair<=4; B>=0.54",
+    "core_rank": "TV21Score desc; rank1 only",
+    "core_gate": "Gan each 1-5; abs(dGan)<=1; H5pair<=3; minH21>=5",
+    "balanced_rank": "RankScore desc; rank1 only",
+    "balanced_gate": "Gan each 2-7; abs(dGan)<=2; H5pair<=7; minH21>=5",
+    "fallback": "NONE"
+  },
+  "results": {
+    "train_2021_2023": {"orders":207,"wins":90,"win_rate":0.4347826087,"hits":123,"hits_per_order":0.5942028986,"pnl_vnd":4770000,"roi":0.0333963453,"max_drawdown_vnd":-9000000,"max_loss_streak":9,"core_orders":154,"balanced_orders":53},
+    "validation_2024": {"orders":95,"wins":49,"win_rate":0.5157894737,"hits":72,"hits_per_order":0.7578947368,"pnl_vnd":20850000,"roi":0.3180778032,"max_drawdown_vnd":-4320000,"max_loss_streak":5,"core_orders":79,"balanced_orders":16},
+    "oos_2025_2026_07_11": {"orders":83,"wins":41,"win_rate":0.4939759036,"hits":52,"hits_per_order":0.6265060241,"pnl_vnd":5130000,"roi":0.0895756941,"max_drawdown_vnd":-5190000,"max_loss_streak":5,"core_orders":59,"balanced_orders":24},
+    "full_2021_2026_07_11": {"orders":385,"wins":180,"win_rate":0.4675324675,"hits":247,"hits_per_order":0.6415584416,"pnl_vnd":30750000,"roi":0.1157538114,"max_drawdown_vnd":-9000000,"max_loss_streak":9}
+  },
+  "oos_year_split": {
+    "2025": {"orders":50,"wins":21,"hits":28,"hits_per_order":0.56,"pnl_vnd":-900000,"roi":-0.0260869565,"max_drawdown_vnd":-5190000,"max_loss_streak":5},
+    "2026_ytd_07_11": {"orders":33,"wins":20,"hits":24,"hits_per_order":0.7272727273,"pnl_vnd":6030000,"roi":0.2648221344,"max_drawdown_vnd":-3120000,"max_loss_streak":4}
+  },
+  "comparison_x2_exact_oos": {
+    "x2_exact": {"orders":83,"wins":39,"hits":53,"hits_per_order":0.6385542169,"pnl_vnd":6330000,"roi":0.1105290728,"max_drawdown_vnd":-7980000,"max_loss_streak":6},
+    "new_method_delta_pnl_vnd": -1200000,
+    "assessment": "New method lowers drawdown and loss streak, but does not establish superior profit."
+  },
+  "uncertainty": {
+    "oos_hpo_bootstrap_ci95": [0.46987952,0.79518072],
+    "probability_hpo_above_break_even": 0.7442,
+    "paired_pnl_delta_ci95_vnd": [-18360000,16080000],
+    "probability_delta_positive": 0.4398
+  },
+  "current_locked_decision": {
+    "target_date": "2026-07-12",
+    "rbk_pool": ["60-06","54-45"],
+    "rank1": "60-06",
+    "rank1_metrics": "Gan1/0; dGan1; H5pair4; minH21=9; B=0.6167",
+    "decision": "A0_SHADOW",
+    "watch_pair": "60-06",
+    "no_fallback_pair": "54-45"
+  },
+  "next_target": {
+    "date": "2026-07-13",
+    "status": "A0_DATA_PENDING",
+    "reason": "The 2026-07-12 draw is not yet locked 27/27; no causal selection is permitted."
+  },
+  "status": "ACTIVE_SHADOW_LOCKED"
+}

@@ -1,5 +1,5 @@
 {
-  "schema_version": "MB_AUTOMATION_POLICY_V4",
+  "schema_version": "MB_AUTOMATION_POLICY_V5",
   "status": "ACTIVE_PERMANENT",
   "source_spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
   "website_repository": "nguyenlinhns-arch/mb-daily-control",
@@ -56,20 +56,30 @@
   },
   "top_block": {
     "status": "ACTIVE_PERMANENT",
-    "rule_version": "TOP3_GATE_WR_DAILY_V1",
-    "first_block_must_use_top3": true,
-    "number_count": 3,
-    "unique_codes": true,
-    "candidate_scope": ["A1", "X3", "X2"],
-    "ranking_order": [
-      "controller_selected_and_gate_pass DESC",
-      "gate_pass DESC",
-      "validated_method_reference_win_rate DESC",
-      "method_priority A1>X3>X2",
-      "within_method_rank ASC",
-      "code ASC"
-    ],
-    "fill_policy": "Nếu chưa đủ 3 mã đạt, điền các vị trí còn lại bằng Watch/Shadow xếp hạng cao nhất; phải ghi đúng trạng thái và vốn thật 0đ.",
+    "rule_version": "FIRST_BLOCK_ALL_PASS_ELSE_TOP3_WR_V2",
+    "candidate_scope": ["A1", "X2", "X3"],
+    "all_methods_pass_mode": {
+      "condition": "A1, X2 and X3 each have at least one gate-qualified selection",
+      "action": "Show every qualified selection from all three methods",
+      "method_order": ["A1", "X2", "X3"],
+      "number_cap": null,
+      "preserve_method_sections": true,
+      "duplicate_code_across_methods_allowed": true
+    },
+    "fallback_mode": {
+      "condition": "At least one of A1, X2 or X3 has no gate-qualified selection",
+      "action": "Show exactly three unique codes with the highest validated method reference win rate",
+      "number_count": 3,
+      "unique_codes": true,
+      "ranking_order": [
+        "validated_method_reference_win_rate DESC",
+        "gate_pass DESC",
+        "controller_selected DESC",
+        "method_priority A1>X2>X3",
+        "within_method_rank ASC",
+        "code ASC"
+      ]
+    },
     "method_reference_win_rates": {
       "A1_CORE": {
         "rate": 0.4737,
@@ -93,7 +103,7 @@
       }
     },
     "display_disclaimer": "Tỷ lệ thắng chỉ là tham chiếu lịch sử cấp phương pháp, không phải xác suất riêng của từng mã và không bảo đảm kết quả.",
-    "real_money_rule": "Chỉ các mã có điểm lớn hơn 0 trong Top3 mới thuộc kế hoạch tiền thật chờ xác nhận; Watch/Shadow luôn 0đ."
+    "real_money_rule": "Chỉ phương pháp được controller chọn có điểm/vốn. Các số Đạt nhưng bị ưu tiên chặn, Watch hoặc Shadow luôn 0đ."
   },
   "milestones": {
     "status": "ACTIVE_MANDATORY_ABSOLUTE",
@@ -118,7 +128,7 @@
       "settle confirmed real orders idempotently",
       "recompute next-day A1/X3/X2",
       "apply A1 reverse50 without duplicate codes",
-      "build permanent daily Top3 first block",
+      "build first block: all A1/X2/X3 pass => show all in A1/X2/X3 order; otherwise show top3 by validated reference win rate",
       "validate all earliest-entry milestones",
       "write data/current.json",
       "write data/plans/YYYY-MM-DD.json",

@@ -1,5 +1,5 @@
 {
-  "schema_version": "MB_AUTOMATION_POLICY_V5",
+  "schema_version": "MB_AUTOMATION_POLICY_V6",
   "status": "ACTIVE_PERMANENT",
   "source_spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
   "website_repository": "nguyenlinhns-arch/mb-daily-control",
@@ -56,30 +56,40 @@
   },
   "top_block": {
     "status": "ACTIVE_PERMANENT",
-    "rule_version": "FIRST_BLOCK_ALL_PASS_ELSE_TOP3_WR_V2",
-    "candidate_scope": ["A1", "X2", "X3"],
-    "all_methods_pass_mode": {
-      "condition": "A1, X2 and X3 each have at least one gate-qualified selection",
-      "action": "Show every qualified selection from all three methods",
-      "method_order": ["A1", "X2", "X3"],
-      "number_cap": null,
-      "preserve_method_sections": true,
-      "duplicate_code_across_methods_allowed": true
+    "rule_version": "FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3",
+    "panel_order": ["A1", "X2", "X3"],
+    "a1_panel": {
+      "always_present": true,
+      "show_official_selection": true,
+      "primary_code_must_be_circled": true,
+      "blank_when_no_a1": true,
+      "reverse_code_follows_A1_REVERSE50_NO_DUPLICATE_V1": true
     },
-    "fallback_mode": {
-      "condition": "At least one of A1, X2 or X3 has no gate-qualified selection",
-      "action": "Show exactly three unique codes with the highest validated method reference win rate",
+    "x2_panel": {
+      "always_present": true,
+      "qualified_action": "Show exactly the two codes of the qualified X2 pair",
+      "fallback_action": "Show exactly the two codes of the current rank-1 X2 pair",
+      "number_count": 2,
+      "reference_key": "X2_RESCUE"
+    },
+    "x3_panel": {
+      "always_present": true,
+      "qualified_action": "Show exactly the three codes of the qualified X3 basket",
+      "fallback_action": "Show exactly the three codes of the current top-ranked X3 basket",
       "number_count": 3,
-      "unique_codes": true,
-      "ranking_order": [
-        "validated_method_reference_win_rate DESC",
-        "gate_pass DESC",
-        "controller_selected DESC",
-        "method_priority A1>X2>X3",
-        "within_method_rank ASC",
-        "code ASC"
-      ]
+      "reference_key": "X3_GROWTH"
     },
+    "colour_convention": {
+      "PASS": "GREEN",
+      "NEAR": "LIME_YELLOW",
+      "FAIL": "RED",
+      "labels_vi": {
+        "PASS": "Đạt",
+        "NEAR": "Gần đạt",
+        "FAIL": "Không đạt"
+      }
+    },
+    "near_rule": "Explicit NEAR/GẦN status, an individually-qualified candidate blocked by a higher layer, or a conditional earliest date no later than the next draw; X3 sum 31/35 is also near the 32-34 gate.",
     "method_reference_win_rates": {
       "A1_CORE": {
         "rate": 0.4737,
@@ -103,7 +113,7 @@
       }
     },
     "display_disclaimer": "Tỷ lệ thắng chỉ là tham chiếu lịch sử cấp phương pháp, không phải xác suất riêng của từng mã và không bảo đảm kết quả.",
-    "real_money_rule": "Chỉ phương pháp được controller chọn có điểm/vốn. Các số Đạt nhưng bị ưu tiên chặn, Watch hoặc Shadow luôn 0đ."
+    "real_money_rule": "Chỉ phương pháp được controller chọn có điểm/vốn. X2/X3 đạt nhưng bị ưu tiên chặn, gần đạt hoặc không đạt vẫn hiển thị nhưng vốn bằng 0đ."
   },
   "milestones": {
     "status": "ACTIVE_MANDATORY_ABSOLUTE",
@@ -128,7 +138,7 @@
       "settle confirmed real orders idempotently",
       "recompute next-day A1/X3/X2",
       "apply A1 reverse50 without duplicate codes",
-      "build first block: all A1/X2/X3 pass => show all in A1/X2/X3 order; otherwise show top3 by validated reference win rate",
+      "build top panels: pin/circle A1 when present; show X2 pair and X3 basket with pass/near/fail colours",
       "validate all earliest-entry milestones",
       "write data/current.json",
       "write data/plans/YYYY-MM-DD.json",

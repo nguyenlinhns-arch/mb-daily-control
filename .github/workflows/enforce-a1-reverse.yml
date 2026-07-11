@@ -1,9 +1,9 @@
-name: Enforce permanent A1 reverse50 rule
+name: Enforce permanent A1 reverse50 and Top3 first block
 
 on:
   workflow_dispatch:
   schedule:
-    # Belt-and-suspenders runs after the canonical 14:00 / 19:15 / 19:35 / 19:55 pipeline.
+    # Chạy sau pipeline canonical 14:00 / 19:15 / 19:35 / 19:55.
     - cron: "5 7 * * *"
     - cron: "20 12 * * *"
     - cron: "40 12 * * *"
@@ -15,19 +15,20 @@ on:
       - "data/plans/**"
       - "data/automation-policy.json"
       - "scripts/enforce_a1_reverse.py"
+      - "scripts/enforce_top3_first_block.py"
       - ".github/workflows/enforce-a1-reverse.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: enforce-a1-reverse50
+  group: enforce-a1-reverse50-and-top3
   cancel-in-progress: false
 
 jobs:
   enforce:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,22 +40,26 @@ jobs:
         with:
           python-version: "3.12"
 
-      # This post-processor is authoritative even when the canonical planner is rebuilt.
       - name: Apply A1 reverse50 and no-duplicate policy
         run: python scripts/enforce_a1_reverse.py
 
-      - name: Validate permanent invariant
-        run: python scripts/enforce_a1_reverse.py --check
+      - name: Build exactly three ranked numbers for the first block
+        run: python scripts/enforce_top3_first_block.py
+
+      - name: Validate permanent invariants
+        run: |
+          python scripts/enforce_a1_reverse.py --check
+          python scripts/enforce_top3_first_block.py --check
 
       - name: Commit only when enforcement changed files
         run: |
           if git diff --quiet -- data; then
-            echo "A1 reverse50 rule already enforced."
+            echo "A1 reverse50 and Top3 first-block rules already enforced."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git commit -m "data: enforce A1 reverse50 no-duplicate rule"
+          git commit -m "data: enforce A1 reverse50 and daily Top3 first block"
           git pull --rebase origin main
           git push origin HEAD:main

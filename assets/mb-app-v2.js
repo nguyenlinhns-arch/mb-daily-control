@@ -27,7 +27,7 @@
   function pnlCard(label,value,note,cls=""){return`<div class="pnl-card ${cls}"><span>${esc(label)}</span><b class="${moneyClass(value)}">${signed(value)}</b><small>${esc(note)}</small></div>`}
 
   function render(d){
-    const p=d.portfolio||{},t=d.top_signals||{},q=d.pnl_summary||{},ds=d.data||{},policy=d.milestone_policy||{},methods=t.methods||[];
+    const p=d.portfolio||{},t=d.qualified_signal_snapshot||d.top_signals||{},q=d.pnl_summary||{},ds=d.data||{},policy=d.milestone_policy||{},methods=t.methods||[];
     const byKey=key=>methods.find(m=>methodKey(m)===key)||{},a1=byKey("a1"),x2=byKey("x2"),x3=byKey("x3");
     const methodFact=(label,m,unit)=>`<div class="fact"><span>${label}</span><b>${esc(m.code_count??0)} ${unit} · ${esc(m.status||"—")}</b></div>`;
     const legend=(t.legend||[{visual_status:"PASS",label:"Xanh lá · Đạt"},{visual_status:"NEAR",label:"Vàng chanh · Gần đạt"},{visual_status:"FAIL",label:"Đỏ · Không đạt"}]).map(x=>`<span class="legend-item tone-${tone(x.visual_status)}">${esc(x.label)}</span>`).join("");

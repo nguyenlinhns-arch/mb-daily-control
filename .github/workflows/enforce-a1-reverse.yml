@@ -2,6 +2,9 @@ name: Enforce permanent A1 reverse50 and first-block policy
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["MB Daily result settlement and next-day plan"]
+    types: [completed]
   schedule:
     # Chạy sau pipeline canonical 14:00 / 19:15 / 19:35 / 19:55.
     - cron: "5 7 * * *"
@@ -28,12 +31,14 @@ concurrency:
 
 jobs:
   enforce:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout latest main
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up Python

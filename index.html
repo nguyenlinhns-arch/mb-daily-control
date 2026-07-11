@@ -2,751 +2,106 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate">
   <meta name="theme-color" content="#0b1f36">
-  <meta name="description" content="MB Daily Control — bảng điều khiển XSMB hằng ngày">
+  <meta name="description" content="MB Daily Control — XSMB Daily Validation">
   <title>MB Daily Control</title>
   <style>
-    :root {
-      --navy: #0b1f36;
-      --navy-2: #174d79;
-      --blue: #2467c9;
-      --green: #087b54;
-      --green-bg: #eaf8f2;
-      --amber: #925605;
-      --amber-bg: #fff5df;
-      --red: #b42318;
-      --red-bg: #fff0ee;
-      --ink: #172033;
-      --muted: #66758a;
-      --line: #dde5ee;
-      --canvas: #f3f6fa;
-      --panel: #ffffff;
-      --shadow: 0 14px 34px rgba(11, 31, 54, 0.08);
+    :root{
+      --navy:#0b1f36;--navy2:#174d79;--blue:#2467c9;--green:#087b54;
+      --green-bg:#eaf8f2;--amber:#925605;--amber-bg:#fff5df;--red:#b42318;
+      --red-bg:#fff0ee;--ink:#172033;--muted:#66758a;--line:#dde5ee;
+      --canvas:#f3f6fa;--panel:#fff;--blue-bg:#eef5ff;
+      --shadow:0 14px 34px rgba(11,31,54,.08)
     }
-
-    * { box-sizing: border-box; }
-
-    html {
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-    }
-
-    body {
-      margin: 0;
-      background: var(--canvas);
-      color: var(--ink);
-      font: 15px/1.48 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      overflow-wrap: anywhere;
-    }
-
-    button { font: inherit; }
-
-    .wrap {
-      width: min(1120px, calc(100% - 24px));
-      margin: 0 auto;
-      padding: max(16px, env(safe-area-inset-top)) 0 calc(36px + env(safe-area-inset-bottom));
-    }
-
-    .bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .brand {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      min-width: 0;
-    }
-
-    .logo {
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-      border-radius: 12px;
-      background: var(--navy);
-      color: #fff;
-      font-weight: 900;
-    }
-
-    .brand b,
-    .brand small { display: block; }
-
-    .brand b { line-height: 1.2; }
-    .brand small { color: var(--muted); }
-
-    #refresh {
-      flex: 0 0 auto;
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 10px;
-      padding: 8px 11px;
-      font-weight: 800;
-      color: var(--navy);
-      cursor: pointer;
-    }
-
-    #refresh:disabled { opacity: 0.55; cursor: wait; }
-
-    .hero {
-      overflow: hidden;
-      border-radius: 20px;
-      background: linear-gradient(135deg, var(--navy), var(--navy-2));
-      color: #fff;
-      box-shadow: var(--shadow);
-    }
-
-    .hero-main { padding: 24px; }
-
-    .tag {
-      display: inline-block;
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #a9c2dd;
-      font-weight: 800;
-    }
-
-    h1 {
-      margin: 7px 0 9px;
-      font-size: clamp(1.85rem, 4vw, 3rem);
-      line-height: 1.08;
-      letter-spacing: -0.035em;
-      overflow-wrap: anywhere;
-    }
-
-    .hero-main > p {
-      margin: 0;
-      color: #c5d5e6;
-      max-width: 780px;
-    }
-
-    .facts,
-    .pnl,
-    .methods,
-    .groups {
-      display: grid;
-      gap: 10px;
-    }
-
-    .facts {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin-top: 18px;
-    }
-
-    .fact {
-      min-width: 0;
-      min-height: 84px;
-      padding: 11px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .fact span,
-    .fact b { display: block; }
-
-    .fact span {
-      font-size: 0.68rem;
-      color: #b8cadd;
-    }
-
-    .fact b {
-      margin-top: 5px;
-      font-size: clamp(1.05rem, 2.4vw, 1.55rem);
-      line-height: 1.22;
-      word-break: normal;
-      overflow-wrap: anywhere;
-    }
-
-    .fact.status b { font-size: clamp(0.98rem, 2.2vw, 1.35rem); }
-
-    .signals {
-      padding: 21px;
-      background: #f8fbff;
-      color: var(--ink);
-    }
-
-    .signals h2,
-    .section h2 { margin: 0; }
-
-    .section-title { color: #64778e; }
-
-    .head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 14px;
-      margin-bottom: 11px;
-    }
-
-    .head > div { min-width: 0; }
-
-    .head h2 {
-      line-height: 1.2;
-      overflow-wrap: anywhere;
-    }
-
-    .head p {
-      margin: 0;
-      max-width: 520px;
-      color: var(--muted);
-      text-align: right;
-    }
-
-    .methods {
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      margin-top: 13px;
-    }
-
-    .method {
-      min-width: 0;
-      padding: 15px;
-      border: 1px solid #b8ddcc;
-      border-top: 4px solid var(--green);
-      border-radius: 15px;
-      background: #fff;
-    }
-
-    .method-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .method-head > div { min-width: 0; }
-
-    .method-head small {
-      display: block;
-      color: var(--muted);
-      overflow-wrap: anywhere;
-    }
-
-    .method-head h2 {
-      margin-top: 3px;
-      overflow-wrap: anywhere;
-    }
-
-    .gate {
-      flex: 0 0 auto;
-      max-width: 46%;
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: var(--green-bg);
-      color: var(--green);
-      font-size: 0.65rem;
-      line-height: 1.2;
-      font-weight: 900;
-      text-align: center;
-      overflow-wrap: anywhere;
-    }
-
-    .nums {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin: 14px 0;
-    }
-
-    .num {
-      min-width: 0;
-      min-height: 178px;
-      padding: 15px 10px 13px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: #f5f8fb;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    .num b {
-      display: block;
-      color: var(--navy);
-      font-size: clamp(2.7rem, 7vw, 3.6rem);
-      line-height: 1;
-      letter-spacing: -0.04em;
-    }
-
-    .num em {
-      display: block;
-      margin-top: 11px;
-      color: var(--blue);
-      font-size: clamp(1rem, 3.4vw, 1.25rem);
-      line-height: 1.2;
-      font-style: normal;
-      font-weight: 900;
-      white-space: nowrap;
-    }
-
-    .num-meta {
-      display: block;
-      width: 100%;
-      margin-top: 8px;
-      color: var(--ink);
-      font-size: 0.88rem;
-      line-height: 1.35;
-      text-align: center;
-    }
-
-    .num-role,
-    .num-capital {
-      display: block;
-      max-width: 100%;
-      overflow-wrap: anywhere;
-    }
-
-    .num-role { font-weight: 700; }
-    .num-capital { margin-top: 2px; color: var(--muted); }
-
-    .method-summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 7px;
-    }
-
-    .method-summary div {
-      min-width: 0;
-      padding: 8px;
-      border-radius: 9px;
-      background: #eef5f1;
-    }
-
-    .method-summary span,
-    .method-summary strong { display: block; }
-
-    .method-summary span {
-      color: var(--muted);
-      font-size: 0.59rem;
-      text-transform: uppercase;
-    }
-
-    .method-summary strong {
-      margin-top: 3px;
-      font-size: 0.76rem;
-      overflow-wrap: anywhere;
-    }
-
-    .note {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: var(--amber-bg);
-      color: #704307;
-      font-size: 0.8rem;
-      line-height: 1.45;
-    }
-
-    .section { margin-top: 23px; }
-
-    .pnl { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-
-    .pnl-card {
-      min-width: 0;
-      padding: 13px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: #fff;
-    }
-
-    .pnl-card.main {
-      background: var(--green-bg);
-      border-color: #a8d7c3;
-    }
-
-    .pnl-card.pending {
-      background: var(--amber-bg);
-      border-color: #eed09b;
-    }
-
-    .pnl-card span,
-    .pnl-card b,
-    .pnl-card small { display: block; }
-
-    .pnl-card span {
-      color: var(--muted);
-      font-size: 0.62rem;
-      text-transform: uppercase;
-    }
-
-    .pnl-card b {
-      margin: 5px 0;
-      font-size: clamp(1.02rem, 2.6vw, 1.28rem);
-      line-height: 1.22;
-      overflow-wrap: anywhere;
-    }
-
-    .pnl-card small {
-      color: var(--muted);
-      line-height: 1.35;
-      overflow-wrap: anywhere;
-    }
-
-    .pos { color: var(--green); }
-    .neg { color: var(--red); }
-    .zero { color: var(--muted); }
-
-    .groups { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
-    .card {
-      min-width: 0;
-      padding: 15px;
-      border: 1px solid var(--line);
-      border-top: 4px solid #d49b39;
-      border-radius: 14px;
-      background: #fff;
-    }
-
-    .card.pass { border-top-color: var(--green); }
-
-    .card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .card-head > div { min-width: 0; }
-    .card h3 { margin: 2px 0 8px; }
-
-    .pill {
-      flex: 0 0 auto;
-      max-width: 48%;
-      padding: 4px 7px;
-      border-radius: 999px;
-      background: var(--amber-bg);
-      color: var(--amber);
-      font-size: 0.62rem;
-      line-height: 1.2;
-      font-weight: 900;
-      text-align: center;
-      overflow-wrap: anywhere;
-    }
-
-    .pass .pill { background: var(--green-bg); color: var(--green); }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 9px 0;
-    }
-
-    .chip {
-      padding: 7px 9px;
-      border-radius: 9px;
-      background: #eef3f8;
-      color: var(--navy);
-      font-weight: 900;
-    }
-
-    .why {
-      padding: 8px;
-      border-radius: 8px;
-      background: var(--amber-bg);
-      color: #704307;
-      font-size: 0.75rem;
-      line-height: 1.45;
-    }
-
-    .candidate {
-      margin-top: 8px;
-      padding-top: 7px;
-      border-top: 1px solid #edf1f5;
-      color: var(--muted);
-      font-size: 0.72rem;
-      line-height: 1.45;
-    }
-
-    details {
-      margin-top: 20px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: #fff;
-    }
-
-    summary { cursor: pointer; padding: 12px 14px; font-weight: 800; }
-    .audit { padding: 0 14px 14px; }
-
-    .codes {
-      display: grid;
-      grid-template-columns: repeat(9, minmax(0, 1fr));
-      gap: 5px;
-    }
-
-    .codes span {
-      padding: 6px;
-      border-radius: 7px;
-      background: #f0f4f8;
-      text-align: center;
-      font-weight: 800;
-    }
-
-    .error {
-      padding: 20px;
-      border-radius: 14px;
-      background: var(--red-bg);
-      color: var(--red);
-    }
-
-    footer {
-      margin-top: 22px;
-      color: var(--muted);
-      font-size: 0.72rem;
-    }
-
-    @media (max-width: 900px) {
-      .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .pnl { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 640px) {
-      .wrap { width: min(100% - 16px, 1120px); padding-top: max(10px, env(safe-area-inset-top)); }
-      .bar { margin-bottom: 10px; }
-      .brand small { font-size: 0.76rem; }
-      #refresh { padding: 8px 9px; }
-      .hero { border-radius: 16px; }
-      .hero-main { padding: 20px 16px; }
-      .signals { padding: 20px 16px; }
-      h1 { font-size: clamp(1.7rem, 8vw, 2.35rem); }
-      .facts { gap: 9px; }
-      .fact { min-height: 104px; padding: 12px 10px; }
-      .fact b { font-size: clamp(1.22rem, 5.8vw, 1.62rem); }
-      .fact.status b { font-size: clamp(1.05rem, 4.9vw, 1.38rem); }
-      .head { align-items: flex-start; flex-direction: column; gap: 5px; }
-      .head p { text-align: left; }
-      .head h2 { font-size: clamp(1.45rem, 6.2vw, 2rem); }
-      .methods { grid-template-columns: minmax(0, 1fr); }
-      .method { padding: 14px; }
-      .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-      .num { min-height: 190px; padding: 15px 8px 13px; }
-      .num b { font-size: clamp(2.75rem, 14vw, 3.65rem); }
-      .num em { font-size: clamp(0.98rem, 4.8vw, 1.18rem); }
-      .num-meta { font-size: 0.86rem; }
-      .method-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .pnl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .groups { grid-template-columns: minmax(0, 1fr); }
-      .codes { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 390px) {
-      .nums { grid-template-columns: minmax(0, 1fr); }
-      .num { min-height: 174px; }
-      .pnl { grid-template-columns: minmax(0, 1fr); }
-      .facts { grid-template-columns: minmax(0, 1fr); }
-      .fact { min-height: 78px; }
-    }
+    *{box-sizing:border-box}html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+    body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.48 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-wrap:anywhere}
+    button{font:inherit}.wrap{width:min(1120px,calc(100% - 24px));margin:auto;padding:max(16px,env(safe-area-inset-top)) 0 calc(36px + env(safe-area-inset-bottom))}
+    .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.brand{display:flex;gap:10px;align-items:center;min-width:0}
+    .logo{display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;border-radius:12px;background:var(--navy);color:#fff;font-weight:900}
+    .brand b,.brand small{display:block}.brand b{line-height:1.2}.brand small{color:var(--muted)}
+    #refresh{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 11px;font-weight:800;color:var(--navy);cursor:pointer}
+    #refresh:disabled{opacity:.55;cursor:wait}
+    .hero{overflow:hidden;border-radius:20px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;box-shadow:var(--shadow)}
+    .hero-main{padding:24px}.tag{display:inline-block;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:#a9c2dd;font-weight:800}
+    h1{margin:7px 0 9px;font-size:clamp(1.85rem,4vw,3rem);line-height:1.08;letter-spacing:-.035em}.hero-main>p{margin:0;color:#c5d5e6;max-width:790px}
+    .facts,.pnl,.methods,.groups{display:grid;gap:10px}.facts{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px}
+    .fact{min-width:0;min-height:84px;padding:11px 12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.06)}
+    .fact span,.fact b{display:block}.fact span{font-size:.68rem;color:#b8cadd}.fact b{margin-top:5px;font-size:clamp(1.05rem,2.4vw,1.55rem);line-height:1.22}.fact.status b{font-size:clamp(.98rem,2.2vw,1.35rem)}
+    .signals{padding:21px;background:#f8fbff;color:var(--ink)}.signals h2,.section h2{margin:0}.section-title{color:#64778e}
+    .head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:11px}.head>div{min-width:0}.head h2{line-height:1.2}.head p{margin:0;max-width:540px;color:var(--muted);text-align:right}
+    .methods{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:13px}.method{min-width:0;padding:15px;border:1px solid #b8ddcc;border-top:4px solid var(--green);border-radius:15px;background:#fff}
+    .method-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.method-head>div{min-width:0}.method-head small{display:block;color:var(--muted)}.method-head h2{margin-top:3px}
+    .gate{flex:0 0 auto;max-width:46%;padding:5px 8px;border-radius:999px;background:var(--green-bg);color:var(--green);font-size:.65rem;line-height:1.2;font-weight:900;text-align:center}
+    .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}.num{min-width:0;min-height:178px;padding:15px 10px 13px;border:1px solid var(--line);border-radius:13px;background:#f5f8fb;text-align:center;display:flex;flex-direction:column;align-items:center}
+    .num b{display:block;color:var(--navy);font-size:clamp(2.7rem,7vw,3.6rem);line-height:1;letter-spacing:-.04em}.num em{display:block;margin-top:11px;color:var(--blue);font-size:clamp(1rem,3.4vw,1.25rem);line-height:1.2;font-style:normal;font-weight:900;white-space:nowrap}
+    .num-meta{display:block;width:100%;margin-top:8px;font-size:.88rem;line-height:1.35}.num-role,.num-capital{display:block}.num-role{font-weight:700}.num-capital{margin-top:2px;color:var(--muted)}
+    .method-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.method-summary div{min-width:0;padding:8px;border-radius:9px;background:#eef5f1}.method-summary span,.method-summary strong{display:block}.method-summary span{color:var(--muted);font-size:.59rem;text-transform:uppercase}.method-summary strong{margin-top:3px;font-size:.76rem}
+    .note{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--amber-bg);color:#704307;font-size:.8rem;line-height:1.45}
+    .section{margin-top:23px}.pnl{grid-template-columns:repeat(5,minmax(0,1fr))}.pnl-card{min-width:0;padding:13px;border:1px solid var(--line);border-radius:13px;background:#fff}.pnl-card.main{background:var(--green-bg);border-color:#a8d7c3}.pnl-card.pending{background:var(--amber-bg);border-color:#eed09b}
+    .pnl-card span,.pnl-card b,.pnl-card small{display:block}.pnl-card span{color:var(--muted);font-size:.62rem;text-transform:uppercase}.pnl-card b{margin:5px 0;font-size:clamp(1.02rem,2.6vw,1.28rem);line-height:1.22}.pnl-card small{color:var(--muted);line-height:1.35}.pos{color:var(--green)}.neg{color:var(--red)}.zero{color:var(--muted)}
+    .groups{grid-template-columns:repeat(3,minmax(0,1fr))}.card{min-width:0;padding:15px;border:1px solid var(--line);border-top:4px solid #d49b39;border-radius:14px;background:#fff}.card.pass{border-top-color:var(--green)}
+    .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.card-head>div{min-width:0}.card h3{margin:2px 0 8px}.pill{flex:0 0 auto;max-width:48%;padding:4px 7px;border-radius:999px;background:var(--amber-bg);color:var(--amber);font-size:.62rem;line-height:1.2;font-weight:900;text-align:center}.pass .pill{background:var(--green-bg);color:var(--green)}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.chip{padding:7px 9px;border-radius:9px;background:#eef3f8;color:var(--navy);font-weight:900}.why{padding:8px;border-radius:8px;background:var(--amber-bg);color:#704307;font-size:.75rem;line-height:1.45}
+    .profile{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0}.profile div{padding:7px 8px;border-radius:8px;background:#f5f8fb}.profile span,.profile b{display:block}.profile span{font-size:.58rem;color:var(--muted);text-transform:uppercase}.profile b{margin-top:2px;font-size:.73rem}
+    .candidate{margin-top:9px;padding-top:8px;border-top:1px solid #edf1f5;color:var(--muted);font-size:.73rem;line-height:1.45}.candidate-title{color:var(--ink)}
+    .milestone{margin-top:7px;padding:8px 9px;border-left:3px solid var(--blue);border-radius:7px;background:var(--blue-bg);color:#35516f;font-size:.7rem;line-height:1.42}.milestone b,.milestone span,.milestone small{display:block}.milestone b{color:var(--navy);font-size:.73rem}.milestone span{margin-top:3px}.milestone small{margin-top:3px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+    details{margin-top:20px;border:1px solid var(--line);border-radius:13px;background:#fff}summary{cursor:pointer;padding:12px 14px;font-weight:800}.audit{padding:0 14px 14px}.codes{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:5px}.codes span{padding:6px;border-radius:7px;background:#f0f4f8;text-align:center;font-weight:800}
+    .error{padding:20px;border-radius:14px;background:var(--red-bg);color:var(--red)}footer{margin-top:22px;color:var(--muted);font-size:.72rem}
+    @media(max-width:900px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.pnl{grid-template-columns:repeat(3,minmax(0,1fr))}.groups{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:640px){.wrap{width:min(100% - 16px,1120px);padding-top:max(10px,env(safe-area-inset-top))}.bar{margin-bottom:10px}.hero{border-radius:16px}.hero-main,.signals{padding:20px 16px}h1{font-size:clamp(1.7rem,8vw,2.35rem)}.facts{gap:9px}.fact{min-height:104px;padding:12px 10px}.head{align-items:flex-start;flex-direction:column;gap:5px}.head p{text-align:left}.head h2{font-size:clamp(1.42rem,6.1vw,2rem)}.methods{grid-template-columns:minmax(0,1fr)}.nums{grid-template-columns:repeat(2,minmax(0,1fr))}.num{min-height:190px;padding:15px 8px 13px}.num b{font-size:clamp(2.75rem,14vw,3.65rem)}.num em{font-size:clamp(.98rem,4.8vw,1.18rem)}.method-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.pnl{grid-template-columns:repeat(2,minmax(0,1fr))}.groups{grid-template-columns:minmax(0,1fr)}.codes{grid-template-columns:repeat(6,minmax(0,1fr))}}
+    @media(max-width:390px){.nums,.pnl,.facts{grid-template-columns:minmax(0,1fr)}.num{min-height:174px}.fact{min-height:78px}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header class="bar">
-      <div class="brand">
-        <div class="logo">MB</div>
-        <div><b>MB Daily Control</b><small>XSMB Daily Validation</small></div>
-      </div>
-      <button id="refresh" type="button">↻ Làm mới</button>
-    </header>
+    <header class="bar"><div class="brand"><div class="logo">MB</div><div><b>MB Daily Control</b><small>XSMB Daily Validation</small></div></div><button id="refresh" type="button">↻ Làm mới</button></header>
     <main id="app">Đang tải…</main>
-    <footer>Chỉ ghi lãi/lỗ sau khi kết quả được khóa. Sổ archive hiển thị riêng và được cộng vào tổng toàn bộ.</footer>
+    <footer>Mốc sớm nhất là điều kiện/lower bound và được tính lại sau mỗi kỳ khóa; không phải cam kết chắc chắn vào lệnh.</footer>
   </div>
-
   <script>
-    (() => {
-      "use strict";
+  (()=>{"use strict";
+    const app=document.getElementById("app"),refresh=document.getElementById("refresh");
+    const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const vnd=n=>`${new Intl.NumberFormat("vi-VN").format(Number(n||0))}đ`;
+    const signed=n=>{const x=Number(n||0);return`${x>0?"+":x<0?"−":""}${vnd(Math.abs(x))}`};
+    const moneyClass=n=>Number(n)>0?"pos":Number(n)<0?"neg":"zero";
+    const date=s=>{if(!s)return"—";const[y,m,d]=String(s).split("-");return`${d}/${m}/${y}`};
+    const pass=s=>String(s||"").includes("PASS")?"pass":"";
+    const pct=v=>v===undefined||v===null?"—":(typeof v==="number"&&v<=1?`${(v*100).toFixed(2).replace(".",",")}%`:String(v));
 
-      const app = document.getElementById("app");
-      const refreshButton = document.getElementById("refresh");
+    function signalMethod(m){return`<article class="method"><div class="method-head"><div><small>${esc(m.method)}</small><h2>${esc(m.label)}</h2></div><span class="gate">${esc(m.status)}</span></div><div class="nums">${(m.numbers||[]).map(n=>`<div class="num"><b>${esc(n.code)}</b><em>×${esc(n.points)} điểm</em><small class="num-meta"><span class="num-role">${esc(n.role)}</span><span class="num-capital">${vnd(n.capital_vnd)}</span></small></div>`).join("")}</div><div class="method-summary"><div><span>Điểm/số</span><strong>${esc(m.points_per_code)}</strong></div><div><span>Số mã</span><strong>${esc(m.code_count)}</strong></div><div><span>Vốn</span><strong>${vnd(m.capital_vnd)}</strong></div></div></article>`}
 
-      const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      }[char]));
+    function profile(h){if(!h)return"";const cells=[];
+      if(h.orders!==undefined)cells.push(["Lệnh",h.orders]);
+      if(h.wins!==undefined)cells.push(["Thắng",h.wins]);
+      if(h.win_rate!==undefined)cells.push(["WR",pct(h.win_rate)]);
+      if(h.oos_win_rate!==undefined)cells.push(["WR OOS",pct(h.oos_win_rate)]);
+      if(h.pnl_vnd!==undefined)cells.push(["P/L",signed(h.pnl_vnd)]);
+      if(h.pnl_units!==undefined)cells.push(["P/L",`${h.pnl_units} đơn vị`]);
+      if(h.max_drawdown_vnd!==undefined)cells.push(["Max DD",signed(h.max_drawdown_vnd)]);
+      if(h.max_drawdown_units!==undefined)cells.push(["Max DD",`${h.max_drawdown_units} đơn vị`]);
+      if(!cells.length)return"";return`<div class="profile">${cells.slice(0,6).map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("")}</div>`}
 
-      const formatVnd = (value) => `${new Intl.NumberFormat("vi-VN").format(Number(value || 0))}đ`;
-      const signedVnd = (value) => {
-        const number = Number(value || 0);
-        return `${number > 0 ? "+" : number < 0 ? "−" : ""}${formatVnd(Math.abs(number))}`;
-      };
-      const moneyClass = (value) => Number(value) > 0 ? "pos" : Number(value) < 0 ? "neg" : "zero";
-      const formatDate = (value) => {
-        if (!value) return "—";
-        const [year, month, day] = String(value).split("-");
-        return `${day}/${month}/${year}`;
-      };
-      const passClass = (status) => String(status || "").includes("PASS") ? "pass" : "";
+    function milestone(c){if(!c.earliest_eligible_date)return"";return`<div class="milestone"><b>Mốc sớm nhất: ${date(c.earliest_eligible_date)}</b><span>${esc(c.earliest_condition||"")}</span><small>${esc(c.milestone_type||"CONDITIONAL")}</small></div>`}
 
-      function renderSignalMethod(method) {
-        const numbers = (method.numbers || []).map((number) => `
-          <div class="num">
-            <b>${escapeHtml(number.code)}</b>
-            <em>×${escapeHtml(number.points)} điểm</em>
-            <small class="num-meta">
-              <span class="num-role">${escapeHtml(number.role)}</span>
-              <span class="num-capital">${formatVnd(number.capital_vnd)}</span>
-            </small>
-          </div>
-        `).join("");
+    function groupCard(g){const candidates=(g.candidates||[]).map(c=>{const metrics=[c.gan!==undefined?`Gan ${c.gan}`:"",c.gmax!==undefined?`Gmax ${c.gmax}`:"",c.score!==undefined?`Score ${Number(c.score).toFixed(3)}`:"",c.hot21!==undefined?`HOT21 ${c.hot21}`:"",c.h21!==undefined?`H21 ${c.h21}`:"",c.co365!==undefined?`Co365 ${c.co365}`:"",c.gan_lead!==undefined?`Lead ${c.gan_lead}`:"",c.occ30!==undefined?`Occ30 ${c.occ30}`:""].filter(Boolean).join(" · ");return`<div class="candidate"><div><b class="candidate-title">${esc(c.code)}</b> · ${esc(c.status)}${metrics?` · ${esc(metrics)}`:""}</div><div>${esc(c.reason)}</div>${milestone(c)}</div>`}).join("");
+      const basket=g.earliest_basket_date?`<div class="milestone"><b>Mốc sớm nhất của cả rổ: ${date(g.earliest_basket_date)}</b><span>${esc(g.earliest_basket_condition||"")}</span><small>LOWER BOUND DYNAMIC</small></div>`:"";
+      return`<article class="card ${pass(g.status)}"><div class="card-head"><div><small>${esc(g.role)}</small><h3>${esc(g.label)}</h3></div><span class="pill">${esc(g.status)}</span></div><b>${esc(g.method)}</b><div class="chips">${(g.selected_numbers||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join("")}</div><p>${esc(g.summary)}</p><div class="why">${esc(g.reason)}</div>${profile(g.historical_profile)}${candidates}${basket}</article>`}
 
-        return `
-          <article class="method">
-            <div class="method-head">
-              <div>
-                <small>${escapeHtml(method.method)}</small>
-                <h2>${escapeHtml(method.label)}</h2>
-              </div>
-              <span class="gate">${escapeHtml(method.status)}</span>
-            </div>
-            <div class="nums">${numbers}</div>
-            <div class="method-summary">
-              <div><span>Điểm/số</span><strong>${escapeHtml(method.points_per_code)}</strong></div>
-              <div><span>Số mã</span><strong>${escapeHtml(method.code_count)}</strong></div>
-              <div><span>Vốn</span><strong>${formatVnd(method.capital_vnd)}</strong></div>
-            </div>
-          </article>
-        `;
-      }
+    function pnlCard(label,value,note,cls=""){return`<div class="pnl-card ${cls}"><span>${esc(label)}</span><b class="${moneyClass(value)}">${signed(value)}</b><small>${esc(note)}</small></div>`}
 
-      function renderGroupCard(group) {
-        const chips = (group.selected_numbers || []).map((number) => `<span class="chip">${escapeHtml(number)}</span>`).join("");
-        const candidates = (group.candidates || []).map((candidate) => {
-          const metrics = [
-            candidate.gan !== undefined ? `Gan ${candidate.gan}` : "",
-            candidate.gmax !== undefined ? `Gmax ${candidate.gmax}` : "",
-            candidate.score !== undefined ? `Score ${Number(candidate.score).toFixed(3)}` : "",
-            candidate.hot21 !== undefined ? `HOT21 ${candidate.hot21}` : ""
-          ].filter(Boolean).join(" · ");
+    function render(d){const p=d.portfolio||{},t=d.top_signals||{},q=d.pnl_summary||{},ds=d.data||{},policy=d.milestone_policy||{};
+      const pnl=[pnlCard("Kết quả hôm qua",q.yesterday_pnl_vnd,`${date(q.yesterday_date)} · ${q.yesterday_hits} nháy`),pnlCard("Tổng 5 nhóm",q.active_five_group_pnl_vnd,`Khóa đến ${date(q.confirmed_through)}`,"main"),pnlCard("Sổ archive",q.archive_pnl_vnd,"Than Vo lưu trữ"),pnlCard("Tổng toàn bộ",q.grand_total_pnl_vnd,"5 nhóm + archive","main"),`<div class="pnl-card pending"><span>Lệnh hôm nay chờ KQ</span><b>${vnd(q.today_pending_capital_vnd)}</b><small>${esc(q.today_pending_order)} · chưa cộng P/L</small></div>`].join("");
+      app.innerHTML=`<section class="hero"><div class="hero-main"><span class="tag">RÀ SOÁT ${date(d.target_date)}</span><h1>${esc(p.title)}</h1><p>${esc(p.reason)}</p><div class="facts"><div class="fact"><span>Tổng điểm</span><b>${esc(t.total_points)}</b></div><div class="fact"><span>Số mã</span><b>${esc(t.total_numbers)}</b></div><div class="fact"><span>Vốn hôm nay</span><b>${vnd(t.total_capital_vnd)}</b></div><div class="fact status"><span>Trạng thái</span><b>${esc(p.tier)}</b></div></div></div><div class="signals"><div class="head"><div><span class="tag section-title">${esc(t.title)}</span><h2>${esc(t.subtitle)}</h2></div><p>${esc(t.total_methods)} phương pháp đạt</p></div><div class="methods">${(t.methods||[]).map(signalMethod).join("")||'<div class="note">Không có tín hiệu đạt gate.</div>'}</div><div class="note">${esc(t.note)}</div></div></section>
+      <section class="section"><div class="head"><div><span class="tag section-title">LÃI/LỖ</span><h2>Theo dõi vốn và lợi nhuận</h2></div><p>Hôm qua đã cộng; lệnh hôm nay chưa cộng.</p></div><div class="pnl">${pnl}</div></section>
+      <section class="section"><div class="head"><div><span class="tag section-title">CHI TIẾT & MỐC VÀO</span><h2>A1 · X2 · X3 · Xiên 2 · Đề đầu/đuôi</h2></div><p>${esc(policy.disclosure||"Mốc sớm nhất là điều kiện, không phải cam kết.")}</p></div><div class="groups">${(d.groups||[]).map(groupCard).join("")}</div></section>
+      <details><summary>Kiểm toán dữ liệu và 27 mã gần nhất</summary><div class="audit"><p>${esc(ds.source_label)}</p><div class="codes">${(ds.latest_27_codes||[]).map(x=>`<span>${esc(x)}</span>`).join("")}</div></div></details>`}
 
-          return `<div class="candidate"><b>${escapeHtml(candidate.code)}</b> · ${escapeHtml(candidate.status)}${metrics ? ` · ${escapeHtml(metrics)}` : ""} — ${escapeHtml(candidate.reason)}</div>`;
-        }).join("");
-
-        return `
-          <article class="card ${passClass(group.status)}">
-            <div class="card-head">
-              <div><small>${escapeHtml(group.role)}</small><h3>${escapeHtml(group.label)}</h3></div>
-              <span class="pill">${escapeHtml(group.status)}</span>
-            </div>
-            <b>${escapeHtml(group.method)}</b>
-            <div class="chips">${chips}</div>
-            <p>${escapeHtml(group.summary)}</p>
-            <div class="why">${escapeHtml(group.reason)}</div>
-            ${candidates}
-          </article>
-        `;
-      }
-
-      function renderPnlCard(label, value, note, extraClass = "") {
-        return `
-          <div class="pnl-card ${extraClass}">
-            <span>${escapeHtml(label)}</span>
-            <b class="${moneyClass(value)}">${signedVnd(value)}</b>
-            <small>${escapeHtml(note)}</small>
-          </div>
-        `;
-      }
-
-      function render(data) {
-        const portfolio = data.portfolio || {};
-        const topSignals = data.top_signals || {};
-        const pnlSummary = data.pnl_summary || {};
-        const sourceData = data.data || {};
-
-        const pnlCards = [
-          renderPnlCard("Kết quả hôm qua", pnlSummary.yesterday_pnl_vnd, `${formatDate(pnlSummary.yesterday_date)} · ${pnlSummary.yesterday_hits} nháy`),
-          renderPnlCard("Tổng 5 nhóm", pnlSummary.active_five_group_pnl_vnd, `Khóa đến ${formatDate(pnlSummary.confirmed_through)}`, "main"),
-          renderPnlCard("Sổ archive", pnlSummary.archive_pnl_vnd, "Than Vo lưu trữ"),
-          renderPnlCard("Tổng toàn bộ", pnlSummary.grand_total_pnl_vnd, "5 nhóm + archive", "main"),
-          `<div class="pnl-card pending">
-            <span>Lệnh hôm nay chờ KQ</span>
-            <b>${formatVnd(pnlSummary.today_pending_capital_vnd)}</b>
-            <small>${escapeHtml(pnlSummary.today_pending_order)} · chưa cộng P/L</small>
-          </div>`
-        ].join("");
-
-        app.innerHTML = `
-          <section class="hero">
-            <div class="hero-main">
-              <span class="tag">RÀ SOÁT ${formatDate(data.target_date)}</span>
-              <h1>${escapeHtml(portfolio.title)}</h1>
-              <p>${escapeHtml(portfolio.reason)}</p>
-              <div class="facts">
-                <div class="fact"><span>Tổng điểm</span><b>${escapeHtml(topSignals.total_points)}</b></div>
-                <div class="fact"><span>Số mã</span><b>${escapeHtml(topSignals.total_numbers)}</b></div>
-                <div class="fact"><span>Vốn hôm nay</span><b>${formatVnd(topSignals.total_capital_vnd)}</b></div>
-                <div class="fact status"><span>Trạng thái</span><b>${escapeHtml(portfolio.tier)}</b></div>
-              </div>
-            </div>
-
-            <div class="signals">
-              <div class="head">
-                <div>
-                  <span class="tag section-title">${escapeHtml(topSignals.title)}</span>
-                  <h2>${escapeHtml(topSignals.subtitle)}</h2>
-                </div>
-                <p>${escapeHtml(topSignals.total_methods)} phương pháp đạt</p>
-              </div>
-              <div class="methods">${(topSignals.methods || []).map(renderSignalMethod).join("") || '<div class="note">Không có tín hiệu đạt gate.</div>'}</div>
-              <div class="note">${escapeHtml(topSignals.note)}</div>
-            </div>
-          </section>
-
-          <section class="section">
-            <div class="head">
-              <div><span class="tag section-title">LÃI/LỖ</span><h2>Theo dõi vốn và lợi nhuận</h2></div>
-              <p>Hôm qua đã cộng; lệnh hôm nay chưa cộng.</p>
-            </div>
-            <div class="pnl">${pnlCards}</div>
-          </section>
-
-          <section class="section">
-            <div class="head">
-              <div><span class="tag section-title">CHI TIẾT</span><h2>A1 · X2 · X3 · Xiên · Đề</h2></div>
-              <p>Phương pháp fail vẫn có chi tiết nhưng 0 điểm.</p>
-            </div>
-            <div class="groups">${(data.groups || []).map(renderGroupCard).join("")}</div>
-          </section>
-
-          <details>
-            <summary>Kiểm toán dữ liệu và 27 mã gần nhất</summary>
-            <div class="audit">
-              <p>${escapeHtml(sourceData.source_label)}</p>
-              <div class="codes">${(sourceData.latest_27_codes || []).map((number) => `<span>${escapeHtml(number)}</span>`).join("")}</div>
-            </div>
-          </details>
-        `;
-      }
-
-      async function load() {
-        refreshButton.disabled = true;
-        try {
-          const response = await fetch(`./data/current.json?v=${Date.now()}`, { cache: "no-store" });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          render(await response.json());
-        } catch (error) {
-          app.innerHTML = `<div class="error"><b>Không tải được dữ liệu.</b><p>${escapeHtml(error.message)}</p></div>`;
-        } finally {
-          refreshButton.disabled = false;
-        }
-      }
-
-      refreshButton.addEventListener("click", load);
-      load();
-      window.setInterval(load, 120000);
-    })();
+    async function load(){refresh.disabled=true;try{const r=await fetch(`./data/current.json?v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw Error(`HTTP ${r.status}`);render(await r.json())}catch(err){app.innerHTML=`<div class="error"><b>Không tải được dữ liệu.</b><p>${esc(err.message)}</p></div>`}finally{refresh.disabled=false}}
+    refresh.addEventListener("click",load);load();setInterval(load,120000)
+  })();
   </script>
 </body>
 </html>

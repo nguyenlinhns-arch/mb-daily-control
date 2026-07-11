@@ -1,10 +1,10 @@
 {
-  "schema_version": "MB_DAILY_WEB_V2",
-  "report_run_id": "RPT_MB_20260711_TOP_SIGNAL_POLICY_V4",
+  "schema_version": "MB_DAILY_WEB_V3",
+  "report_run_id": "RPT_MB_20260711_TOP_SIGNAL_PNL_V5",
   "source_run_id": "RPT_MB_20260711_TOP_SIGNAL_POLICY_V4",
   "config_id": "MB_A1_DUAL_CORE_VOLUME_BALANCE_GAN21_12_CORE100_VOLUME50",
   "target_date": "2026-07-11",
-  "generated_at": "2026-07-11T11:12:07+07:00",
+  "generated_at": "2026-07-11T11:36:22+07:00",
   "valid_until": "2026-07-11T18:15:00+07:00",
   "data_snapshot_id": "MBH27_20260710_LOCKED_26U_R13X2",
   "official_url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
@@ -26,17 +26,36 @@
     "volume_points": 50,
     "reverse_points": 50,
     "cost_per_point_vnd": 23000,
-    "payout_per_point_vnd": 80000
+    "payout_per_point_vnd": 80000,
+    "note": "Core 100, Volume 50, đảo 50."
   },
   "top_signal_policy": {
-    "status": "ACTIVE_USER_LOCKED",
     "mode": "QUALIFIED_METHODS_NO_CAP",
-    "method_scope": ["A1","X2","X3"],
-    "include_rule": "Chỉ phương pháp đạt gate độc lập mới xuất hiện ở khối đầu; hiển thị toàn bộ số và mức đặt của phương pháp đó.",
-    "no_number_limit": true,
+    "include_rule": "Chỉ đưa A1/X2/X3 đạt gate lên đầu; hiển thị toàn bộ số và mức điểm, không giới hạn số.",
     "when_x2_and_x3_fail": "A1_ONLY",
-    "failed_method_placement": "DETAIL_ONLY_ZERO_POINTS",
-    "supersedes": ["TOP3_SUPPORT_HERO","A0_FALLBACK_TOP3_HERO"]
+    "failed_method_rule": "EXCLUDE_FROM_HERO_KEEP_IN_DETAIL"
+  },
+  "top_signals": {
+    "title": "TÍN HIỆU ĐẠT TIÊU CHÍ",
+    "subtitle": "X2 và X3 không đạt nên hôm nay chỉ hiển thị A1",
+    "total_methods": 1,
+    "total_numbers": 2,
+    "total_points": 100,
+    "total_capital_vnd": 2300000,
+    "note": "75 là A1 Volume50. 57 là mã đảo50 đã xác nhận. X2/X3 chỉ nằm ở phần chi tiết Shadow 0 điểm.",
+    "methods": [{
+      "id": "A1",
+      "label": "MB A1",
+      "method": "Volume50 + đảo50",
+      "status": "PASS_REAL",
+      "points_per_code": 50,
+      "code_count": 2,
+      "capital_vnd": 2300000,
+      "numbers": [
+        {"code":"75","points":50,"capital_vnd":1150000,"role":"A1 Volume"},
+        {"code":"57","points":50,"capital_vnd":1150000,"role":"Đảo xác nhận"}
+      ]
+    }]
   },
   "portfolio": {
     "decision": "REAL",
@@ -47,161 +66,116 @@
     "points_per_code": 50,
     "code_count": 2,
     "capital_vnd": 2300000,
-    "reason": "75 đạt A1 Volume50; 57 là đảo50 theo xác nhận. X2 và X3 đều không đạt nên khối đầu chỉ hiển thị A1.",
+    "reason": "75 đạt A1 Volume. 57 là mã đảo theo xác nhận, cùng mức 50 điểm.",
     "pnl_status": "PENDING_RESULT"
-  },
-  "top_signals": {
-    "title": "TÍN HIỆU ĐẠT TIÊU CHÍ",
-    "subtitle": "Không giới hạn số · Chỉ hiện A1/X2/X3 đạt gate",
-    "display_mode": "A1_ONLY_X2_X3_FAIL",
-    "total_methods": 1,
-    "total_numbers": 2,
-    "total_points": 100,
-    "total_capital_vnd": 2300000,
-    "note": "X2 và X3 đều fail hôm nay nên khối đầu chỉ có A1. Không dùng số Watch để lấp chỗ.",
-    "methods": [
-      {
-        "id": "A1",
-        "label": "MB A1",
-        "gate": "PASS_VOLUME50_PLUS_REVERSE50",
-        "status": "REAL",
-        "method": "A1 Dual Core Volume Balance — Gan 21/12",
-        "points_per_code": 50,
-        "code_count": 2,
-        "capital_vnd": 2300000,
-        "numbers": [
-          {"code":"75","role":"VOLUME50","points":50,"capital_vnd":1150000,"qualified":true,"gan":14,"gmax":14,"score":1.0},
-          {"code":"57","role":"REVERSE50","points":50,"capital_vnd":1150000,"qualified":false,"manual_confirmed":true}
-        ]
-      }
-    ]
   },
   "pending_order": {
     "date": "2026-07-11",
+    "capital_vnd": 2300000,
     "items": [
       {"code":"75","role":"A1_VOLUME","points":50,"capital_vnd":1150000,"qualified":true,"gan":14,"gmax":14,"score":1.0},
       {"code":"57","role":"USER_MANUAL_REVERSE","points":50,"capital_vnd":1150000,"qualified":false}
     ],
-    "capital_vnd": 2300000,
     "scenarios": [
       {"total_hits":0,"net_pnl_vnd":-2300000},
       {"total_hits":1,"net_pnl_vnd":1700000},
       {"total_hits":2,"net_pnl_vnd":5700000}
     ],
-    "note": "Chưa cộng vào lãi/lỗ cho đến khi kết quả 11/07 được khóa. Hai mã là hai lô đơn, không phải Xiên 2."
+    "note": "Chưa cộng vào lãi/lỗ cho đến khi kết quả 11/07 được khóa."
+  },
+  "pnl_summary": {
+    "confirmed_through": "2026-07-10",
+    "yesterday_date": "2026-07-10",
+    "yesterday_pnl_vnd": 8550000,
+    "yesterday_hits": 5,
+    "yesterday_stake": "5 mã ×30 điểm",
+    "active_five_group_pnl_vnd": 17000000,
+    "archive_pnl_vnd": 7400000,
+    "grand_total_pnl_vnd": 24400000,
+    "today_pending_capital_vnd": 2300000,
+    "today_pending_order": "75×50 + 57×50",
+    "today_included": false,
+    "note": "Tổng toàn bộ = 5 nhóm đang hoạt động + sổ Than Vo archive. Lệnh hôm nay chưa cộng."
+  },
+  "ledger": {
+    "start_date": "2026-06-30",
+    "confirmed_through": "2026-07-10",
+    "total_pnl_vnd": 17000000,
+    "archive_pnl_vnd": 7400000,
+    "grand_total_pnl_vnd": 24400000,
+    "yesterday_pnl_vnd": 8550000,
+    "note": "Ngày 10/07 lãi +8.550.000đ đã được cộng. Lệnh 75×50 và 57×50 ngày 11/07 đang chờ kết quả.",
+    "items": [
+      {"id":"A1","label":"MB A1","pnl_vnd":3870000,"note":"Đã gồm phần ngày 10/07; hôm nay pending"},
+      {"id":"X2","label":"MB X2","pnl_vnd":5820000,"note":"Đã gồm phần ngày 10/07"},
+      {"id":"X3","label":"MB X3","pnl_vnd":7910000,"note":"Đã gồm phần ngày 10/07"},
+      {"id":"XIEN","label":"Xiên 2","pnl_vnd":-600000,"note":"0 thắng / 6 thua"},
+      {"id":"DE","label":"Đề","pnl_vnd":0,"note":"Chưa có lệnh xác nhận"}
+    ]
   },
   "groups": [
     {
-      "id":"A1",
-      "label":"MB A1",
-      "status":"PASS_VOLUME50_REAL",
-      "role":"PRODUCTION MAIN",
-      "method":"A1 Dual Core Volume Balance — Gan 21/12",
-      "layer":"Volume50 + user reverse50",
-      "selected_numbers":["75","57"],
-      "points":100,
-      "points_per_code":50,
-      "capital_vnd":2300000,
-      "summary":"75 đạt Volume50; đảo57 x50 theo xác nhận.",
-      "reason":"A1 là phương pháp duy nhất đạt/được xác nhận hôm nay nên là khối duy nhất trên đầu.",
+      "id":"A1","label":"MB A1","status":"PASS_VOLUME50_REAL","role":"PRODUCTION MAIN",
+      "method":"A1 Dual Core Volume Balance — Gan 21/12","layer":"Volume50 + user reverse50",
+      "selected_numbers":["75","57"],"points":100,"points_per_code":50,"capital_vnd":2300000,
+      "summary":"75 đạt Volume50; đảo 57 x50 đã xác nhận.",
+      "reason":"75 là mã A1 hợp lệ. 57 được theo dõi tách khỏi thống kê A1-qualified.",
       "candidates":[
         {"code":"75","rank":1,"gan":14,"gmax":14,"score":1.0,"gate":true,"status":"REAL A1 VOLUME50","reason":"PASS_VOLUME; vốn1.150.000đ"},
-        {"code":"57","rank":2,"gate":false,"status":"REAL MANUAL REVERSE50","reason":"Đảo theo xác nhận; vốn1.150.000đ"},
-        {"code":"88","rank":3,"gan":13,"gmax":21,"score":0.619048,"gate":false,"status":"WATCH","reason":"Chỉ ở phần chi tiết; Score<0.70"},
-        {"code":"72","rank":4,"gan":19,"gmax":30,"score":0.633333,"gate":false,"status":"WATCH","reason":"Chỉ ở phần chi tiết; Score<0.70"}
+        {"code":"57","rank":2,"gate":false,"status":"REAL MANUAL REVERSE50","reason":"Đảo đã xác nhận; vốn1.150.000đ"},
+        {"code":"88","rank":3,"gan":13,"gmax":21,"score":0.619048,"gate":false,"status":"WATCH","reason":"Score0.619<0.70"},
+        {"code":"72","rank":4,"gan":19,"gmax":30,"score":0.633333,"gate":false,"status":"WATCH","reason":"Score0.633<0.70"}
       ],
       "historical_profile":{"label":"A1 Volume","sample":"133 lệnh backtest tham chiếu","win_rate":"25,56%"}
     },
     {
-      "id":"X2",
-      "label":"MB X2",
-      "status":"FAIL_DETAIL_ONLY",
-      "role":"A0 RESCUE",
-      "method":"X2 Fusion A0 Rescue",
-      "layer":"Cặp rank-1",
-      "selected_numbers":["32","23"],
-      "selection":"32-23",
-      "points":0,
-      "capital_vnd":0,
-      "summary":"Không đạt gate; chỉ hiển thị ở phần chi tiết, không xuất hiện trên đầu.",
-      "reason":"X2 fail và giữ Shadow 0 điểm.",
+      "id":"X2","label":"MB X2","status":"A0_SHADOW","role":"A0 RESCUE",
+      "method":"X2 Fusion A0 Rescue","layer":"Cặp rank-1","selected_numbers":["32","23"],"selection":"32-23",
+      "points":0,"capital_vnd":0,"summary":"Không đạt gate; chỉ hiển thị chi tiết.",
+      "reason":"minH21=3<5; không xuất hiện trong khối đầu.",
       "candidates":[
         {"code":"32","rank":1,"tier":"Main","gan":4,"gate":false,"status":"WATCH","reason":"Mã chính của cặp rank-1"},
         {"code":"23","rank":2,"tier":"Cover","gan":4,"gate":false,"status":"WATCH","reason":"Mã phủ của cặp rank-1"}
       ],
-      "historical_profile":{"label":"X2 Rescue35","sample":"35 lệnh","win_rate":"65,71%","pnl_vnd":14250000,"max_drawdown_vnd":-1410000}
+      "historical_profile":{"label":"X2 Rescue35","sample":"35 lệnh","win_rate":"65,71%","pnl_vnd":14250000}
     },
     {
-      "id":"X3",
-      "label":"MB X3",
-      "status":"FAIL_DETAIL_ONLY",
-      "role":"PRODUCTION SUPPORT",
-      "method":"X3 Growth 32–34",
-      "layer":"Rổ generator top-3",
-      "selected_numbers":["32","47","80"],
-      "selection":"32-47-80",
-      "points":0,
-      "capital_vnd":0,
-      "summary":"Không đạt gate; chỉ hiển thị ở phần chi tiết, không xuất hiện trên đầu.",
-      "reason":"X3 fail và giữ Shadow 0 điểm.",
+      "id":"X3","label":"MB X3","status":"A0_SHADOW","role":"PRODUCTION SUPPORT",
+      "method":"X3 Growth 32–34","layer":"Rổ generator top-3","selected_numbers":["32","47","80"],"selection":"32-47-80",
+      "points":0,"capital_vnd":0,"summary":"Không đạt gate; chỉ hiển thị chi tiết.",
+      "reason":"HOT21 tổng30, max10; không xuất hiện trong khối đầu.",
       "candidates":[
         {"code":"32","rank":1,"hot21":10,"gate":false,"status":"WATCH","reason":"Generator top-1"},
         {"code":"47","rank":2,"hot21":10,"gate":false,"status":"WATCH","reason":"Generator top-2"},
         {"code":"80","rank":3,"hot21":10,"gate":false,"status":"WATCH","reason":"Generator top-3"}
       ],
-      "historical_profile":{"label":"X3 Growth 32–34 OOS","sample":"99 lệnh","win_rate":"69,70%","pnl_vnd":74450000,"max_drawdown_vnd":-13250000}
+      "historical_profile":{"label":"X3 Growth 32–34 OOS","sample":"99 lệnh","win_rate":"69,70%","pnl_vnd":74450000}
     },
     {
-      "id":"XIEN",
-      "label":"Xiên 2",
-      "status":"A0_SHADOW",
-      "role":"SEPARATE SHADOW",
-      "method":"Xiên 2",
-      "selected_numbers":[],
-      "points":0,
-      "capital_vnd":0,
-      "summary":"75–57 là hai lô đơn, không phải Xiên 2.",
-      "reason":"Không có xác nhận Xiên riêng.",
-      "candidates":[],
-      "ledger":{"wins":0,"losses":6,"pnl_vnd":-600000}
+      "id":"XIEN","label":"Xiên 2","status":"A0_SHADOW","role":"SEPARATE SHADOW",
+      "method":"Xiên 2","layer":"Không có cặp xác nhận","selected_numbers":[],"pairs":[],
+      "points":0,"capital_vnd":0,"summary":"75–57 là hai lô đơn, không phải Xiên 2.",
+      "reason":"Không có xác nhận Xiên riêng.","candidates":[],"ledger":{"wins":0,"losses":6,"pnl_vnd":-600000}
     },
     {
-      "id":"DE",
-      "label":"Đề theo đầu",
-      "status":"A0_VALIDATION",
-      "role":"VALIDATION",
-      "method":"Đề Digit Expansion Clean v1.1",
+      "id":"DE","label":"Đề theo đầu","status":"A0_VALIDATION","role":"VALIDATION",
+      "method":"Đề Digit Expansion Clean v1.1","layer":"Ứng viên tốt nhất",
       "selected_numbers":["20","21","22","23","24","25","26","27","28","29"],
-      "points":0,
-      "capital_vnd":0,
-      "summary":"Không có lệnh; ứng viên tốt nhất vẫn ở phần chi tiết.",
+      "points":0,"capital_vnd":0,"summary":"Không có lệnh; ứng viên tốt nhất là Đầu 2.",
       "reason":"Môi trường repeat2 không đạt gate.",
       "candidates":[{"code":"Đầu 2","rank":1,"gan":38,"gmax":53,"score":0.717,"gate":false,"status":"WATCH","reason":"Fail môi trường repeat2"}],
       "historical_profile":{"label":"Expansion Clean v1.1","sample":"50 lệnh","win_rate":"44,00%"}
     }
   ],
-  "ledger": {
-    "start_date":"2026-06-30",
-    "confirmed_through":"2026-07-10",
-    "total_pnl_vnd":17000000,
-    "note":"Lệnh 75 x50 và đảo57 x50 ngày 11/07 đang chờ kết quả, chưa cộng vào lãi/lỗ.",
-    "items":[
-      {"id":"A1","label":"MB A1","pnl_vnd":3870000,"note":"Đã xác nhận đến10/07; lệnh hôm nay pending"},
-      {"id":"X2","label":"MB X2","pnl_vnd":5820000,"note":"Lũy kế xác nhận"},
-      {"id":"X3","label":"MB X3","pnl_vnd":7910000,"note":"Lũy kế xác nhận"},
-      {"id":"XIEN","label":"Xiên 2","pnl_vnd":-600000,"note":"0 thắng / 6 thua"},
-      {"id":"DE","label":"Đề","pnl_vnd":0,"note":"Chưa có lệnh xác nhận"}
-    ]
-  },
   "backtests": [
     {"id":"A1","label":"A1 Dual Core Volume Balance","status":"ACTIVE_MAIN","period":"01/01/2025–30/06/2026","orders":171,"wins":52,"win_rate":"30,41%","pnl_vnd":41330000,"max_drawdown_vnd":-12240000,"longest_loss":13},
     {"id":"X3_GROWTH","label":"X3 Growth 32–34","status":"ACTIVE_REPLACEMENT","period":"OOS 2025–09/07/2026","orders":99,"wins":69,"win_rate":"69,70%","pnl_vnd":74450000,"max_drawdown_vnd":-13250000,"longest_loss":3},
     {"id":"X2_RESCUE35","label":"X2 Rescue35","status":"ACTIVE_GUARDED","period":"2025–29/06/2026","orders":35,"wins":23,"win_rate":"65,71%","pnl_vnd":14250000,"max_drawdown_vnd":-1410000,"longest_loss":2}
   ],
   "publication": {
-    "status":"LIVE_TOP_SIGNAL_POLICY_V2",
+    "status":"LIVE_PNL_EXPANDED",
     "official_url":"https://nguyenlinhns-arch.github.io/mb-daily-control/",
     "auto_refresh_seconds":120,
-    "source_warning":"Khối đầu không còn Top3 cố định; chỉ hiển thị phương pháp đạt gate và mức đặt tương ứng."
+    "source_warning":"Tổng toàn bộ bao gồm sổ archive; lệnh hôm nay chỉ được cộng sau khi khóa kết quả."
   }
 }

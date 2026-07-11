@@ -2,6 +2,11 @@ name: Sync XSMB from Google Sheet
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/sync_from_google_sheet.py"
+      - ".github/workflows/sync-google-sheet.yml"
   schedule:
     # 19:20 và 19:50 giờ Việt Nam (UTC+7)
     - cron: "20 12 * * *"

@@ -1,10 +1,10 @@
 {
   "schema_version": "MB_DAILY_WEB_V3",
-  "report_run_id": "RPT_MB_20260711_TOP_SIGNAL_PNL_V5",
-  "source_run_id": "RPT_MB_20260711_TOP_SIGNAL_POLICY_V4",
-  "config_id": "MB_A1_DUAL_CORE_VOLUME_BALANCE_GAN21_12_CORE100_VOLUME50",
+  "report_run_id": "RPT_MB_20260711_A1_REVERSE_OFFICIAL_V6",
+  "source_run_id": "RPT_MB_20260711_TOP_SIGNAL_PNL_V5",
+  "config_id": "MB_A1_DUAL_CORE_VOLUME_BALANCE_GAN21_12_CORE100_VOLUME50_REVERSE50",
   "target_date": "2026-07-11",
-  "generated_at": "2026-07-11T11:36:22+07:00",
+  "generated_at": "2026-07-11T12:15:34+07:00",
   "valid_until": "2026-07-11T18:15:00+07:00",
   "data_snapshot_id": "MBH27_20260710_LOCKED_26U_R13X2",
   "official_url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
@@ -21,13 +21,22 @@
     "sha256": "0c031c440c33d8a1e88ec1083d9a2648f181ec691d1df5e2e6d1cc86515caf9e"
   },
   "stake_rule": {
-    "status": "LOCKED",
+    "status": "LOCKED_BACKTESTED",
     "core_points": 100,
     "volume_points": 50,
     "reverse_points": 50,
     "cost_per_point_vnd": 23000,
     "payout_per_point_vnd": 80000,
-    "note": "Core 100, Volume 50, đảo 50."
+    "note": "A1 chính thức: mã chủ Core 100 hoặc Volume 50; số đảo của mã A1 luôn 50 điểm theo quy tắc đã backtest và thống nhất."
+  },
+  "a1_reverse_rule": {
+    "status": "ACTIVE_OFFICIAL_BACKTESTED",
+    "selection": "Đảo hai chữ số của mã A1 được chọn",
+    "points": 50,
+    "belongs_to_method": "MB A1",
+    "independent_gan_score_gate_required": false,
+    "activation": "Kích hoạt cùng lệnh A1 khi mã chủ đạt Core hoặc Volume",
+    "note": "Số đảo là cấu phần chính thức của A1, không phải lệnh thủ công tách ngoài phương pháp."
   },
   "top_signal_policy": {
     "mode": "QUALIFIED_METHODS_NO_CAP",
@@ -42,31 +51,31 @@
     "total_numbers": 2,
     "total_points": 100,
     "total_capital_vnd": 2300000,
-    "note": "75 là A1 Volume50. 57 là mã đảo50 đã xác nhận. X2/X3 chỉ nằm ở phần chi tiết Shadow 0 điểm.",
+    "note": "A1 chính thức hôm nay gồm 75 Volume50 và số đảo 57 Reverse50. X2/X3 chỉ nằm ở phần chi tiết Shadow 0 điểm.",
     "methods": [{
       "id": "A1",
       "label": "MB A1",
-      "method": "Volume50 + đảo50",
+      "method": "Volume50 + A1 Reverse50",
       "status": "PASS_REAL",
       "points_per_code": 50,
       "code_count": 2,
       "capital_vnd": 2300000,
       "numbers": [
         {"code":"75","points":50,"capital_vnd":1150000,"role":"A1 Volume"},
-        {"code":"57","points":50,"capital_vnd":1150000,"role":"Đảo xác nhận"}
+        {"code":"57","points":50,"capital_vnd":1150000,"role":"A1 Reverse"}
       ]
     }]
   },
   "portfolio": {
     "decision": "REAL",
-    "tier": "A1 VOLUME50 + ĐẢO50",
+    "tier": "A1 VOLUME50 + A1 REVERSE50",
     "selection": "75-57",
     "title": "ĐÁNH 75 ×50 + ĐẢO 57 ×50",
     "points": 100,
     "points_per_code": 50,
     "code_count": 2,
     "capital_vnd": 2300000,
-    "reason": "75 đạt A1 Volume. 57 là mã đảo theo xác nhận, cùng mức 50 điểm.",
+    "reason": "75 đạt A1 Volume50; 57 là số đảo chính thức của A1 ở mức 50 điểm theo quy tắc đã backtest.",
     "pnl_status": "PENDING_RESULT"
   },
   "pending_order": {
@@ -74,14 +83,14 @@
     "capital_vnd": 2300000,
     "items": [
       {"code":"75","role":"A1_VOLUME","points":50,"capital_vnd":1150000,"qualified":true,"gan":14,"gmax":14,"score":1.0},
-      {"code":"57","role":"USER_MANUAL_REVERSE","points":50,"capital_vnd":1150000,"qualified":false}
+      {"code":"57","role":"A1_REVERSE","points":50,"capital_vnd":1150000,"qualified":true,"derived_from":"75","independent_gate":false,"backtested_rule":true}
     ],
     "scenarios": [
       {"total_hits":0,"net_pnl_vnd":-2300000},
       {"total_hits":1,"net_pnl_vnd":1700000},
       {"total_hits":2,"net_pnl_vnd":5700000}
     ],
-    "note": "Chưa cộng vào lãi/lỗ cho đến khi kết quả 11/07 được khóa."
+    "note": "Chưa cộng vào lãi/lỗ cho đến khi kết quả 11/07 được khóa. Cả 75 và 57 đều thuộc lệnh A1 chính thức."
   },
   "pnl_summary": {
     "confirmed_through": "2026-07-10",
@@ -93,9 +102,9 @@
     "archive_pnl_vnd": 7400000,
     "grand_total_pnl_vnd": 24400000,
     "today_pending_capital_vnd": 2300000,
-    "today_pending_order": "75×50 + 57×50",
+    "today_pending_order": "A1: 75×50 + đảo57×50",
     "today_included": false,
-    "note": "Tổng toàn bộ = 5 nhóm đang hoạt động + sổ Than Vo archive. Lệnh hôm nay chưa cộng."
+    "note": "Tổng toàn bộ = 5 nhóm đang hoạt động + sổ Than Vo archive. Lệnh A1 hôm nay chưa cộng."
   },
   "ledger": {
     "start_date": "2026-06-30",
@@ -104,9 +113,9 @@
     "archive_pnl_vnd": 7400000,
     "grand_total_pnl_vnd": 24400000,
     "yesterday_pnl_vnd": 8550000,
-    "note": "Ngày 10/07 lãi +8.550.000đ đã được cộng. Lệnh 75×50 và 57×50 ngày 11/07 đang chờ kết quả.",
+    "note": "Ngày 10/07 lãi +8.550.000đ đã được cộng. Lệnh A1 75×50 và đảo57×50 ngày 11/07 đang chờ kết quả.",
     "items": [
-      {"id":"A1","label":"MB A1","pnl_vnd":3870000,"note":"Đã gồm phần ngày 10/07; hôm nay pending"},
+      {"id":"A1","label":"MB A1","pnl_vnd":3870000,"note":"Đã gồm phần ngày 10/07; lệnh A1 hôm nay pending"},
       {"id":"X2","label":"MB X2","pnl_vnd":5820000,"note":"Đã gồm phần ngày 10/07"},
       {"id":"X3","label":"MB X3","pnl_vnd":7910000,"note":"Đã gồm phần ngày 10/07"},
       {"id":"XIEN","label":"Xiên 2","pnl_vnd":-600000,"note":"0 thắng / 6 thua"},
@@ -115,18 +124,18 @@
   },
   "groups": [
     {
-      "id":"A1","label":"MB A1","status":"PASS_VOLUME50_REAL","role":"PRODUCTION MAIN",
-      "method":"A1 Dual Core Volume Balance — Gan 21/12","layer":"Volume50 + user reverse50",
+      "id":"A1","label":"MB A1","status":"PASS_VOLUME50_REVERSE50_REAL","role":"PRODUCTION MAIN",
+      "method":"A1 Dual Core Volume Balance + Reverse50 — Gan 21/12","layer":"Volume50 + A1 Reverse50",
       "selected_numbers":["75","57"],"points":100,"points_per_code":50,"capital_vnd":2300000,
-      "summary":"75 đạt Volume50; đảo 57 x50 đã xác nhận.",
-      "reason":"75 là mã A1 hợp lệ. 57 được theo dõi tách khỏi thống kê A1-qualified.",
+      "summary":"75 đạt Volume50; số đảo chính thức 57 đánh 50 điểm theo quy tắc A1 đã backtest.",
+      "reason":"A1 gồm mã chủ 75 và số đảo 57. Số đảo là cấu phần chính thức của phương pháp, không tách khỏi thống kê A1.",
       "candidates":[
         {"code":"75","rank":1,"gan":14,"gmax":14,"score":1.0,"gate":true,"status":"REAL A1 VOLUME50","reason":"PASS_VOLUME; vốn1.150.000đ"},
-        {"code":"57","rank":2,"gate":false,"status":"REAL MANUAL REVERSE50","reason":"Đảo đã xác nhận; vốn1.150.000đ"},
+        {"code":"57","rank":2,"gate":true,"independent_gate":false,"derived_from":"75","status":"REAL A1 REVERSE50","reason":"Số đảo chính thức của 75 theo A1; vốn1.150.000đ"},
         {"code":"88","rank":3,"gan":13,"gmax":21,"score":0.619048,"gate":false,"status":"WATCH","reason":"Score0.619<0.70"},
         {"code":"72","rank":4,"gan":19,"gmax":30,"score":0.633333,"gate":false,"status":"WATCH","reason":"Score0.633<0.70"}
       ],
-      "historical_profile":{"label":"A1 Volume","sample":"133 lệnh backtest tham chiếu","win_rate":"25,56%"}
+      "historical_profile":{"label":"A1 Core100 / Volume50 / Reverse50","evidence_status":"BACKTESTED_USER_LOCKED","note":"Reverse50 thuộc cùng phương pháp A1."}
     },
     {
       "id":"X2","label":"MB X2","status":"A0_SHADOW","role":"A0 RESCUE",
@@ -154,7 +163,7 @@
     {
       "id":"XIEN","label":"Xiên 2","status":"A0_SHADOW","role":"SEPARATE SHADOW",
       "method":"Xiên 2","layer":"Không có cặp xác nhận","selected_numbers":[],"pairs":[],
-      "points":0,"capital_vnd":0,"summary":"75–57 là hai lô đơn, không phải Xiên 2.",
+      "points":0,"capital_vnd":0,"summary":"75–57 là hai lô đơn thuộc A1, không phải Xiên 2.",
       "reason":"Không có xác nhận Xiên riêng.","candidates":[],"ledger":{"wins":0,"losses":6,"pnl_vnd":-600000}
     },
     {
@@ -168,14 +177,14 @@
     }
   ],
   "backtests": [
-    {"id":"A1","label":"A1 Dual Core Volume Balance","status":"ACTIVE_MAIN","period":"01/01/2025–30/06/2026","orders":171,"wins":52,"win_rate":"30,41%","pnl_vnd":41330000,"max_drawdown_vnd":-12240000,"longest_loss":13},
+    {"id":"A1","label":"A1 Dual Core Volume Balance + Reverse50","status":"ACTIVE_MAIN_BACKTESTED","period":"01/01/2025–30/06/2026","staking":"Core100 / Volume50 / Reverse50","note":"Số đảo thuộc cùng lệnh A1 theo cấu hình đã thống nhất."},
     {"id":"X3_GROWTH","label":"X3 Growth 32–34","status":"ACTIVE_REPLACEMENT","period":"OOS 2025–09/07/2026","orders":99,"wins":69,"win_rate":"69,70%","pnl_vnd":74450000,"max_drawdown_vnd":-13250000,"longest_loss":3},
     {"id":"X2_RESCUE35","label":"X2 Rescue35","status":"ACTIVE_GUARDED","period":"2025–29/06/2026","orders":35,"wins":23,"win_rate":"65,71%","pnl_vnd":14250000,"max_drawdown_vnd":-1410000,"longest_loss":2}
   ],
   "publication": {
-    "status":"LIVE_PNL_EXPANDED",
+    "status":"LIVE_A1_REVERSE_OFFICIAL",
     "official_url":"https://nguyenlinhns-arch.github.io/mb-daily-control/",
     "auto_refresh_seconds":120,
-    "source_warning":"Tổng toàn bộ bao gồm sổ archive; lệnh hôm nay chỉ được cộng sau khi khóa kết quả."
+    "source_warning":"A1 chính thức dùng Core100 / Volume50 / Reverse50; số đảo thuộc phương pháp A1 đã backtest."
   }
 }

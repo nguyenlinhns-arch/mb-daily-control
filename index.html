@@ -4,174 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate">
-  <meta name="theme-color" content="#0b1f36">
+  <meta name="theme-color" content="#0c2138">
   <meta name="description" content="MB Daily Control — XSMB Daily Validation">
   <title>MB Daily Control</title>
-  <style>
-    :root{
-      --navy:#0b1f36;--navy-2:#164a75;--navy-3:#236795;
-      --blue:#2367c8;--blue-bg:#edf4ff;
-      --green:#087a53;--green-bg:#eaf8f2;--green-line:#9fd2bd;
-      --lime:#687400;--lime-bg:#f3f7c5;--lime-line:#c8d54c;
-      --amber:#8d5708;--amber-bg:#fff5df;
-      --red:#b42318;--red-bg:#fff0ee;--red-line:#e8aaa4;
-      --ink:#142033;--muted:#68778b;--line:#dce4ed;
-      --canvas:#eef3f8;--surface:#fff;--surface-soft:#f7f9fc;
-      --shadow:0 18px 45px rgba(11,31,54,.09);--shadow-soft:0 8px 24px rgba(11,31,54,.06)
-    }
-    *{box-sizing:border-box}
-    html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-    body{
-      margin:0;color:var(--ink);font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:
-        radial-gradient(circle at 12% 0%,rgba(35,103,200,.08),transparent 30rem),
-        radial-gradient(circle at 88% 12%,rgba(8,122,83,.06),transparent 28rem),
-        var(--canvas);
-      overflow-wrap:anywhere
-    }
-    button{font:inherit}
-    .wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:max(18px,env(safe-area-inset-top)) 0 calc(42px + env(safe-area-inset-bottom))}
-    .bar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
-    .brand{display:flex;gap:11px;align-items:center;min-width:0}
-    .logo{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;border-radius:13px;background:linear-gradient(145deg,var(--navy),var(--navy-3));color:#fff;font-weight:900;box-shadow:0 8px 20px rgba(11,31,54,.18)}
-    .brand b,.brand small{display:block}.brand b{font-size:1rem;letter-spacing:-.01em}.brand small{color:var(--muted);font-size:.76rem}
-    #refresh{flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.9);border-radius:11px;padding:8px 12px;font-weight:800;color:var(--navy);cursor:pointer;box-shadow:var(--shadow-soft);transition:.18s ease}
-    #refresh:hover{transform:translateY(-1px);border-color:#bdcad7}#refresh:disabled{opacity:.55;cursor:wait;transform:none}
-
-    .hero{overflow:hidden;border:1px solid rgba(255,255,255,.22);border-radius:24px;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;box-shadow:var(--shadow)}
-    .hero-main{position:relative;padding:26px 28px 24px}
-    .hero-main::after{content:"";position:absolute;right:-90px;top:-130px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 66%);pointer-events:none}
-    .tag{display:inline-block;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:#a9c2dd;font-weight:900}
-    h1{margin:8px 0 9px;font-size:clamp(1.75rem,3.7vw,2.75rem);line-height:1.08;letter-spacing:-.035em}
-    .hero-main>p{margin:0;color:#c7d6e6;max-width:820px}
-    .facts,.pnl,.methods,.groups{display:grid;gap:11px}
-    .facts{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:19px}
-    .fact{min-width:0;min-height:76px;padding:10px 12px;border:1px solid rgba(255,255,255,.14);border-radius:13px;background:rgba(255,255,255,.065);backdrop-filter:blur(3px)}
-    .fact span,.fact b{display:block}.fact span{font-size:.64rem;color:#b8cadd;text-transform:uppercase;letter-spacing:.05em}.fact b{margin-top:5px;font-size:clamp(1rem,2.1vw,1.38rem);line-height:1.2}.fact.status b{font-size:clamp(.92rem,1.9vw,1.17rem)}
-
-    .signals{padding:22px 24px 24px;background:#f8fbff;color:var(--ink);border-top:1px solid rgba(255,255,255,.22)}
-    .signals h2,.section h2{margin:0}.section-title{color:#61758d}.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:10px}.head>div{min-width:0}.head h2{line-height:1.2;letter-spacing:-.02em}.head p{margin:0;max-width:560px;color:var(--muted);text-align:right;font-size:.82rem}
-    .status-legend{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 3px}
-    .legend-item{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid transparent;border-radius:999px;font-size:.68rem;font-weight:850}
-    .legend-item::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
-    .legend-item.tone-pass{background:var(--green-bg);border-color:#cce8dc;color:var(--green)}
-    .legend-item.tone-near{background:var(--lime-bg);border-color:#e1e99a;color:var(--lime)}
-    .legend-item.tone-fail{background:var(--red-bg);border-color:#f4d0cc;color:var(--red)}
-
-    .methods{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;margin-top:14px;gap:13px}
-    .method{position:relative;min-width:0;padding:15px;border:1px solid var(--line);border-radius:17px;background:var(--surface);box-shadow:var(--shadow-soft);overflow:hidden}
-    .method::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:#c3cdd8}
-    .method.tone-pass{border-color:var(--green-line)}.method.tone-pass::before{background:var(--green)}
-    .method.tone-near{border-color:var(--lime-line)}.method.tone-near::before{background:var(--lime-line)}
-    .method.tone-fail{border-color:var(--red-line)}.method.tone-fail::before{background:var(--red)}
-    .method.tone-empty{border-style:dashed}.method.tone-empty::before{background:#b8c2cf}
-    .method-head,.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-    .method-head>div,.card-head>div{min-width:0}.method-head small{display:block;color:var(--muted);font-size:.69rem;line-height:1.35}.method-head h2{margin:3px 0 0;font-size:1.1rem;letter-spacing:-.015em}
-    .gate,.pill{flex:0 0 auto;max-width:48%;padding:5px 8px;border-radius:999px;font-size:.62rem;line-height:1.2;font-weight:900;text-align:center;overflow-wrap:anywhere}
-    .gate.tone-pass{background:var(--green-bg);color:var(--green)}.gate.tone-near{background:var(--lime-bg);color:var(--lime)}.gate.tone-fail{background:var(--red-bg);color:var(--red)}.gate.tone-empty{background:#eef2f6;color:var(--muted)}
-    .pill{background:var(--amber-bg);color:var(--amber)}.card.pass .pill{background:var(--green-bg);color:var(--green)}
-
-    .nums{display:grid;gap:8px;margin:13px 0 11px;align-items:stretch}
-    .nums.count-0,.nums.count-1{grid-template-columns:minmax(112px,150px);justify-content:center}
-    .nums.count-2{grid-template-columns:repeat(2,minmax(82px,1fr))}
-    .nums.count-3{grid-template-columns:repeat(3,minmax(72px,1fr))}
-    .num{position:relative;min-width:0;min-height:132px;padding:12px 7px 9px;border:1px solid var(--line);border-radius:14px;background:var(--surface-soft);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;transition:.18s ease}
-    .num:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(11,31,54,.07)}
-    .num.tone-pass{border-color:var(--green-line);background:linear-gradient(180deg,#f5fcf8,var(--green-bg))}
-    .num.tone-near{border-color:var(--lime-line);background:linear-gradient(180deg,#fcfddf,var(--lime-bg))}
-    .num.tone-fail{border-color:var(--red-line);background:linear-gradient(180deg,#fff8f7,var(--red-bg))}
-    .num b{display:grid;place-items:center;color:var(--navy);font-size:clamp(1.95rem,3.8vw,2.5rem);font-weight:900;line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
-    .num.a1-primary b{width:68px;height:68px;border:3px solid var(--green);border-radius:50%;box-shadow:0 0 0 4px rgba(8,122,83,.11);background:rgba(255,255,255,.7)}
-    .num.a1-primary::after{content:"A1 CHỌN";position:absolute;top:7px;right:7px;padding:3px 6px;border-radius:999px;background:var(--green);color:#fff;font-size:.5rem;font-weight:950;letter-spacing:.04em}
-    .num em{display:block;margin-top:8px;color:var(--blue);font-size:.83rem;line-height:1.2;font-style:normal;font-weight:900;white-space:nowrap}
-    .num.tone-fail em{color:var(--red)}.num.tone-near em{color:var(--lime)}
-    .num-meta{display:block;width:100%;margin-top:6px;font-size:.68rem;line-height:1.32}
-    .num-role,.num-capital{display:block}.num-role{font-weight:720;color:#33445a;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.num-capital{margin-top:2px;color:var(--muted);font-variant-numeric:tabular-nums}
-    .empty-a1{height:132px;border:1px dashed #b8c3cf;border-radius:14px;background:#f7f9fb;display:grid;place-items:center}
-    .empty-a1::before{content:"";width:68px;height:68px;border:3px dashed #c5ced8;border-radius:50%}
-    .method-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding-top:10px;border-top:1px solid #edf1f5}
-    .method-summary div{min-width:0;padding:7px 6px;border-radius:9px;background:#f4f7fa;text-align:center}
-    .method-summary span,.method-summary strong{display:block}.method-summary span{color:var(--muted);font-size:.55rem;text-transform:uppercase;letter-spacing:.04em}.method-summary strong{margin-top:3px;font-size:.72rem;font-variant-numeric:tabular-nums}
-
-    .note{margin-top:11px;padding:10px 12px;border:1px solid #f0d8a9;border-radius:11px;background:var(--amber-bg);color:#704307;font-size:.77rem;line-height:1.45}
-    .section{margin-top:24px}.section>.head{padding:0 2px}.section h2{font-size:1.35rem}
-    .pnl{grid-template-columns:repeat(5,minmax(0,1fr))}
-    .pnl-card{min-width:0;padding:13px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow-soft)}
-    .pnl-card.main{background:var(--green-bg);border-color:var(--green-line)}.pnl-card.pending{background:var(--amber-bg);border-color:#ecd09b}
-    .pnl-card span,.pnl-card b,.pnl-card small{display:block}.pnl-card span{color:var(--muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.04em}.pnl-card b{margin:5px 0;font-size:clamp(.98rem,2.2vw,1.22rem);line-height:1.2;font-variant-numeric:tabular-nums}.pnl-card small{color:var(--muted);font-size:.72rem;line-height:1.35}.pos{color:var(--green)}.neg{color:var(--red)}.zero{color:var(--muted)}
-
-    .groups{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
-    .card{min-width:0;padding:15px;border:1px solid var(--line);border-top:4px solid #d49b39;border-radius:16px;background:var(--surface);box-shadow:var(--shadow-soft)}
-    .card.pass{border-top-color:var(--green)}.card h3{margin:2px 0 8px;font-size:1.08rem}.card>p{color:#43536a;font-size:.82rem}.card>b{font-size:.78rem;color:#314258}
-    .chips{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.chip{padding:6px 9px;border:1px solid #dfe6ee;border-radius:9px;background:#f2f5f8;color:var(--navy);font-weight:900;font-size:.78rem}
-    .why{padding:9px;border-radius:9px;background:var(--amber-bg);color:#704307;font-size:.72rem;line-height:1.45}
-    .profile{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0}.profile div{padding:7px 8px;border-radius:8px;background:#f5f8fb}.profile span,.profile b{display:block}.profile span{font-size:.58rem;color:var(--muted);text-transform:uppercase}.profile b{margin-top:2px;font-size:.73rem}
-    .quality{margin:10px 0;padding:9px 10px;border-left:3px solid #7b61c9;border-radius:8px;background:#f4f0ff;color:#4f417e;font-size:.72rem;line-height:1.42}.quality b,.quality span{display:block}.quality span{margin-top:3px}
-    .candidate{margin-top:9px;padding-top:8px;border-top:1px solid #edf1f5;color:var(--muted);font-size:.71rem;line-height:1.45}.candidate-title{color:var(--ink)}.metrics{margin-top:2px;color:#52677e}
-    .milestone{margin-top:7px;padding:8px 9px;border-left:3px solid var(--blue);border-radius:8px;background:var(--blue-bg);color:#35516f;font-size:.69rem;line-height:1.42}.milestone b,.milestone span,.milestone small{display:block}.milestone b{color:var(--navy);font-size:.72rem}.milestone span{margin-top:3px}.milestone small{margin-top:3px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
-    details{margin-top:21px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow-soft)}summary{cursor:pointer;padding:13px 15px;font-weight:850}.audit{padding:0 15px 15px}.audit p{color:var(--muted);font-size:.78rem}.codes{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:5px}.codes span{padding:6px;border-radius:7px;background:#f0f4f8;text-align:center;font-weight:800;font-size:.75rem;font-variant-numeric:tabular-nums}.error{padding:20px;border-radius:14px;background:var(--red-bg);color:var(--red)}
-    footer{margin-top:23px;color:var(--muted);font-size:.7rem;text-align:center}
-
-    @media(max-width:980px){
-      .methods{grid-template-columns:repeat(2,minmax(0,1fr))}.methods .method:nth-child(3){grid-column:1/-1}
-      .facts{grid-template-columns:repeat(2,minmax(0,1fr))}.pnl{grid-template-columns:repeat(3,minmax(0,1fr))}.groups{grid-template-columns:repeat(2,minmax(0,1fr))}
-    }
-    @media(max-width:680px){
-      .wrap{width:min(100% - 16px,1180px);padding-top:max(10px,env(safe-area-inset-top))}.hero{border-radius:18px}.hero-main{padding:21px 17px 19px}.signals{padding:19px 14px 20px}
-      h1{font-size:clamp(1.58rem,7.4vw,2.15rem)}.head{align-items:flex-start;flex-direction:column;gap:5px}.head p{text-align:left}.head h2{font-size:clamp(1.28rem,5.7vw,1.75rem)}
-      .methods{grid-template-columns:minmax(0,1fr)}.methods .method:nth-child(3){grid-column:auto}.method{padding:14px}.num{min-height:124px}.num b{font-size:clamp(1.85rem,9vw,2.35rem)}.num.a1-primary b{width:64px;height:64px}
-      .pnl{grid-template-columns:repeat(2,minmax(0,1fr))}.groups{grid-template-columns:minmax(0,1fr)}.codes{grid-template-columns:repeat(6,minmax(0,1fr))}
-    }
-    @media(max-width:390px){
-      .facts,.pnl{grid-template-columns:minmax(0,1fr)}.nums.count-3{gap:6px}.num{padding-inline:5px}.num-meta{font-size:.64rem}.num em{font-size:.78rem}.fact{min-height:70px}
-    }
-  </style>
+  <link rel="stylesheet" href="./assets/mb-ui-v2.css?v=2">
 </head>
 <body>
 <div class="wrap">
-  <header class="bar"><div class="brand"><div class="logo">MB</div><div><b>MB Daily Control</b><small>XSMB Daily Validation</small></div></div><button id="refresh" type="button">↻ Làm mới</button></header>
+  <header class="bar">
+    <div class="brand"><div class="logo">MB</div><div><b>MB Daily Control</b><small>XSMB Daily Validation</small></div></div>
+    <button id="refresh" type="button">↻ Làm mới</button>
+  </header>
   <main id="app" aria-live="polite">Đang tải…</main>
   <footer>Mốc sớm nhất là điều kiện/lower bound và được tính lại sau mỗi kỳ khóa; không phải cam kết chắc chắn vào lệnh.</footer>
 </div>
-<script>
-(()=>{"use strict";
-  const app=document.getElementById("app"),refresh=document.getElementById("refresh");
-  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const vnd=n=>`${new Intl.NumberFormat("vi-VN").format(Number(n||0))}đ`;
-  const signed=n=>{const x=Number(n||0);return`${x>0?"+":x<0?"−":""}${vnd(Math.abs(x))}`};
-  const moneyClass=n=>Number(n)>0?"pos":Number(n)<0?"neg":"zero";
-  const date=s=>{if(!s)return"—";const[y,m,d]=String(s).split("-");return`${d}/${m}/${y}`};
-  const pass=s=>String(s||"").includes("PASS")?"pass":"";
-  const pct=v=>v===undefined||v===null?"—":(typeof v==="number"&&v<=1?`${(v*100).toFixed(2).replace(".",",")}%`:String(v));
-  const roleLabel=v=>({HEAD:"Head",TAIL:"Tail",Leg1:"Chân1",Leg2:"Chân2"}[v]||v);
-  const tone=v=>{const s=String(v||"").toUpperCase();if(s==="PASS"||((s.includes("ĐẠT")||s.includes("PASS"))&&!s.includes("GẦN")&&!s.includes("KHÔNG")&&!s.includes("FAIL")&&!s.includes("A0")))return"pass";if(s==="NEAR"||s.includes("GẦN")||s.includes("NEAR"))return"near";if(s==="EMPTY"||s.includes("TRỐNG"))return"empty";return"fail"};
-
-  function signalMethod(m){
-    const mt=tone(m.visual_status||m.status),numbers=m.numbers||[],count=Math.min(numbers.length,3);
-    const body=numbers.length?numbers.map(n=>{const nt=tone(n.visual_status||n.status),ring=n.highlight_primary?" a1-primary":"";return`<div class="num tone-${nt}${ring}"><b>${esc(n.code)}</b><em>×${esc(n.points)} điểm</em><small class="num-meta"><span class="num-role">${esc(n.role)}</span><span class="num-capital">${vnd(n.capital_vnd)}</span></small></div>`}).join(""):(m.empty_slot?'<div class="empty-a1" aria-label="Ô A1 để trống"></div>':'');
-    return`<article class="method tone-${mt}"><div class="method-head"><div><small>${esc(m.method)}</small><h2>${esc(m.label)}</h2></div><span class="gate tone-${mt}">${esc(m.status)}</span></div><div class="nums count-${count}">${body}</div><div class="method-summary"><div><span>Điểm/số</span><strong>${esc(m.points_per_code)}</strong></div><div><span>Số mã</span><strong>${esc(m.code_count)}</strong></div><div><span>Vốn</span><strong>${vnd(m.capital_vnd)}</strong></div></div></article>`
-  }
-
-  function profile(h){if(!h)return"";const losses=h.losses!==undefined?h.losses:(h.orders!==undefined&&h.wins!==undefined?Math.max(Number(h.orders)-Number(h.wins),0):undefined);const cells=[];if(h.wins!==undefined)cells.push(["Số lệnh thắng",h.wins]);if(losses!==undefined)cells.push(["Số lệnh thua",losses]);if(h.pnl_vnd!==undefined)cells.push(["Tổng lãi/lỗ",signed(h.pnl_vnd)]);if(h.orders!==undefined)cells.push(["Tổng lệnh",h.orders]);if(h.win_rate!==undefined)cells.push(["Tỷ lệ thắng",pct(h.win_rate)]);if(h.oos_win_rate!==undefined)cells.push(["WR OOS",pct(h.oos_win_rate)]);if(h.pnl_units!==undefined)cells.push(["P/L",`${h.pnl_units} đơn vị`]);if(h.max_drawdown_vnd!==undefined)cells.push(["Max DD",signed(h.max_drawdown_vnd)]);if(h.max_drawdown_units!==undefined)cells.push(["Max DD",`${h.max_drawdown_units} đơn vị`]);if(!cells.length)return"";return`<div class="profile">${cells.slice(0,8).map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("")}</div>`}
-  function quality(q){if(!q)return"";return`<div class="quality"><b>Quality benchmark: ${esc(q.label||q.id||"")}</b><span>${q.orders!==undefined?`${esc(q.orders)} lệnh · `:""}${q.wins!==undefined?`${esc(q.wins)} thắng · `:""}WR ${pct(q.win_rate)}${q.pnl_units!==undefined?` · P/L ${esc(q.pnl_units)} đơn vị`:""}${q.max_drawdown_units!==undefined?` · DD ${esc(q.max_drawdown_units)} đơn vị`:""} · ${esc(q.status||"")}</span></div>`}
-  function milestone(c){if(!c.earliest_eligible_date)return"";return`<div class="milestone"><b>Mốc sớm nhất: ${date(c.earliest_eligible_date)}</b><span>${esc(c.earliest_condition||"")}</span><small>${esc(c.milestone_type||"CONDITIONAL")}</small></div>`}
-  function metrics(c){return[c.role?`Vai trò ${roleLabel(c.role)}`:"",c.side?`Nhánh ${roleLabel(c.side)}`:"",c.gan!==undefined?`Gan ${c.gan}`:"",c.gmax!==undefined?`Gmax ${c.gmax}`:"",c.score!==undefined?`Score ${Number(c.score).toFixed(3)}`:"",c.hot21!==undefined?`HOT21 ${c.hot21}`:"",c.h21!==undefined?`H21 ${c.h21}`:"",c.count90!==undefined?`Count90 ${c.count90}`:"",c.pair_count21!==undefined?`Pair21 ${c.pair_count21}`:"",c.pair_count180!==undefined?`Pair180 ${c.pair_count180}`:"",c.co365!==undefined?`Co365 ${c.co365}`:"",c.gan_lead!==undefined?`Lead ${c.gan_lead}`:"",c.occ30!==undefined?`Occ30 ${c.occ30}`:""].filter(Boolean).join(" · ")}
-  function groupCard(g){const candidates=(g.candidates||[]).map(c=>`<div class="candidate"><div><b class="candidate-title">${esc(c.code)}</b> · ${esc(c.status)}</div>${metrics(c)?`<div class="metrics">${esc(metrics(c))}</div>`:""}<div>${esc(c.reason)}</div>${milestone(c)}</div>`).join("");const basket=g.earliest_basket_date?`<div class="milestone"><b>Mốc sớm nhất cả rổ: ${date(g.earliest_basket_date)}</b><span>${esc(g.earliest_basket_condition||"")}</span><small>LOWER BOUND DYNAMIC</small></div>`:"";return`<article class="card ${pass(g.status)}"><div class="card-head"><div><small>${esc(g.role)}</small><h3>${esc(g.label)}</h3></div><span class="pill">${esc(g.status)}</span></div><b>${esc(g.method)}</b><div class="chips">${(g.selected_numbers||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join("")}</div><p>${esc(g.summary)}</p><div class="why">${esc(g.reason)}</div>${String(g.id||"").toUpperCase()==="X2"?"":profile(g.historical_profile)}${String(g.id||"").toUpperCase()==="X2"?"":quality(g.quality_benchmark)}${candidates}${basket}</article>`}
-  function pnlCard(label,value,note,cls=""){return`<div class="pnl-card ${cls}"><span>${esc(label)}</span><b class="${moneyClass(value)}">${signed(value)}</b><small>${esc(note)}</small></div>`}
-
-  function render(d){
-    const p=d.portfolio||{},t=d.top_signals||{},q=d.pnl_summary||{},ds=d.data||{},policy=d.milestone_policy||{};
-    const legend=(t.legend||[{visual_status:"PASS",label:"Xanh lá · Đạt"},{visual_status:"NEAR",label:"Vàng chanh · Gần đạt"},{visual_status:"FAIL",label:"Đỏ · Không đạt"}]).map(x=>`<span class="legend-item tone-${tone(x.visual_status)}">${esc(x.label)}</span>`).join("");
-    const pnl=[pnlCard("Kết quả hôm qua",q.yesterday_pnl_vnd,`${date(q.yesterday_date)} · ${q.yesterday_hits} nháy`),pnlCard("Tổng 5 nhóm",q.active_five_group_pnl_vnd,`Khóa đến ${date(q.confirmed_through)}`,"main"),pnlCard("Sổ archive",q.archive_pnl_vnd,"Than Vo lưu trữ"),pnlCard("Tổng toàn bộ",q.grand_total_pnl_vnd,"5 nhóm + archive","main"),`<div class="pnl-card pending"><span>Lệnh hôm nay chờ KQ</span><b>${vnd(q.today_pending_capital_vnd)}</b><small>${esc(q.today_pending_order)} · chưa cộng P/L</small></div>`].join("");
-    app.innerHTML=`<section class="hero"><div class="hero-main"><span class="tag">RÀ SOÁT ${date(d.target_date)}</span><h1>${esc(p.title)}</h1><p>${esc(p.reason)}</p><div class="facts"><div class="fact"><span>Tổng điểm</span><b>${esc(t.total_points)}</b></div><div class="fact"><span>Số mã</span><b>${esc(t.total_numbers)}</b></div><div class="fact"><span>Vốn hôm nay</span><b>${vnd(t.total_capital_vnd)}</b></div><div class="fact status"><span>Trạng thái</span><b>${esc(p.tier)}</b></div></div></div><div class="signals"><div class="head"><div><span class="tag section-title">${esc(t.title)}</span><h2>${esc(t.subtitle)}</h2></div><p>${esc(t.total_methods)} khối: A1 · X2 · X3</p></div><div class="status-legend">${legend}</div><div class="methods">${(t.methods||[]).map(signalMethod).join("")||'<div class="note">Không có tín hiệu để hiển thị.</div>'}</div><div class="note">${esc(t.note)}</div></div></section>
-    <section class="section"><div class="head"><div><span class="tag section-title">LÃI/LỖ</span><h2>Theo dõi vốn và lợi nhuận</h2></div><p>Hôm qua đã cộng; lệnh hôm nay chưa cộng.</p></div><div class="pnl">${pnl}</div></section>
-    <section class="section"><div class="head"><div><span class="tag section-title">CHI TIẾT & MỐC VÀO</span><h2>A1 · X2 · X3 · Xiên2 · Đề đầu/đuôi</h2></div><p>${esc(policy.disclosure||"Mốc sớm nhất là điều kiện, không phải cam kết.")}</p></div><div class="groups">${(d.groups||[]).map(groupCard).join("")}</div></section>
-    <details><summary>Kiểm toán dữ liệu và 27 mã gần nhất</summary><div class="audit"><p>${esc(ds.source_label)}</p><div class="codes">${(ds.latest_27_codes||[]).map(x=>`<span>${esc(x)}</span>`).join("")}</div></div></details>`
-  }
-
-  async function load(){refresh.disabled=true;try{const r=await fetch(`./data/current.json?v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw Error(`HTTP ${r.status}`);render(await r.json())}catch(err){app.innerHTML=`<div class="error"><b>Không tải được dữ liệu.</b><p>${esc(err.message)}</p></div>`}finally{refresh.disabled=false}}
-  refresh.addEventListener("click",load);load();setInterval(load,120000)
-})();
-</script>
+<script src="./assets/mb-app-v2.js?v=2" defer></script>
 </body>
 </html>

@@ -1,1 +1,1 @@
-{"schema_version":"MB_AUTOMATION_STATE_V1","status":"DATA_FAIL_A0","reason":"Không tải được Google Sheet XLSX; A0 bắt buộc.","last_locked_through":"2026-07-11","next_target_date":"2026-07-12","milestones_complete":true,"updated_at":"2026-07-11T22:13:04+07:00"}
+{"schema_version":"MB_AUTOMATION_STATE_V1","status":"DATA_FAIL_A0","reason":"Không tải được Google Sheet XLSX/CSV; A0 bắt buộc.","last_locked_through":"2026-07-11","next_target_date":"2026-07-12","milestones_complete":true,"updated_at":"2026-07-11T22:17:24+07:00"}

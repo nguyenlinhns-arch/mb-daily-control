@@ -1,0 +1,67 @@
+{
+  "schema_version": "MB_AUTOMATION_POLICY_V1",
+  "status": "ACTIVE_PERMANENT",
+  "source_spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
+  "website_repository": "nguyenlinhns-arch/mb-daily-control",
+  "website_payload": "data/current.json",
+  "controller": {
+    "order": [
+      "A1_CORE100",
+      "A1_VOLUME50",
+      "X3_GROWTH_32_34",
+      "X2_RESCUE15",
+      "A0"
+    ],
+    "maximum_real_orders_per_day": 1,
+    "confirmation_required_before_real_order": true,
+    "no_martingale": true
+  },
+  "a1": {
+    "core_points_per_code": 100,
+    "volume_points_per_code": 50,
+    "core_gate": "Gan>=21; 0.90<=Score<=1.60; Presence5=0; MaxFreq5<2; hard-noise brake off",
+    "volume_gate": "Gan>=12; 0.70<=Score<=1.80; Presence5=0; MaxFreq5<2; hard-noise brake off",
+    "hard_noise_brake": "repeat2_count>=3 OR max_frequency>=3"
+  },
+  "x3": {
+    "method": "MB_X3_GROWTH_32_34",
+    "points_per_code": 50,
+    "basket_size": 3,
+    "gate": "repeat2<=4; previous maxfreq<=2; HOT21 sum 32-34; HOT21 max 11-14; no fallback"
+  },
+  "x2": {
+    "method": "MB_X2_FUSION_A0_RESCUE",
+    "points_per_code": 15,
+    "pair_size": 2,
+    "rank_first_then_gate": true,
+    "website_performance_metrics_hidden_permanently": true
+  },
+  "milestones": {
+    "status": "ACTIVE_MANDATORY_ABSOLUTE",
+    "required_groups": ["A1", "X2", "X3"],
+    "required_fields": [
+      "earliest_eligible_date",
+      "earliest_condition",
+      "milestone_type"
+    ],
+    "x3_group_requires_earliest_basket_date": true,
+    "recalculate_after_each_locked_draw": true,
+    "meaning": "Conditional lower bound, never a guaranteed entry date"
+  },
+  "pipeline": {
+    "result_schedule_vn": ["19:15", "19:35", "19:55"],
+    "review_schedule_vn": ["14:00"],
+    "result_actions": [
+      "download Google Sheet XLSX",
+      "validate latest 27/27",
+      "settle confirmed real orders idempotently",
+      "recompute next-day A1/X3/X2",
+      "validate all earliest-entry milestones",
+      "write data/current.json",
+      "write data/plans/YYYY-MM-DD.json",
+      "update data/review-ledger.json",
+      "commit and publish with GitHub Pages"
+    ],
+    "data_failure_action": "A0_DATA_FAIL; never guess; preserve prior ledgers"
+  }
+}

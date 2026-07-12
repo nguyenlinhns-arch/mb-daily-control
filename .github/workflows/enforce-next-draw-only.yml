@@ -1,0 +1,51 @@
+name: Enforce next-draw-only website
+
+on:
+  workflow_run:
+    workflows: ["MB Daily result settlement and next-day plan"]
+    types: [completed]
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "data/current.json"
+      - "data/current-override.json"
+      - "scripts/enforce_next_draw_only.py"
+      - ".github/workflows/enforce-next-draw-only.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mb-next-draw-only
+  cancel-in-progress: false
+
+jobs:
+  compact-public-payload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Remove completed-draw details from public current payload
+        run: python scripts/enforce_next_draw_only.py
+
+      - name: Commit only when payload changed
+        run: |
+          if git diff --quiet -- data/current.json data/current-override.json; then
+            echo "Public payload already shows only the next draw."
+            exit 0
+          fi
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/current.json data/current-override.json
+          git commit -m "web: keep current payload on next draw only"
+          git pull --rebase origin main
+          git push origin HEAD:main

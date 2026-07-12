@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export settlement, next-draw and Xiên 2 recommendation state as CSV."""
+"""Export settlement, next-draw, Xiên 2 and Đề watchlist state as CSV."""
 from __future__ import annotations
 
 import argparse
@@ -47,6 +47,8 @@ def build_current(doc: dict[str, Any], ledger: dict[str, Any]) -> str:
     pending = doc.get("pending_order") or {}
     pnl = doc.get("pnl_summary") or {}
     xien = doc.get("xien2_recommendation") or {}
+    de = doc.get("de_watchlist") or {}
+    de_candidates = de.get("candidates") or []
     settlements = ledger.get("settlements") or {}
     last_date = max(settlements, default="")
     last = settlements.get(last_date) or {}
@@ -91,6 +93,14 @@ def build_current(doc: dict[str, Any], ledger: dict[str, Any]) -> str:
         ("xien2", "gross_return_per_winning_pair_vnd", xien.get("gross_return_per_winning_pair_vnd", 1600000)),
         ("xien2", "confirmation_required", bool(xien.get("confirmation_required", True))),
         ("xien2", "pnl_included", bool(xien.get("pnl_included", False))),
+        ("de", "rule_version", de.get("rule_version", "")),
+        ("de", "status", de.get("status", "")),
+        ("de", "method", de.get("method", "")),
+        ("de", "candidate_count", len(de_candidates)),
+        ("de", "candidate_list", "|".join(str(item.get("code") or "") for item in de_candidates)),
+        ("de", "earliest_dates", compact_json({str(item.get("code") or ""): item.get("earliest_eligible_date", "") for item in de_candidates})),
+        ("de", "candidate_metrics", compact_json({str(item.get("code") or ""): {"gan": item.get("gan"), "gmax": item.get("gmax"), "score": item.get("score"), "occ30": item.get("occ30"), "lead": item.get("lead")} for item in de_candidates})),
+        ("de", "capital_vnd", 0),
     ]
     rows.extend([list(item) for item in values])
     return csv_text(rows)

@@ -5,12 +5,6 @@ on:
   workflow_run:
     workflows: ["MB Daily result settlement and next-day plan"]
     types: [completed]
-  schedule:
-    # Chạy sau pipeline canonical 14:00 / 19:15 / 19:35 / 19:55.
-    - cron: "5 7 * * *"
-    - cron: "20 12 * * *"
-    - cron: "40 12 * * *"
-    - cron: "0 13 * * *"
   push:
     branches: ["main"]
     paths:

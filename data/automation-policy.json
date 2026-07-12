@@ -1,7 +1,7 @@
 {
-  "schema_version": "MB_AUTOMATION_POLICY_V8_TWICE_DAILY",
+  "schema_version": "MB_AUTOMATION_POLICY_V9_XIEN2_AUTO",
   "status": "ACTIVE_PERMANENT",
-  "config_id": "MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712",
+  "config_id": "MB_PARALLEL_EXACT_ROLL7_REAL30_XIEN2_AUTO_V1_20260712",
   "source_spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
   "website_repository": "nguyenlinhns-arch/mb-daily-control",
   "website_payload": "data/current.json",
@@ -14,6 +14,7 @@
     "maximum_standard_method_blocks_per_day": 3,
     "dedupe_same_code_by_highest_stake": true,
     "roll7_only_when_all_standard_methods_fail": true,
+    "xien2_auto_from_funded_codes": true,
     "confirmation_required_before_real_order": true,
     "no_martingale": true,
     "no_progression": true
@@ -76,6 +77,21 @@
     "target": "25 signal days in every 30 draw sessions",
     "real_capital_vnd": 0
   },
+  "xien2": {
+    "status": "ACTIVE_AUTO_RECOMMENDATION",
+    "rule_version": "XIEN2_AUTO_FROM_FUNDED_CODES_V1",
+    "source": "Every unique code with positive stake in the current A1/X2/X3/ROLL7 plan",
+    "minimum_codes": 2,
+    "pair_generation": "ALL_UNORDERED_2_COMBINATIONS",
+    "pair_formula": "n*(n-1)/2",
+    "points_per_pair": 100,
+    "capital_per_pair_vnd": 100000,
+    "gross_return_per_winning_pair_vnd": 1600000,
+    "confirmation_required_before_booking": true,
+    "auto_recommendation_is_not_execution": true,
+    "no_shadow_or_watch_codes": true,
+    "separate_ledger": true
+  },
   "overlap": {
     "same_code_across_methods": "FUND_ONCE_AT_HIGHEST_STAKE",
     "preserve_confluence_tags": true,
@@ -84,8 +100,8 @@
   },
   "top_block": {
     "status": "ACTIVE_PERMANENT",
-    "rule_version": "PARALLEL_A1_X2_X3_STATUS_V7",
-    "panel_order": ["A1", "X2", "X3"],
+    "rule_version": "PARALLEL_A1_X2_X3_ROLL7_XIEN2_STATUS_V9",
+    "panel_order": ["A1", "X2", "X3", "ROLL7", "XIEN2"],
     "a1_panel": {
       "always_present": true,
       "show_official_selection": true,
@@ -105,6 +121,18 @@
       "fallback_action": "Show exactly the three codes of the current top-ranked X3 basket with zero capital",
       "number_count": 3
     },
+    "roll7_panel": {
+      "always_present": true,
+      "show_status_when_inactive": true
+    },
+    "xien2_panel": {
+      "always_present": true,
+      "activation": "At least two unique positive-stake codes",
+      "show_all_generated_pairs": true,
+      "show_capital_per_pair": true,
+      "show_total_pair_capital": true,
+      "confirmation_label_required": true
+    },
     "colour_convention": {
       "PASS": "GREEN",
       "NEAR": "LIME_YELLOW",
@@ -112,8 +140,8 @@
       "labels_vi": {"PASS": "Đạt", "NEAR": "Gần đạt", "FAIL": "Không đạt"}
     },
     "near_rule": "Explicit NEAR/GẦN status, a conditionally close candidate, or X3 sum 31/35 near the 32-34 gate.",
-    "display_disclaimer": "Tỷ lệ thắng chỉ là tham chiếu lịch sử cấp phương pháp, không phải xác suất riêng của từng mã và không bảo đảm kết quả.",
-    "real_money_rule": "A1, X2 and X3 are independent. Every passing standard method receives its canonical stake; the same code is funded once at the highest applicable stake. ROLL7 is used only when all three standard methods are A0."
+    "display_disclaimer": "Xiên 2 là khuyến nghị tự động từ mã có vốn, không phải xác nhận đã đặt và không bảo đảm kết quả.",
+    "real_money_rule": "A1, X2 and X3 are independent; ROLL7 only when all three A0; Xiên 2 recommends every two-code combination whenever at least two unique funded codes exist. Booking still requires explicit confirmation."
   },
   "milestones": {
     "status": "ACTIVE_MANDATORY_ABSOLUTE",
@@ -140,6 +168,7 @@
       "record P/L and settlement ledger",
       "write repository data files and Google Sheet import CSVs",
       "recompute A1/X2/X3 and ROLL7",
+      "generate Xiên 2 recommendation from every funded code when count >=2",
       "publish website for the next draw"
     ],
     "result_actions": [
@@ -150,11 +179,13 @@
       "recompute next-day A1, X2 and X3 independently",
       "fund every passing standard method with cross-method dedupe",
       "apply ROLL7 rescue30 only when all standard methods are A0",
+      "generate all Xiên 2 combinations from unique positive-stake codes",
       "validate all earliest-entry milestones",
       "write data/current.json",
       "write data/plans/YYYY-MM-DD.json",
       "update data/review-ledger.json",
       "write data/sheet-current.csv and data/sheet-settlements.csv",
+      "render static website including Xiên 2",
       "commit and publish with GitHub Pages"
     ],
     "source_access_failure_action": "Preserve the last valid data/current.json; write failure only to data/automation-status.json; retry on the next scheduled run.",

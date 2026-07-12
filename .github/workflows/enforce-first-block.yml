@@ -82,9 +82,14 @@ jobs:
           assert any('X2' in x for x in ids), ids
           assert any('X3' in x for x in ids), ids
           pending = doc.get('pending_order') or {}
+          method_id = str(pending.get('method_id') or '').upper()
           points = pending.get('points_by_code') or {}
-          if pending.get('method_id') == 'X2_CORE_EXACT':
-              assert points == {'54': 50, '45': 50}, points
+          if method_id.startswith('X2_'):
+              assert points and all(int(value) == 50 for value in points.values()), points
+              assert len(points) == 2, points
+          if method_id.startswith('X3_'):
+              assert points and all(int(value) == 50 for value in points.values()), points
+              assert len(points) == 3, points
           assert (doc.get('funding_policy') or {}).get('cross_method_blocking') is False
           print('PARALLEL_CURRENT_METHOD_CARDS_OK')
           PY

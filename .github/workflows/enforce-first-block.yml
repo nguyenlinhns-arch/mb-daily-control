@@ -1,4 +1,4 @@
-name: Enforce pinned A1 and X2/X3 status panels
+name: Enforce current A1/X2/X3 status panels
 
 on:
   workflow_dispatch:
@@ -14,6 +14,7 @@ on:
     branches: ["main"]
     paths:
       - "data/current.json"
+      - "data/current-override.json"
       - "data/plans/**"
       - "data/automation-policy.json"
       - "index.html"
@@ -25,7 +26,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: enforce-first-block-v3
+  group: enforce-current-method-panels-v4
   cancel-in-progress: false
 
 jobs:
@@ -45,21 +46,59 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build pinned A1 and X2/X3 status panels
+      - name: Detect controller generation
+        id: mode
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          doc = json.loads(Path('data/current.json').read_text(encoding='utf-8'))
+          config = str(doc.get('config_id') or '')
+          mode = str((doc.get('funding_policy') or {}).get('mode') or '')
+          parallel = config.startswith('MB_PARALLEL_') or mode == 'FUND_EVERY_EXACT_PASS_METHOD'
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write(f"parallel={'true' if parallel else 'false'}\n")
+          print({'config_id': config, 'funding_mode': mode, 'parallel': parallel})
+          PY
+
+      - name: Build legacy pinned panels only for legacy controller
+        if: steps.mode.outputs.parallel != 'true'
         run: python scripts/enforce_top3_first_block.py
 
-      - name: Validate first-block invariant
+      - name: Validate legacy first-block invariant
+        if: steps.mode.outputs.parallel != 'true'
         run: python scripts/enforce_top3_first_block.py --check
 
-      - name: Commit only when files changed
+      - name: Validate parallel next-draw cards without rewriting stakes
+        if: steps.mode.outputs.parallel == 'true'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          doc = json.loads(Path('data/current.json').read_text(encoding='utf-8'))
+          methods = (doc.get('top_signals') or {}).get('methods') or []
+          ids = {str(m.get('id') or '').upper() for m in methods}
+          assert any('A1' in x for x in ids), ids
+          assert any('X2' in x for x in ids), ids
+          assert any('X3' in x for x in ids), ids
+          pending = doc.get('pending_order') or {}
+          points = pending.get('points_by_code') or {}
+          if pending.get('method_id') == 'X2_CORE_EXACT':
+              assert points == {'54': 50, '45': 50}, points
+          assert (doc.get('funding_policy') or {}).get('cross_method_blocking') is False
+          print('PARALLEL_CURRENT_METHOD_CARDS_OK')
+          PY
+
+      - name: Commit legacy normalization only when files changed
+        if: steps.mode.outputs.parallel != 'true'
         run: |
           if git diff --quiet -- data; then
-            echo "Pinned A1 and X2/X3 panel policy already enforced."
+            echo "Legacy pinned panel policy already enforced."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git commit -m "data: enforce pinned A1 and X2/X3 status panels"
+          git commit -m "data: enforce legacy pinned A1 and X2/X3 status panels"
           git pull --rebase origin main
           git push origin HEAD:main

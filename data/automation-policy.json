@@ -1,5 +1,5 @@
 {
-  "schema_version": "MB_AUTOMATION_POLICY_V7_PARALLEL",
+  "schema_version": "MB_AUTOMATION_POLICY_V8_TWICE_DAILY",
   "status": "ACTIVE_PERMANENT",
   "config_id": "MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712",
   "source_spreadsheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
@@ -127,12 +127,26 @@
   },
   "pipeline": {
     "planner_entrypoint": "scripts/plan_next_day_parallel.py",
-    "result_schedule_vn": ["19:15", "19:35", "19:55"],
-    "review_schedule_vn": ["14:00"],
+    "schedule_policy_version": "MB_TWICE_DAILY_0800_1930_V1_20260712",
+    "schedule_timezone": "Asia/Ho_Chi_Minh",
+    "full_run_schedule_vn": ["08:00", "19:30"],
+    "cron_utc": ["0 1 * * *", "30 12 * * *"],
+    "review_schedule_vn": ["08:00", "19:30"],
+    "result_schedule_vn": ["08:00", "19:30"],
+    "old_schedules_removed": true,
+    "run_scope_at_both_times": [
+      "review latest locked result",
+      "settle confirmed real orders idempotently",
+      "record P/L and settlement ledger",
+      "write repository data files and Google Sheet import CSVs",
+      "recompute A1/X2/X3 and ROLL7",
+      "publish website for the next draw"
+    ],
     "result_actions": [
       "download Google Sheet XLSX",
       "validate latest 27/27",
       "settle confirmed real orders idempotently",
+      "record P/L and settlement ledger",
       "recompute next-day A1, X2 and X3 independently",
       "fund every passing standard method with cross-method dedupe",
       "apply ROLL7 rescue30 only when all standard methods are A0",
@@ -140,6 +154,7 @@
       "write data/current.json",
       "write data/plans/YYYY-MM-DD.json",
       "update data/review-ledger.json",
+      "write data/sheet-current.csv and data/sheet-settlements.csv",
       "commit and publish with GitHub Pages"
     ],
     "source_access_failure_action": "Preserve the last valid data/current.json; write failure only to data/automation-status.json; retry on the next scheduled run.",

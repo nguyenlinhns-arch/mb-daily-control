@@ -3,9 +3,8 @@
 
 Audit history remains in dated plans and settlement ledgers. Only the public
 `current` payload is compacted: cumulative P/L is retained and completed-draw
-orders/results are removed. All current A1/X2/X3 cards and current candidates
-remain visible, whether PASS or FAIL, so the website never hides the methods
-being reviewed for the next draw.
+orders/results are removed. All current A1/X2/X3/ROLL7/Xiên 2 cards and current
+candidates remain visible, whether active or inactive.
 """
 from __future__ import annotations
 
@@ -49,6 +48,8 @@ def compact(doc: dict[str, Any]) -> bool:
         "show_target_date_only": True,
         "show_all_current_methods": True,
         "show_nonfunded_current_candidates": True,
+        "show_roll7_current_status": True,
+        "show_xien2_current_recommendation": True,
         "hide_completed_draw_details": True,
         "hide_latest_27_codes": True,
         "hide_completed_draw_method_cards": True,
@@ -75,6 +76,9 @@ def compact(doc: dict[str, Any]) -> bool:
         "grand_total_pnl_vnd",
         "active_all_real_pnl_vnd",
         "today_pending_capital_vnd",
+        "today_pending_standard_capital_vnd",
+        "today_pending_xien2_capital_vnd",
+        "today_pending_total_recommended_capital_vnd",
         "today_pending_order",
         "today_included",
     }
@@ -82,13 +86,12 @@ def compact(doc: dict[str, Any]) -> bool:
     doc["pnl_summary"]["confirmed_through"] = locked.isoformat()
     doc["pnl_summary"]["settlement_applied"] = True
 
-    # Keep the three current prospective method groups. The UI may hide the
-    # long detail section, but A1 uses its current candidates for the Top-3
-    # watchlist and PASS/FAIL cards must remain visible in top_signals.
+    # Preserve every current operational/recommendation group. Historical result
+    # groups remain outside the public current payload.
     groups = doc.get("groups") or []
     doc["groups"] = [
         group for group in groups
-        if str(group.get("id", "")).upper() in {"A1", "X2", "X3"}
+        if str(group.get("id", "")).upper() in {"A1", "X2", "X3", "ROLL7", "XIEN", "XIEN2"}
     ]
 
     after = json.dumps(doc, ensure_ascii=False, sort_keys=True)

@@ -10,9 +10,11 @@
   "display_policy": {
     "mode": "NEXT_DRAW_ONLY_AFTER_SETTLEMENT",
     "show_target_date_only": true,
+    "show_all_current_methods": true,
+    "show_nonfunded_current_candidates": true,
     "hide_completed_draw_details": true,
     "hide_latest_27_codes": true,
-    "hide_historical_method_cards": true,
+    "hide_completed_draw_method_cards": true,
     "pnl_display": "CUMULATIVE_AND_NEXT_CAPITAL_ONLY",
     "settlement_applied_through": "2026-07-12"
   },

@@ -1,4 +1,4 @@
-name: Enforce current A1/X2/X3 status panels
+name: Enforce current A1/X2/X3/ROLL7 status panels
 
 on:
   workflow_dispatch:
@@ -10,18 +10,20 @@ on:
     paths:
       - "data/current.json"
       - "data/current-override.json"
+      - "data/review-ledger.json"
       - "data/plans/**"
       - "data/automation-policy.json"
       - "index.html"
       - "scripts/enforce_top3_first_block.py"
       - "scripts/enforce_top3_first_block.py.zlib.b64"
+      - "scripts/inject_roll7_panel.py"
       - ".github/workflows/enforce-first-block.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: enforce-current-method-panels-v4
+  group: enforce-current-method-panels-v5
   cancel-in-progress: false
 
 jobs:
@@ -50,7 +52,10 @@ jobs:
           doc = json.loads(Path('data/current.json').read_text(encoding='utf-8'))
           config = str(doc.get('config_id') or '')
           mode = str((doc.get('funding_policy') or {}).get('mode') or '')
-          parallel = config.startswith('MB_PARALLEL_') or mode == 'FUND_EVERY_EXACT_PASS_METHOD'
+          parallel = config.startswith('MB_PARALLEL_') or mode in {
+              'FUND_EVERY_EXACT_PASS_METHOD',
+              'PARALLEL_INDEPENDENT_ALL_EXACT_PASS',
+          }
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
               fh.write(f"parallel={'true' if parallel else 'false'}\n")
           print({'config_id': config, 'funding_mode': mode, 'parallel': parallel})
@@ -64,9 +69,12 @@ jobs:
         if: steps.mode.outputs.parallel != 'true'
         run: python scripts/enforce_top3_first_block.py --check
 
-      - name: Validate parallel next-draw cards without rewriting stakes
-        if: steps.mode.outputs.parallel == 'true'
+      - name: Add permanent ROLL7 current-status panel
+        run: python scripts/inject_roll7_panel.py
+
+      - name: Validate current method cards and stakes
         run: |
+          python scripts/inject_roll7_panel.py --check
           python - <<'PY'
           import json
           from pathlib import Path
@@ -76,6 +84,7 @@ jobs:
           assert any('A1' in x for x in ids), ids
           assert any('X2' in x for x in ids), ids
           assert any('X3' in x for x in ids), ids
+          assert 'ROLL7_STATUS' in ids, ids
           pending = doc.get('pending_order') or {}
           method_id = str(pending.get('method_id') or '').upper()
           points = pending.get('points_by_code') or {}
@@ -85,20 +94,23 @@ jobs:
           if method_id.startswith('X3_'):
               assert points and all(int(value) == 50 for value in points.values()), points
               assert len(points) == 3, points
-          assert (doc.get('funding_policy') or {}).get('cross_method_blocking') is False
-          print('PARALLEL_CURRENT_METHOD_CARDS_OK')
+          if method_id.startswith('ROLL7'):
+              assert points and all(int(value) == 30 for value in points.values()), points
+              assert 1 <= len(points) <= 2, points
+          policy = doc.get('funding_policy') or {}
+          assert policy.get('cross_method_blocking') is False or policy.get('no_cross_method_blocking') is True
+          print('A1_X2_X3_ROLL7_CURRENT_CARDS_OK')
           PY
 
-      - name: Commit legacy normalization only when files changed
-        if: steps.mode.outputs.parallel != 'true'
+      - name: Commit only when files changed
         run: |
           if git diff --quiet -- data; then
-            echo "Legacy pinned panel policy already enforced."
+            echo "Current A1/X2/X3/ROLL7 panels already correct."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git commit -m "data: enforce legacy pinned A1 and X2/X3 status panels"
+          git commit -m "data: keep ROLL7 visible with current method panels"
           git pull --rebase origin main
           git push origin HEAD:main

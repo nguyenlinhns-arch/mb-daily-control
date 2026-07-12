@@ -1,0 +1,74 @@
+name: Apply automatic Xiên 2 recommendations
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "MB Daily result settlement and next-day plan"
+      - "Enforce A1 reverse50 and current recommendations"
+      - "Enforce next-draw-only website"
+    types: [completed]
+  push:
+    branches: ["main"]
+    paths:
+      - "data/current.json"
+      - "data/current-override.json"
+      - "data/plans/**"
+      - "data/automation-policy.json"
+      - "scripts/apply_xien2_auto_pairs.py"
+      - "scripts/export_sheet_sync.py"
+      - "scripts/render_fast_dashboard.py"
+      - ".github/workflows/apply-xien2-auto.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-xien2-auto-recommendations
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply and validate Xiên 2 auto pairs
+        run: |
+          python scripts/apply_xien2_auto_pairs.py
+          python scripts/apply_xien2_auto_pairs.py --check
+
+      - name: Refresh Google Sheet CSV projections
+        run: |
+          python scripts/export_sheet_sync.py
+          python scripts/export_sheet_sync.py --check
+
+      - name: Render and validate static website
+        run: |
+          python scripts/render_fast_dashboard.py
+          python scripts/render_fast_dashboard.py --check
+          grep -q 'Xiên 2 tự động' index.html
+
+      - name: Commit only when files changed
+        run: |
+          if git diff --quiet -- data index.html; then
+            echo "Xiên 2 auto recommendation already current."
+            exit 0
+          fi
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data index.html
+          git commit -m "data: auto-generate Xiên 2 recommendations"
+          git pull --rebase origin main
+          git push origin HEAD:main

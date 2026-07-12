@@ -1,0 +1,66 @@
+name: Apply confirmed manual real order
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "MB Daily result settlement and next-day plan"
+      - "Enforce A1 reverse50 and top status panels"
+      - "Enforce pinned A1 and X2/X3 status panels"
+    types: [completed]
+  schedule:
+    # Chạy sau các lượt rà soát chính và hậu kiểm.
+    - cron: "8 7 * * *"
+    - cron: "23 12 * * *"
+    - cron: "43 12 * * *"
+    - cron: "3 13 * * *"
+  push:
+    branches: ["main"]
+    paths:
+      - "data/current.json"
+      - "data/manual-orders/**"
+      - "scripts/apply_manual_order.py"
+      - ".github/workflows/enforce-manual-order.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-confirmed-manual-order
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply confirmed order
+        run: python scripts/apply_manual_order.py
+
+      - name: Validate confirmed order invariant
+        run: python scripts/apply_manual_order.py --check
+
+      - name: Commit only when files changed
+        run: |
+          if git diff --quiet -- data; then
+            echo "Confirmed manual order already applied."
+            exit 0
+          fi
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          git commit -m "data: apply confirmed manual real order"
+          git pull --rebase origin main
+          git push origin HEAD:main

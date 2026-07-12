@@ -1,1 +1,771 @@
-{"schema_version":"MB_DAILY_WEB_V10_NEXT_DRAW_ALL_METHODS","report_run_id":"RPT_MB_20260713_PARALLEL_NEXT_ALL_METHODS","source_run_id":"LOCK_20260712_1484100F99","config_id":"MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712","target_date":"2026-07-13","generated_at":"2026-07-12T20:45:00+07:00","valid_until":"2026-07-13T23:59:59+07:00","official_url":"https://nguyenlinhns-arch.github.io/mb-daily-control/","display_policy":{"mode":"NEXT_DRAW_ONLY_AFTER_SETTLEMENT","show_target_date_only":true,"show_all_current_methods":true,"show_nonfunded_current_candidates":true,"hide_completed_draw_details":true,"hide_latest_27_codes":true,"hide_completed_draw_method_cards":true,"pnl_display":"CUMULATIVE_AND_NEXT_CAPITAL_ONLY","settlement_applied_through":"2026-07-12"},"data":{"locked_through":"2026-07-12","status":"LOCKED_CROSSCHECKED_3_SOURCES","count":27,"unique":24,"repeat2_count":3,"max_frequency":2,"noise_status":"A1_HARD_BRAKE","source_label":"Dữ liệu khóa đủ 27/27 đến 12/07/2026; dùng để lập kế hoạch 13/07/2026."},"funding_policy":{"id":"PARALLEL_INDEPENDENT_ALL_EXACT_PASS_V1","mode":"FUND_EVERY_EXACT_PASS_METHOD","scope":["A1","X2","X3"],"cross_method_blocking":false,"dedupe_same_code_by_highest_stake":true,"roll7_only_when_all_standard_methods_fail":true},"stake_rule":{"a1_core_main_points":100,"a1_volume_main_points":50,"a1_reverse_points":50,"x2_exact_points_per_code":50,"x3_exact_points_per_code":50,"roll7_rescue_points_per_code":30,"lo_cost_per_point_vnd":23000,"lo_payout_per_hit_point_vnd":80000,"no_martingale":true},"milestone_policy":{"status":"ACTIVE_MANDATORY_ABSOLUTE","recalculate_after_each_locked_draw":true,"disclosure":"Chỉ hiển thị dữ liệu và ứng viên của kỳ sắp tới; mọi mốc được tính lại sau kỳ khóa mới."},"top_signals":{"title":"A1 ĐƯỢC CHỌN & CÁC SỐ WR CAO NHẤT","subtitle":"A1 — · X2 54-45 · X3 51-80-54","total_methods":3,"total_numbers":"5 mã hiển thị","total_points":"30 điểm","total_capital_vnd":690000,"note":"A1 luôn có ô riêng: có A1 thì khoanh mã chính, không có thì để trống. X2 luôn hiển thị 02 số của cặp ưu tiên; X3 luôn hiển thị 03 số của rổ ưu tiên. Xanh lá = Đạt · Vàng chanh = Gần đạt · Đỏ = Không đạt. WR là tham chiếu lịch sử cấp phương pháp; chỉ phương pháp được controller chọn có điểm/vốn.","legend":[{"visual_status":"PASS","label":"Xanh lá · Đạt"},{"visual_status":"NEAR","label":"Vàng chanh · Gần đạt"},{"visual_status":"FAIL","label":"Đỏ · Không đạt"}],"methods":[{"id":"PINNED_A1","label":"A1 được chọn","method":"Khoanh mã A1 chính · số đảo đi kèm theo luật 50 điểm","status":"TRỐNG","visual_status":"EMPTY","empty_slot":true,"points_per_code":"Theo tầng A1","code_count":0,"capital_vnd":0,"reference_win_rate":0.4737,"numbers":[]},{"id":"WR_X2","label":"MB X2 · WR 65,71%","method":"Hiển thị đúng 02 số của cặp X2 ưu tiên","status":"ĐẠT","visual_status":"PASS","empty_slot":false,"points_per_code":15,"code_count":2,"capital_vnd":690000,"reference_win_rate":0.6571,"numbers":[{"code":"54","points":15,"capital_vnd":345000,"role":"Cặp X2 54-45 · ĐẠT · WR tham chiếu 65,71%","visual_status":"PASS","highlight_primary":false,"reference_win_rate":0.6571},{"code":"45","points":15,"capital_vnd":345000,"role":"Cặp X2 54-45 · ĐẠT · WR tham chiếu 65,71%","visual_status":"PASS","highlight_primary":false,"reference_win_rate":0.6571}]},{"id":"WR_X3","label":"MB X3 · WR 69,70%","method":"Hiển thị đúng 03 số của rổ X3 ưu tiên","status":"GẦN ĐẠT","visual_status":"NEAR","empty_slot":false,"points_per_code":0,"code_count":3,"capital_vnd":0,"reference_win_rate":0.697,"numbers":[{"code":"51","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54 · GẦN ĐẠT · WR tham chiếu 69,70%","visual_status":"NEAR","highlight_primary":false,"reference_win_rate":0.697},{"code":"80","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54 · GẦN ĐẠT · WR tham chiếu 69,70%","visual_status":"NEAR","highlight_primary":false,"reference_win_rate":0.697},{"code":"54","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54 · GẦN ĐẠT · WR tham chiếu 69,70%","visual_status":"NEAR","highlight_primary":false,"reference_win_rate":0.697}]}],"first_block_rule_version":"FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3","first_block_mode":"A1_PINNED_X2_X3_STATUS_PANELS"},"portfolio":{"decision":"X2_CORE_EXACT","tier":"LỆNH TIỀN THẬT KỲ 13/07 · CHỜ XÁC NHẬN","selection":"54-45","title":"54 × 50 ĐIỂM · 45 × 50 ĐIỂM","points":100,"points_by_code":{"54":50,"45":50},"capital_vnd":2300000,"payout_vnd":0,"pnl_vnd":0,"reason":"Chỉ X2 Core Exact 54-45 đạt chuẩn cho kỳ 13/07. A1 bị phanh riêng; X3 không đạt; ROLL7 không kích hoạt.","pnl_status":"NOT_INCLUDED_UNTIL_CONFIRMED"},"pending_order":{"status":"SYSTEM_SIGNAL_NOT_YET_CONFIRMED","date":"2026-07-13","method_id":"X2_CORE_EXACT","selection":["54","45"],"points_by_code":{"54":50,"45":50},"capital_vnd":2300000,"pnl_included":false},"pnl_summary":{"confirmed_through":"2026-07-12","settlement_applied":true,"grand_total_pnl_vnd":25396000,"today_pending_capital_vnd":2300000,"today_pending_order":"54 ×50 · 45 ×50 · chờ xác nhận","today_included":false},"groups":[{"id":"A1","label":"MB A1","status":"A0_HARD_BRAKE","role":"PRODUCTION INDEPENDENT","method":"Dual Core Volume Balance — Core100/Volume50","layer":"Core → Volume","selected_numbers":["88"],"points":0,"capital_vnd":0,"summary":"88 đạt điều kiện Volume thô nhưng A1 bị hard brake.","reason":"Kỳ 12/07 có đúng 3 mã lặp hai nháy.","candidates":[{"code":"88","rank":1,"watch_rank":1,"gate":false,"status":"VOLUME WATCH · HARD BRAKE","tracking_tier":"VOLUME","tracking_rule_version":"A1_TOP3_WATCHLIST_V1","gan":15,"gmax":20,"score":0.75,"hot21":4,"reason":"Gan15; Gmax20; Score0,750; phanh A1 repeat2=3.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rà lại sau kỳ 13/07; A1 chỉ vào nếu phanh nhiễu tắt và thứ hạng/Gan/Score còn hợp lệ.","milestone_type":"CONDITIONAL_NEXT_REVIEW"},{"code":"12","rank":2,"watch_rank":2,"gate":false,"status":"VOLUME WATCH","tracking_tier":"VOLUME","tracking_rule_version":"A1_TOP3_WATCHLIST_V1","gan":12,"gmax":21,"score":0.571429,"hot21":4,"reason":"Chưa đạt Score0,70.","earliest_eligible_date":"2026-07-16","earliest_condition":"Cần tiếp tục không về để đạt Gan/Score và toàn bộ A1 gate sạch.","milestone_type":"CONDITIONAL_LOWER_BOUND"},{"code":"38","rank":3,"watch_rank":3,"gate":false,"status":"VOLUME WATCH","tracking_tier":"VOLUME","tracking_rule_version":"A1_TOP3_WATCHLIST_V1","gan":10,"gmax":20,"score":0.5,"hot21":5,"reason":"Chưa đạt Gan12/Score0,70.","earliest_eligible_date":"2026-07-17","earliest_condition":"Mốc lower bound nếu tiếp tục không về và mọi gate khác sạch.","milestone_type":"CONDITIONAL_LOWER_BOUND"}]},{"id":"X2","label":"MB X2","status":"PASS_CORE_EXACT","role":"PRODUCTION INDEPENDENT","method":"MB X2 Exact Rank1","layer":"Core Exact → Balanced Exact","selected_numbers":["54","45"],"points":100,"capital_vnd":2300000,"summary":"Cặp 54-45 đạt Core Exact rank1.","reason":"Gan2/2; ΔGan0; H5Pair2; H21 9/6; TV21≈6,1507.","candidates":[{"code":"54-45","rank":1,"gate":true,"status":"CORE EXACT RANK1 · PASS","reason":"Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507.","earliest_eligible_date":"2026-07-13","earliest_condition":"Đạt toàn bộ Core Exact tại dữ liệu khóa 12/07; vẫn cần xác nhận đặt trước quay.","milestone_type":"ELIGIBLE_NOW"}]},{"id":"X3","label":"MB X3","status":"A0_SHADOW","role":"PRODUCTION INDEPENDENT","method":"MB X3 Growth32-34","layer":"Generator top3","selected_numbers":["51","80","54"],"points":0,"capital_vnd":0,"summary":"HOT21 sum=24; max=9; FAIL.","reason":"Không đạt exact gate tổng32–34, max11–14.","candidates":[{"code":"51","rank":1,"gate":false,"status":"RANK 1","gan":7,"hot21":9,"reason":"X3 top1; rổ chưa đạt.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.","milestone_type":"DYNAMIC_LOWER_BOUND"},{"code":"80","rank":2,"gate":false,"status":"RANK 2","gan":4,"hot21":8,"reason":"X3 top2; rổ chưa đạt.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.","milestone_type":"DYNAMIC_LOWER_BOUND"},{"code":"54","rank":3,"gate":false,"status":"RANK 3","gan":2,"hot21":7,"reason":"X3 top3; rổ chưa đạt.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.","milestone_type":"DYNAMIC_LOWER_BOUND"}],"earliest_basket_date":"2026-07-14","earliest_basket_condition":"Xếp lại sau kỳ 13/07; cần HOT21 sum32–34, max11–14 và gate môi trường sạch."}],"automation":{"status":"MANUAL_LOCKED_NEXT_DRAW_ALL_METHODS","pipeline_version":"MB_DAILY_PIPELINE_PARALLEL_V1","locked_through":"2026-07-12","target_date":"2026-07-13","settlement_checked":true,"signal_review_complete":true,"milestones_complete":true,"website_refresh_seconds":120,"first_block_rule_version":"FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3","first_block_mode":"A1_PINNED_X2_X3_STATUS_PANELS","first_block_complete":true,"first_block_codes":["54","45","51","80","54"],"first_block_hash":"bf2bd9bed4be8f7546a6d280526564881f7e6debf214279efe79e106f8a972f8"},"qualified_signal_snapshot":{"title":"KỲ SẮP TỚI 13/07/2026","subtitle":"A1 A0 · X2 54-45 ĐẠT · X3 51-80-54 KHÔNG ĐẠT","total_methods":3,"total_numbers":"5 mã duy nhất · 2 mã cấp vốn","total_points":"100 điểm","total_capital_vnd":2300000,"note":"Hiển thị đầy đủ A1, X2 và X3 của kỳ tới. Chỉ mã đạt gate có điểm/vốn. 88 không tiếp tục ngày 13/07; ROLL7 không dùng vì X2 đã đạt.","legend":[{"visual_status":"PASS","label":"Xanh lá · Đạt"},{"visual_status":"FAIL","label":"Đỏ · Không đạt"}],"methods":[{"id":"A1_INDEPENDENT","label":"MB A1","method":"A1 Core100 / Volume50","status":"KHÔNG ĐẠT · HARD BRAKE","visual_status":"FAIL","points_per_code":0,"code_count":1,"capital_vnd":0,"numbers":[{"code":"88","points":0,"capital_vnd":0,"role":"Raw Volume · Gan15 · Gmax20 · Score0,75; bị phanh repeat2_count=3","visual_status":"FAIL","highlight_primary":true}]},{"id":"X2_CORE_EXACT","label":"MB X2 Core Exact","method":"X2 Core Exact rank1","status":"ĐẠT · CHỜ XÁC NHẬN","visual_status":"PASS","points_per_code":50,"code_count":2,"capital_vnd":2300000,"numbers":[{"code":"54","points":50,"capital_vnd":1150000,"role":"X2 Core Exact · Gan2 · H21=9","visual_status":"PASS"},{"code":"45","points":50,"capital_vnd":1150000,"role":"X2 Core Exact · Gan2 · H21=6","visual_status":"PASS"}]},{"id":"X3_GROWTH_EXACT","label":"MB X3 Growth Exact","method":"X3 Growth32-34","status":"KHÔNG ĐẠT","visual_status":"FAIL","points_per_code":0,"code_count":3,"capital_vnd":0,"numbers":[{"code":"51","points":0,"capital_vnd":0,"role":"HOT21=9","visual_status":"FAIL"},{"code":"80","points":0,"capital_vnd":0,"role":"HOT21=8","visual_status":"FAIL"},{"code":"54","points":0,"capital_vnd":0,"role":"HOT21=7 · trùng X2 nhưng X3 không đạt; không cộng vốn","visual_status":"FAIL"}]}]},"first_block_snapshot":{"status":"ACTIVE_PERMANENT","rule_version":"FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3","mode":"A1_PINNED_X2_X3_STATUS_PANELS","panel_order":["A1","X2","X3"],"a1_primary_code":null,"a1_blank":true,"x2_code_count":2,"x3_code_count":3,"count":5,"codes":["54","45","51","80","54"],"items":[{"code":"54","method_id":"X2","method_label":"MB X2 Rescue","method_subtype":"RESCUE","method_rank":1,"gate_pass":true,"controller_selected":true,"visual_status":"PASS","status":"ĐẠT","highlight_primary":false,"reference_win_rate":0.6571,"reference_label":"X2 Rescue35","reference_sample":"35 lệnh Rescue","reference_scope":"METHOD_NOT_CODE","points":15,"capital_vnd":345000,"role":"Cặp X2 54-45","reason":"Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."},{"code":"45","method_id":"X2","method_label":"MB X2 Rescue","method_subtype":"RESCUE","method_rank":2,"gate_pass":true,"controller_selected":true,"visual_status":"PASS","status":"ĐẠT","highlight_primary":false,"reference_win_rate":0.6571,"reference_label":"X2 Rescue35","reference_sample":"35 lệnh Rescue","reference_scope":"METHOD_NOT_CODE","points":15,"capital_vnd":345000,"role":"Cặp X2 54-45","reason":"Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."},{"code":"51","method_id":"X3","method_label":"MB X3 Growth","method_subtype":"GROWTH","method_rank":1,"gate_pass":false,"controller_selected":false,"visual_status":"NEAR","status":"GẦN ĐẠT","highlight_primary":false,"reference_win_rate":0.697,"reference_label":"X3 Growth32-34 OOS","reference_sample":"99 lệnh OOS","reference_scope":"METHOD_NOT_CODE","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54","reason":"X3 top1; rổ chưa đạt."},{"code":"80","method_id":"X3","method_label":"MB X3 Growth","method_subtype":"GROWTH","method_rank":2,"gate_pass":false,"controller_selected":false,"visual_status":"NEAR","status":"GẦN ĐẠT","highlight_primary":false,"reference_win_rate":0.697,"reference_label":"X3 Growth32-34 OOS","reference_sample":"99 lệnh OOS","reference_scope":"METHOD_NOT_CODE","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54","reason":"X3 top2; rổ chưa đạt."},{"code":"54","method_id":"X3","method_label":"MB X3 Growth","method_subtype":"GROWTH","method_rank":3,"gate_pass":false,"controller_selected":false,"visual_status":"NEAR","status":"GẦN ĐẠT","highlight_primary":false,"reference_win_rate":0.697,"reference_label":"X3 Growth32-34 OOS","reference_sample":"99 lệnh OOS","reference_scope":"METHOD_NOT_CODE","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54","reason":"X3 top3; rổ chưa đạt."}],"colour_convention":{"PASS":"GREEN","NEAR":"LIME_YELLOW","FAIL":"RED"},"reference_scope":"METHOD_NOT_CODE","hash":"bf2bd9bed4be8f7546a6d280526564881f7e6debf214279efe79e106f8a972f8"},"top_ranked_numbers":{"status":"ACTIVE_PERMANENT","rule_version":"FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3","mode":"A1_PINNED_X2_X3_STATUS_PANELS","panel_order":["A1","X2","X3"],"a1_primary_code":null,"a1_blank":true,"x2_code_count":2,"x3_code_count":3,"count":5,"codes":["54","45","51","80","54"],"items":[{"code":"54","method_id":"X2","method_label":"MB X2 Rescue","method_subtype":"RESCUE","method_rank":1,"gate_pass":true,"controller_selected":true,"visual_status":"PASS","status":"ĐẠT","highlight_primary":false,"reference_win_rate":0.6571,"reference_label":"X2 Rescue35","reference_sample":"35 lệnh Rescue","reference_scope":"METHOD_NOT_CODE","points":15,"capital_vnd":345000,"role":"Cặp X2 54-45","reason":"Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."},{"code":"45","method_id":"X2","method_label":"MB X2 Rescue","method_subtype":"RESCUE","method_rank":2,"gate_pass":true,"controller_selected":true,"visual_status":"PASS","status":"ĐẠT","highlight_primary":false,"reference_win_rate":0.6571,"reference_label":"X2 Rescue35","reference_sample":"35 lệnh Rescue","reference_scope":"METHOD_NOT_CODE","points":15,"capital_vnd":345000,"role":"Cặp X2 54-45","reason":"Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."},{"code":"51","method_id":"X3","method_label":"MB X3 Growth","method_subtype":"GROWTH","method_rank":1,"gate_pass":false,"controller_selected":false,"visual_status":"NEAR","status":"GẦN ĐẠT","highlight_primary":false,"reference_win_rate":0.697,"reference_label":"X3 Growth32-34 OOS","reference_sample":"99 lệnh OOS","reference_scope":"METHOD_NOT_CODE","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54","reason":"X3 top1; rổ chưa đạt."},{"code":"80","method_id":"X3","method_label":"MB X3 Growth","method_subtype":"GROWTH","method_rank":2,"gate_pass":false,"controller_selected":false,"visual_status":"NEAR","status":"GẦN ĐẠT","highlight_primary":false,"reference_win_rate":0.697,"reference_label":"X3 Growth32-34 OOS","reference_sample":"99 lệnh OOS","reference_scope":"METHOD_NOT_CODE","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54","reason":"X3 top2; rổ chưa đạt."},{"code":"54","method_id":"X3","method_label":"MB X3 Growth","method_subtype":"GROWTH","method_rank":3,"gate_pass":false,"controller_selected":false,"visual_status":"NEAR","status":"GẦN ĐẠT","highlight_primary":false,"reference_win_rate":0.697,"reference_label":"X3 Growth32-34 OOS","reference_sample":"99 lệnh OOS","reference_scope":"METHOD_NOT_CODE","points":0,"capital_vnd":0,"role":"Rổ X3 51-80-54","reason":"X3 top3; rổ chưa đạt."}],"colour_convention":{"PASS":"GREEN","NEAR":"LIME_YELLOW","FAIL":"RED"},"reference_scope":"METHOD_NOT_CODE","hash":"bf2bd9bed4be8f7546a6d280526564881f7e6debf214279efe79e106f8a972f8"},"top_signal_policy":{"first_block_rule":"FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3","first_block_mode":"A1_PINNED_X2_X3_STATUS_PANELS","panel_order":["A1","X2","X3"],"a1_primary_must_be_circled":true,"a1_blank_when_absent":true,"x2_display_count":2,"x3_display_count":3,"colour_convention":{"PASS":"GREEN","NEAR":"LIME_YELLOW","FAIL":"RED"}},"validation":{"first_block_complete":true,"first_block_mode":"A1_PINNED_X2_X3_STATUS_PANELS","first_block_reference_scope":"METHOD_NOT_CODE","first_block_colour_convention":true}}
+{
+  "schema_version": "MB_DAILY_WEB_V10_NEXT_DRAW_ALL_METHODS",
+  "report_run_id": "RPT_MB_20260713_PARALLEL_NEXT_ALL_METHODS",
+  "source_run_id": "LOCK_20260712_1484100F99",
+  "config_id": "MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712",
+  "target_date": "2026-07-13",
+  "generated_at": "2026-07-12T20:45:00+07:00",
+  "valid_until": "2026-07-13T23:59:59+07:00",
+  "official_url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
+  "display_policy": {
+    "mode": "NEXT_DRAW_ONLY_AFTER_SETTLEMENT",
+    "show_target_date_only": true,
+    "hide_completed_draw_details": true,
+    "hide_latest_27_codes": true,
+    "hide_historical_method_cards": true,
+    "pnl_display": "CUMULATIVE_AND_NEXT_CAPITAL_ONLY",
+    "settlement_applied_through": "2026-07-12"
+  },
+  "data": {
+    "locked_through": "2026-07-12",
+    "status": "LOCKED_CROSSCHECKED_3_SOURCES",
+    "count": 27,
+    "unique": 24,
+    "repeat2_count": 3,
+    "max_frequency": 2,
+    "noise_status": "A1_HARD_BRAKE",
+    "source_label": "Dữ liệu khóa đủ 27/27 đến 12/07/2026; dùng để lập kế hoạch 13/07/2026."
+  },
+  "funding_policy": {
+    "id": "PARALLEL_INDEPENDENT_ALL_EXACT_PASS_V1",
+    "mode": "FUND_EVERY_EXACT_PASS_METHOD",
+    "scope": [
+      "A1",
+      "X2",
+      "X3"
+    ],
+    "cross_method_blocking": false,
+    "dedupe_same_code_by_highest_stake": true,
+    "roll7_only_when_all_standard_methods_fail": true
+  },
+  "stake_rule": {
+    "a1_core_main_points": 100,
+    "a1_volume_main_points": 50,
+    "a1_reverse_points": 50,
+    "x2_exact_points_per_code": 50,
+    "x3_exact_points_per_code": 50,
+    "roll7_rescue_points_per_code": 30,
+    "lo_cost_per_point_vnd": 23000,
+    "lo_payout_per_hit_point_vnd": 80000,
+    "no_martingale": true
+  },
+  "milestone_policy": {
+    "status": "ACTIVE_MANDATORY_ABSOLUTE",
+    "recalculate_after_each_locked_draw": true,
+    "disclosure": "Chỉ hiển thị dữ liệu và ứng viên của kỳ sắp tới; mọi mốc được tính lại sau kỳ khóa mới."
+  },
+  "top_signals": {
+    "title": "A1 ĐƯỢC CHỌN & CÁC SỐ WR CAO NHẤT",
+    "subtitle": "A1 — · X2 54-45 · X3 51-80-54",
+    "total_methods": 3,
+    "total_numbers": "5 mã hiển thị",
+    "total_points": "30 điểm",
+    "total_capital_vnd": 690000,
+    "note": "A1 luôn có ô riêng: có A1 thì khoanh mã chính, không có thì để trống. X2 luôn hiển thị 02 số của cặp ưu tiên; X3 luôn hiển thị 03 số của rổ ưu tiên. Xanh lá = Đạt · Vàng chanh = Gần đạt · Đỏ = Không đạt. WR là tham chiếu lịch sử cấp phương pháp; chỉ phương pháp được controller chọn có điểm/vốn.",
+    "legend": [
+      {
+        "visual_status": "PASS",
+        "label": "Xanh lá · Đạt"
+      },
+      {
+        "visual_status": "NEAR",
+        "label": "Vàng chanh · Gần đạt"
+      },
+      {
+        "visual_status": "FAIL",
+        "label": "Đỏ · Không đạt"
+      }
+    ],
+    "methods": [
+      {
+        "id": "PINNED_A1",
+        "label": "A1 được chọn",
+        "method": "Khoanh mã A1 chính · số đảo đi kèm theo luật 50 điểm",
+        "status": "TRỐNG",
+        "visual_status": "EMPTY",
+        "empty_slot": true,
+        "points_per_code": "Theo tầng A1",
+        "code_count": 0,
+        "capital_vnd": 0,
+        "reference_win_rate": 0.4737,
+        "numbers": []
+      },
+      {
+        "id": "WR_X2",
+        "label": "MB X2 · WR 65,71%",
+        "method": "Hiển thị đúng 02 số của cặp X2 ưu tiên",
+        "status": "ĐẠT",
+        "visual_status": "PASS",
+        "empty_slot": false,
+        "points_per_code": 15,
+        "code_count": 2,
+        "capital_vnd": 690000,
+        "reference_win_rate": 0.6571,
+        "numbers": [
+          {
+            "code": "54",
+            "points": 15,
+            "capital_vnd": 345000,
+            "role": "Cặp X2 54-45 · ĐẠT · WR tham chiếu 65,71%",
+            "visual_status": "PASS",
+            "highlight_primary": false,
+            "reference_win_rate": 0.6571
+          },
+          {
+            "code": "45",
+            "points": 15,
+            "capital_vnd": 345000,
+            "role": "Cặp X2 54-45 · ĐẠT · WR tham chiếu 65,71%",
+            "visual_status": "PASS",
+            "highlight_primary": false,
+            "reference_win_rate": 0.6571
+          }
+        ]
+      },
+      {
+        "id": "WR_X3",
+        "label": "MB X3 · WR 69,70%",
+        "method": "Hiển thị đúng 03 số của rổ X3 ưu tiên",
+        "status": "GẦN ĐẠT",
+        "visual_status": "NEAR",
+        "empty_slot": false,
+        "points_per_code": 0,
+        "code_count": 3,
+        "capital_vnd": 0,
+        "reference_win_rate": 0.697,
+        "numbers": [
+          {
+            "code": "51",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "Rổ X3 51-80-54 · GẦN ĐẠT · WR tham chiếu 69,70%",
+            "visual_status": "NEAR",
+            "highlight_primary": false,
+            "reference_win_rate": 0.697
+          },
+          {
+            "code": "80",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "Rổ X3 51-80-54 · GẦN ĐẠT · WR tham chiếu 69,70%",
+            "visual_status": "NEAR",
+            "highlight_primary": false,
+            "reference_win_rate": 0.697
+          },
+          {
+            "code": "54",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "Rổ X3 51-80-54 · GẦN ĐẠT · WR tham chiếu 69,70%",
+            "visual_status": "NEAR",
+            "highlight_primary": false,
+            "reference_win_rate": 0.697
+          }
+        ]
+      }
+    ],
+    "first_block_rule_version": "FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3",
+    "first_block_mode": "A1_PINNED_X2_X3_STATUS_PANELS"
+  },
+  "portfolio": {
+    "decision": "X2_CORE_EXACT",
+    "tier": "LỆNH TIỀN THẬT KỲ 13/07 · CHỜ XÁC NHẬN",
+    "selection": "54-45",
+    "title": "54 × 50 ĐIỂM · 45 × 50 ĐIỂM",
+    "points": 100,
+    "points_by_code": {
+      "54": 50,
+      "45": 50
+    },
+    "capital_vnd": 2300000,
+    "payout_vnd": 0,
+    "pnl_vnd": 0,
+    "reason": "Chỉ X2 Core Exact 54-45 đạt chuẩn cho kỳ 13/07. A1 bị phanh riêng; X3 không đạt; ROLL7 không kích hoạt.",
+    "pnl_status": "NOT_INCLUDED_UNTIL_CONFIRMED"
+  },
+  "pending_order": {
+    "status": "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
+    "date": "2026-07-13",
+    "method_id": "X2_CORE_EXACT",
+    "selection": [
+      "54",
+      "45"
+    ],
+    "points_by_code": {
+      "54": 50,
+      "45": 50
+    },
+    "capital_vnd": 2300000,
+    "pnl_included": false
+  },
+  "pnl_summary": {
+    "confirmed_through": "2026-07-12",
+    "settlement_applied": true,
+    "grand_total_pnl_vnd": 25396000,
+    "today_pending_capital_vnd": 2300000,
+    "today_pending_order": "54 ×50 · 45 ×50 · chờ xác nhận",
+    "today_included": false
+  },
+  "groups": [
+    {
+      "id": "A1",
+      "label": "MB A1",
+      "status": "A0_HARD_BRAKE",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "Dual Core Volume Balance — Core100/Volume50",
+      "layer": "Core → Volume",
+      "selected_numbers": [
+        "88"
+      ],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "88 đạt điều kiện Volume thô nhưng A1 bị hard brake.",
+      "reason": "Kỳ 12/07 có đúng 3 mã lặp hai nháy.",
+      "candidates": [
+        {
+          "code": "88",
+          "rank": 1,
+          "watch_rank": 1,
+          "gate": false,
+          "status": "VOLUME WATCH · HARD BRAKE",
+          "tracking_tier": "VOLUME",
+          "tracking_rule_version": "A1_TOP3_WATCHLIST_V1",
+          "gan": 15,
+          "gmax": 20,
+          "score": 0.75,
+          "hot21": 4,
+          "reason": "Gan15; Gmax20; Score0,750; phanh A1 repeat2=3.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rà lại sau kỳ 13/07; A1 chỉ vào nếu phanh nhiễu tắt và thứ hạng/Gan/Score còn hợp lệ.",
+          "milestone_type": "CONDITIONAL_NEXT_REVIEW"
+        },
+        {
+          "code": "12",
+          "rank": 2,
+          "watch_rank": 2,
+          "gate": false,
+          "status": "VOLUME WATCH",
+          "tracking_tier": "VOLUME",
+          "tracking_rule_version": "A1_TOP3_WATCHLIST_V1",
+          "gan": 12,
+          "gmax": 21,
+          "score": 0.571429,
+          "hot21": 4,
+          "reason": "Chưa đạt Score0,70.",
+          "earliest_eligible_date": "2026-07-16",
+          "earliest_condition": "Cần tiếp tục không về để đạt Gan/Score và toàn bộ A1 gate sạch.",
+          "milestone_type": "CONDITIONAL_LOWER_BOUND"
+        },
+        {
+          "code": "38",
+          "rank": 3,
+          "watch_rank": 3,
+          "gate": false,
+          "status": "VOLUME WATCH",
+          "tracking_tier": "VOLUME",
+          "tracking_rule_version": "A1_TOP3_WATCHLIST_V1",
+          "gan": 10,
+          "gmax": 20,
+          "score": 0.5,
+          "hot21": 5,
+          "reason": "Chưa đạt Gan12/Score0,70.",
+          "earliest_eligible_date": "2026-07-17",
+          "earliest_condition": "Mốc lower bound nếu tiếp tục không về và mọi gate khác sạch.",
+          "milestone_type": "CONDITIONAL_LOWER_BOUND"
+        }
+      ]
+    },
+    {
+      "id": "X2",
+      "label": "MB X2",
+      "status": "PASS_CORE_EXACT",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "MB X2 Exact Rank1",
+      "layer": "Core Exact → Balanced Exact",
+      "selected_numbers": [
+        "54",
+        "45"
+      ],
+      "points": 100,
+      "capital_vnd": 2300000,
+      "summary": "Cặp 54-45 đạt Core Exact rank1.",
+      "reason": "Gan2/2; ΔGan0; H5Pair2; H21 9/6; TV21≈6,1507.",
+      "candidates": [
+        {
+          "code": "54-45",
+          "rank": 1,
+          "gate": true,
+          "status": "CORE EXACT RANK1 · PASS",
+          "reason": "Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507.",
+          "earliest_eligible_date": "2026-07-13",
+          "earliest_condition": "Đạt toàn bộ Core Exact tại dữ liệu khóa 12/07; vẫn cần xác nhận đặt trước quay.",
+          "milestone_type": "ELIGIBLE_NOW"
+        }
+      ]
+    },
+    {
+      "id": "X3",
+      "label": "MB X3",
+      "status": "A0_SHADOW",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "MB X3 Growth32-34",
+      "layer": "Generator top3",
+      "selected_numbers": [
+        "51",
+        "80",
+        "54"
+      ],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "HOT21 sum=24; max=9; FAIL.",
+      "reason": "Không đạt exact gate tổng32–34, max11–14.",
+      "candidates": [
+        {
+          "code": "51",
+          "rank": 1,
+          "gate": false,
+          "status": "RANK 1",
+          "gan": 7,
+          "hot21": 9,
+          "reason": "X3 top1; rổ chưa đạt.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.",
+          "milestone_type": "DYNAMIC_LOWER_BOUND"
+        },
+        {
+          "code": "80",
+          "rank": 2,
+          "gate": false,
+          "status": "RANK 2",
+          "gan": 4,
+          "hot21": 8,
+          "reason": "X3 top2; rổ chưa đạt.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.",
+          "milestone_type": "DYNAMIC_LOWER_BOUND"
+        },
+        {
+          "code": "54",
+          "rank": 3,
+          "gate": false,
+          "status": "RANK 3",
+          "gan": 2,
+          "hot21": 7,
+          "reason": "X3 top3; rổ chưa đạt.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.",
+          "milestone_type": "DYNAMIC_LOWER_BOUND"
+        }
+      ],
+      "earliest_basket_date": "2026-07-14",
+      "earliest_basket_condition": "Xếp lại sau kỳ 13/07; cần HOT21 sum32–34, max11–14 và gate môi trường sạch."
+    }
+  ],
+  "automation": {
+    "status": "MANUAL_LOCKED_NEXT_DRAW_ALL_METHODS",
+    "pipeline_version": "MB_DAILY_PIPELINE_PARALLEL_V1",
+    "locked_through": "2026-07-12",
+    "target_date": "2026-07-13",
+    "settlement_checked": true,
+    "signal_review_complete": true,
+    "milestones_complete": true,
+    "website_refresh_seconds": 120,
+    "first_block_rule_version": "FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3",
+    "first_block_mode": "A1_PINNED_X2_X3_STATUS_PANELS",
+    "first_block_complete": true,
+    "first_block_codes": [
+      "54",
+      "45",
+      "51",
+      "80",
+      "54"
+    ],
+    "first_block_hash": "bf2bd9bed4be8f7546a6d280526564881f7e6debf214279efe79e106f8a972f8"
+  },
+  "qualified_signal_snapshot": {
+    "title": "KỲ SẮP TỚI 13/07/2026",
+    "subtitle": "A1 A0 · X2 54-45 ĐẠT · X3 51-80-54 KHÔNG ĐẠT",
+    "total_methods": 3,
+    "total_numbers": "5 mã duy nhất · 2 mã cấp vốn",
+    "total_points": "100 điểm",
+    "total_capital_vnd": 2300000,
+    "note": "Hiển thị đầy đủ A1, X2 và X3 của kỳ tới. Chỉ mã đạt gate có điểm/vốn. 88 không tiếp tục ngày 13/07; ROLL7 không dùng vì X2 đã đạt.",
+    "legend": [
+      {
+        "visual_status": "PASS",
+        "label": "Xanh lá · Đạt"
+      },
+      {
+        "visual_status": "FAIL",
+        "label": "Đỏ · Không đạt"
+      }
+    ],
+    "methods": [
+      {
+        "id": "A1_INDEPENDENT",
+        "label": "MB A1",
+        "method": "A1 Core100 / Volume50",
+        "status": "KHÔNG ĐẠT · HARD BRAKE",
+        "visual_status": "FAIL",
+        "points_per_code": 0,
+        "code_count": 1,
+        "capital_vnd": 0,
+        "numbers": [
+          {
+            "code": "88",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "Raw Volume · Gan15 · Gmax20 · Score0,75; bị phanh repeat2_count=3",
+            "visual_status": "FAIL",
+            "highlight_primary": true
+          }
+        ]
+      },
+      {
+        "id": "X2_CORE_EXACT",
+        "label": "MB X2 Core Exact",
+        "method": "X2 Core Exact rank1",
+        "status": "ĐẠT · CHỜ XÁC NHẬN",
+        "visual_status": "PASS",
+        "points_per_code": 50,
+        "code_count": 2,
+        "capital_vnd": 2300000,
+        "numbers": [
+          {
+            "code": "54",
+            "points": 50,
+            "capital_vnd": 1150000,
+            "role": "X2 Core Exact · Gan2 · H21=9",
+            "visual_status": "PASS"
+          },
+          {
+            "code": "45",
+            "points": 50,
+            "capital_vnd": 1150000,
+            "role": "X2 Core Exact · Gan2 · H21=6",
+            "visual_status": "PASS"
+          }
+        ]
+      },
+      {
+        "id": "X3_GROWTH_EXACT",
+        "label": "MB X3 Growth Exact",
+        "method": "X3 Growth32-34",
+        "status": "KHÔNG ĐẠT",
+        "visual_status": "FAIL",
+        "points_per_code": 0,
+        "code_count": 3,
+        "capital_vnd": 0,
+        "numbers": [
+          {
+            "code": "51",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "HOT21=9",
+            "visual_status": "FAIL"
+          },
+          {
+            "code": "80",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "HOT21=8",
+            "visual_status": "FAIL"
+          },
+          {
+            "code": "54",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "HOT21=7 · trùng X2 nhưng X3 không đạt; không cộng vốn",
+            "visual_status": "FAIL"
+          }
+        ]
+      }
+    ]
+  },
+  "first_block_snapshot": {
+    "status": "ACTIVE_PERMANENT",
+    "rule_version": "FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3",
+    "mode": "A1_PINNED_X2_X3_STATUS_PANELS",
+    "panel_order": [
+      "A1",
+      "X2",
+      "X3"
+    ],
+    "a1_primary_code": null,
+    "a1_blank": true,
+    "x2_code_count": 2,
+    "x3_code_count": 3,
+    "count": 5,
+    "codes": [
+      "54",
+      "45",
+      "51",
+      "80",
+      "54"
+    ],
+    "items": [
+      {
+        "code": "54",
+        "method_id": "X2",
+        "method_label": "MB X2 Rescue",
+        "method_subtype": "RESCUE",
+        "method_rank": 1,
+        "gate_pass": true,
+        "controller_selected": true,
+        "visual_status": "PASS",
+        "status": "ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.6571,
+        "reference_label": "X2 Rescue35",
+        "reference_sample": "35 lệnh Rescue",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 15,
+        "capital_vnd": 345000,
+        "role": "Cặp X2 54-45",
+        "reason": "Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."
+      },
+      {
+        "code": "45",
+        "method_id": "X2",
+        "method_label": "MB X2 Rescue",
+        "method_subtype": "RESCUE",
+        "method_rank": 2,
+        "gate_pass": true,
+        "controller_selected": true,
+        "visual_status": "PASS",
+        "status": "ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.6571,
+        "reference_label": "X2 Rescue35",
+        "reference_sample": "35 lệnh Rescue",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 15,
+        "capital_vnd": 345000,
+        "role": "Cặp X2 54-45",
+        "reason": "Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."
+      },
+      {
+        "code": "51",
+        "method_id": "X3",
+        "method_label": "MB X3 Growth",
+        "method_subtype": "GROWTH",
+        "method_rank": 1,
+        "gate_pass": false,
+        "controller_selected": false,
+        "visual_status": "NEAR",
+        "status": "GẦN ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.697,
+        "reference_label": "X3 Growth32-34 OOS",
+        "reference_sample": "99 lệnh OOS",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 0,
+        "capital_vnd": 0,
+        "role": "Rổ X3 51-80-54",
+        "reason": "X3 top1; rổ chưa đạt."
+      },
+      {
+        "code": "80",
+        "method_id": "X3",
+        "method_label": "MB X3 Growth",
+        "method_subtype": "GROWTH",
+        "method_rank": 2,
+        "gate_pass": false,
+        "controller_selected": false,
+        "visual_status": "NEAR",
+        "status": "GẦN ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.697,
+        "reference_label": "X3 Growth32-34 OOS",
+        "reference_sample": "99 lệnh OOS",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 0,
+        "capital_vnd": 0,
+        "role": "Rổ X3 51-80-54",
+        "reason": "X3 top2; rổ chưa đạt."
+      },
+      {
+        "code": "54",
+        "method_id": "X3",
+        "method_label": "MB X3 Growth",
+        "method_subtype": "GROWTH",
+        "method_rank": 3,
+        "gate_pass": false,
+        "controller_selected": false,
+        "visual_status": "NEAR",
+        "status": "GẦN ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.697,
+        "reference_label": "X3 Growth32-34 OOS",
+        "reference_sample": "99 lệnh OOS",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 0,
+        "capital_vnd": 0,
+        "role": "Rổ X3 51-80-54",
+        "reason": "X3 top3; rổ chưa đạt."
+      }
+    ],
+    "colour_convention": {
+      "PASS": "GREEN",
+      "NEAR": "LIME_YELLOW",
+      "FAIL": "RED"
+    },
+    "reference_scope": "METHOD_NOT_CODE",
+    "hash": "bf2bd9bed4be8f7546a6d280526564881f7e6debf214279efe79e106f8a972f8"
+  },
+  "top_ranked_numbers": {
+    "status": "ACTIVE_PERMANENT",
+    "rule_version": "FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3",
+    "mode": "A1_PINNED_X2_X3_STATUS_PANELS",
+    "panel_order": [
+      "A1",
+      "X2",
+      "X3"
+    ],
+    "a1_primary_code": null,
+    "a1_blank": true,
+    "x2_code_count": 2,
+    "x3_code_count": 3,
+    "count": 5,
+    "codes": [
+      "54",
+      "45",
+      "51",
+      "80",
+      "54"
+    ],
+    "items": [
+      {
+        "code": "54",
+        "method_id": "X2",
+        "method_label": "MB X2 Rescue",
+        "method_subtype": "RESCUE",
+        "method_rank": 1,
+        "gate_pass": true,
+        "controller_selected": true,
+        "visual_status": "PASS",
+        "status": "ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.6571,
+        "reference_label": "X2 Rescue35",
+        "reference_sample": "35 lệnh Rescue",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 15,
+        "capital_vnd": 345000,
+        "role": "Cặp X2 54-45",
+        "reason": "Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."
+      },
+      {
+        "code": "45",
+        "method_id": "X2",
+        "method_label": "MB X2 Rescue",
+        "method_subtype": "RESCUE",
+        "method_rank": 2,
+        "gate_pass": true,
+        "controller_selected": true,
+        "visual_status": "PASS",
+        "status": "ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.6571,
+        "reference_label": "X2 Rescue35",
+        "reference_sample": "35 lệnh Rescue",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 15,
+        "capital_vnd": 345000,
+        "role": "Cặp X2 54-45",
+        "reason": "Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507."
+      },
+      {
+        "code": "51",
+        "method_id": "X3",
+        "method_label": "MB X3 Growth",
+        "method_subtype": "GROWTH",
+        "method_rank": 1,
+        "gate_pass": false,
+        "controller_selected": false,
+        "visual_status": "NEAR",
+        "status": "GẦN ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.697,
+        "reference_label": "X3 Growth32-34 OOS",
+        "reference_sample": "99 lệnh OOS",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 0,
+        "capital_vnd": 0,
+        "role": "Rổ X3 51-80-54",
+        "reason": "X3 top1; rổ chưa đạt."
+      },
+      {
+        "code": "80",
+        "method_id": "X3",
+        "method_label": "MB X3 Growth",
+        "method_subtype": "GROWTH",
+        "method_rank": 2,
+        "gate_pass": false,
+        "controller_selected": false,
+        "visual_status": "NEAR",
+        "status": "GẦN ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.697,
+        "reference_label": "X3 Growth32-34 OOS",
+        "reference_sample": "99 lệnh OOS",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 0,
+        "capital_vnd": 0,
+        "role": "Rổ X3 51-80-54",
+        "reason": "X3 top2; rổ chưa đạt."
+      },
+      {
+        "code": "54",
+        "method_id": "X3",
+        "method_label": "MB X3 Growth",
+        "method_subtype": "GROWTH",
+        "method_rank": 3,
+        "gate_pass": false,
+        "controller_selected": false,
+        "visual_status": "NEAR",
+        "status": "GẦN ĐẠT",
+        "highlight_primary": false,
+        "reference_win_rate": 0.697,
+        "reference_label": "X3 Growth32-34 OOS",
+        "reference_sample": "99 lệnh OOS",
+        "reference_scope": "METHOD_NOT_CODE",
+        "points": 0,
+        "capital_vnd": 0,
+        "role": "Rổ X3 51-80-54",
+        "reason": "X3 top3; rổ chưa đạt."
+      }
+    ],
+    "colour_convention": {
+      "PASS": "GREEN",
+      "NEAR": "LIME_YELLOW",
+      "FAIL": "RED"
+    },
+    "reference_scope": "METHOD_NOT_CODE",
+    "hash": "bf2bd9bed4be8f7546a6d280526564881f7e6debf214279efe79e106f8a972f8"
+  },
+  "top_signal_policy": {
+    "first_block_rule": "FIRST_BLOCK_A1_PINNED_X2_X3_STATUS_V3",
+    "first_block_mode": "A1_PINNED_X2_X3_STATUS_PANELS",
+    "panel_order": [
+      "A1",
+      "X2",
+      "X3"
+    ],
+    "a1_primary_must_be_circled": true,
+    "a1_blank_when_absent": true,
+    "x2_display_count": 2,
+    "x3_display_count": 3,
+    "colour_convention": {
+      "PASS": "GREEN",
+      "NEAR": "LIME_YELLOW",
+      "FAIL": "RED"
+    }
+  },
+  "validation": {
+    "first_block_complete": true,
+    "first_block_mode": "A1_PINNED_X2_X3_STATUS_PANELS",
+    "first_block_reference_scope": "METHOD_NOT_CODE",
+    "first_block_colour_convention": true
+  }
+}

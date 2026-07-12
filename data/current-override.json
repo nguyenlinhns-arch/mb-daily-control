@@ -1,0 +1,264 @@
+{
+  "schema_version": "MB_DAILY_WEB_V8_PARALLEL_OVERRIDE",
+  "report_run_id": "RPT_MB_20260713_PARALLEL_MANUAL_LOCK",
+  "source_run_id": "LOCK_20260712_1484100F99",
+  "config_id": "MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712",
+  "target_date": "2026-07-13",
+  "generated_at": "2026-07-12T19:05:00+07:00",
+  "valid_until": "2026-07-13T23:59:59+07:00",
+  "official_url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
+  "data": {
+    "locked_through": "2026-07-12",
+    "status": "LOCKED_CROSSCHECKED_3_SOURCES",
+    "count": 27,
+    "unique": 24,
+    "repeat2_count": 3,
+    "repeat_codes": ["34×2", "40×2", "62×2"],
+    "max_frequency": 2,
+    "noise_status": "A1_HARD_BRAKE",
+    "latest_27_codes": ["94", "06", "20", "58", "09", "50", "08", "23", "64", "36", "62", "11", "40", "65", "33", "19", "40", "71", "17", "37", "56", "69", "34", "59", "34", "05", "62"],
+    "source_tabs": ["MB_History_27", "Raw_Results_IMPORT", "Raw_2Digits_IMPORT"],
+    "source_label": "Google Sheet XSMB · khóa đến 12/07/2026 · đủ 27/27 · đối chiếu xosodaiphat, xoso.com.vn và xskt.com.vn",
+    "sha256": "1484100f9947288a3efd54a240a04e674286705247267c6e6e6ed598d43a60b2"
+  },
+  "funding_policy": {
+    "id": "PARALLEL_INDEPENDENT_ALL_EXACT_PASS_V1",
+    "mode": "FUND_EVERY_EXACT_PASS_METHOD",
+    "scope": ["A1", "X2", "X3"],
+    "cross_method_blocking": false,
+    "max_orders_per_method_per_day": 1,
+    "max_standard_method_blocks_per_day": 3,
+    "dedupe_same_code_by_highest_stake": true,
+    "roll7_only_when_all_standard_methods_fail": true,
+    "note": "A1, X2 và X3 chấm độc lập; phương pháp nào đạt thì cấp vốn. Mã trùng chỉ cấp vốn một lần ở mức cao nhất."
+  },
+  "stake_rule": {
+    "a1_core_main_points": 100,
+    "a1_volume_main_points": 50,
+    "a1_reverse_points": 50,
+    "x2_exact_points_per_code": 50,
+    "x3_exact_points_per_code": 50,
+    "roll7_rescue_points_per_code": 30,
+    "lo_cost_per_point_vnd": 23000,
+    "lo_payout_per_hit_point_vnd": 80000,
+    "no_martingale": true
+  },
+  "milestone_policy": {
+    "status": "ACTIVE_MANDATORY_ABSOLUTE",
+    "source": "PARALLEL_EARLIEST_ENTRY_ENGINE_V1",
+    "rule": "Mọi ứng viên A1/X2/X3 hiển thị phải có mốc sớm nhất và điều kiện; các phương pháp được xét độc lập.",
+    "recalculate_after_each_locked_draw": true,
+    "disclosure": "Mốc sớm nhất là lower bound có điều kiện, không phải cam kết chắc chắn vào lệnh."
+  },
+  "top_signal_policy": {
+    "mode": "PARALLEL_EXACT_PLAN",
+    "controller": "A1 | X2 | X3 → cấp vốn toàn bộ phương pháp đạt; ROLL7 chỉ khi cả ba A0",
+    "system_signals_preserved_in_groups": true,
+    "pnl_rule": "Chưa xác nhận đặt thật trước quay thì không cộng P/L."
+  },
+  "top_signals": {
+    "title": "A1 · X2 · X3 — CHẤM ĐỘC LẬP",
+    "subtitle": "13/07: X2 54-45 đạt · A1 và X3 không đạt",
+    "total_methods": 1,
+    "total_numbers": "2 mã được cấp vốn",
+    "total_points": "100 điểm",
+    "total_capital_vnd": 2300000,
+    "note": "Không có quy tắc dừng sau phương pháp đầu tiên. Hôm nay chỉ X2 đạt; ROLL7 không kích hoạt vì đã có tín hiệu chuẩn.",
+    "legend": [
+      {"visual_status": "PASS", "label": "Xanh lá · Đạt"},
+      {"visual_status": "NEAR", "label": "Vàng chanh · Gần đạt"},
+      {"visual_status": "FAIL", "label": "Đỏ · Không đạt"}
+    ],
+    "methods": [
+      {
+        "id": "A1_INDEPENDENT",
+        "label": "MB A1",
+        "method": "A1 Core100 / Volume50",
+        "status": "KHÔNG ĐẠT · HARD BRAKE",
+        "visual_status": "FAIL",
+        "points_per_code": 0,
+        "code_count": 1,
+        "capital_vnd": 0,
+        "numbers": [
+          {"code": "88", "points": 0, "capital_vnd": 0, "role": "Raw Volume: Gan15 · Gmax20 · Score0,75; A1 bị phanh vì repeat2_count=3", "visual_status": "FAIL", "highlight_primary": true}
+        ]
+      },
+      {
+        "id": "X2_CORE_EXACT",
+        "label": "MB X2 Core Exact",
+        "method": "X2 Core Exact rank1",
+        "status": "ĐẠT · CHỜ XÁC NHẬN",
+        "visual_status": "PASS",
+        "points_per_code": 50,
+        "code_count": 2,
+        "capital_vnd": 2300000,
+        "numbers": [
+          {"code": "54", "points": 50, "capital_vnd": 1150000, "role": "X2 Core Exact · Gan2 · H21=9", "visual_status": "PASS"},
+          {"code": "45", "points": 50, "capital_vnd": 1150000, "role": "X2 Core Exact · Gan2 · H21=6", "visual_status": "PASS"}
+        ]
+      },
+      {
+        "id": "X3_GROWTH_EXACT",
+        "label": "MB X3 Growth Exact",
+        "method": "X3 Growth32-34",
+        "status": "KHÔNG ĐẠT",
+        "visual_status": "FAIL",
+        "points_per_code": 0,
+        "code_count": 3,
+        "capital_vnd": 0,
+        "numbers": [
+          {"code": "51", "points": 0, "capital_vnd": 0, "role": "HOT21=9", "visual_status": "FAIL"},
+          {"code": "80", "points": 0, "capital_vnd": 0, "role": "HOT21=8", "visual_status": "FAIL"},
+          {"code": "54", "points": 0, "capital_vnd": 0, "role": "HOT21=7 · trùng mã X2 nhưng X3 không đạt", "visual_status": "FAIL"}
+        ]
+      }
+    ]
+  },
+  "portfolio": {
+    "decision": "X2_CORE_EXACT",
+    "tier": "1 PHƯƠNG PHÁP CHUẨN · CHỜ XÁC NHẬN",
+    "selection": "54-45",
+    "title": "X2 CORE EXACT 54-45 — 50 ĐIỂM/SỐ",
+    "points": 100,
+    "points_by_code": {"54": 50, "45": 50},
+    "capital_vnd": 2300000,
+    "payout_vnd": 0,
+    "pnl_vnd": 0,
+    "reason": "A1 bị phanh riêng; X2 Core Exact 54-45 đạt rank1; X3 không đạt. Các phương pháp được chấm độc lập.",
+    "pnl_status": "NOT_INCLUDED_UNTIL_CONFIRMED"
+  },
+  "pending_order": {
+    "status": "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
+    "date": "2026-07-13",
+    "method_id": "X2_CORE_EXACT",
+    "selection": ["54", "45"],
+    "points_by_code": {"54": 50, "45": 50},
+    "capital_vnd": 2300000,
+    "pnl_included": false,
+    "note": "Chỉ chuyển thành actual_order khi người dùng xác nhận trước quay."
+  },
+  "last_settlement": {
+    "date": "2026-07-12",
+    "result_codes": ["94", "06", "20", "58", "09", "50", "08", "23", "64", "36", "62", "11", "40", "65", "33", "19", "40", "71", "17", "37", "56", "69", "34", "59", "34", "05", "62"],
+    "result_sha256": "1484100f9947288a3efd54a240a04e674286705247267c6e6e6ed598d43a60b2",
+    "lo_hits_total": 0,
+    "xien_wins": 0,
+    "lo_pnl_vnd": -3404000,
+    "xien_pnl_vnd": 0,
+    "total_pnl_vnd": -3404000,
+    "note": "Lệnh thật đã xác nhận: 88×88; 68×30; 86×30. X2 54-45 không được backdate."
+  },
+  "pnl_summary": {
+    "confirmed_through": "2026-07-12",
+    "yesterday_date": "2026-07-12",
+    "yesterday_pnl_vnd": -3404000,
+    "yesterday_hits": 0,
+    "yesterday_stake": "88×88 · 68×30 · 86×30",
+    "five_group_pnl_vnd": 15976000,
+    "user_lo_pnl_vnd": -4000,
+    "active_five_group_pnl_vnd": 15976000,
+    "active_all_real_pnl_vnd": 17996000,
+    "archive_pnl_vnd": 7400000,
+    "grand_total_pnl_vnd": 25396000,
+    "today_pending_capital_vnd": 2300000,
+    "today_pending_order": "X2 Core Exact 54×50 · 45×50 · chờ xác nhận",
+    "today_included": false
+  },
+  "groups": [
+    {
+      "id": "A1",
+      "label": "MB A1",
+      "status": "A0_HARD_BRAKE",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "Dual Core Volume Balance — Core100/Volume50",
+      "layer": "Core → Volume",
+      "selected_numbers": ["88"],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "88 đạt điều kiện Volume thô nhưng A1 bị hard brake.",
+      "reason": "Kỳ 12/07 có đúng 3 mã lặp hai nháy: 34, 40, 62.",
+      "candidates": [
+        {"code": "88", "rank": 1, "watch_rank": 1, "gate": false, "status": "VOLUME WATCH · HARD BRAKE", "tracking_tier": "VOLUME", "tracking_rule_version": "A1_TOP3_WATCHLIST_V1", "gan": 15, "gmax": 20, "score": 0.75, "hot21": 4, "reason": "Gan15; Gmax20; Score0,750; phanh A1 repeat2=3.", "earliest_eligible_date": "2026-07-14", "earliest_condition": "Rà lại sau kỳ 13/07; A1 chỉ vào nếu phanh nhiễu tắt và thứ hạng/Gan/Score còn hợp lệ.", "milestone_type": "CONDITIONAL_NEXT_REVIEW"},
+        {"code": "12", "rank": 2, "watch_rank": 2, "gate": false, "status": "VOLUME WATCH", "tracking_tier": "VOLUME", "tracking_rule_version": "A1_TOP3_WATCHLIST_V1", "gan": 12, "gmax": 21, "score": 0.571429, "hot21": 4, "reason": "Chưa đạt Score0,70.", "earliest_eligible_date": "2026-07-16", "earliest_condition": "Cần tiếp tục không về để đạt Gan/Score và toàn bộ A1 gate sạch.", "milestone_type": "CONDITIONAL_LOWER_BOUND"},
+        {"code": "38", "rank": 3, "watch_rank": 3, "gate": false, "status": "VOLUME WATCH", "tracking_tier": "VOLUME", "tracking_rule_version": "A1_TOP3_WATCHLIST_V1", "gan": 10, "gmax": 20, "score": 0.5, "hot21": 5, "reason": "Chưa đạt Gan12/Score0,70.", "earliest_eligible_date": "2026-07-17", "earliest_condition": "Mốc lower bound nếu tiếp tục không về và mọi gate khác sạch.", "milestone_type": "CONDITIONAL_LOWER_BOUND"}
+      ]
+    },
+    {
+      "id": "X2",
+      "label": "MB X2",
+      "status": "PASS_CORE_EXACT",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "MB X2 Exact Rank1",
+      "layer": "Core Exact → Balanced Exact",
+      "selected_numbers": ["54", "45"],
+      "points": 100,
+      "capital_vnd": 2300000,
+      "summary": "Cặp 54-45 đạt Core Exact rank1.",
+      "reason": "Gan2/2; ΔGan0; H5Pair2; H21 9/6; TV21≈6,1507.",
+      "candidates": [
+        {"code": "54-45", "rank": 1, "gate": true, "status": "CORE EXACT RANK1 · PASS", "reason": "Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507.", "earliest_eligible_date": "2026-07-13", "earliest_condition": "Đạt toàn bộ Core Exact tại dữ liệu khóa 12/07; vẫn cần xác nhận đặt trước quay.", "milestone_type": "ELIGIBLE_NOW"}
+      ],
+      "display_policy": {"hide_fields": ["historical_profile", "quality_benchmark", "orders", "wins", "losses", "win_rate", "pnl_vnd", "max_drawdown_vnd"], "keep_fields": [], "scope": "WEBSITE_X2_NO_PERFORMANCE_METRICS_PERMANENT"}
+    },
+    {
+      "id": "X3",
+      "label": "MB X3",
+      "status": "A0_SHADOW",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "MB X3 Growth32-34",
+      "layer": "Generator top3",
+      "selected_numbers": ["51", "80", "54"],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "HOT21 sum=24; max=9; FAIL.",
+      "reason": "Không đạt exact gate tổng32–34, max11–14.",
+      "candidates": [
+        {"code": "51", "rank": 1, "gate": false, "status": "RANK 1", "gan": 7, "hot21": 9, "reason": "X3 top1; rổ chưa đạt.", "earliest_eligible_date": "2026-07-14", "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.", "milestone_type": "DYNAMIC_LOWER_BOUND"},
+        {"code": "80", "rank": 2, "gate": false, "status": "RANK 2", "gan": 4, "hot21": 8, "reason": "X3 top2; rổ chưa đạt.", "earliest_eligible_date": "2026-07-14", "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.", "milestone_type": "DYNAMIC_LOWER_BOUND"},
+        {"code": "54", "rank": 3, "gate": false, "status": "RANK 3", "gan": 2, "hot21": 7, "reason": "X3 top3; rổ chưa đạt.", "earliest_eligible_date": "2026-07-14", "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.", "milestone_type": "DYNAMIC_LOWER_BOUND"}
+      ],
+      "earliest_basket_date": "2026-07-14",
+      "earliest_basket_condition": "Xếp lại sau kỳ 13/07; cần HOT21 sum32–34, max11–14 và gate môi trường sạch."
+    },
+    {
+      "id": "XIEN",
+      "label": "Xiên 2",
+      "status": "A0_SHADOW",
+      "role": "SỔ RIÊNG",
+      "method": "Không tự mở từ A1/X2/X3",
+      "layer": "Chờ xác nhận riêng",
+      "selected_numbers": [],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "Không có lệnh Xiên tự động.",
+      "reason": "Chỉ mở khi người dùng xác nhận riêng trước quay.",
+      "candidates": []
+    },
+    {
+      "id": "DE",
+      "label": "Đề đầu/đuôi",
+      "status": "A0_VALIDATION",
+      "role": "VALIDATION SHADOW",
+      "method": "Theo dõi riêng",
+      "layer": "Research",
+      "selected_numbers": [],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "Không có lệnh thật.",
+      "reason": "Chỉ theo dõi theo gate riêng.",
+      "candidates": []
+    }
+  ],
+  "automation": {
+    "status": "MANUAL_LOCKED_OVERRIDE_PUBLISHED",
+    "pipeline_version": "MB_DAILY_PIPELINE_PARALLEL_V1",
+    "source": "GOOGLE_SHEET_LOCKED_27 + THREE_PUBLIC_CROSSCHECKS",
+    "last_updated_at": "2026-07-12T19:05:00+07:00",
+    "locked_through": "2026-07-12",
+    "target_date": "2026-07-13",
+    "settlement_checked": true,
+    "signal_review_complete": true,
+    "milestones_complete": true,
+    "website_refresh_seconds": 120
+  }
+}

@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Runtime entry for the parallel planner.
+"""Runtime entry for the parallel planner plus Xiên 2 recommendation.
 
 The workflow materializes and patches the packed base engine into
-`plan_next_day_base.py`.  The parallel controller source is then evaluated with
-its base-engine path redirected to that preserved file, avoiding recursive
-imports after `plan_next_day.py` becomes the workflow delegator.
+`plan_next_day_base.py`. The parallel controller source is evaluated with its
+base-engine path redirected to that file. After a successful normal planning
+run, the Xiên 2 engine deterministically generates every pair from the unique
+positive-stake codes. Self-tests and data-failure paths never create pairs.
 """
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -29,7 +31,22 @@ namespace = {
     "__package__": None,
 }
 exec(compile(text, str(SOURCE), "exec"), namespace)
-main = namespace["main"]
+_planner_main = namespace["main"]
+
+
+def main() -> None:
+    original_argv = list(sys.argv)
+    _planner_main()
+    if any(flag in original_argv for flag in ("--self-test", "--data-fail")):
+        return
+    from apply_xien2_auto_pairs import main as xien2_main
+
+    try:
+        sys.argv = [original_argv[0]]
+        xien2_main()
+    finally:
+        sys.argv = original_argv
+
 
 if __name__ == "__main__":
     main()

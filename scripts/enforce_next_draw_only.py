@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Keep the public website focused on the next draw after settlement.
 
-Audit history remains in dated plans and settlement ledgers.  Only the public
-`current` payload is compacted: cumulative P/L is retained, completed-draw
-orders/results are removed, and A1/X2/X3 prospective groups remain.
+Audit history remains in dated plans and settlement ledgers. Only the public
+`current` payload is compacted: cumulative P/L is retained and completed-draw
+orders/results are removed. All current A1/X2/X3 cards and current candidates
+remain visible, whether PASS or FAIL, so the website never hides the methods
+being reviewed for the next draw.
 """
 from __future__ import annotations
 
@@ -45,9 +47,11 @@ def compact(doc: dict[str, Any]) -> bool:
     doc["display_policy"] = {
         "mode": "NEXT_DRAW_ONLY_AFTER_SETTLEMENT",
         "show_target_date_only": True,
+        "show_all_current_methods": True,
+        "show_nonfunded_current_candidates": True,
         "hide_completed_draw_details": True,
         "hide_latest_27_codes": True,
-        "hide_historical_method_cards": True,
+        "hide_completed_draw_method_cards": True,
         "pnl_display": "CUMULATIVE_AND_NEXT_CAPITAL_ONLY",
         "settlement_applied_through": locked.isoformat(),
     }
@@ -78,6 +82,9 @@ def compact(doc: dict[str, Any]) -> bool:
     doc["pnl_summary"]["confirmed_through"] = locked.isoformat()
     doc["pnl_summary"]["settlement_applied"] = True
 
+    # Keep the three current prospective method groups. The UI may hide the
+    # long detail section, but A1 uses its current candidates for the Top-3
+    # watchlist and PASS/FAIL cards must remain visible in top_signals.
     groups = doc.get("groups") or []
     doc["groups"] = [
         group for group in groups

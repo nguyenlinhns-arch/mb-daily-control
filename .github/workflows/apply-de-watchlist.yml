@@ -1,0 +1,102 @@
+name: Apply Đề watchlist and milestones
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "MB Daily result settlement and next-day plan"
+      - "Apply automatic Xiên 2 recommendations"
+      - "Enforce next-draw-only website"
+    types: [completed]
+  push:
+    branches: ["main"]
+    paths:
+      - "data/current.json"
+      - "data/current-override.json"
+      - "data/plans/**"
+      - "data/history-27.bz2.b64"
+      - "data/history-bootstrap/**"
+      - "data/settlement-ledger.json"
+      - "data/automation-policy.json"
+      - "scripts/apply_de_watchlist.py"
+      - "scripts/export_sheet_sync.py"
+      - "scripts/render_fast_dashboard.py"
+      - "scripts/enforce_next_draw_only.py"
+      - ".github/workflows/apply-de-watchlist.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-de-watchlist
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply and validate Đề watchlist
+        run: |
+          python scripts/apply_de_watchlist.py
+          python scripts/apply_de_watchlist.py --check
+
+      - name: Reapply Xiên 2 recommendation
+        run: |
+          python scripts/apply_xien2_auto_pairs.py
+          python scripts/apply_xien2_auto_pairs.py --check
+
+      - name: Refresh Google Sheet CSV projections
+        run: |
+          python scripts/export_sheet_sync.py
+          python scripts/export_sheet_sync.py --check
+
+      - name: Render and validate static website
+        run: |
+          python scripts/render_fast_dashboard.py
+          python scripts/render_fast_dashboard.py --check
+          grep -q 'MB Đề' index.html
+          grep -q 'Mốc sớm nhất' index.html
+
+      - name: Validate Đề payload invariants
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          doc=json.loads(Path('data/current.json').read_text(encoding='utf-8'))
+          de=doc.get('de_watchlist') or {}
+          candidates=de.get('candidates') or []
+          assert len(candidates)==2, candidates
+          assert {c.get('side') for c in candidates}=={'HEAD','TAIL'}
+          for c in candidates:
+              for field in ('earliest_eligible_date','earliest_condition','required_gate','milestone_type'):
+                  assert c.get(field), (c,field)
+          groups={str(g.get('id','')).upper():g for g in doc.get('groups',[])}
+          assert 'DE' in groups
+          print('DE_WATCHLIST_INVARIANTS_OK')
+          PY
+
+      - name: Commit only when files changed
+        run: |
+          if git diff --quiet -- data index.html; then
+            echo "Đề watchlist already current."
+            exit 0
+          fi
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data index.html
+          git commit -m "data: publish Đề watchlist and entry milestones"
+          git pull --rebase origin main
+          git push origin HEAD:main

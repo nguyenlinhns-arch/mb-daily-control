@@ -1,0 +1,71 @@
+{
+  "schema_version": "MB_DAILY_PLAN_SNAPSHOT_PARALLEL_V1",
+  "report_run_id": "RPT_MB_20260713_PARALLEL_A4A6D5A68E03",
+  "plan_hash": "a4a6d5a68e03a8138deb51212289911fef4b2a43afb75497f19c3b51ee3a43b6",
+  "generated_at": "2026-07-12T19:05:00+07:00",
+  "locked_through": "2026-07-12",
+  "target_date": "2026-07-13",
+  "config_id": "MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712",
+  "controller_rule": ["A1_INDEPENDENT", "X2_EXACT_INDEPENDENT", "X3_EXACT_INDEPENDENT", "ROLL7_IF_NONE", "A0"],
+  "funding_policy": {
+    "fund_every_passing_standard_method": true,
+    "stop_after_first_pass": false,
+    "dedupe_same_code_by_highest_stake": true,
+    "roll7_only_when_all_standard_methods_fail": true
+  },
+  "data_snapshot": {
+    "status": "LOCKED_CROSSCHECKED_3_SOURCES",
+    "count": 27,
+    "unique": 24,
+    "repeat2_count": 3,
+    "max_frequency": 2,
+    "latest_27_codes": ["94", "06", "20", "58", "09", "50", "08", "23", "64", "36", "62", "11", "40", "65", "33", "19", "40", "71", "17", "37", "56", "69", "34", "59", "34", "05", "62"]
+  },
+  "methods": [
+    {
+      "id": "A1",
+      "status": "A0_HARD_BRAKE",
+      "raw_candidate": "88",
+      "metrics": {"gan": 15, "gmax": 20, "score": 0.75},
+      "points_by_code": {},
+      "reason": "Kỳ 12/07 có repeat2_count=3."
+    },
+    {
+      "id": "X2",
+      "status": "PASS_CORE_EXACT_RANK1",
+      "selection": ["54", "45"],
+      "points_by_code": {"54": 50, "45": 50},
+      "capital_vnd": 2300000,
+      "metrics": {"gan": "2-2", "dgan": 0, "h5_pair": 2, "h21": "9-6", "tv21": 6.1507}
+    },
+    {
+      "id": "X3",
+      "status": "FAIL_HOT21",
+      "selection": ["51", "80", "54"],
+      "points_by_code": {},
+      "metrics": {"hot21_sum": 24, "hot21_max": 9}
+    },
+    {
+      "id": "ROLL7",
+      "status": "NOT_APPLICABLE_STANDARD_PASS",
+      "selection": [],
+      "points_by_code": {}
+    }
+  ],
+  "portfolio": {
+    "decision": "X2_CORE_EXACT",
+    "selection": ["54", "45"],
+    "points_by_code": {"54": 50, "45": 50},
+    "total_points": 100,
+    "capital_vnd": 2300000,
+    "execution_status": "UNCONFIRMED",
+    "pnl_included": false,
+    "scenarios": {"zero_hits": -2300000, "one_hit": 1700000, "two_hits": 5700000}
+  },
+  "validation": {
+    "data_27_ok": true,
+    "parallel_all_pass_funding": true,
+    "cross_method_blocking": false,
+    "pnl_not_included_without_confirmation": true
+  }
+}

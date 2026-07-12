@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Patch the materialized daily planner so A1 always publishes a Top-3 watchlist.
+"""Patch A1 Top-3, preserve the patched base, then install parallel entrypoint.
 
-The canonical engine is packed in plan_next_day.py.zlib.b64 and materialized on every
-workflow run. This patch is deliberately idempotent and runs immediately after that
-materialization. It preserves the production gate/selection rules and only expands the
-A1 candidate payload to three ranked primary codes, each with a recalculated earliest
-eligible date.
+The canonical engine is packed in plan_next_day.py.zlib.b64 and materialized on
+every workflow run.  This script is idempotent.  It first applies the A1 Top-3
+watchlist replacement, writes the fully patched sequential engine to
+`plan_next_day_base.py`, then changes `plan_next_day.py` into a tiny delegator
+for the permanent independent A1/X2/X3 parallel controller.
 """
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "scripts" / "plan_next_day.py"
+BASE_TARGET = ROOT / "scripts" / "plan_next_day_base.py"
 START = "def a1_candidates("
 END = "\ndef build_x3("
 MARKER = "A1_TOP3_WATCHLIST_V1"
@@ -24,7 +25,7 @@ REPLACEMENT = r'''def a1_candidates(
 
     Ranking is deterministic and does not change the production decision:
     official selected code -> other raw-qualified code -> earliest conditional entry ->
-    projected tier -> current Gan/Gmax/Score -> smaller code.  Reverse numbers are added
+    projected tier -> current Gan/Gmax/Score -> smaller code. Reverse numbers are added
     later by the separate A1 reverse post-processor and are not independent watch codes.
     """
     rule_version = "A1_TOP3_WATCHLIST_V1"
@@ -72,9 +73,6 @@ REPLACEMENT = r'''def a1_candidates(
             offset = 1
         if gan + offset <= upper:
             return offset
-        # If the current gap has already passed the upper score bound, the earliest
-        # viable route is one hit followed by a clean miss run. This remains a lower
-        # bound and is recalculated after every locked draw.
         reset_gmax = max(gmax, gan)
         reset_required = max(minimum, math.ceil(low_ratio * reset_gmax - 1e-12))
         reset_upper = math.floor(high_ratio * reset_gmax + 1e-12)
@@ -109,8 +107,6 @@ REPLACEMENT = r'''def a1_candidates(
     def tracking_key(item: dict[str, Any]) -> tuple[Any, ...]:
         feature = item["feature"]
         tier = item["tier"]
-        # After the official choice, current raw qualifiers remain ahead of future
-        # watches. Conditional watches are then ranked by their earliest lower bound.
         return (
             0 if item["selected"] else 1,
             0 if item["raw_qualified"] else 1,
@@ -135,7 +131,6 @@ REPLACEMENT = r'''def a1_candidates(
             feature, tier, target_date, noise_blocked
         )
         gate = bool(item["selected"])
-        # A second raw-qualified code cannot be another real order on the same day.
         if not gate and earliest <= target_date:
             earliest = target_date + timedelta(days=1)
             milestone_type = "CONDITIONAL_NEXT_REVIEW"
@@ -184,6 +179,14 @@ REPLACEMENT = r'''def a1_candidates(
     }
 '''
 
+DELEGATOR = '''#!/usr/bin/env python3
+"""Workflow entry point: independent A1/X2/X3 parallel funding."""
+from plan_next_day_parallel_entry import main
+
+if __name__ == "__main__":
+    main()
+'''
+
 
 def main() -> None:
     text = TARGET.read_text(encoding="utf-8")
@@ -191,11 +194,15 @@ def main() -> None:
     end = text.index(END, start)
     current = text[start:end]
     if MARKER in current and current.strip() == REPLACEMENT.strip():
+        patched = text
         print("A1_TOP3_WATCHLIST_PATCH_ALREADY_APPLIED")
-        return
-    patched = text[:start] + REPLACEMENT.rstrip() + "\n" + text[end:]
-    TARGET.write_text(patched, encoding="utf-8")
-    print("A1_TOP3_WATCHLIST_PATCH_APPLIED")
+    else:
+        patched = text[:start] + REPLACEMENT.rstrip() + "\n" + text[end:]
+        print("A1_TOP3_WATCHLIST_PATCH_APPLIED")
+    BASE_TARGET.write_text(patched, encoding="utf-8")
+    TARGET.write_text(DELEGATOR, encoding="utf-8")
+    TARGET.chmod(0o755)
+    print("PARALLEL_PLANNER_ENTRYPOINT_INSTALLED")
 
 
 if __name__ == "__main__":

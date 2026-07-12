@@ -15,6 +15,7 @@ on:
       - "scripts/sync_from_google_sheet.py"
       - "scripts/plan_next_day.py.zlib.b64"
       - "scripts/build_public_snapshot.py.zlib.b64"
+      - "scripts/patch_a1_top3_watchlist.py"
       - "data/automation-policy.json"
       - "data/history-bootstrap/**"
       - ".github/workflows/sync-google-sheet.yml"
@@ -63,6 +64,9 @@ jobs:
               target.chmod(0o755)
               print(target, hashlib.sha256(source).hexdigest())
           PY
+
+      - name: Apply permanent A1 Top3 watchlist patch
+        run: python scripts/patch_a1_top3_watchlist.py
 
       - name: Validate engines and history bootstrap
         run: |
@@ -248,6 +252,13 @@ jobs:
               for candidate in candidates:
                   for field in ("earliest_eligible_date", "earliest_condition", "milestone_type"):
                       assert candidate.get(field), f"{group_id}/{candidate.get('code')} missing {field}"
+          a1_primary = [
+              c for c in groups["A1"].get("candidates", [])
+              if str(c.get("component", "")).upper() != "A1_REVERSE50"
+          ]
+          assert len(a1_primary) == 3, f"A1 Top3 watchlist invalid: {a1_primary}"
+          assert [c.get("rank") for c in a1_primary] == [1, 2, 3], a1_primary
+          assert all(c.get("tracking_rule_version") == "A1_TOP3_WATCHLIST_V1" for c in a1_primary)
           assert groups["X3"].get("earliest_basket_date"), "X3 missing earliest_basket_date"
           x2 = groups["X2"]
           forbidden = {
@@ -259,7 +270,7 @@ jobs:
           pending = doc.get("pending_order") or {}
           assert not pending.get("pnl_included"), "Pending plan must not include P/L"
           assert (doc.get("automation") or {}).get("milestones_complete") is True
-          print("ABSOLUTE_MILESTONE_AND_PAYLOAD_INVARIANTS_OK")
+          print("ABSOLUTE_MILESTONE_A1_TOP3_AND_PAYLOAD_INVARIANTS_OK")
           PY
 
       - name: Commit only when files changed
@@ -271,6 +282,6 @@ jobs:
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data scripts/plan_next_day.py scripts/build_public_snapshot.py
-          git commit -m "data: auto settle, milestone and plan $(TZ=Asia/Bangkok date +%F)"
+          git commit -m "data: auto settle, A1 Top3 milestone and plan $(TZ=Asia/Bangkok date +%F)"
           git pull --rebase origin main
           git push origin HEAD:main

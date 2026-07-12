@@ -6,14 +6,8 @@ on:
     workflows:
       - "MB Daily result settlement and next-day plan"
       - "Enforce A1 reverse50 and top status panels"
-      - "Enforce pinned A1 and X2/X3 status panels"
+      - "Enforce current A1/X2/X3 status panels"
     types: [completed]
-  schedule:
-    # Chạy sau các lượt rà soát chính và hậu kiểm.
-    - cron: "8 7 * * *"
-    - cron: "23 12 * * *"
-    - cron: "43 12 * * *"
-    - cron: "3 13 * * *"
   push:
     branches: ["main"]
     paths:

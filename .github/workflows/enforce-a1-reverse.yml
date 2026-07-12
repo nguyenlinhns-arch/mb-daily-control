@@ -1,4 +1,4 @@
-name: Enforce A1 reverse50 and top status panels
+name: Enforce A1 reverse50 and current recommendations
 
 on:
   workflow_dispatch:
@@ -11,17 +11,19 @@ on:
       - "data/current.json"
       - "data/plans/**"
       - "data/automation-policy.json"
-      - "index.html"
       - "scripts/enforce_a1_reverse.py"
       - "scripts/enforce_top3_first_block.py"
       - "scripts/enforce_top3_first_block.py.zlib.b64"
+      - "scripts/apply_xien2_auto_pairs.py"
+      - "scripts/export_sheet_sync.py"
+      - "scripts/render_fast_dashboard.py"
       - ".github/workflows/enforce-a1-reverse.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: enforce-a1-reverse50-and-top-panels-v3
+  group: enforce-a1-reverse-and-current-recommendations-v4
   cancel-in-progress: false
 
 jobs:
@@ -41,26 +43,56 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Detect controller generation
+        id: mode
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          doc = json.loads(Path('data/current.json').read_text(encoding='utf-8'))
+          config = str(doc.get('config_id') or '')
+          mode = str((doc.get('funding_policy') or {}).get('mode') or '')
+          parallel = config.startswith('MB_PARALLEL_') or mode == 'FUND_EVERY_EXACT_PASS_METHOD'
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write(f"parallel={'true' if parallel else 'false'}\n")
+          print({'config_id': config, 'funding_mode': mode, 'parallel': parallel})
+          PY
+
       - name: Apply A1 reverse50 and no-duplicate policy
         run: python scripts/enforce_a1_reverse.py
 
-      - name: Build pinned A1 and X2/X3 status panels
+      - name: Build legacy pinned panels only for legacy controller
+        if: steps.mode.outputs.parallel != 'true'
         run: python scripts/enforce_top3_first_block.py
 
-      - name: Validate permanent invariants
+      - name: Validate A1 and legacy invariants
         run: |
           python scripts/enforce_a1_reverse.py --check
-          python scripts/enforce_top3_first_block.py --check
+          if [ "${{ steps.mode.outputs.parallel }}" != "true" ]; then
+            python scripts/enforce_top3_first_block.py --check
+          fi
+
+      - name: Apply Xiên 2 auto-pair recommendation
+        run: |
+          python scripts/apply_xien2_auto_pairs.py
+          python scripts/apply_xien2_auto_pairs.py --check
+
+      - name: Refresh Sheet CSV and static website
+        run: |
+          python scripts/export_sheet_sync.py
+          python scripts/export_sheet_sync.py --check
+          python scripts/render_fast_dashboard.py
+          python scripts/render_fast_dashboard.py --check
 
       - name: Commit only when enforcement changed files
         run: |
-          if git diff --quiet -- data; then
-            echo "A1 reverse50 and top-panel rules already enforced."
+          if git diff --quiet -- data index.html; then
+            echo "A1, Xiên 2 and current recommendation rules already enforced."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data
-          git commit -m "data: enforce A1 reverse50 and top status panels"
+          git add data index.html
+          git commit -m "data: enforce A1 and Xiên 2 current recommendations"
           git pull --rebase origin main
           git push origin HEAD:main

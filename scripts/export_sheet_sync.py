@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""Export the latest MB settlement/plan state as CSV for Google Sheet IMPORTDATA.
-
-The canonical Google workbook can import these two public CSV files:
-- data/sheet-current.csv: latest locked settlement summary + next-draw plan.
-- data/sheet-settlements.csv: append-only settlement ledger projection.
-
-This script is deterministic and idempotent. It never invents P/L and only reads
-records already present in data/current.json and data/settlement-ledger.json.
-"""
+"""Export settlement, next-draw and Xiên 2 recommendation state as CSV."""
 from __future__ import annotations
 
 import argparse
@@ -54,6 +46,7 @@ def build_current(doc: dict[str, Any], ledger: dict[str, Any]) -> str:
     portfolio = doc.get("portfolio") or {}
     pending = doc.get("pending_order") or {}
     pnl = doc.get("pnl_summary") or {}
+    xien = doc.get("xien2_recommendation") or {}
     settlements = ledger.get("settlements") or {}
     last_date = max(settlements, default="")
     last = settlements.get(last_date) or {}
@@ -82,9 +75,22 @@ def build_current(doc: dict[str, Any], ledger: dict[str, Any]) -> str:
         ("next", "selection", portfolio.get("selection", "")),
         ("next", "points_by_code", compact_json(portfolio.get("points_by_code") or pending.get("points_by_code") or {})),
         ("next", "total_points", portfolio.get("points", "")),
-        ("next", "capital_vnd", portfolio.get("capital_vnd", "")),
+        ("next", "standard_capital_vnd", portfolio.get("standard_capital_vnd", portfolio.get("capital_vnd", ""))),
+        ("next", "xien2_recommended_capital_vnd", xien.get("capital_vnd", 0)),
+        ("next", "total_recommended_capital_vnd", portfolio.get("total_recommended_capital_vnd", portfolio.get("capital_vnd", ""))),
         ("next", "execution_status", pending.get("status", "A0" if not pending else "")),
         ("next", "pnl_included", bool(pending.get("pnl_included", False))),
+        ("xien2", "rule_version", xien.get("rule_version", "")),
+        ("xien2", "status", xien.get("status", "")),
+        ("xien2", "base_numbers", "|".join(xien.get("base_numbers") or [])),
+        ("xien2", "pairs", "|".join(xien.get("pairs") or [])),
+        ("xien2", "pair_count", xien.get("pair_count", 0)),
+        ("xien2", "points_per_pair", xien.get("points_per_pair", 100)),
+        ("xien2", "capital_per_pair_vnd", xien.get("capital_per_pair_vnd", 100000)),
+        ("xien2", "capital_vnd", xien.get("capital_vnd", 0)),
+        ("xien2", "gross_return_per_winning_pair_vnd", xien.get("gross_return_per_winning_pair_vnd", 1600000)),
+        ("xien2", "confirmation_required", bool(xien.get("confirmation_required", True))),
+        ("xien2", "pnl_included", bool(xien.get("pnl_included", False))),
     ]
     rows.extend([list(item) for item in values])
     return csv_text(rows)
@@ -92,20 +98,10 @@ def build_current(doc: dict[str, Any], ledger: dict[str, Any]) -> str:
 
 def build_settlements(ledger: dict[str, Any]) -> str:
     rows: list[list[Any]] = [[
-        "date",
-        "result_codes",
-        "funded_codes",
-        "points_by_code",
-        "hits_by_code",
-        "hits_total",
-        "lo_capital_vnd",
-        "lo_payout_vnd",
-        "lo_pnl_vnd",
-        "xien_pnl_vnd",
-        "total_capital_vnd",
-        "total_payout_vnd",
-        "total_pnl_vnd",
-        "components",
+        "date", "result_codes", "funded_codes", "points_by_code", "hits_by_code", "hits_total",
+        "lo_capital_vnd", "lo_payout_vnd", "lo_pnl_vnd",
+        "xien_pairs", "xien_wins", "xien_losses", "xien_capital_vnd", "xien_payout_vnd", "xien_pnl_vnd",
+        "total_capital_vnd", "total_payout_vnd", "total_pnl_vnd", "components",
     ]]
     for day, record in sorted((ledger.get("settlements") or {}).items()):
         lo = record.get("lo") or {}
@@ -120,6 +116,11 @@ def build_settlements(ledger: dict[str, Any]) -> str:
             lo.get("capital_vnd", 0),
             lo.get("payout_vnd", 0),
             lo.get("pnl_vnd", 0),
+            "|".join(xien.get("pairs") or []),
+            xien.get("wins", 0),
+            xien.get("losses", 0),
+            xien.get("capital_vnd", 0),
+            xien.get("payout_vnd", 0),
             xien.get("pnl_vnd", 0),
             record.get("total_capital_vnd", 0),
             record.get("total_payout_vnd", 0),
@@ -133,12 +134,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-
     doc = load_json(CURRENT, {})
     ledger = load_json(LEDGER, {"settlements": {}})
     current_text = build_current(doc, ledger)
     settlements_text = build_settlements(ledger)
-
     if args.check:
         if CURRENT_CSV.read_text(encoding="utf-8") != current_text:
             raise SystemExit("sheet-current.csv is stale")
@@ -146,7 +145,6 @@ def main() -> None:
             raise SystemExit("sheet-settlements.csv is stale")
         print("SHEET_SYNC_CSV_OK")
         return
-
     changed = []
     if write_if_changed(CURRENT_CSV, current_text):
         changed.append(CURRENT_CSV.name)

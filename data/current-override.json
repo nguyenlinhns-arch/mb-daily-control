@@ -14,6 +14,7 @@
     "show_nonfunded_current_candidates": true,
     "show_roll7_current_status": true,
     "show_xien2_current_recommendation": true,
+    "show_de_current_watchlist": true,
     "hide_completed_draw_details": true,
     "hide_latest_27_codes": true,
     "hide_completed_draw_method_cards": true,

@@ -23,14 +23,68 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build privacy-safe public site
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site/assets _site/data
+          cp index.html _site/index.html
+          cp -R assets/. _site/assets/
+          for file in 404.html favicon.ico CNAME; do
+            if [ -f "$file" ]; then cp "$file" "_site/$file"; fi
+          done
+          python scripts/build_public_payload.py \
+            --input data/current.json \
+            --output _site/data/current.json
+          touch _site/.nojekyll
+
+      - name: Validate no private finance files are published
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          site = Path("_site")
+          payload = json.loads((site / "data" / "current.json").read_text(encoding="utf-8"))
+          privacy = payload.get("finance_privacy") or {}
+          assert privacy.get("status") == "OWNER_ONLY", privacy
+          assert privacy.get("public_visible") is False, privacy
+          forbidden_paths = [
+              "data/settlement-ledger.json",
+              "data/actual-order-ledger.json",
+              "data/review-ledger.json",
+              "data/automation-state.json",
+              "data/manual-orders",
+              "data/plans",
+          ]
+          for rel in forbidden_paths:
+              assert not (site / rel).exists(), f"Private file leaked into Pages artifact: {rel}"
+          text = (site / "data" / "current.json").read_text(encoding="utf-8").lower()
+          for key in (
+              '"grand_total_pnl_vnd"', '"active_all_real_pnl_vnd"',
+              '"archive_pnl_vnd"', '"total_pnl_vnd"', '"lo_pnl_vnd"',
+              '"xien_pnl_vnd"', '"payout_vnd"'
+          ):
+              assert key not in text, key
+          print("PUBLIC_SITE_FINANCE_PRIVACY_OK")
+          PY
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

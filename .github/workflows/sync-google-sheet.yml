@@ -3,12 +3,10 @@ name: MB Daily result settlement and next-day plan
 on:
   workflow_dispatch:
   schedule:
-    # 14:00 giờ Việt Nam: rà lại kế hoạch từ kỳ đã khóa.
-    - cron: "0 7 * * *"
-    # 19:15, 19:35, 19:55 giờ Việt Nam: khóa kết quả, quyết toán, lập kế hoạch ngày sau.
-    - cron: "15 12 * * *"
-    - cron: "35 12 * * *"
-    - cron: "55 12 * * *"
+    # 08:00 giờ Việt Nam (01:00 UTC): rà soát đầy đủ, quyết toán nếu có dữ liệu mới, ghi file và lập kế hoạch kế tiếp.
+    - cron: "0 1 * * *"
+    # 19:30 giờ Việt Nam (12:30 UTC): khóa kết quả ngày, ghi nhận P/L, ghi file và công bố kế hoạch ngày sau.
+    - cron: "30 12 * * *"
   push:
     branches: ["main"]
     paths:
@@ -16,6 +14,7 @@ on:
       - "scripts/plan_next_day.py.zlib.b64"
       - "scripts/build_public_snapshot.py.zlib.b64"
       - "scripts/patch_a1_top3_watchlist.py"
+      - "scripts/export_sheet_sync.py"
       - "data/automation-policy.json"
       - "data/history-bootstrap/**"
       - ".github/workflows/sync-google-sheet.yml"
@@ -234,6 +233,11 @@ jobs:
           PY
           exit 0
 
+      - name: Export file and Google Sheet sync CSVs
+        run: |
+          python scripts/export_sheet_sync.py
+          python scripts/export_sheet_sync.py --check
+
       - name: Validate absolute milestone and website invariants
         run: |
           python - <<'PY'
@@ -275,13 +279,13 @@ jobs:
 
       - name: Commit only when files changed
         run: |
-          if git diff --quiet -- data scripts/plan_next_day.py scripts/build_public_snapshot.py; then
+          if git diff --quiet -- data scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py; then
             echo "Không có dữ liệu hoặc kế hoạch mới."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data scripts/plan_next_day.py scripts/build_public_snapshot.py
-          git commit -m "data: auto settle, A1 Top3 milestone and plan $(TZ=Asia/Bangkok date +%F)"
+          git add data scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py
+          git commit -m "data: auto settle, record P/L, sync files and plan $(TZ=Asia/Bangkok date +%F)"
           git pull --rebase origin main
           git push origin HEAD:main

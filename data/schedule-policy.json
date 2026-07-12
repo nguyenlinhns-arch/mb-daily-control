@@ -1,0 +1,21 @@
+{
+  "schema_version": "MB_SCHEDULE_POLICY_V1",
+  "status": "ACTIVE_CANONICAL",
+  "policy_id": "MB_TWICE_DAILY_0800_1930_V1_20260712",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "times_vn": ["08:00", "19:30"],
+  "cron_utc": ["0 1 * * *", "30 12 * * *"],
+  "old_cron_schedules_removed": true,
+  "workflow": ".github/workflows/sync-google-sheet.yml",
+  "actions_each_run": [
+    "review latest locked result",
+    "settle confirmed real orders idempotently",
+    "record P/L and settlement ledger",
+    "write repository data files and Google Sheet import CSVs",
+    "recompute A1/X2/X3 and ROLL7",
+    "publish website for the next draw"
+  ],
+  "sheet_current_csv": "data/sheet-current.csv",
+  "sheet_settlements_csv": "data/sheet-settlements.csv",
+  "updated_at": "2026-07-12T22:55:00+07:00"
+}

@@ -1,4 +1,4 @@
-name: Apply confirmed manual real order
+name: Apply confirmed manual real orders
 
 on:
   workflow_dispatch:
@@ -19,14 +19,14 @@ on:
     paths:
       - "data/current.json"
       - "data/manual-orders/**"
-      - "scripts/apply_manual_order.py"
+      - "scripts/apply_manual_orders_v2.py"
       - ".github/workflows/enforce-manual-order.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: apply-confirmed-manual-order
+  group: apply-confirmed-manual-orders-v2
   cancel-in-progress: false
 
 jobs:
@@ -46,21 +46,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Apply confirmed order
-        run: python scripts/apply_manual_order.py
+      - name: Apply all confirmed orders
+        run: python scripts/apply_manual_orders_v2.py
 
-      - name: Validate confirmed order invariant
-        run: python scripts/apply_manual_order.py --check
+      - name: Validate confirmed-order invariant
+        run: python scripts/apply_manual_orders_v2.py --check
 
       - name: Commit only when files changed
         run: |
           if git diff --quiet -- data; then
-            echo "Confirmed manual order already applied."
+            echo "Confirmed manual orders already applied."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git commit -m "data: apply confirmed manual real order"
+          git commit -m "data: apply confirmed manual real orders"
           git pull --rebase origin main
           git push origin HEAD:main

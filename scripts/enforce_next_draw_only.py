@@ -3,8 +3,8 @@
 
 Audit history remains in dated plans and settlement ledgers. Only the public
 `current` payload is compacted: cumulative P/L is retained and completed-draw
-orders/results are removed. All current A1/X2/X3/ROLL7/Xiên 2 cards and current
-candidates remain visible, whether active or inactive.
+orders/results are removed. All current A1/X2/X3/ROLL7/Xiên 2/Đề cards and
+current candidates remain visible, whether active or inactive.
 """
 from __future__ import annotations
 
@@ -50,6 +50,7 @@ def compact(doc: dict[str, Any]) -> bool:
         "show_nonfunded_current_candidates": True,
         "show_roll7_current_status": True,
         "show_xien2_current_recommendation": True,
+        "show_de_current_watchlist": True,
         "hide_completed_draw_details": True,
         "hide_latest_27_codes": True,
         "hide_completed_draw_method_cards": True,
@@ -86,12 +87,10 @@ def compact(doc: dict[str, Any]) -> bool:
     doc["pnl_summary"]["confirmed_through"] = locked.isoformat()
     doc["pnl_summary"]["settlement_applied"] = True
 
-    # Preserve every current operational/recommendation group. Historical result
-    # groups remain outside the public current payload.
     groups = doc.get("groups") or []
     doc["groups"] = [
         group for group in groups
-        if str(group.get("id", "")).upper() in {"A1", "X2", "X3", "ROLL7", "XIEN", "XIEN2"}
+        if str(group.get("id", "")).upper() in {"A1", "X2", "X3", "ROLL7", "XIEN", "XIEN2", "DE", "DE_DIGIT"}
     ]
 
     after = json.dumps(doc, ensure_ascii=False, sort_keys=True)

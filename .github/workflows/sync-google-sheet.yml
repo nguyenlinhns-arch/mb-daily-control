@@ -15,6 +15,7 @@ on:
       - "scripts/build_public_snapshot.py.zlib.b64"
       - "scripts/patch_a1_top3_watchlist.py"
       - "scripts/export_sheet_sync.py"
+      - "scripts/render_fast_dashboard.py"
       - "data/automation-policy.json"
       - "data/history-bootstrap/**"
       - ".github/workflows/sync-google-sheet.yml"
@@ -238,6 +239,11 @@ jobs:
           python scripts/export_sheet_sync.py
           python scripts/export_sheet_sync.py --check
 
+      - name: Render zero-dependency static website
+        run: |
+          python scripts/render_fast_dashboard.py
+          python scripts/render_fast_dashboard.py --check
+
       - name: Validate absolute milestone and website invariants
         run: |
           python - <<'PY'
@@ -279,13 +285,13 @@ jobs:
 
       - name: Commit only when files changed
         run: |
-          if git diff --quiet -- data scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py; then
+          if git diff --quiet -- data index.html scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py scripts/render_fast_dashboard.py; then
             echo "Không có dữ liệu hoặc kế hoạch mới."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py
-          git commit -m "data: auto settle, record P/L, sync files and plan $(TZ=Asia/Bangkok date +%F)"
+          git add data index.html scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py scripts/render_fast_dashboard.py
+          git commit -m "data: auto settle, record P/L, render fast website and plan $(TZ=Asia/Bangkok date +%F)"
           git pull --rebase origin main
           git push origin HEAD:main

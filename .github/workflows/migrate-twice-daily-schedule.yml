@@ -2,6 +2,8 @@ name: One-time migrate all automation schedules to 08:00 and 19:30 VN
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
   push:
     branches: ["main"]
     paths:
@@ -105,7 +107,6 @@ jobs:
                   path.write_text(new, encoding='utf-8')
                   changed.append(str(path))
 
-          # Validate that only the canonical workflow retains a schedule block.
           for path in sorted(workflows.glob('*.y*ml')):
               if path == self_path:
                   continue
@@ -157,12 +158,10 @@ jobs:
           schedule_path.write_text(json.dumps(schedule_doc, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           changed.append(str(schedule_path))
 
-          # Materialize current CSV projections immediately.
           import subprocess
           subprocess.run(['python', 'scripts/export_sheet_sync.py'], check=True)
           subprocess.run(['python', 'scripts/export_sheet_sync.py', '--check'], check=True)
 
-          # This migration workflow is intentionally one-shot.
           self_path.unlink()
           print('MIGRATION_CHANGED=' + ','.join(changed))
           PY

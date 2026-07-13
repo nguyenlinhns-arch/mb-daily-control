@@ -1,0 +1,22 @@
+{
+  "schema_version": "XIEN2_CONFLUENCE_ROUTER_POLICY_V1",
+  "status": "ACTIVE_PRODUCTION",
+  "effective_date": "2026-07-14",
+  "rule_version": "XIEN2_CONFLUENCE_ROUTER_V1",
+  "capital_per_pair_vnd": 100000,
+  "gross_return_per_winning_pair_vnd": 1600000,
+  "rules": {
+    "A1_X2_ONLY": "KEEP_CROSS_METHOD_A1_X2_PAIRS_ONLY",
+    "A1_X2_X3": "EXCLUDE_A1_LEGS_AND_KEEP_ALL_PAIRS_WITHIN_X2_UNION_X3",
+    "OTHER_ACTIVE_METHOD_COMBINATIONS": "KEEP_CANONICAL_ALL_UNORDERED_PAIRS"
+  },
+  "loss_brake": {
+    "rule_version": "XIEN2_TWO_LO_LOSS_BRAKE_V1",
+    "priority": "DOMINANT",
+    "effect": "ROUTED_PAIRS_REMAIN_VISIBLE_AS_SHADOW_ZERO_CAPITAL"
+  },
+  "coverage_effect": "NONE",
+  "lo_order_effect": "NONE",
+  "confirmation_required_before_booking": true,
+  "notes": "Xiên 2 is a separate ledger and never counts toward lô coverage."
+}

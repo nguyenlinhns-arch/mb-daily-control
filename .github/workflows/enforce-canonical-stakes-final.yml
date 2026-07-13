@@ -1,0 +1,105 @@
+name: Enforce final canonical stakes and Xiên brake
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "MB Daily result settlement and next-day plan"
+      - "Apply automatic Xiên 2 recommendations"
+      - "Enforce A1 reverse50 and current recommendations"
+      - "Apply Đề watchlist and milestones"
+      - "Apply coverage-preserving optimization shadows"
+      - "Enforce next-draw-only website"
+    types: [completed]
+  push:
+    branches: ["main"]
+    paths:
+      - "data/current.json"
+      - "data/current-override.json"
+      - "data/plans/**"
+      - "data/settlement-ledger.json"
+      - "data/xien2-loss-brake-policy.json"
+      - "scripts/enforce_canonical_stakes_and_xien_brake.py"
+      - "scripts/apply_xien2_auto_pairs.py"
+      - "scripts/render_fast_dashboard.py"
+      - ".github/workflows/enforce-canonical-stakes-final.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: enforce-final-canonical-stakes
+  cancel-in-progress: true
+
+jobs:
+  enforce:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Enforce canonical A1 stakes and Xiên brake
+        run: |
+          python scripts/enforce_canonical_stakes_and_xien_brake.py
+          python scripts/enforce_canonical_stakes_and_xien_brake.py --check
+
+      - name: Refresh optimization shadow for the same target
+        run: |
+          if [ -f scripts/apply_coverage_preserve_optimizations.py ]; then
+            python scripts/apply_coverage_preserve_optimizations.py
+            python scripts/apply_coverage_preserve_optimizations.py --check
+          fi
+
+      - name: Refresh Sheet projections and static website
+        run: |
+          python scripts/export_sheet_sync.py
+          python scripts/export_sheet_sync.py --check
+          python scripts/render_fast_dashboard.py
+          python scripts/render_fast_dashboard.py --check
+          if [ -f scripts/inject_optimization_shadow_cards.py ] && [ -f data/optimization-current.json ]; then
+            python scripts/inject_optimization_shadow_cards.py
+            python scripts/inject_optimization_shadow_cards.py --check
+          fi
+
+      - name: Validate 14 July canonical invariants
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          doc=json.loads(Path('data/current.json').read_text(encoding='utf-8'))
+          pending=doc.get('pending_order') or {}
+          points=pending.get('points_by_code') or {}
+          if doc.get('target_date') == '2026-07-14':
+              assert points.get('88') == 50, points
+              assert points.get('54') == 50 and points.get('45') == 50, points
+              assert pending.get('capital_vnd') == 3450000, pending
+              xien=doc.get('xien2_recommendation') or {}
+              assert xien.get('brake_active') is True, xien
+              assert xien.get('capital_vnd') == 0, xien
+              assert pending.get('total_recommended_capital_vnd') == 3450000, pending
+          assert (doc.get('automation') or {}).get('canonical_stake_guard_complete') is True
+          print('FINAL_CANONICAL_STAKE_AND_XIEN_BRAKE_OK')
+          PY
+
+      - name: Commit only when files changed
+        run: |
+          if git diff --quiet -- data index.html; then
+            echo "Final canonical stakes already current."
+            exit 0
+          fi
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data index.html
+          git commit -m "data: enforce final Core100 Volume50 and Xiên loss brake"
+          git pull --rebase origin main
+          git push origin HEAD:main

@@ -1,0 +1,45 @@
+{
+  "schema_version": "MB_COVERAGE_PRESERVE_OPT_V1",
+  "status": "ACTIVE_FROM_2026-07-13_SHADOW_ONLY",
+  "accepted_at_vn": "2026-07-13T10:33:00+07:00",
+  "production_unchanged": {
+    "A1": "Core100 / Volume50 + reverse50",
+    "X2": "Exact rank1 · 50 points/code",
+    "X3": "Growth32-34 Exact · 50 points/code",
+    "ROLL7": "Rescue30 only when A1/X2/X3 all A0"
+  },
+  "xien2_confluence_router": {
+    "rule_version": "XIEN2_CONFLUENCE_ROUTER_V1",
+    "status": "ACTIVE_CHALLENGER_SHADOW",
+    "real_capital_vnd": 0,
+    "coverage_effect": "NONE",
+    "a1_x2_only": "Keep only cross-method A1-X2 pairs",
+    "triple_pass": "Exclude every A1-related pair; keep all pairs inside X2 union X3",
+    "all_other_method_combinations": "Keep canonical all-pairs recommendation",
+    "reference_backtest_2024_2026_0712": {
+      "baseline_xien_pnl_vnd": 27300000,
+      "router_xien_pnl_vnd": 36000000,
+      "pnl_improvement_vnd": 8700000,
+      "baseline_pair_count": 1183,
+      "router_pair_count": 1080,
+      "signal_days_unchanged": 405
+    },
+    "promotion_gate": "Prospective same-day comparison; positive incremental P/L; coverage unchanged; drawdown not worse; no rule change mid-audit"
+  },
+  "triple_confluence_normalizer": {
+    "rule_version": "TRIPLE_CONFLUENCE_NORMALIZER_SHADOW_V1",
+    "status": "ACTIVE_CHALLENGER_SHADOW",
+    "real_capital_vnd": 0,
+    "coverage_effect": "NONE",
+    "trigger": "A1, X2 and X3 all pass on the same draw",
+    "shadow_staking": "A1 Core main100 unchanged; each A1 50-point leg becomes 30; X2/X3 remain 50; dedupe by max stake",
+    "reference_backtest_2024_2026_0712": {
+      "triple_pass_days": 6,
+      "portfolio_pnl_with_router_vnd": 297650000,
+      "portfolio_pnl_router_plus_normalizer_vnd": 301110000,
+      "additional_pnl_vnd": 3460000
+    },
+    "promotion_gate": "More triple-pass samples required; shadow only until independent prospective evidence"
+  },
+  "operational_rule": "Both challengers are calculated at 08:00 and 19:30, logged separately, displayed on the website, and never mutate actual orders or booked P/L without a separate explicit promotion decision."
+}

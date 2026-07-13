@@ -1,1 +1,781 @@
-{"schema_version":"MB_DAILY_WEB_V10_NEXT_DRAW_ALL_METHODS","report_run_id":"RPT_MB_20260713_PARALLEL_NEXT_ALL_METHODS","source_run_id":"LOCK_20260712_1484100F99","config_id":"MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712","target_date":"2026-07-13","generated_at":"2026-07-12T20:45:00+07:00","valid_until":"2026-07-13T23:59:59+07:00","official_url":"https://nguyenlinhns-arch.github.io/mb-daily-control/","display_policy":{"mode":"NEXT_DRAW_ONLY_AFTER_SETTLEMENT","show_target_date_only":true,"show_all_current_methods":true,"show_nonfunded_current_candidates":true,"show_roll7_current_status":true,"show_xien2_current_recommendation":true,"show_de_current_watchlist":true,"hide_completed_draw_details":true,"hide_latest_27_codes":true,"hide_completed_draw_method_cards":true,"pnl_display":"CUMULATIVE_AND_NEXT_CAPITAL_ONLY","settlement_applied_through":"2026-07-12","show_xien2_loss_brake_status":true},"data":{"locked_through":"2026-07-12","status":"LOCKED_CROSSCHECKED_3_SOURCES","count":27,"unique":24,"repeat2_count":3,"max_frequency":2,"noise_status":"A1_HARD_BRAKE","source_label":"Dữ liệu khóa đủ 27/27 đến 12/07/2026; dùng để lập kế hoạch 13/07/2026."},"funding_policy":{"id":"PARALLEL_INDEPENDENT_ALL_EXACT_PASS_V1","mode":"FUND_EVERY_EXACT_PASS_METHOD","scope":["A1","X2","X3"],"cross_method_blocking":false,"dedupe_same_code_by_highest_stake":true,"roll7_only_when_all_standard_methods_fail":true},"stake_rule":{"a1_core_main_points":100,"a1_volume_main_points":50,"a1_reverse_points":50,"x2_exact_points_per_code":50,"x3_exact_points_per_code":50,"roll7_rescue_points_per_code":30,"lo_cost_per_point_vnd":23000,"lo_payout_per_hit_point_vnd":80000,"no_martingale":true,"xien2_points_per_pair":100,"xien2_capital_per_pair_vnd":100000,"xien2_gross_return_per_winning_pair_vnd":1600000,"xien2_two_lo_loss_brake":true},"milestone_policy":{"status":"ACTIVE_MANDATORY_ABSOLUTE","recalculate_after_each_locked_draw":true,"disclosure":"Chỉ hiển thị dữ liệu và ứng viên của kỳ sắp tới; mọi mốc được tính lại sau kỳ khóa mới."},"top_signals":{"title":"KỲ SẮP TỚI 13/07/2026","subtitle":"A1 A0 · X2 54-45 ĐẠT · X3 51-80-54 KHÔNG ĐẠT","total_methods":3,"total_numbers":"5 mã duy nhất · 2 mã cấp vốn","total_points":"100 điểm","total_capital_vnd":2300000,"note":"Hiển thị đầy đủ A1, X2 và X3 của kỳ tới. Chỉ mã đạt gate có điểm/vốn. 88 không tiếp tục ngày 13/07; ROLL7 không dùng vì X2 đã đạt.","legend":[{"visual_status":"PASS","label":"Xanh lá · Đạt"},{"visual_status":"FAIL","label":"Đỏ · Không đạt"}],"methods":[{"id":"A1_INDEPENDENT","label":"MB A1","method":"A1 Core100 / Volume50","status":"KHÔNG ĐẠT · HARD BRAKE","visual_status":"FAIL","points_per_code":0,"code_count":1,"capital_vnd":0,"numbers":[{"code":"88","points":0,"capital_vnd":0,"role":"Raw Volume · Gan15 · Gmax20 · Score0,75; bị phanh repeat2_count=3","visual_status":"FAIL","highlight_primary":true}]},{"id":"X2_CORE_EXACT","label":"MB X2 Core Exact","method":"X2 Core Exact rank1","status":"ĐẠT · CHỜ XÁC NHẬN","visual_status":"PASS","points_per_code":50,"code_count":2,"capital_vnd":2300000,"numbers":[{"code":"54","points":50,"capital_vnd":1150000,"role":"X2 Core Exact · Gan2 · H21=9","visual_status":"PASS"},{"code":"45","points":50,"capital_vnd":1150000,"role":"X2 Core Exact · Gan2 · H21=6","visual_status":"PASS"}]},{"id":"X3_GROWTH_EXACT","label":"MB X3 Growth Exact","method":"X3 Growth32-34","status":"KHÔNG ĐẠT","visual_status":"FAIL","points_per_code":0,"code_count":3,"capital_vnd":0,"numbers":[{"code":"51","points":0,"capital_vnd":0,"role":"HOT21=9","visual_status":"FAIL"},{"code":"80","points":0,"capital_vnd":0,"role":"HOT21=8","visual_status":"FAIL"},{"code":"54","points":0,"capital_vnd":0,"role":"HOT21=7 · trùng X2 nhưng X3 không đạt; không cộng vốn","visual_status":"FAIL"}]},{"id":"DE_WATCHLIST","label":"MB Đề · Đầu/đuôi","method":"Đề Gan Lead18 / Head-Tail Strict v2","status":"A0 · THEO DÕI","visual_status":"FAIL","points_per_code":0,"code_count":0,"capital_vnd":0,"numbers":[],"empty_slot":true,"candidates":[{"code":"Đầu 2","side":"HEAD","digit":"2","rank":1,"gate":false,"research_gate":false,"status":"WATCH","gan":40,"gmax":38,"score":1.052632,"occ30":0,"lead":23,"current_context":"repeat2=3; maxfreq=2","required_gate":"Đầu top Gan; lead≥18; Gan 36-50; Score 0.85-1.00; Occ30≤0; repeat2 3-6; maxfreq≤3","earliest_eligible_date":"2026-08-19","earliest_condition":"Nếu đầu 2 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.","milestone_type":"CONDITIONAL_LOWER_BOUND","points":0,"capital_vnd":0},{"code":"Đuôi 0","side":"TAIL","digit":"0","rank":1,"gate":false,"research_gate":false,"status":"WATCH","gan":22,"gmax":54,"score":0.407407,"occ30":3,"lead":5,"current_context":"repeat2=3; maxfreq=2","required_gate":"Đuôi top Gan; lead≥18; Gan 40-60; Score 0.90-1.40; Occ30≤0; repeat2 0-4; maxfreq≤2","earliest_eligible_date":"2026-08-09","earliest_condition":"Nếu đuôi 0 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.","milestone_type":"CONDITIONAL_LOWER_BOUND","points":0,"capital_vnd":0}],"reason":"Theo dõi Đầu 2 và Đuôi 0; chưa cấp vốn tự động. Mốc vào là lower bound có điều kiện, không phải cam kết."},{"id":"ROLL7_STATUS","label":"MB ROLL7 · 5-of-7","method":"ROLL7 rescue30 · chỉ khi A1/X2/X3 đều A0","status":"KHÔNG KÍCH HOẠT · ĐÃ CÓ TÍN HIỆU CHUẨN","visual_status":"EMPTY","points_per_code":30,"points_by_code":{},"code_count":0,"capital_vnd":0,"numbers":[],"empty_slot":true,"target":"Ít nhất 5 ngày phát số trong mọi 7 phiên liên tiếp","reason":"ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt.","state":"NOT_APPLICABLE_STANDARD_PASS"},{"id":"XIEN2_AUTO_PAIRS","label":"Xiên 2 tự động","method":"Ghép toàn bộ cặp từ các số được cấp vốn thật","status":"PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ","visual_status":"EMPTY","points_per_pair":100,"reference_capital_per_pair_vnd":100000,"capital_per_pair_vnd":0,"code_count":1,"pair_count":1,"paper_capital_vnd":100000,"capital_vnd":0,"brake_active":true,"numbers":[{"code":"54-45","points":0,"caption":"Shadow 0đ · chuẩn 100.000đ/cặp","capital_vnd":0,"role":"Xiên 2 Shadow do phanh hai ngày lô thua; không được đặt tiền thật: 54-45","visual_status":"EMPTY"}],"empty_slot":false,"reason":"Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi.","confirmation_required":false,"booking_allowed":false}],"displayed_blocks":6,"roll7_note":"ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt.","xien2_pair_count":1,"xien2_capital_vnd":0,"xien2_paper_capital_vnd":100000,"xien2_loss_brake_active":true},"portfolio":{"decision":"X2_CORE_EXACT","tier":"LỆNH TIỀN THẬT KỲ 13/07 · CHỜ XÁC NHẬN","selection":"54-45","title":"54 × 50 ĐIỂM · 45 × 50 ĐIỂM","points":100,"points_by_code":{"54":50,"45":50},"capital_vnd":2300000,"payout_vnd":0,"pnl_vnd":0,"reason":"Chỉ X2 Core Exact 54-45 đạt chuẩn cho kỳ 13/07. A1 bị phanh riêng; X3 không đạt; ROLL7 không kích hoạt.","pnl_status":"NOT_INCLUDED_UNTIL_CONFIRMED","standard_capital_vnd":2300000,"xien2_recommended_capital_vnd":0,"total_recommended_capital_vnd":2300000,"xien2_paper_capital_vnd":100000},"pending_order":{"status":"SYSTEM_SIGNAL_NOT_YET_CONFIRMED","date":"2026-07-13","method_id":"X2_CORE_EXACT","selection":["54","45"],"points_by_code":{"54":50,"45":50},"capital_vnd":2300000,"pnl_included":false,"xien2_recommendation":{"rule_version":"XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE","loss_brake_rule_version":"XIEN2_TWO_LO_LOSS_BRAKE_V1","target_date":"2026-07-13","status":"PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ","state":"SHADOW_ONLY_TWO_LO_LOSS_BRAKE","base_numbers":["54","45"],"pairs":["54-45"],"pair_count":1,"pair_generation":"ALL_UNORDERED_2_COMBINATIONS","points_per_pair":100,"reference_capital_per_pair_vnd":100000,"capital_per_pair_vnd":0,"gross_return_per_winning_pair_vnd":1600000,"paper_capital_vnd":100000,"capital_vnd":0,"gross_return_if_one_pair_wins_vnd":0,"brake_active":true,"brake_basis":[{"date":"2026-07-13","pnl_vnd":-2300000,"capital_vnd":2300000,"numbers":["54","45"]},{"date":"2026-07-12","pnl_vnd":-3404000,"capital_vnd":3404000,"numbers":["88","68","86"]}],"booking_allowed":false,"confirmation_required":false,"pnl_included":false,"reason":"Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi."},"standard_capital_vnd":2300000,"xien2_recommended_capital_vnd":0,"total_recommended_capital_vnd":2300000,"xien2_paper_capital_vnd":100000},"pnl_summary":{"confirmed_through":"2026-07-12","settlement_applied":true,"grand_total_pnl_vnd":25396000,"today_pending_capital_vnd":2300000,"today_pending_order":"54 ×50 · 45 ×50 · chờ xác nhận","today_included":false,"today_pending_standard_capital_vnd":2300000,"today_pending_xien2_capital_vnd":0,"today_pending_total_recommended_capital_vnd":2300000,"today_pending_xien2_paper_capital_vnd":100000},"groups":[{"id":"A1","label":"MB A1","status":"A0_HARD_BRAKE","role":"PRODUCTION INDEPENDENT","method":"Dual Core Volume Balance — Core100/Volume50","layer":"Core → Volume","selected_numbers":["88"],"points":0,"capital_vnd":0,"summary":"88 đạt điều kiện Volume thô nhưng A1 bị hard brake.","reason":"Kỳ 12/07 có đúng 3 mã lặp hai nháy.","candidates":[{"code":"88","rank":1,"watch_rank":1,"gate":false,"status":"VOLUME WATCH · HARD BRAKE","tracking_tier":"VOLUME","tracking_rule_version":"A1_TOP3_WATCHLIST_V1","gan":15,"gmax":20,"score":0.75,"hot21":4,"reason":"Gan15; Gmax20; Score0,750; phanh A1 repeat2=3.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rà lại sau kỳ 13/07; A1 chỉ vào nếu phanh nhiễu tắt và thứ hạng/Gan/Score còn hợp lệ.","milestone_type":"CONDITIONAL_NEXT_REVIEW"},{"code":"12","rank":2,"watch_rank":2,"gate":false,"status":"VOLUME WATCH","tracking_tier":"VOLUME","tracking_rule_version":"A1_TOP3_WATCHLIST_V1","gan":12,"gmax":21,"score":0.571429,"hot21":4,"reason":"Chưa đạt Score0,70.","earliest_eligible_date":"2026-07-16","earliest_condition":"Cần tiếp tục không về để đạt Gan/Score và toàn bộ A1 gate sạch.","milestone_type":"CONDITIONAL_LOWER_BOUND"},{"code":"38","rank":3,"watch_rank":3,"gate":false,"status":"VOLUME WATCH","tracking_tier":"VOLUME","tracking_rule_version":"A1_TOP3_WATCHLIST_V1","gan":10,"gmax":20,"score":0.5,"hot21":5,"reason":"Chưa đạt Gan12/Score0,70.","earliest_eligible_date":"2026-07-17","earliest_condition":"Mốc lower bound nếu tiếp tục không về và mọi gate khác sạch.","milestone_type":"CONDITIONAL_LOWER_BOUND"}]},{"id":"X2","label":"MB X2","status":"PASS_CORE_EXACT","role":"PRODUCTION INDEPENDENT","method":"MB X2 Exact Rank1","layer":"Core Exact → Balanced Exact","selected_numbers":["54","45"],"points":100,"capital_vnd":2300000,"summary":"Cặp 54-45 đạt Core Exact rank1.","reason":"Gan2/2; ΔGan0; H5Pair2; H21 9/6; TV21≈6,1507.","candidates":[{"code":"54-45","rank":1,"gate":true,"status":"CORE EXACT RANK1 · PASS","reason":"Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507.","earliest_eligible_date":"2026-07-13","earliest_condition":"Đạt toàn bộ Core Exact tại dữ liệu khóa 12/07; vẫn cần xác nhận đặt trước quay.","milestone_type":"ELIGIBLE_NOW"}]},{"id":"X3","label":"MB X3","status":"A0_SHADOW","role":"PRODUCTION INDEPENDENT","method":"MB X3 Growth32-34","layer":"Generator top3","selected_numbers":["51","80","54"],"points":0,"capital_vnd":0,"summary":"HOT21 sum=24; max=9; FAIL.","reason":"Không đạt exact gate tổng32–34, max11–14.","candidates":[{"code":"51","rank":1,"gate":false,"status":"RANK 1","gan":7,"hot21":9,"reason":"X3 top1; rổ chưa đạt.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.","milestone_type":"DYNAMIC_LOWER_BOUND"},{"code":"80","rank":2,"gate":false,"status":"RANK 2","gan":4,"hot21":8,"reason":"X3 top2; rổ chưa đạt.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.","milestone_type":"DYNAMIC_LOWER_BOUND"},{"code":"54","rank":3,"gate":false,"status":"RANK 3","gan":2,"hot21":7,"reason":"X3 top3; rổ chưa đạt.","earliest_eligible_date":"2026-07-14","earliest_condition":"Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.","milestone_type":"DYNAMIC_LOWER_BOUND"}],"earliest_basket_date":"2026-07-14","earliest_basket_condition":"Xếp lại sau kỳ 13/07; cần HOT21 sum32–34, max11–14 và gate môi trường sạch."},{"id":"DE","label":"MB Đề · Đầu/đuôi","status":"WATCHLIST_ONLY","role":"PAPER / RESEARCH · SEPARATE CONFIRMATION","method":"Đề Gan Lead18 / Head-Tail Strict v2","layer":"Top Gan Head/Tail + mốc điều kiện","selected_numbers":[],"points":0,"capital_vnd":0,"summary":"A0 · THEO DÕI","reason":"Theo dõi Đầu 2 và Đuôi 0; chưa cấp vốn tự động. Mốc vào là lower bound có điều kiện, không phải cam kết.","candidates":[{"code":"Đầu 2","side":"HEAD","digit":"2","rank":1,"gate":false,"research_gate":false,"status":"WATCH","gan":40,"gmax":38,"score":1.052632,"occ30":0,"lead":23,"current_context":"repeat2=3; maxfreq=2","required_gate":"Đầu top Gan; lead≥18; Gan 36-50; Score 0.85-1.00; Occ30≤0; repeat2 3-6; maxfreq≤3","earliest_eligible_date":"2026-08-19","earliest_condition":"Nếu đầu 2 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.","milestone_type":"CONDITIONAL_LOWER_BOUND","points":0,"capital_vnd":0},{"code":"Đuôi 0","side":"TAIL","digit":"0","rank":1,"gate":false,"research_gate":false,"status":"WATCH","gan":22,"gmax":54,"score":0.407407,"occ30":3,"lead":5,"current_context":"repeat2=3; maxfreq=2","required_gate":"Đuôi top Gan; lead≥18; Gan 40-60; Score 0.90-1.40; Occ30≤0; repeat2 0-4; maxfreq≤2","earliest_eligible_date":"2026-08-09","earliest_condition":"Nếu đuôi 0 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.","milestone_type":"CONDITIONAL_LOWER_BOUND","points":0,"capital_vnd":0}]},{"id":"XIEN","label":"Xiên 2 tự động","status":"SHADOW_ONLY_TWO_LO_LOSS_BRAKE","role":"AUTO RECOMMENDATION · SEPARATE XIEN LEDGER","method":"Toàn bộ tổ hợp 2 từ mã được cấp vốn","layer":"1 cặp · vốn thật 0đ","selected_numbers":["54-45"],"selection":"54-45","points":0,"points_per_pair":100,"reference_capital_per_pair_vnd":100000,"capital_per_pair_vnd":0,"paper_capital_vnd":100000,"capital_vnd":0,"summary":"PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ","reason":"Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi.","brake_active":true,"confirmation_required":false,"booking_allowed":false,"candidates":[{"code":"54-45","rank":1,"gate":false,"status":"SHADOW · PHANH XIÊN","capital_vnd":0,"paper_capital_vnd":100000,"reason":"Cặp vẫn được theo dõi nhưng không cấp vốn vì hai ngày lô có lệnh gần nhất đều âm."}]},{"id":"ROLL7","label":"MB ROLL7 · 5-of-7","status":"NOT_APPLICABLE_STANDARD_PASS","role":"REAL30 CONDITIONAL RESCUE","method":"ROLL7 Rescue30","layer":"Chỉ xét khi A1, X2, X3 đều A0","selected_numbers":[],"points":0,"points_by_code":{},"capital_vnd":0,"summary":"KHÔNG KÍCH HOẠT · ĐÃ CÓ TÍN HIỆU CHUẨN","reason":"ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt.","candidates":[]}],"automation":{"status":"MANUAL_LOCKED_NEXT_DRAW_ALL_METHODS","pipeline_version":"MB_DAILY_PIPELINE_PARALLEL_V1","locked_through":"2026-07-12","target_date":"2026-07-13","settlement_checked":true,"signal_review_complete":true,"milestones_complete":true,"website_refresh_seconds":120,"de_watchlist_rule_version":"DE_HEAD_TAIL_WATCHLIST_V1","de_watchlist_complete":true,"xien2_auto_pair_rule_version":"XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE","xien2_auto_pair_complete":true,"xien2_loss_brake_rule_version":"XIEN2_TWO_LO_LOSS_BRAKE_V1","xien2_loss_brake_active":true},"roll7_status":{"target_date":"2026-07-13","state":"NOT_APPLICABLE_STANDARD_PASS","status":"KHÔNG KÍCH HOẠT · ĐÃ CÓ TÍN HIỆU CHUẨN","points_per_code":30,"selected_numbers":[],"points_by_code":{},"capital_vnd":0,"reason":"ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt."},"de_watchlist":{"rule_version":"DE_HEAD_TAIL_WATCHLIST_V1","method":"Đề Gan Lead18 / Head-Tail Strict v2","status":"A0 · THEO DÕI","state":"WATCHLIST_ONLY","target_date":"2026-07-13","data_locked_through":"2026-07-12","candidates":[{"code":"Đầu 2","side":"HEAD","digit":"2","rank":1,"gate":false,"research_gate":false,"status":"WATCH","gan":40,"gmax":38,"score":1.052632,"occ30":0,"lead":23,"current_context":"repeat2=3; maxfreq=2","required_gate":"Đầu top Gan; lead≥18; Gan 36-50; Score 0.85-1.00; Occ30≤0; repeat2 3-6; maxfreq≤3","earliest_eligible_date":"2026-08-19","earliest_condition":"Nếu đầu 2 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.","milestone_type":"CONDITIONAL_LOWER_BOUND","points":0,"capital_vnd":0},{"code":"Đuôi 0","side":"TAIL","digit":"0","rank":1,"gate":false,"research_gate":false,"status":"WATCH","gan":22,"gmax":54,"score":0.407407,"occ30":3,"lead":5,"current_context":"repeat2=3; maxfreq=2","required_gate":"Đuôi top Gan; lead≥18; Gan 40-60; Score 0.90-1.40; Occ30≤0; repeat2 0-4; maxfreq≤2","earliest_eligible_date":"2026-08-09","earliest_condition":"Nếu đuôi 0 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.","milestone_type":"CONDITIONAL_LOWER_BOUND","points":0,"capital_vnd":0}],"points":0,"capital_vnd":0,"confirmation_required":true,"real_money_default":false,"reason":"Theo dõi Đầu 2 và Đuôi 0; chưa cấp vốn tự động. Mốc vào là lower bound có điều kiện, không phải cam kết."},"xien2_policy":{"status":"ACTIVE_RECOMMENDATION_WITH_TWO_LO_LOSS_BRAKE","rule_version":"XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE","loss_brake_rule_version":"XIEN2_TWO_LO_LOSS_BRAKE_V1","source":"UNIQUE_POSITIVE_STAKE_CODES_IN_CURRENT_PLAN","minimum_codes":2,"pair_generation":"ALL_UNORDERED_2_COMBINATIONS","formula":"n*(n-1)/2","points_per_pair":100,"capital_per_pair_vnd":100000,"gross_return_per_winning_pair_vnd":1600000,"loss_brake_trigger":"TWO_MOST_RECENT_LO_SIGNAL_DAYS_HAVE_NEGATIVE_LO_PNL","loss_brake_effect":"SHOW_PAIRS_AS_SHADOW_ZERO_CAPITAL; NEVER_CHANGE_LO_ORDERS","confirmation_required_before_booking":true},"xien2_recommendation":{"rule_version":"XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE","loss_brake_rule_version":"XIEN2_TWO_LO_LOSS_BRAKE_V1","target_date":"2026-07-13","status":"PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ","state":"SHADOW_ONLY_TWO_LO_LOSS_BRAKE","base_numbers":["54","45"],"pairs":["54-45"],"pair_count":1,"pair_generation":"ALL_UNORDERED_2_COMBINATIONS","points_per_pair":100,"reference_capital_per_pair_vnd":100000,"capital_per_pair_vnd":0,"gross_return_per_winning_pair_vnd":1600000,"paper_capital_vnd":100000,"capital_vnd":0,"gross_return_if_one_pair_wins_vnd":0,"brake_active":true,"brake_basis":[{"date":"2026-07-13","pnl_vnd":-2300000,"capital_vnd":2300000,"numbers":["54","45"]},{"date":"2026-07-12","pnl_vnd":-3404000,"capital_vnd":3404000,"numbers":["88","68","86"]}],"booking_allowed":false,"confirmation_required":false,"pnl_included":false,"reason":"Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi."}}
+{
+  "schema_version": "MB_DAILY_WEB_V10_NEXT_DRAW_ALL_METHODS",
+  "report_run_id": "RPT_MB_20260713_PARALLEL_NEXT_ALL_METHODS",
+  "source_run_id": "LOCK_20260712_1484100F99",
+  "config_id": "MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712",
+  "target_date": "2026-07-13",
+  "generated_at": "2026-07-12T20:45:00+07:00",
+  "valid_until": "2026-07-13T23:59:59+07:00",
+  "official_url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
+  "display_policy": {
+    "mode": "NEXT_DRAW_ONLY_AFTER_SETTLEMENT",
+    "show_target_date_only": true,
+    "show_all_current_methods": true,
+    "show_nonfunded_current_candidates": true,
+    "show_roll7_current_status": true,
+    "show_xien2_current_recommendation": true,
+    "show_de_current_watchlist": true,
+    "hide_completed_draw_details": true,
+    "hide_latest_27_codes": true,
+    "hide_completed_draw_method_cards": true,
+    "pnl_display": "CUMULATIVE_AND_NEXT_CAPITAL_ONLY",
+    "settlement_applied_through": "2026-07-12"
+  },
+  "data": {
+    "locked_through": "2026-07-12",
+    "status": "LOCKED_CROSSCHECKED_3_SOURCES",
+    "count": 27,
+    "unique": 24,
+    "repeat2_count": 3,
+    "max_frequency": 2,
+    "noise_status": "A1_HARD_BRAKE",
+    "source_label": "Dữ liệu khóa đủ 27/27 đến 12/07/2026; dùng để lập kế hoạch 13/07/2026."
+  },
+  "funding_policy": {
+    "id": "PARALLEL_INDEPENDENT_ALL_EXACT_PASS_V1",
+    "mode": "FUND_EVERY_EXACT_PASS_METHOD",
+    "scope": [
+      "A1",
+      "X2",
+      "X3"
+    ],
+    "cross_method_blocking": false,
+    "dedupe_same_code_by_highest_stake": true,
+    "roll7_only_when_all_standard_methods_fail": true
+  },
+  "stake_rule": {
+    "a1_core_main_points": 100,
+    "a1_volume_main_points": 50,
+    "a1_reverse_points": 50,
+    "x2_exact_points_per_code": 50,
+    "x3_exact_points_per_code": 50,
+    "roll7_rescue_points_per_code": 30,
+    "lo_cost_per_point_vnd": 23000,
+    "lo_payout_per_hit_point_vnd": 80000,
+    "no_martingale": true,
+    "xien2_points_per_pair": 100,
+    "xien2_capital_per_pair_vnd": 100000,
+    "xien2_gross_return_per_winning_pair_vnd": 1600000,
+    "xien2_two_lo_loss_brake": true
+  },
+  "milestone_policy": {
+    "status": "ACTIVE_MANDATORY_ABSOLUTE",
+    "recalculate_after_each_locked_draw": true,
+    "disclosure": "Chỉ hiển thị dữ liệu và ứng viên của kỳ sắp tới; mọi mốc được tính lại sau kỳ khóa mới."
+  },
+  "top_signals": {
+    "title": "KỲ SẮP TỚI 13/07/2026",
+    "subtitle": "A1 A0 · X2 54-45 ĐẠT · X3 51-80-54 KHÔNG ĐẠT",
+    "total_methods": 3,
+    "total_numbers": "5 mã duy nhất · 2 mã cấp vốn",
+    "total_points": "100 điểm",
+    "total_capital_vnd": 2300000,
+    "note": "Hiển thị đầy đủ A1, X2 và X3 của kỳ tới. Chỉ mã đạt gate có điểm/vốn. 88 không tiếp tục ngày 13/07; ROLL7 không dùng vì X2 đã đạt.",
+    "legend": [
+      {
+        "visual_status": "PASS",
+        "label": "Xanh lá · Đạt"
+      },
+      {
+        "visual_status": "FAIL",
+        "label": "Đỏ · Không đạt"
+      }
+    ],
+    "methods": [
+      {
+        "id": "A1_INDEPENDENT",
+        "label": "MB A1",
+        "method": "A1 Core100 / Volume50",
+        "status": "KHÔNG ĐẠT · HARD BRAKE",
+        "visual_status": "FAIL",
+        "points_per_code": 0,
+        "code_count": 1,
+        "capital_vnd": 0,
+        "numbers": [
+          {
+            "code": "88",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "Raw Volume · Gan15 · Gmax20 · Score0,75; bị phanh repeat2_count=3",
+            "visual_status": "FAIL",
+            "highlight_primary": true
+          }
+        ]
+      },
+      {
+        "id": "X2_CORE_EXACT",
+        "label": "MB X2 Core Exact",
+        "method": "X2 Core Exact rank1",
+        "status": "ĐẠT · CHỜ XÁC NHẬN",
+        "visual_status": "PASS",
+        "points_per_code": 50,
+        "code_count": 2,
+        "capital_vnd": 2300000,
+        "numbers": [
+          {
+            "code": "54",
+            "points": 50,
+            "capital_vnd": 1150000,
+            "role": "X2 Core Exact · Gan2 · H21=9",
+            "visual_status": "PASS"
+          },
+          {
+            "code": "45",
+            "points": 50,
+            "capital_vnd": 1150000,
+            "role": "X2 Core Exact · Gan2 · H21=6",
+            "visual_status": "PASS"
+          }
+        ]
+      },
+      {
+        "id": "X3_GROWTH_EXACT",
+        "label": "MB X3 Growth Exact",
+        "method": "X3 Growth32-34",
+        "status": "KHÔNG ĐẠT",
+        "visual_status": "FAIL",
+        "points_per_code": 0,
+        "code_count": 3,
+        "capital_vnd": 0,
+        "numbers": [
+          {
+            "code": "51",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "HOT21=9",
+            "visual_status": "FAIL"
+          },
+          {
+            "code": "80",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "HOT21=8",
+            "visual_status": "FAIL"
+          },
+          {
+            "code": "54",
+            "points": 0,
+            "capital_vnd": 0,
+            "role": "HOT21=7 · trùng X2 nhưng X3 không đạt; không cộng vốn",
+            "visual_status": "FAIL"
+          }
+        ]
+      },
+      {
+        "id": "DE_WATCHLIST",
+        "label": "MB Đề · Đầu/đuôi",
+        "method": "Đề Gan Lead18 / Head-Tail Strict v2",
+        "status": "A0 · THEO DÕI",
+        "visual_status": "FAIL",
+        "points_per_code": 0,
+        "code_count": 0,
+        "capital_vnd": 0,
+        "numbers": [],
+        "empty_slot": true,
+        "candidates": [
+          {
+            "code": "Đầu 2",
+            "side": "HEAD",
+            "digit": "2",
+            "rank": 1,
+            "gate": false,
+            "research_gate": false,
+            "status": "WATCH",
+            "gan": 40,
+            "gmax": 38,
+            "score": 1.052632,
+            "occ30": 0,
+            "lead": 23,
+            "current_context": "repeat2=3; maxfreq=2",
+            "required_gate": "Đầu top Gan; lead≥18; Gan 36-50; Score 0.85-1.00; Occ30≤0; repeat2 3-6; maxfreq≤3",
+            "earliest_eligible_date": "2026-08-19",
+            "earliest_condition": "Nếu đầu 2 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.",
+            "milestone_type": "CONDITIONAL_LOWER_BOUND",
+            "points": 0,
+            "capital_vnd": 0
+          },
+          {
+            "code": "Đuôi 0",
+            "side": "TAIL",
+            "digit": "0",
+            "rank": 1,
+            "gate": false,
+            "research_gate": false,
+            "status": "WATCH",
+            "gan": 22,
+            "gmax": 54,
+            "score": 0.407407,
+            "occ30": 3,
+            "lead": 5,
+            "current_context": "repeat2=3; maxfreq=2",
+            "required_gate": "Đuôi top Gan; lead≥18; Gan 40-60; Score 0.90-1.40; Occ30≤0; repeat2 0-4; maxfreq≤2",
+            "earliest_eligible_date": "2026-08-09",
+            "earliest_condition": "Nếu đuôi 0 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.",
+            "milestone_type": "CONDITIONAL_LOWER_BOUND",
+            "points": 0,
+            "capital_vnd": 0
+          }
+        ],
+        "reason": "Theo dõi Đầu 2 và Đuôi 0; chưa cấp vốn tự động. Mốc vào là lower bound có điều kiện, không phải cam kết."
+      },
+      {
+        "id": "ROLL7_STATUS",
+        "label": "MB ROLL7 · 5-of-7",
+        "method": "ROLL7 rescue30 · chỉ khi A1/X2/X3 đều A0",
+        "status": "KHÔNG KÍCH HOẠT · ĐÃ CÓ TÍN HIỆU CHUẨN",
+        "visual_status": "EMPTY",
+        "points_per_code": 30,
+        "points_by_code": {},
+        "code_count": 0,
+        "capital_vnd": 0,
+        "numbers": [],
+        "empty_slot": true,
+        "target": "Ít nhất 5 ngày phát số trong mọi 7 phiên liên tiếp",
+        "reason": "ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt.",
+        "state": "NOT_APPLICABLE_STANDARD_PASS"
+      },
+      {
+        "id": "XIEN2_AUTO_PAIRS",
+        "label": "Xiên 2 tự động",
+        "method": "Ghép toàn bộ cặp từ các số được cấp vốn thật",
+        "status": "PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ",
+        "visual_status": "EMPTY",
+        "points_per_pair": 100,
+        "reference_capital_per_pair_vnd": 100000,
+        "capital_per_pair_vnd": 0,
+        "code_count": 1,
+        "pair_count": 1,
+        "paper_capital_vnd": 100000,
+        "capital_vnd": 0,
+        "brake_active": true,
+        "numbers": [
+          {
+            "code": "54-45",
+            "points": 0,
+            "caption": "Shadow 0đ · chuẩn 100.000đ/cặp",
+            "capital_vnd": 0,
+            "role": "Xiên 2 Shadow do phanh hai ngày lô thua; không được đặt tiền thật: 54-45",
+            "visual_status": "EMPTY"
+          }
+        ],
+        "empty_slot": false,
+        "reason": "Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi.",
+        "confirmation_required": false,
+        "booking_allowed": false
+      }
+    ],
+    "displayed_blocks": 6,
+    "roll7_note": "ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt.",
+    "xien2_pair_count": 1,
+    "xien2_capital_vnd": 0,
+    "xien2_paper_capital_vnd": 100000,
+    "xien2_loss_brake_active": true
+  },
+  "portfolio": {
+    "decision": "X2_CORE_EXACT",
+    "tier": "LỆNH TIỀN THẬT KỲ 13/07 · CHỜ XÁC NHẬN",
+    "selection": "54-45",
+    "title": "54 × 50 ĐIỂM · 45 × 50 ĐIỂM",
+    "points": 100,
+    "points_by_code": {
+      "54": 50,
+      "45": 50
+    },
+    "capital_vnd": 2300000,
+    "payout_vnd": 0,
+    "pnl_vnd": 0,
+    "reason": "Chỉ X2 Core Exact 54-45 đạt chuẩn cho kỳ 13/07. A1 bị phanh riêng; X3 không đạt; ROLL7 không kích hoạt.",
+    "pnl_status": "NOT_INCLUDED_UNTIL_CONFIRMED",
+    "standard_capital_vnd": 2300000,
+    "xien2_recommended_capital_vnd": 0,
+    "total_recommended_capital_vnd": 2300000,
+    "xien2_paper_capital_vnd": 100000
+  },
+  "pending_order": {
+    "status": "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
+    "date": "2026-07-13",
+    "method_id": "X2_CORE_EXACT",
+    "selection": [
+      "54",
+      "45"
+    ],
+    "points_by_code": {
+      "54": 50,
+      "45": 50
+    },
+    "capital_vnd": 2300000,
+    "pnl_included": false,
+    "xien2_recommendation": {
+      "rule_version": "XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE",
+      "loss_brake_rule_version": "XIEN2_TWO_LO_LOSS_BRAKE_V1",
+      "target_date": "2026-07-13",
+      "status": "PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ",
+      "state": "SHADOW_ONLY_TWO_LO_LOSS_BRAKE",
+      "base_numbers": [
+        "54",
+        "45"
+      ],
+      "pairs": [
+        "54-45"
+      ],
+      "pair_count": 1,
+      "pair_generation": "ALL_UNORDERED_2_COMBINATIONS",
+      "points_per_pair": 100,
+      "reference_capital_per_pair_vnd": 100000,
+      "capital_per_pair_vnd": 0,
+      "gross_return_per_winning_pair_vnd": 1600000,
+      "paper_capital_vnd": 100000,
+      "capital_vnd": 0,
+      "gross_return_if_one_pair_wins_vnd": 0,
+      "brake_active": true,
+      "brake_basis": [
+        {
+          "date": "2026-07-13",
+          "pnl_vnd": -2300000,
+          "capital_vnd": 2300000,
+          "numbers": [
+            "54",
+            "45"
+          ]
+        },
+        {
+          "date": "2026-07-12",
+          "pnl_vnd": -3404000,
+          "capital_vnd": 3404000,
+          "numbers": [
+            "88",
+            "68",
+            "86"
+          ]
+        }
+      ],
+      "booking_allowed": false,
+      "confirmation_required": false,
+      "pnl_included": false,
+      "reason": "Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi."
+    },
+    "standard_capital_vnd": 2300000,
+    "xien2_recommended_capital_vnd": 0,
+    "total_recommended_capital_vnd": 2300000,
+    "xien2_paper_capital_vnd": 100000
+  },
+  "pnl_summary": {
+    "confirmed_through": "2026-07-12",
+    "settlement_applied": true,
+    "grand_total_pnl_vnd": 25396000,
+    "today_pending_capital_vnd": 2300000,
+    "today_pending_order": "54 ×50 · 45 ×50 · chờ xác nhận",
+    "today_included": false,
+    "today_pending_standard_capital_vnd": 2300000,
+    "today_pending_xien2_capital_vnd": 0,
+    "today_pending_total_recommended_capital_vnd": 2300000
+  },
+  "groups": [
+    {
+      "id": "A1",
+      "label": "MB A1",
+      "status": "A0_HARD_BRAKE",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "Dual Core Volume Balance — Core100/Volume50",
+      "layer": "Core → Volume",
+      "selected_numbers": [
+        "88"
+      ],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "88 đạt điều kiện Volume thô nhưng A1 bị hard brake.",
+      "reason": "Kỳ 12/07 có đúng 3 mã lặp hai nháy.",
+      "candidates": [
+        {
+          "code": "88",
+          "rank": 1,
+          "watch_rank": 1,
+          "gate": false,
+          "status": "VOLUME WATCH · HARD BRAKE",
+          "tracking_tier": "VOLUME",
+          "tracking_rule_version": "A1_TOP3_WATCHLIST_V1",
+          "gan": 15,
+          "gmax": 20,
+          "score": 0.75,
+          "hot21": 4,
+          "reason": "Gan15; Gmax20; Score0,750; phanh A1 repeat2=3.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rà lại sau kỳ 13/07; A1 chỉ vào nếu phanh nhiễu tắt và thứ hạng/Gan/Score còn hợp lệ.",
+          "milestone_type": "CONDITIONAL_NEXT_REVIEW"
+        },
+        {
+          "code": "12",
+          "rank": 2,
+          "watch_rank": 2,
+          "gate": false,
+          "status": "VOLUME WATCH",
+          "tracking_tier": "VOLUME",
+          "tracking_rule_version": "A1_TOP3_WATCHLIST_V1",
+          "gan": 12,
+          "gmax": 21,
+          "score": 0.571429,
+          "hot21": 4,
+          "reason": "Chưa đạt Score0,70.",
+          "earliest_eligible_date": "2026-07-16",
+          "earliest_condition": "Cần tiếp tục không về để đạt Gan/Score và toàn bộ A1 gate sạch.",
+          "milestone_type": "CONDITIONAL_LOWER_BOUND"
+        },
+        {
+          "code": "38",
+          "rank": 3,
+          "watch_rank": 3,
+          "gate": false,
+          "status": "VOLUME WATCH",
+          "tracking_tier": "VOLUME",
+          "tracking_rule_version": "A1_TOP3_WATCHLIST_V1",
+          "gan": 10,
+          "gmax": 20,
+          "score": 0.5,
+          "hot21": 5,
+          "reason": "Chưa đạt Gan12/Score0,70.",
+          "earliest_eligible_date": "2026-07-17",
+          "earliest_condition": "Mốc lower bound nếu tiếp tục không về và mọi gate khác sạch.",
+          "milestone_type": "CONDITIONAL_LOWER_BOUND"
+        }
+      ]
+    },
+    {
+      "id": "X2",
+      "label": "MB X2",
+      "status": "PASS_CORE_EXACT",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "MB X2 Exact Rank1",
+      "layer": "Core Exact → Balanced Exact",
+      "selected_numbers": [
+        "54",
+        "45"
+      ],
+      "points": 100,
+      "capital_vnd": 2300000,
+      "summary": "Cặp 54-45 đạt Core Exact rank1.",
+      "reason": "Gan2/2; ΔGan0; H5Pair2; H21 9/6; TV21≈6,1507.",
+      "candidates": [
+        {
+          "code": "54-45",
+          "rank": 1,
+          "gate": true,
+          "status": "CORE EXACT RANK1 · PASS",
+          "reason": "Gan2/2; ΔGan0; H5Pair2; minH21=6; TV21≈6,1507.",
+          "earliest_eligible_date": "2026-07-13",
+          "earliest_condition": "Đạt toàn bộ Core Exact tại dữ liệu khóa 12/07; vẫn cần xác nhận đặt trước quay.",
+          "milestone_type": "ELIGIBLE_NOW"
+        }
+      ]
+    },
+    {
+      "id": "X3",
+      "label": "MB X3",
+      "status": "A0_SHADOW",
+      "role": "PRODUCTION INDEPENDENT",
+      "method": "MB X3 Growth32-34",
+      "layer": "Generator top3",
+      "selected_numbers": [
+        "51",
+        "80",
+        "54"
+      ],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "HOT21 sum=24; max=9; FAIL.",
+      "reason": "Không đạt exact gate tổng32–34, max11–14.",
+      "candidates": [
+        {
+          "code": "51",
+          "rank": 1,
+          "gate": false,
+          "status": "RANK 1",
+          "gan": 7,
+          "hot21": 9,
+          "reason": "X3 top1; rổ chưa đạt.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.",
+          "milestone_type": "DYNAMIC_LOWER_BOUND"
+        },
+        {
+          "code": "80",
+          "rank": 2,
+          "gate": false,
+          "status": "RANK 2",
+          "gan": 4,
+          "hot21": 8,
+          "reason": "X3 top2; rổ chưa đạt.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.",
+          "milestone_type": "DYNAMIC_LOWER_BOUND"
+        },
+        {
+          "code": "54",
+          "rank": 3,
+          "gate": false,
+          "status": "RANK 3",
+          "gan": 2,
+          "hot21": 7,
+          "reason": "X3 top3; rổ chưa đạt.",
+          "earliest_eligible_date": "2026-07-14",
+          "earliest_condition": "Rổ phải được xếp lại sau kỳ khóa kế tiếp và đạt toàn bộ HOT21/noise gate.",
+          "milestone_type": "DYNAMIC_LOWER_BOUND"
+        }
+      ],
+      "earliest_basket_date": "2026-07-14",
+      "earliest_basket_condition": "Xếp lại sau kỳ 13/07; cần HOT21 sum32–34, max11–14 và gate môi trường sạch."
+    },
+    {
+      "id": "DE",
+      "label": "MB Đề · Đầu/đuôi",
+      "status": "WATCHLIST_ONLY",
+      "role": "PAPER / RESEARCH · SEPARATE CONFIRMATION",
+      "method": "Đề Gan Lead18 / Head-Tail Strict v2",
+      "layer": "Top Gan Head/Tail + mốc điều kiện",
+      "selected_numbers": [],
+      "points": 0,
+      "capital_vnd": 0,
+      "summary": "A0 · THEO DÕI",
+      "reason": "Theo dõi Đầu 2 và Đuôi 0; chưa cấp vốn tự động. Mốc vào là lower bound có điều kiện, không phải cam kết.",
+      "candidates": [
+        {
+          "code": "Đầu 2",
+          "side": "HEAD",
+          "digit": "2",
+          "rank": 1,
+          "gate": false,
+          "research_gate": false,
+          "status": "WATCH",
+          "gan": 40,
+          "gmax": 38,
+          "score": 1.052632,
+          "occ30": 0,
+          "lead": 23,
+          "current_context": "repeat2=3; maxfreq=2",
+          "required_gate": "Đầu top Gan; lead≥18; Gan 36-50; Score 0.85-1.00; Occ30≤0; repeat2 3-6; maxfreq≤3",
+          "earliest_eligible_date": "2026-08-19",
+          "earliest_condition": "Nếu đầu 2 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.",
+          "milestone_type": "CONDITIONAL_LOWER_BOUND",
+          "points": 0,
+          "capital_vnd": 0
+        },
+        {
+          "code": "Đuôi 0",
+          "side": "TAIL",
+          "digit": "0",
+          "rank": 1,
+          "gate": false,
+          "research_gate": false,
+          "status": "WATCH",
+          "gan": 22,
+          "gmax": 54,
+          "score": 0.407407,
+          "occ30": 3,
+          "lead": 5,
+          "current_context": "repeat2=3; maxfreq=2",
+          "required_gate": "Đuôi top Gan; lead≥18; Gan 40-60; Score 0.90-1.40; Occ30≤0; repeat2 0-4; maxfreq≤2",
+          "earliest_eligible_date": "2026-08-09",
+          "earliest_condition": "Nếu đuôi 0 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.",
+          "milestone_type": "CONDITIONAL_LOWER_BOUND",
+          "points": 0,
+          "capital_vnd": 0
+        }
+      ]
+    },
+    {
+      "id": "XIEN",
+      "label": "Xiên 2 tự động",
+      "status": "SHADOW_ONLY_TWO_LO_LOSS_BRAKE",
+      "role": "AUTO RECOMMENDATION · SEPARATE XIEN LEDGER",
+      "method": "Toàn bộ tổ hợp 2 từ mã được cấp vốn",
+      "layer": "1 cặp · vốn thật 0đ",
+      "selected_numbers": [
+        "54-45"
+      ],
+      "selection": "54-45",
+      "points": 0,
+      "points_per_pair": 100,
+      "reference_capital_per_pair_vnd": 100000,
+      "capital_per_pair_vnd": 0,
+      "paper_capital_vnd": 100000,
+      "capital_vnd": 0,
+      "summary": "PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ",
+      "reason": "Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi.",
+      "brake_active": true,
+      "confirmation_required": false,
+      "booking_allowed": false,
+      "candidates": [
+        {
+          "code": "54-45",
+          "rank": 1,
+          "gate": false,
+          "status": "SHADOW · PHANH XIÊN",
+          "capital_vnd": 0,
+          "paper_capital_vnd": 100000,
+          "reason": "Cặp vẫn được theo dõi nhưng không cấp vốn vì hai ngày lô có lệnh gần nhất đều âm."
+        }
+      ]
+    },
+    {
+      "id": "ROLL7",
+      "label": "MB ROLL7 · 5-of-7",
+      "status": "NOT_APPLICABLE_STANDARD_PASS",
+      "role": "REAL30 CONDITIONAL RESCUE",
+      "method": "ROLL7 Rescue30",
+      "layer": "Chỉ xét khi A1, X2, X3 đều A0",
+      "selected_numbers": [],
+      "points": 0,
+      "points_by_code": {},
+      "capital_vnd": 0,
+      "summary": "KHÔNG KÍCH HOẠT · ĐÃ CÓ TÍN HIỆU CHUẨN",
+      "reason": "ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt.",
+      "candidates": []
+    }
+  ],
+  "automation": {
+    "status": "MANUAL_LOCKED_NEXT_DRAW_ALL_METHODS",
+    "pipeline_version": "MB_DAILY_PIPELINE_PARALLEL_V1",
+    "locked_through": "2026-07-12",
+    "target_date": "2026-07-13",
+    "settlement_checked": true,
+    "signal_review_complete": true,
+    "milestones_complete": true,
+    "website_refresh_seconds": 120,
+    "de_watchlist_rule_version": "DE_HEAD_TAIL_WATCHLIST_V1",
+    "de_watchlist_complete": true,
+    "xien2_auto_pair_rule_version": "XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE",
+    "xien2_auto_pair_complete": true,
+    "xien2_loss_brake_rule_version": "XIEN2_TWO_LO_LOSS_BRAKE_V1",
+    "xien2_loss_brake_active": true
+  },
+  "roll7_status": {
+    "target_date": "2026-07-13",
+    "state": "NOT_APPLICABLE_STANDARD_PASS",
+    "status": "KHÔNG KÍCH HOẠT · ĐÃ CÓ TÍN HIỆU CHUẨN",
+    "points_per_code": 30,
+    "selected_numbers": [],
+    "points_by_code": {},
+    "capital_vnd": 0,
+    "reason": "ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt."
+  },
+  "de_watchlist": {
+    "rule_version": "DE_HEAD_TAIL_WATCHLIST_V1",
+    "method": "Đề Gan Lead18 / Head-Tail Strict v2",
+    "status": "A0 · THEO DÕI",
+    "state": "WATCHLIST_ONLY",
+    "target_date": "2026-07-13",
+    "data_locked_through": "2026-07-12",
+    "candidates": [
+      {
+        "code": "Đầu 2",
+        "side": "HEAD",
+        "digit": "2",
+        "rank": 1,
+        "gate": false,
+        "research_gate": false,
+        "status": "WATCH",
+        "gan": 40,
+        "gmax": 38,
+        "score": 1.052632,
+        "occ30": 0,
+        "lead": 23,
+        "current_context": "repeat2=3; maxfreq=2",
+        "required_gate": "Đầu top Gan; lead≥18; Gan 36-50; Score 0.85-1.00; Occ30≤0; repeat2 3-6; maxfreq≤3",
+        "earliest_eligible_date": "2026-08-19",
+        "earliest_condition": "Nếu đầu 2 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.",
+        "milestone_type": "CONDITIONAL_LOWER_BOUND",
+        "points": 0,
+        "capital_vnd": 0
+      },
+      {
+        "code": "Đuôi 0",
+        "side": "TAIL",
+        "digit": "0",
+        "rank": 1,
+        "gate": false,
+        "research_gate": false,
+        "status": "WATCH",
+        "gan": 22,
+        "gmax": 54,
+        "score": 0.407407,
+        "occ30": 3,
+        "lead": 5,
+        "current_context": "repeat2=3; maxfreq=2",
+        "required_gate": "Đuôi top Gan; lead≥18; Gan 40-60; Score 0.90-1.40; Occ30≤0; repeat2 0-4; maxfreq≤2",
+        "earliest_eligible_date": "2026-08-09",
+        "earliest_condition": "Nếu đuôi 0 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa.",
+        "milestone_type": "CONDITIONAL_LOWER_BOUND",
+        "points": 0,
+        "capital_vnd": 0
+      }
+    ],
+    "points": 0,
+    "capital_vnd": 0,
+    "confirmation_required": true,
+    "real_money_default": false,
+    "reason": "Theo dõi Đầu 2 và Đuôi 0; chưa cấp vốn tự động. Mốc vào là lower bound có điều kiện, không phải cam kết."
+  },
+  "xien2_policy": {
+    "status": "ACTIVE_RECOMMENDATION_WITH_TWO_LO_LOSS_BRAKE",
+    "rule_version": "XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE",
+    "loss_brake_rule_version": "XIEN2_TWO_LO_LOSS_BRAKE_V1",
+    "source": "UNIQUE_POSITIVE_STAKE_CODES_IN_CURRENT_PLAN",
+    "minimum_codes": 2,
+    "pair_generation": "ALL_UNORDERED_2_COMBINATIONS",
+    "formula": "n*(n-1)/2",
+    "points_per_pair": 100,
+    "capital_per_pair_vnd": 100000,
+    "gross_return_per_winning_pair_vnd": 1600000,
+    "loss_brake_trigger": "TWO_MOST_RECENT_LO_SIGNAL_DAYS_HAVE_NEGATIVE_LO_PNL",
+    "loss_brake_effect": "SHOW_PAIRS_AS_SHADOW_ZERO_CAPITAL; NEVER_CHANGE_LO_ORDERS",
+    "confirmation_required_before_booking": true
+  },
+  "xien2_recommendation": {
+    "rule_version": "XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE",
+    "loss_brake_rule_version": "XIEN2_TWO_LO_LOSS_BRAKE_V1",
+    "target_date": "2026-07-13",
+    "status": "PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ",
+    "state": "SHADOW_ONLY_TWO_LO_LOSS_BRAKE",
+    "base_numbers": [
+      "54",
+      "45"
+    ],
+    "pairs": [
+      "54-45"
+    ],
+    "pair_count": 1,
+    "pair_generation": "ALL_UNORDERED_2_COMBINATIONS",
+    "points_per_pair": 100,
+    "reference_capital_per_pair_vnd": 100000,
+    "capital_per_pair_vnd": 0,
+    "gross_return_per_winning_pair_vnd": 1600000,
+    "paper_capital_vnd": 100000,
+    "capital_vnd": 0,
+    "gross_return_if_one_pair_wins_vnd": 0,
+    "brake_active": true,
+    "brake_basis": [
+      {
+        "date": "2026-07-13",
+        "pnl_vnd": -2300000,
+        "capital_vnd": 2300000,
+        "numbers": [
+          "54",
+          "45"
+        ]
+      },
+      {
+        "date": "2026-07-12",
+        "pnl_vnd": -3404000,
+        "capital_vnd": 3404000,
+        "numbers": [
+          "88",
+          "68",
+          "86"
+        ]
+      }
+    ],
+    "booking_allowed": false,
+    "confirmation_required": false,
+    "pnl_included": false,
+    "reason": "Hai ngày lô có lệnh gần nhất đều âm (2026-07-12 -3.404.000đ; 2026-07-13 -2.300.000đ). Vẫn hiển thị 1 cặp (54-45) để theo dõi nhưng vốn Xiên thật bằng 0đ; A1/X2/X3/ROLL7 không bị thay đổi."
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "RARE_STATE_STAKE_NORMALIZER_POLICY_V1",
+  "status": "ACTIVE_SHADOW_ONLY",
+  "effective_date": "2026-07-14",
+  "rule_version": "RARE_STATE_STAKE_NORMALIZER_V1_SHADOW",
+  "coverage_effect": "NONE",
+  "selection_effect": "NONE",
+  "real_money_effect": false,
+  "rules": [
+    {
+      "id": "X2_H5PAIR4_50_TO_30",
+      "condition": "X2 exact pass and H5Pair=4",
+      "shadow_effect": "X2 50-point legs become 30 points"
+    },
+    {
+      "id": "X3_QUIET_CONTEXT_REPEAT2_0_MAXFREQ_1_50_TO_30",
+      "condition": "X3 exact pass and prior locked draw repeat2_count=0, max_frequency=1",
+      "shadow_effect": "X3 50-point legs become 30 points"
+    },
+    {
+      "id": "TRIPLE_PASS_A1_SECONDARY50_TO_30_CORE100_UNCHANGED",
+      "condition": "A1, X2 and X3 all pass",
+      "shadow_effect": "A1 50-point legs become 30; A1 Core main100 remains 100"
+    }
+  ],
+  "promotion_gate": {
+    "minimum_prospective_impacted_cases": 20,
+    "minimum_operating_months": 12,
+    "require_both": true,
+    "delta_pnl_positive": true,
+    "positive_day_rate_not_lower": true,
+    "max_drawdown_not_worse": true,
+    "single_quarter_delta_profit_share_max": 0.5
+  }
+}

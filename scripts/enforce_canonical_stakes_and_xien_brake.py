@@ -8,6 +8,7 @@ This guard runs after legacy recommendation workflows and enforces:
 - Cross-method duplicate codes use the highest stake once.
 - Xiên recommendations are rebuilt through apply_xien2_auto_pairs.py, including
   the two-recent-lô-loss brake that moves Xiên to Shadow 0 VND.
+- Public execution state uses a compact Vietnamese display label.
 """
 from __future__ import annotations
 
@@ -23,6 +24,7 @@ DATA = ROOT / "data"
 CURRENT = DATA / "current.json"
 OVERRIDE = DATA / "current-override.json"
 LO_COST = 23_000
+UNCONFIRMED_DISPLAY = "CHỜ XÁC NHẬN"
 
 SPEC = importlib.util.spec_from_file_location("xien_auto", ROOT / "scripts" / "apply_xien2_auto_pairs.py")
 if SPEC is None or SPEC.loader is None:
@@ -60,14 +62,31 @@ def normalize_components(doc: dict[str, Any]) -> tuple[list[dict[str, Any]], dic
             method_id = str(method.get("id") or "")
             if not any(token in method_id.upper() for token in ("A1", "X2", "X3", "ROLL7")):
                 continue
-            selection = [str(n.get("code")) for n in method.get("numbers") or [] if int(n.get("points") or 0) > 0]
+            selection = [
+                str(n.get("code"))
+                for n in method.get("numbers") or []
+                if int(n.get("points") or 0) > 0
+            ]
             if selection:
-                components.append({"method_id": method_id, "selection": selection, "points_by_code": method.get("points_by_code") or {str(n.get("code")): int(n.get("points") or 0) for n in method.get("numbers") or []}})
+                components.append(
+                    {
+                        "method_id": method_id,
+                        "selection": selection,
+                        "points_by_code": method.get("points_by_code")
+                        or {
+                            str(n.get("code")): int(n.get("points") or 0)
+                            for n in method.get("numbers") or []
+                        },
+                    }
+                )
 
     aggregate: dict[str, int] = {}
     for component in components:
         method_id = str(component.get("method_id") or "")
-        selection = [code for value in (component.get("selection") or []) if (code := code2(value))]
+        selection = [
+            code for value in (component.get("selection") or [])
+            if (code := code2(value))
+        ]
         if method_id.upper().startswith("A1"):
             points = a1_points(method_id, selection)
             component["selection"] = list(points)
@@ -75,7 +94,7 @@ def normalize_components(doc: dict[str, Any]) -> tuple[list[dict[str, Any]], dic
             component["capital_vnd"] = sum(points.values()) * LO_COST
         else:
             raw = component.get("points_by_code") or {}
-            points = {}
+            points: dict[str, int] = {}
             for key, value in raw.items():
                 code = code2(key)
                 try:
@@ -92,13 +111,17 @@ def normalize_components(doc: dict[str, Any]) -> tuple[list[dict[str, Any]], dic
     return components, aggregate
 
 
-def patch_a1_cards(doc: dict[str, Any], aggregate: dict[str, int]) -> None:
+def patch_a1_cards(doc: dict[str, Any]) -> None:
     methods = (doc.get("top_signals") or {}).get("methods") or []
     for method in methods:
         method_id = str(method.get("id") or "")
         if "A1" not in method_id.upper():
             continue
-        funded = [str(n.get("code")) for n in method.get("numbers") or [] if str(n.get("code") or "")]
+        funded = [
+            str(n.get("code"))
+            for n in method.get("numbers") or []
+            if str(n.get("code") or "")
+        ]
         points = a1_points(method_id, funded)
         method["points_by_code"] = points
         method["points_per_code"] = next(iter(points.values()), 0) if len(set(points.values())) <= 1 else 0
@@ -112,13 +135,24 @@ def patch_a1_cards(doc: dict[str, Any], aggregate: dict[str, int]) -> None:
             role = "A1 main" if index == 0 else "A1 reverse50"
             if code == code[::-1]:
                 role += " · tự đảo, chỉ cấp vốn một lần"
-            new_numbers.append({"code": code, "points": stake, "capital_vnd": stake * LO_COST, "role": role, "visual_status": "PASS"})
+            new_numbers.append(
+                {
+                    "code": code,
+                    "points": stake,
+                    "capital_vnd": stake * LO_COST,
+                    "role": role,
+                    "visual_status": "PASS",
+                }
+            )
         method["numbers"] = new_numbers
 
     for group in doc.get("groups") or []:
         if str(group.get("id") or "").upper() != "A1":
             continue
-        selected = [code for value in (group.get("selected_numbers") or []) if (code := code2(value))]
+        selected = [
+            code for value in (group.get("selected_numbers") or [])
+            if (code := code2(value))
+        ]
         status_text = str(group.get("status") or "")
         method_id = "A1_CORE" if "CORE" in status_text.upper() else "A1_VOLUME"
         points = a1_points(method_id, selected)
@@ -126,6 +160,17 @@ def patch_a1_cards(doc: dict[str, Any], aggregate: dict[str, int]) -> None:
         group["points_by_code"] = points
         group["points"] = sum(points.values())
         group["capital_vnd"] = group["points"] * LO_COST
+
+
+def compact_execution_status(raw: Any) -> str:
+    text = str(raw or "").upper()
+    if text == "SYSTEM_SIGNAL_NOT_YET_CONFIRMED" or "NOT_YET_CONFIRMED" in text:
+        return UNCONFIRMED_DISPLAY
+    if "CONFIRMED" in text:
+        return "ĐÃ XÁC NHẬN"
+    if "SETTLED" in text:
+        return "ĐÃ QUYẾT TOÁN"
+    return str(raw or "—")
 
 
 def patch(doc: dict[str, Any]) -> dict[str, Any]:
@@ -138,6 +183,7 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
         pending["total_points"] = sum(aggregate.values())
         pending["capital_vnd"] = pending["total_points"] * LO_COST
         pending["standard_capital_vnd"] = pending["capital_vnd"]
+        pending["display_status"] = compact_execution_status(pending.get("status"))
 
     portfolio = doc.setdefault("portfolio", {})
     portfolio["selection"] = " | ".join(aggregate)
@@ -146,8 +192,11 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
     portfolio["capital_vnd"] = portfolio["points"] * LO_COST
     portfolio["standard_capital_vnd"] = portfolio["capital_vnd"]
     portfolio["title"] = " · ".join(f"{code} ×{stake}" for code, stake in aggregate.items()) if aggregate else "A0"
+    portfolio["display_status"] = compact_execution_status(
+        pending.get("status") if isinstance(pending, dict) else portfolio.get("pnl_status")
+    )
 
-    patch_a1_cards(doc, aggregate)
+    patch_a1_cards(doc)
     top = doc.setdefault("top_signals", {})
     top["total_points"] = f"{sum(aggregate.values())} điểm"
     top["total_capital_vnd"] = sum(aggregate.values()) * LO_COST
@@ -160,13 +209,31 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
     stake["a1_reverse_points"] = 50
     stake["a1_reverse_skip_when_same"] = True
     stake["a1_no_duplicate_same_code"] = True
-    stake["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V2"
+    stake["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V3"
+
+    display = doc.setdefault("display_policy", {})
+    display["compact_execution_status"] = True
+    display["execution_status_label"] = compact_execution_status(
+        pending.get("status") if isinstance(pending, dict) else portfolio.get("pnl_status")
+    )
 
     # Rebuild Xiên after corrected lô stakes and apply the two-loss brake.
     doc = xien_auto.patch(doc)
+
+    if isinstance(pending, dict):
+        xien = doc.get("xien2_recommendation") or {}
+        pending["total_recommended_capital_vnd"] = int(pending.get("capital_vnd") or 0) + int(xien.get("capital_vnd") or 0)
+        pnl = doc.setdefault("pnl_summary", {})
+        pnl["today_pending_capital_vnd"] = int(pending.get("capital_vnd") or 0)
+        pnl["today_pending_standard_capital_vnd"] = int(pending.get("capital_vnd") or 0)
+        pnl["today_pending_xien2_capital_vnd"] = int(xien.get("capital_vnd") or 0)
+        pnl["today_pending_total_recommended_capital_vnd"] = int(pending.get("total_recommended_capital_vnd") or 0)
+        pnl["today_pending_order"] = " · ".join(f"{code}×{stake}" for code, stake in aggregate.items()) + " · chờ xác nhận"
+
     automation = doc.setdefault("automation", {})
     automation["canonical_stake_guard_complete"] = True
-    automation["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V2"
+    automation["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V3"
+    automation["compact_public_status_complete"] = True
     return doc
 
 

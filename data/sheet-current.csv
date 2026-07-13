@@ -17,24 +17,24 @@ pnl,confirmed_through,2026-07-13
 pnl,grand_total_pnl_vnd,22996000
 next,target_date,2026-07-14
 next,decision,A1_VOLUME50 + X2_CORE_EXACT
-next,selection,88 | 54-45
+next,selection,88
 next,points_by_code,"{""45"":50,""54"":50,""88"":50}"
-next,total_points,150
-next,standard_capital_vnd,3450000
-next,xien2_recommended_capital_vnd,300000
-next,total_recommended_capital_vnd,3750000
+next,total_points,100
+next,standard_capital_vnd,2300000
+next,xien2_recommended_capital_vnd,0
+next,total_recommended_capital_vnd,2300000
 next,execution_status,SYSTEM_SIGNAL_NOT_YET_CONFIRMED
 next,pnl_included,False
-xien2,rule_version,XIEN2_AUTO_FROM_FUNDED_CODES_V1
-xien2,status,KHUYẾN NGHỊ ĐÁNH · CHỜ XÁC NHẬN
+xien2,rule_version,XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE
+xien2,status,PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ
 xien2,base_numbers,88|54|45
 xien2,pairs,88-54|88-45|54-45
 xien2,pair_count,3
 xien2,points_per_pair,100
-xien2,capital_per_pair_vnd,100000
-xien2,capital_vnd,300000
+xien2,capital_per_pair_vnd,0
+xien2,capital_vnd,0
 xien2,gross_return_per_winning_pair_vnd,1600000
-xien2,confirmation_required,True
+xien2,confirmation_required,False
 xien2,pnl_included,False
 de,rule_version,DE_HEAD_TAIL_WATCHLIST_V1
 de,status,A0 · THEO DÕI

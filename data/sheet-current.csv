@@ -23,7 +23,7 @@ next,total_points,150
 next,standard_capital_vnd,3450000
 next,xien2_recommended_capital_vnd,0
 next,total_recommended_capital_vnd,3450000
-next,execution_status,SYSTEM_SIGNAL_NOT_YET_CONFIRMED
+next,execution_status,CHỜ XÁC NHẬN
 next,pnl_included,False
 xien2,rule_version,XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE
 xien2,status,PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ

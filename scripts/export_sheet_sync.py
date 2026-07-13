@@ -41,6 +41,26 @@ def compact_json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
+def compact_execution_status(doc: dict[str, Any], pending: dict[str, Any], portfolio: dict[str, Any]) -> str:
+    """Return a stable user-facing status instead of an internal enum."""
+    display = doc.get("display_policy") or {}
+    explicit = (
+        pending.get("display_status")
+        or portfolio.get("display_status")
+        or display.get("execution_status_label")
+    )
+    if explicit:
+        return str(explicit)
+    if not pending:
+        return "A0"
+    internal = str(pending.get("status") or "").upper()
+    if internal in {"SYSTEM_SIGNAL_NOT_YET_CONFIRMED", "PASS_REAL_PENDING", "PENDING_CONFIRMATION"}:
+        return "CHỜ XÁC NHẬN"
+    if "CONFIRMED" in internal:
+        return "ĐÃ XÁC NHẬN"
+    return str(pending.get("status") or "CHỜ XÁC NHẬN")
+
+
 def build_current(doc: dict[str, Any], ledger: dict[str, Any]) -> str:
     data = doc.get("data") or {}
     portfolio = doc.get("portfolio") or {}
@@ -80,7 +100,7 @@ def build_current(doc: dict[str, Any], ledger: dict[str, Any]) -> str:
         ("next", "standard_capital_vnd", portfolio.get("standard_capital_vnd", portfolio.get("capital_vnd", ""))),
         ("next", "xien2_recommended_capital_vnd", xien.get("capital_vnd", 0)),
         ("next", "total_recommended_capital_vnd", portfolio.get("total_recommended_capital_vnd", portfolio.get("capital_vnd", ""))),
-        ("next", "execution_status", pending.get("status", "A0" if not pending else "")),
+        ("next", "execution_status", compact_execution_status(doc, pending, portfolio)),
         ("next", "pnl_included", bool(pending.get("pnl_included", False))),
         ("xien2", "rule_version", xien.get("rule_version", "")),
         ("xien2", "status", xien.get("status", "")),

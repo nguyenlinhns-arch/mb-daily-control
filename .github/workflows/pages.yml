@@ -25,19 +25,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build zero-dependency static site
+      - name: Build zero-dependency normalized static site
         run: |
           set -euo pipefail
           rm -rf _site
           mkdir -p _site/fast
-          cp index.html _site/index.html
-          cp index.html _site/fast/index.html
+          python3 scripts/normalize_static_dashboard.py index.html _site/index.html
+          cp _site/index.html _site/fast/index.html
           printf '%s\n' "static-dashboard-${GITHUB_SHA}" > _site/version.txt
           touch _site/.nojekyll
           test -s _site/index.html
           grep -q 'data-static-dashboard="1"' _site/index.html
+          grep -q 'MB_STATUS_SAFE_V1' _site/index.html
           if grep -q 'Đang tải kế hoạch kỳ sắp tới' _site/index.html; then
             echo 'Dynamic loading placeholder must not be deployed.' >&2
+            exit 1
+          fi
+          if grep -q 'SYSTEM_SIGNAL_NOT_YET_CONFIRMED' _site/index.html; then
+            echo 'Internal execution enum must not be shown publicly.' >&2
             exit 1
           fi
 

@@ -1,25 +1,46 @@
 section,key,value
 meta,config_id,MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712
-meta,report_run_id,RPT_MB_20260713_PARALLEL_NEXT_ALL_METHODS
-meta,generated_at,2026-07-12T20:55:00+07:00
-data,locked_through,2026-07-12
-data,data_status,LOCKED_CROSSCHECKED_3_SOURCES
+meta,report_run_id,RPT_MB_20260714_PARALLEL_A1_X2_V1
+meta,generated_at,2026-07-13T19:45:00+07:00
+data,locked_through,2026-07-13
+data,data_status,LOCKED_CROSSCHECKED_27_OF_27
 data,code_count,27
-settlement,latest_date,2026-07-12
-settlement,latest_result_codes,94|06|20|58|09|50|08|23|64|36|62|11|40|65|33|19|40|71|17|37|56|69|34|59|34|05|62
-settlement,latest_funded_codes,88|68|86
-settlement,latest_points_by_code,"{""68"":30,""86"":30,""88"":88}"
-settlement,latest_hits_by_code,"{""68"":0,""86"":0,""88"":0}"
+settlement,latest_date,2026-07-13
+settlement,latest_result_codes,99|56|60|24|64|67|85|42|97|30|31|32|50|53|92|55|64|13|01|03|89|68|80|97|76|05|75
+settlement,latest_funded_codes,54|45
+settlement,latest_points_by_code,"{""45"":50,""54"":50}"
+settlement,latest_hits_by_code,"{""45"":0,""54"":0}"
 settlement,latest_hits_total,0
-settlement,latest_capital_vnd,3404000
-settlement,latest_pnl_vnd,-3404000
-pnl,confirmed_through,2026-07-12
-pnl,grand_total_pnl_vnd,25396000
-next,target_date,2026-07-13
-next,decision,X2_CORE_EXACT
-next,selection,54-45
-next,points_by_code,"{""45"":50,""54"":50}"
-next,total_points,100
-next,capital_vnd,2300000
+settlement,latest_capital_vnd,2400000
+settlement,latest_pnl_vnd,-2400000
+pnl,confirmed_through,2026-07-13
+pnl,grand_total_pnl_vnd,22996000
+next,target_date,2026-07-14
+next,decision,A1_VOLUME50 + X2_CORE_EXACT
+next,selection,88 | 54-45
+next,points_by_code,"{""45"":50,""54"":50,""88"":50}"
+next,total_points,150
+next,standard_capital_vnd,3450000
+next,xien2_recommended_capital_vnd,300000
+next,total_recommended_capital_vnd,3750000
 next,execution_status,SYSTEM_SIGNAL_NOT_YET_CONFIRMED
 next,pnl_included,False
+xien2,rule_version,XIEN2_AUTO_FROM_FUNDED_CODES_V1
+xien2,status,KHUYẾN NGHỊ ĐÁNH · CHỜ XÁC NHẬN
+xien2,base_numbers,88|54|45
+xien2,pairs,88-54|88-45|54-45
+xien2,pair_count,3
+xien2,points_per_pair,100
+xien2,capital_per_pair_vnd,100000
+xien2,capital_vnd,300000
+xien2,gross_return_per_winning_pair_vnd,1600000
+xien2,confirmation_required,True
+xien2,pnl_included,False
+de,rule_version,DE_HEAD_TAIL_WATCHLIST_V1
+de,status,A0 · THEO DÕI
+de,method,Đề Gan Lead18 / Head-Tail Strict v2
+de,candidate_count,2
+de,candidate_list,Đầu 2|Đuôi 0
+de,earliest_dates,"{""Đuôi 0"":""2026-08-09"",""Đầu 2"":""2026-08-20""}"
+de,candidate_metrics,"{""Đuôi 0"":{""gan"":23,""gmax"":54,""lead"":5,""occ30"":3,""score"":0.425926},""Đầu 2"":{""gan"":41,""gmax"":38,""lead"":23,""occ30"":0,""score"":1.078947}}"
+de,capital_vnd,0

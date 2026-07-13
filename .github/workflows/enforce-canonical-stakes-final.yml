@@ -20,8 +20,12 @@ on:
       - "data/plans/**"
       - "data/settlement-ledger.json"
       - "data/xien2-loss-brake-policy.json"
+      - "data/xien2-confluence-router-policy.json"
+      - "data/rare-state-normalizer-policy.json"
       - "scripts/enforce_canonical_stakes_and_xien_brake.py"
       - "scripts/apply_xien2_auto_pairs.py"
+      - "scripts/apply_xien2_confluence_router_production.py"
+      - "scripts/apply_rare_state_stake_normalizer_shadow.py"
       - "scripts/render_fast_dashboard.py"
       - "scripts/normalize_static_dashboard.py"
       - ".github/workflows/enforce-canonical-stakes-final.yml"
@@ -50,20 +54,39 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Enforce canonical A1 stakes and Xiên brake
+      - name: Enforce canonical A1 stakes and Xiên loss brake
         run: |
           python scripts/enforce_canonical_stakes_and_xien_brake.py
           python scripts/enforce_canonical_stakes_and_xien_brake.py --check
+
+      - name: Apply production Xiên 2 Confluence Router
+        run: |
+          python scripts/apply_xien2_confluence_router_production.py
+          python scripts/apply_xien2_confluence_router_production.py --check
+
+      - name: Refresh rare-state stake normalizer shadow
+        run: |
+          python scripts/apply_rare_state_stake_normalizer_shadow.py
+          python scripts/apply_rare_state_stake_normalizer_shadow.py --check
+
+      - name: Refresh legacy optimization shadow for comparison
+        run: |
+          if [ -f scripts/apply_coverage_preserve_optimizations.py ]; then
+            python scripts/apply_coverage_preserve_optimizations.py
+            python scripts/apply_coverage_preserve_optimizations.py --check
+          fi
 
       - name: Refresh Sheet projections when available
         run: |
           if [ -f scripts/export_sheet_sync.py ]; then
             python scripts/export_sheet_sync.py
+            python scripts/export_sheet_sync.py --check
           fi
 
       - name: Render and normalize the static website
         run: |
           python scripts/render_fast_dashboard.py
+          python scripts/render_fast_dashboard.py --check
           python scripts/normalize_static_dashboard.py index.html index.normalized.html
           mv index.normalized.html index.html
           grep -q 'data-static-dashboard="1"' index.html
@@ -73,7 +96,7 @@ jobs:
             exit 1
           fi
 
-      - name: Validate canonical invariants
+      - name: Validate canonical and optimization invariants
         run: |
           python - <<'PY'
           import json
@@ -83,34 +106,50 @@ jobs:
           doc=json.loads(Path('data/current.json').read_text(encoding='utf-8'))
           pending=doc.get('pending_order') or {}
           points=pending.get('points_by_code') or {}
+          xien=doc.get('xien2_recommendation') or {}
+          rare=json.loads(Path('data/rare-state-normalizer-current.json').read_text(encoding='utf-8'))
+
+          assert (doc.get('automation') or {}).get('canonical_stake_guard_complete') is True
+          assert (doc.get('automation') or {}).get('xien2_confluence_router_complete') is True
+          assert xien.get('rule_version') == 'XIEN2_CONFLUENCE_ROUTER_V1', xien
+          assert (doc.get('xien2_policy') or {}).get('status') == 'ACTIVE_PRODUCTION_CONFLUENCE_ROUTER_WITH_TWO_LO_LOSS_BRAKE'
+          assert rare.get('coverage_effect') == 'NONE'
+          assert rare.get('selection_effect') == 'NONE'
+          assert rare.get('real_money_effect') is False
+
           if doc.get('target_date') == '2026-07-14':
               assert points == {'88': 50, '54': 50, '45': 50}, points
               assert pending.get('capital_vnd') == 3450000, pending
               assert pending.get('display_status') == 'CHỜ XÁC NHẬN', pending
-              xien=doc.get('xien2_recommendation') or {}
+              assert xien.get('router_rule') == 'A1_X2_CROSS_ONLY', xien
+              assert xien.get('pairs') == ['88-54','88-45'], xien
+              assert '54-45' in (xien.get('excluded_pairs') or []), xien
               assert xien.get('brake_active') is True, xien
               assert xien.get('capital_vnd') == 0, xien
               assert pending.get('total_recommended_capital_vnd') == 3450000, pending
-          assert (doc.get('automation') or {}).get('canonical_stake_guard_complete') is True
+              assert rare.get('status') == 'NOT_APPLICABLE_CURRENT_DRAW', rare
+              assert rare.get('baseline_points_by_code') == rare.get('shadow_points_by_code'), rare
+
           html=Path('index.html').read_text(encoding='utf-8')
           assert 'CHỜ XÁC NHẬN' in html
           assert 'SYSTEM_SIGNAL_NOT_YET_CONFIRMED' not in html
+          assert 'Confluence Router' in html
           if 'MB A1 Volume' in html:
               block=re.search(r'<article[^>]*>.*?<h3>MB A1 Volume</h3>.*?</article>', html, re.S)
               assert block and '>50 điểm<' in block.group(0), block.group(0) if block else None
               assert '>100 điểm<' not in block.group(0), block.group(0)
-          print('FINAL_CANONICAL_STAKE_STATUS_AND_LAYOUT_OK')
+          print('FINAL_CANONICAL_XIEN_ROUTER_AND_RARE_STATE_SHADOW_OK')
           PY
 
       - name: Commit only when files changed
         run: |
           if git diff --quiet -- data index.html; then
-            echo "Final canonical stakes and website already current."
+            echo "Final canonical stakes, Xiên Router and shadows already current."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data index.html
-          git commit -m "data: enforce Volume50 and compact website status"
+          git commit -m "data: apply production Xiên router and rare-state shadow"
           git pull --rebase origin main
           git push origin HEAD:main

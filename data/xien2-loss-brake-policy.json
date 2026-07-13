@@ -1,0 +1,24 @@
+{
+  "schema_version": "XIEN2_TWO_LO_LOSS_BRAKE_V1",
+  "status": "ACTIVE_REAL_MONEY_GUARDRAIL_FROM_2026-07-14",
+  "accepted_at_vn": "2026-07-13T20:05:00+07:00",
+  "scope": "XIEN2_ONLY",
+  "trigger": "The two most recent lô signal days both have settled lo.pnl_vnd < 0",
+  "action": {
+    "show_generated_pairs": true,
+    "xien2_real_capital_vnd": 0,
+    "xien2_state": "SHADOW_ONLY",
+    "keep_a1_x2_x3_roll7_orders_unchanged": true,
+    "keep_loto_coverage_unchanged": true
+  },
+  "release": "The brake is recalculated before every draw and is released once the two most recent lô signal days are not both negative.",
+  "no_martingale": true,
+  "no_progression": true,
+  "current_trigger_basis": [
+    {"date": "2026-07-12", "lo_pnl_vnd": -3404000},
+    {"date": "2026-07-13", "lo_pnl_vnd": -2300000}
+  ],
+  "current_target_date": "2026-07-14",
+  "current_state": "BRAKE_ACTIVE_XIEN_SHADOW_ZERO",
+  "production_note": "Only Xiên capital is disabled. A1/X2/X3/ROLL7 selections and stakes remain canonical."
+}

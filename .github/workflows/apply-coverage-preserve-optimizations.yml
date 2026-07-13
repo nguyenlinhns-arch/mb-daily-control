@@ -1,0 +1,95 @@
+name: Apply coverage-preserving optimization shadows
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "MB Daily result settlement and next-day plan"
+      - "Apply automatic Xiên 2 recommendations"
+      - "Apply Đề watchlist and milestones"
+    types: [completed]
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/apply_coverage_preserve_optimizations.py"
+      - "scripts/inject_optimization_shadow_cards.py"
+      - "data/optimization-policy.json"
+      - ".github/workflows/apply-coverage-preserve-optimizations.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-coverage-preserve-optimizations
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Reapply current Xiên 2 and Đề blocks
+        run: |
+          python scripts/apply_xien2_auto_pairs.py
+          python scripts/apply_xien2_auto_pairs.py --check
+          python scripts/apply_de_watchlist.py
+          python scripts/apply_de_watchlist.py --check
+
+      - name: Build and validate optimization shadows
+        run: |
+          python scripts/apply_coverage_preserve_optimizations.py
+          python scripts/apply_coverage_preserve_optimizations.py --check
+
+      - name: Refresh standard Sheet projections
+        run: |
+          python scripts/export_sheet_sync.py
+          python scripts/export_sheet_sync.py --check
+
+      - name: Render dashboard and inject shadow cards
+        run: |
+          python scripts/render_fast_dashboard.py
+          python scripts/render_fast_dashboard.py --check
+          python scripts/inject_optimization_shadow_cards.py
+          python scripts/inject_optimization_shadow_cards.py --check
+          grep -q 'Xiên 2 Confluence Router V1' index.html
+          grep -q 'Triple Confluence Normalizer' index.html
+
+      - name: Validate no real-money mutation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          current=json.loads(Path('data/current.json').read_text(encoding='utf-8'))
+          opt=json.loads(Path('data/optimization-current.json').read_text(encoding='utf-8'))
+          assert opt['status']=='ACTIVE_SHADOW_ONLY'
+          assert opt['coverage_effect']=='NONE'
+          assert opt['real_money_effect']=='NONE_UNTIL_SEPARATE_PROMOTION'
+          pending=current.get('pending_order') or {}
+          assert pending.get('pnl_included') is not True
+          print('COVERAGE_PRESERVE_SHADOW_INVARIANTS_OK')
+          PY
+
+      - name: Commit only when files changed
+        run: |
+          if git diff --quiet -- data index.html; then
+            echo "Optimization shadows already current."
+            exit 0
+          fi
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data index.html
+          git commit -m "data: publish coverage-preserving optimization shadows"
+          git pull --rebase origin main
+          git push origin HEAD:main

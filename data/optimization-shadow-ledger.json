@@ -1,0 +1,46 @@
+{
+  "schema_version": "MB_COVERAGE_PRESERVE_OPT_V1",
+  "policies": {
+    "xien2_router": "XIEN2_CONFLUENCE_ROUTER_V1",
+    "triple_normalizer": "TRIPLE_CONFLUENCE_NORMALIZER_SHADOW_V1",
+    "status": "SHADOW_ONLY"
+  },
+  "entries": {
+    "2026-07-13": {
+      "target_date": "2026-07-13",
+      "locked_through": "2026-07-12",
+      "source_report_run_id": "RPT_MB_20260713_PARALLEL_NEXT_ALL_METHODS",
+      "xien2_router": {
+        "rule_version": "XIEN2_CONFLUENCE_ROUTER_V1",
+        "status": "SAME_AS_BASELINE",
+        "active_standard_methods": ["X2"],
+        "rule_applied": "KEEP_CANONICAL_ALL_PAIRS",
+        "funded_codes": ["54", "45"],
+        "baseline_pairs": ["54-45"],
+        "router_pairs": ["54-45"],
+        "baseline_pair_count": 1,
+        "router_pair_count": 1,
+        "baseline_capital_vnd": 100000,
+        "router_capital_vnd": 100000,
+        "capital_saving_vnd": 0,
+        "real_money_effect": false,
+        "coverage_effect": "NONE",
+        "confirmation_required_if_promoted": true
+      },
+      "triple_normalizer": {
+        "rule_version": "TRIPLE_CONFLUENCE_NORMALIZER_SHADOW_V1",
+        "status": "NOT_APPLICABLE_NOT_TRIPLE_PASS",
+        "active_standard_methods": ["X2"],
+        "baseline_points_by_code": {"54": 50, "45": 50},
+        "shadow_points_by_code": {"54": 50, "45": 50},
+        "baseline_capital_vnd": 2300000,
+        "shadow_capital_vnd": 2300000,
+        "capital_saving_vnd": 0,
+        "real_money_effect": false,
+        "coverage_effect": "NONE"
+      },
+      "settlement_status": "PENDING_RESULT",
+      "settlement": null
+    }
+  }
+}

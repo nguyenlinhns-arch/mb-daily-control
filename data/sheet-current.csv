@@ -25,11 +25,11 @@ next,xien2_recommended_capital_vnd,0
 next,total_recommended_capital_vnd,3450000
 next,execution_status,CHỜ XÁC NHẬN
 next,pnl_included,False
-xien2,rule_version,XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE
-xien2,status,PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ
+xien2,rule_version,XIEN2_CONFLUENCE_ROUTER_V1
+xien2,status,PHANH XIÊN · CONFLUENCE ROUTER · SHADOW 0Đ
 xien2,base_numbers,88|54|45
-xien2,pairs,88-54|88-45|54-45
-xien2,pair_count,3
+xien2,pairs,88-54|88-45
+xien2,pair_count,2
 xien2,points_per_pair,100
 xien2,capital_per_pair_vnd,0
 xien2,capital_vnd,0

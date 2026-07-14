@@ -19,6 +19,7 @@ on:
       - "data/a1-staking-policy.json"
       - "index.html"
       - "scripts/enforce_a1_core100_volume50.py"
+      - "scripts/finalize_a1_core100_volume50.py"
       - "scripts/patch_a1_top3_watchlist.py"
       - ".github/workflows/enforce-a1-core100-volume50.yml"
 
@@ -47,10 +48,14 @@ jobs:
           python-version: "3.12"
 
       - name: Enforce active payload and current plan
-        run: python scripts/enforce_a1_core100_volume50.py
+        run: |
+          python scripts/enforce_a1_core100_volume50.py
+          python scripts/finalize_a1_core100_volume50.py
 
       - name: Validate permanent invariant
-        run: python scripts/enforce_a1_core100_volume50.py --check
+        run: |
+          python scripts/enforce_a1_core100_volume50.py --check
+          python scripts/finalize_a1_core100_volume50.py --check
 
       - name: Commit only when the guard changed active files
         run: |

@@ -1,8 +1,8 @@
 section,key,value
-meta,config_id,MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712
-meta,report_run_id,RPT_MB_20260714_PARALLEL_A1_X2_V1
-meta,generated_at,2026-07-13T19:45:00+07:00
-data,locked_through,2026-07-13
+meta,config_id,MB_A1_DUAL_CORE_VOLUME_BALANCE_GAN21_12_CORE50_VOLUME30_V1_20260713
+meta,report_run_id,RPT_MB_20260715_A1_A0_SETTLED_20260714_V1
+meta,generated_at,2026-07-14T19:55:00+07:00
+data,locked_through,2026-07-14
 data,data_status,LOCKED_CROSSCHECKED_27_OF_27
 data,code_count,27
 settlement,latest_date,2026-07-13
@@ -13,34 +13,34 @@ settlement,latest_hits_by_code,"{""45"":0,""54"":0}"
 settlement,latest_hits_total,0
 settlement,latest_capital_vnd,2400000
 settlement,latest_pnl_vnd,-2400000
-pnl,confirmed_through,2026-07-13
-pnl,grand_total_pnl_vnd,22996000
-next,target_date,2026-07-14
-next,decision,A1_VOLUME
-next,selection,88 | 54-45
-next,points_by_code,"{""45"":50,""54"":50,""88"":50}"
-next,total_points,150
-next,standard_capital_vnd,3450000
+pnl,confirmed_through,2026-07-14
+pnl,grand_total_pnl_vnd,23546000
+next,target_date,2026-07-15
+next,decision,A0_NO_QUALIFIED_A1
+next,selection,A0
+next,points_by_code,{}
+next,total_points,0
+next,standard_capital_vnd,0
 next,xien2_recommended_capital_vnd,0
-next,total_recommended_capital_vnd,3450000
-next,execution_status,CHỜ XÁC NHẬN
+next,total_recommended_capital_vnd,0
+next,execution_status,A0
 next,pnl_included,False
 xien2,rule_version,XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE
-xien2,status,PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ
-xien2,base_numbers,88|54|45
-xien2,pairs,88-54|88-45|54-45
-xien2,pair_count,3
+xien2,status,KHÔNG KÍCH HOẠT · CẦN TỪ 02 SỐ ĐƯỢC CẤP VỐN
+xien2,base_numbers,
+xien2,pairs,
+xien2,pair_count,0
 xien2,points_per_pair,100
-xien2,capital_per_pair_vnd,0
+xien2,capital_per_pair_vnd,100000
 xien2,capital_vnd,0
 xien2,gross_return_per_winning_pair_vnd,1600000
 xien2,confirmation_required,False
 xien2,pnl_included,False
-de,rule_version,DE_HEAD_TAIL_WATCHLIST_V1
-de,status,A0 · THEO DÕI
-de,method,Đề Gan Lead18 / Head-Tail Strict v2
-de,candidate_count,2
-de,candidate_list,Đầu 2|Đuôi 0
-de,earliest_dates,"{""Đuôi 0"":""2026-08-09"",""Đầu 2"":""2026-08-20""}"
-de,candidate_metrics,"{""Đuôi 0"":{""gan"":23,""gmax"":54,""lead"":5,""occ30"":3,""score"":0.425926},""Đầu 2"":{""gan"":41,""gmax"":38,""lead"":23,""occ30"":0,""score"":1.078947}}"
+de,rule_version,
+de,status,
+de,method,
+de,candidate_count,0
+de,candidate_list,
+de,earliest_dates,{}
+de,candidate_metrics,{}
 de,capital_vnd,0

@@ -16,8 +16,8 @@ settlement,latest_pnl_vnd,-2400000
 pnl,confirmed_through,2026-07-13
 pnl,grand_total_pnl_vnd,22996000
 next,target_date,2026-07-14
-next,decision,A1_VOLUME50 + X2_CORE_EXACT
-next,selection,88 | 54 | 45
+next,decision,A1_VOLUME
+next,selection,88 | 54-45
 next,points_by_code,"{""45"":50,""54"":50,""88"":50}"
 next,total_points,150
 next,standard_capital_vnd,3450000

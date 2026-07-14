@@ -2,10 +2,10 @@
 """Patch A1 Top-3, preserve the patched base, then install parallel entrypoint.
 
 The canonical engine is packed in plan_next_day.py.zlib.b64 and materialized on
-every workflow run.  This script is idempotent.  It first applies the A1 Top-3
+every workflow run. This script is idempotent. It first applies the A1 Top-3
 watchlist replacement, writes the fully patched sequential engine to
-`plan_next_day_base.py`, then changes `plan_next_day.py` into a tiny delegator
-for the permanent independent A1/X2/X3 parallel controller.
+`plan_next_day_base.py`, enforces Core100/Volume50 constants, then changes
+`plan_next_day.py` into a tiny delegator for the permanent controller.
 """
 from __future__ import annotations
 
@@ -200,8 +200,11 @@ def main() -> None:
         patched = text[:start] + REPLACEMENT.rstrip() + "\n" + text[end:]
         print("A1_TOP3_WATCHLIST_PATCH_APPLIED")
     BASE_TARGET.write_text(patched, encoding="utf-8")
+    from enforce_a1_core100_volume50 import patch_engine
+    patch_engine()
     TARGET.write_text(DELEGATOR, encoding="utf-8")
     TARGET.chmod(0o755)
+    print("A1_CORE100_VOLUME50_ENGINE_LOCKED")
     print("PARALLEL_PLANNER_ENTRYPOINT_INSTALLED")
 
 

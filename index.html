@@ -2,63 +2,68 @@
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0d2239"><meta name="description" content="MB Daily Control — kế hoạch XSMB kỳ sắp tới"><title>MB Daily Control · 16/07/2026</title>
 <style>
 :root{--bg:#071421;--panel:#0d2239;--panel2:#122c48;--text:#edf6ff;--muted:#9db0c3;--line:#29425a;--green:#21c482;--red:#ff6470;--amber:#f4c95d}*{box-sizing:border-box}html{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}body{margin:0}.wrap{width:min(1180px,calc(100% - 24px));margin:auto;padding:18px 0 36px}.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.brand{display:flex;align-items:center;gap:10px}.logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#1c7cff,#25c58a);font-weight:900}button,.link{border:1px solid var(--line);background:#102841;color:var(--text);padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:700;cursor:pointer}.hero{background:linear-gradient(135deg,#102a45,#0d2137);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:14px}.eyebrow{color:#74b5ff;font-weight:800;font-size:12px;letter-spacing:.08em}h1{font-size:clamp(26px,4vw,46px);margin:7px 0}.hero p{color:var(--muted);margin:6px 0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.stat{background:#0a1c2e;border:1px solid var(--line);border-radius:12px;padding:12px}.stat span{display:block;color:var(--muted);font-size:12px}.stat b{display:block;margin-top:5px;font-size:18px}.methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.method-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}.method-card.pass{border-color:#1e9d70}.method-card.fail{border-color:#9b4050}.method-card.near{border-color:#9b812d}.method-card.idle{border-color:#5f7080}.method-card header{display:flex;gap:11px;align-items:center}.symbol{display:grid;place-items:center;min-width:42px;height:42px;border-radius:11px;background:var(--panel2);font-weight:900}h3{margin:0;font-size:19px}.method-card header p{margin:3px 0 0;color:var(--muted);font-size:12px}.status{display:inline-block;margin:12px 0;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900}.status.pass{background:#123e32;color:#69e6b0}.status.fail{background:#45202a;color:#ff9ca5}.status.near{background:#463b17;color:#ffe083}.status.idle{background:#253544;color:#c1cfda}.numbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.number,.empty{min-height:112px;border:1px solid var(--line);border-radius:12px;background:#0a1b2c;padding:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.number strong{font-size:34px;line-height:1}.number span{font-size:12px;margin-top:8px}.number small{color:var(--muted);margin-top:4px}.number.pass{border-color:#1f9f71}.number.fail{border-color:#713440}.number.near{border-color:#9b812d}.number.idle{border-color:#465a6c}.empty{grid-column:1/-1;color:var(--muted)}.reason{color:var(--muted);font-size:13px;min-height:36px}.method-card footer{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted)}.method-card footer b{display:block;color:var(--text);font-size:14px}.watch{border-top:1px dashed var(--line);margin-top:12px;padding-top:10px}.watch h4{margin:0 0 7px;font-size:13px}.watch-row{display:grid;grid-template-columns:74px 1fr auto;gap:8px;padding:7px 0;font-size:11px;color:var(--muted)}.watch-row b{color:var(--text);font-size:14px}.de-watch-row{display:grid;grid-template-columns:90px 1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}.de-watch-row b{display:block;font-size:17px;color:var(--text)}.de-watch-row small{color:var(--muted);font-size:10px}.de-watch-row span{font-size:12px;color:var(--muted)}.de-watch-row em{font-style:normal;font-size:11px;color:var(--amber);text-align:right}.de-watch-row p{grid-column:1/-1;margin:0;color:var(--muted);font-size:10px}.summary{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#0b1d30}.summary small{color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.methods{grid-template-columns:1fr}.numbers{grid-template-columns:repeat(2,1fr)}.summary{align-items:flex-start;flex-direction:column}.watch-row{grid-template-columns:66px 1fr}.de-watch-row{grid-template-columns:80px 1fr}.de-watch-row em{grid-column:2;text-align:left}}
+/* MB_STATUS_SAFE_V1 */
+.stat{min-width:0;overflow:hidden}
+.stat b{max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal;line-height:1.22;font-size:clamp(12px,2.1vw,18px)}
+.status{max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal;line-height:1.2}
+@media(max-width:430px){.stat b{font-size:13px}.status{font-size:11px}}
 </style></head>
 <body data-static-dashboard="1"><div class="wrap"><div class="bar"><div class="brand"><div class="logo">MB</div><div><b>MB Daily Control</b><div style="color:var(--muted);font-size:12px">XSMB Daily Validation</div></div></div><button type="button" onclick="location.reload()">↻ Làm mới</button></div>
-<section class="hero"><div class="eyebrow">KỲ SẮP TỚI · 16/07/2026</div><h1>Đang rà soát</h1><p></p><div class="stats"><div class="stat"><span>Dữ liệu khóa đến</span><b>15/07/2026</b></div><div class="stat"><span>Vốn thật kỳ tới</span><b>0đ</b></div><div class="stat"><span>Xiên 2</span><b>0 cặp · 0đ</b></div><div class="stat"><span>Trạng thái lệnh</span><b style="font-size:13px">—</b></div></div></section>
+<section class="hero"><div class="eyebrow">KỲ SẮP TỚI · 16/07/2026</div><h1>31 ×50 · 13 ×50</h1><p>Natural ACTIVE qua X2 RBK Exact PASS; A1 A0 chỉ chặn riêng A1. Không gấp thếp và không dùng ROLL30 cứu hộ.</p><div class="stats"><div class="stat"><span>Dữ liệu khóa đến</span><b>15/07/2026</b></div><div class="stat"><span>Vốn thật kỳ tới</span><b>2.300.000đ</b></div><div class="stat"><span>P/L Production 15/07</span><b>−2.300.000đ</b></div><div class="stat"><span>Trạng thái lệnh</span><b style="font-size:13px">CHỜ XÁC NHẬN</b></div></div></section>
 <main class="methods">
     <article class="method-card fail">
-      <header><span class="symbol">A1</span><div><h3>MB A1</h3><p>MB A1</p></div></header>
-      <div class="status fail">KHÔNG CÓ DỮ LIỆU</div>
+      <header><span class="symbol">A1</span><div><h3>MB A1 · A0</h3><p>A1 canonical · Core100/Other50</p></div></header>
+      <div class="status fail">A0 · HARD-NOISE NỘI BỘ A1</div>
       <div class="numbers"><div class="empty">Không có mã/cặp được khuyến nghị</div></div>
-      
-      <p class="reason"></p>
+      <div class="watch"><h4>Top 3 A1 theo dõi</h4><div class="watch-row"><b>51</b><span>Gan 10 · Gmax 22 · Score 0.454545</span><small>Mốc 22/07/2026</small></div><div class="watch-row"><b>29</b><span>Gan 9 · Gmax 21 · Score 0.428571</span><small>Mốc 22/07/2026</small></div><div class="watch-row"><b>15</b><span>Gan 9 · Gmax 22 · Score 0.409091</span><small>Mốc 23/07/2026</small></div></div>
+      <p class="reason">Ba mã lặp hai nháy 19, 72, 92 kích hoạt phanh nội bộ A1; đồng thời không có Core/Volume đạt.</p>
       <footer><span>Điểm/số <b>0</b></span><span>Số mã <b>0</b></span><span>Tổng vốn <b>0đ</b></span></footer>
     </article>
-    <article class="method-card fail">
-      <header><span class="symbol">X2</span><div><h3>MB X2</h3><p>MB X2</p></div></header>
-      <div class="status fail">KHÔNG CÓ DỮ LIỆU</div>
-      <div class="numbers"><div class="empty">Không có mã/cặp được khuyến nghị</div></div>
+    <article class="method-card pass">
+      <header><span class="symbol">X2</span><div><h3>MB X2 RBK Exact · PASS</h3><p>Filter-first rank1 Core → Balanced; không lấy rank2</p></div></header>
+      <div class="status pass">PASS · NATURAL REAL · CHỜ XÁC NHẬN</div>
+      <div class="numbers"><div class="number pass" title="Rank1 · Gan2 · H21=9"><strong>31</strong><span>50 điểm</span><small>1.150.000đ</small></div><div class="number pass" title="Rank1 đảo · Gan2 · H21=7"><strong>13</strong><span>50 điểm</span><small>1.150.000đ</small></div></div>
       
-      <p class="reason"></p>
-      <footer><span>Điểm/số <b>0</b></span><span>Số mã <b>0</b></span><span>Tổng vốn <b>0đ</b></span></footer>
+      <p class="reason">Gan2/2, ΔGan0, H5Pair3, H21=9/7, H60=19/22, H90=29/32, Primary=0,638889, CoreGate=1, BalancedGate=1, TV21=7,160775.</p>
+      <footer><span>Điểm/số <b>50</b></span><span>Số mã <b>2</b></span><span>Tổng vốn <b>2.300.000đ</b></span></footer>
     </article>
     <article class="method-card fail">
-      <header><span class="symbol">X3</span><div><h3>MB X3</h3><p>MB X3</p></div></header>
-      <div class="status fail">KHÔNG CÓ DỮ LIỆU</div>
-      <div class="numbers"><div class="empty">Không có mã/cặp được khuyến nghị</div></div>
+      <header><span class="symbol">X3</span><div><h3>MB X3 Profit · A0</h3><p>X3 Profit exact · không hạ gate</p></div></header>
+      <div class="status fail">A0 · WATCH 31–15–32</div>
+      <div class="numbers"><div class="number fail" title="WATCH · HOT21=11"><strong>31</strong><span>0 điểm · theo dõi</span><small>0đ</small></div><div class="number fail" title="WATCH · HOT21=7"><strong>15</strong><span>0 điểm · theo dõi</span><small>0đ</small></div><div class="number fail" title="WATCH · HOT21=10"><strong>32</strong><span>0 điểm · theo dõi</span><small>0đ</small></div></div>
       
-      <p class="reason"></p>
-      <footer><span>Điểm/số <b>0</b></span><span>Số mã <b>0</b></span><span>Tổng vốn <b>0đ</b></span></footer>
+      <p class="reason">HOT21=11+7+10=28; không đạt Profit gate exact 32–34.</p>
+      <footer><span>Điểm/số <b>0</b></span><span>Số mã <b>3</b></span><span>Tổng vốn <b>0đ</b></span></footer>
     </article>
     <article class="method-card idle">
-      <header><span class="symbol">R7</span><div><h3>MB ROLL7 · 5-of-7</h3><p>Rescue50 khi A1/X2/X3 đều A0</p></div></header>
-      <div class="status idle">CHƯA KÍCH HOẠT</div>
+      <header><span class="symbol">R7</span><div><h3>MB ROLL7 · 5-of-7</h3><p>ROLL7 rescue50 · chỉ khi A1/X2/X3 đều A0</p></div></header>
+      <div class="status idle">KHÔNG KÍCH HOẠT · ĐÃ CÓ TÍN HIỆU CHUẨN</div>
       <div class="numbers"><div class="empty">Không có mã/cặp được khuyến nghị</div></div>
       
-      <p class="reason">Chỉ xét khi cả A1, X2 và X3 đều A0.</p>
+      <p class="reason">ROLL7 chỉ dùng khi A1, X2 và X3 đều A0; kỳ này đã có phương pháp chuẩn đạt.</p>
       <footer><span>Điểm/số <b>50</b></span><span>Số mã <b>0</b></span><span>Tổng vốn <b>0đ</b></span></footer>
     </article>
     <article class="method-card idle">
-      <header><span class="symbol">R30</span><div><h3>MB ROLL30 30/30 · Rescue</h3><p>Coverage 30/30 · Other50</p></div></header>
-      <div class="status idle">CHƯA KÍCH HOẠT</div>
+      <header><span class="symbol">R30</span><div><h3>MB ROLL30 30/30</h3><p>Coverage tầng 2 · Other50</p></div></header>
+      <div class="status idle">KHÔNG ĐÁNH GIÁ · NATURAL ĐÃ ACTIVE</div>
       <div class="numbers"><div class="empty">Không có mã/cặp được khuyến nghị</div></div>
       
-      <p class="reason">Chỉ kích hoạt sau Natural A0 và ROLL7 không phát số.</p>
+      <p class="reason">Natural đã ACTIVE; ROLL30 không tham gia kế hoạch 16/07 và không dùng để gấp thếp.</p>
       <footer><span>Điểm/số <b>50</b></span><span>Số mã <b>0</b></span><span>Tổng vốn <b>0đ</b></span></footer>
     </article>
     <article class="method-card idle">
       <header><span class="symbol">X2+</span><div><h3>Xiên 2 tự động</h3><p>Ghép toàn bộ cặp từ các số được cấp vốn thật</p></div></header>
-      <div class="status idle">KHÔNG KÍCH HOẠT · CẦN TỪ 02 SỐ ĐƯỢC CẤP VỐN</div>
+      <div class="status idle">TẮT · KHÔNG CẤP VỐN</div>
       <div class="numbers"><div class="empty">Không có mã/cặp được khuyến nghị</div></div>
       
-      <p class="reason">Chỉ có 0 mã được cấp vốn; Xiên 2 cần tối thiểu 02 mã.</p>
+      <p class="reason">MB ROLL30 30/30 chỉ có một giỏ lô canonical; không cộng Xiên 2.</p>
       <footer><span>Vốn/cặp <b>100.000đ</b></span><span>Số cặp <b>0</b></span><span>Tổng vốn <b>0đ</b></span></footer>
     </article>
-    <article class="method-card fail">
-      <header><span class="symbol">ĐỀ</span><div><h3>MB Đề · Đầu/đuôi</h3><p>Đề Gan Lead18 / Head-Tail Strict v2</p></div></header>
-      <div class="status fail">A0 · THEO DÕI</div>
+    <article class="method-card idle">
+      <header><span class="symbol">ĐỀ</span><div><h3>MB Đề · Nghiên cứu</h3><p>Đề Gan Lead18 / Head-Tail Strict v2</p></div></header>
+      <div class="status idle">TÁCH KHỎI PRODUCTION · 0Đ</div>
       <div class="numbers"><div class="empty">Chưa có lệnh Đề tiền thật · vốn 0đ</div></div>
-      <div class="watch"><h4>Danh sách Đề đang theo dõi</h4><div class="empty">Chưa có dữ liệu Đề</div></div>
-      <p class="reason">Theo dõi mốc điều kiện; chưa cấp vốn tự động.</p>
-      <footer><span>Điểm thật <b>0</b></span><span>Ứng viên <b>0</b></span><span>Tổng vốn <b>0đ</b></span></footer>
+      <div class="watch de-watch"><h4>Danh sách Đề đang theo dõi & mốc có thể vào</h4><div class="de-watch-row" title="Nếu đầu 2 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa."><div><b>Đầu 2</b><small>WATCH</small></div><span>Gan 42 · Gmax 38 · Score 1.105 · Occ30 0 · Lead 23</span><em>Mốc sớm nhất <strong>21/08/2026</strong></em><p>Đầu top Gan; lead≥18; Gan 36-50; Score 0.85-1.00; Occ30≤0; repeat2 3-6; maxfreq≤3</p></div><div class="de-watch-row" title="Nếu đuôi 0 không xuất hiện đến hết ngày trước mốc, vẫn giữ top Gan/lead, Occ30 và bối cảnh repeat2/maxfreq còn nằm trong gate. Mốc được tính lại sau mỗi kỳ khóa."><div><b>Đuôi 0</b><small>WATCH</small></div><span>Gan 24 · Gmax 54 · Score 0.444 · Occ30 2 · Lead 5</span><em>Mốc sớm nhất <strong>09/08/2026</strong></em><p>Đuôi top Gan; lead≥18; Gan 40-60; Score 0.90-1.40; Occ30≤0; repeat2 0-4; maxfreq≤2</p></div><small>Mốc là lower bound có điều kiện và được tính lại sau mỗi kỳ khóa.</small></div>
+      <p class="reason">Chỉ giữ watchlist nghiên cứu; không tham gia danh mục Production.</p>
+      <footer><span>Điểm thật <b>0</b></span><span>Ứng viên <b>2</b></span><span>Tổng vốn <b>0đ</b></span></footer>
     </article></main><section class="summary"><div><b>Cập nhật 2026-07-15 20:57:48</b><br><small>Đề hiển thị danh sách đang theo dõi và mốc sớm nhất có thể xét; mốc luôn có điều kiện.</small><br><small style="overflow-wrap:anywhere">Report_Run_ID=RPT_MB_20260716_ROLL30_V2_20260715T205748+0700 · Config_ID=MB_ROLL30_30_OF_30_PROD_V2_CORE100_OTHER50_20260715 · Data_Lock_Date=2026-07-15 · Content_Hash=f25dbc6e4c666e8db549370fbb7b64ee7eaeed7c31b447ea40556e6f342d8fa7</small></div><div class="actions"><a class="link" href="https://docs.google.com/spreadsheets/d/1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w/edit" target="_blank" rel="noopener">Mở Google Sheet ↗</a></div></section><div class="foot">MB ROLL30 30/30 Production – Core100/Other50 · Natural xét song song; Natural A0 thì ROLL7 trước, ROLL30 sau; không martingale, không cộng giỏ phụ.</div></div></body></html>

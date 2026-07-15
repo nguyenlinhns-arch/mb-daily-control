@@ -66,6 +66,65 @@
         "max_drawdown_not_worse": true,
         "single_quarter_delta_profit_share_max": 0.5
       }
+    },
+    "2026-07-15": {
+      "schema_version": "RARE_STATE_STAKE_NORMALIZER_V1_SHADOW",
+      "status": "NOT_APPLICABLE_CURRENT_DRAW",
+      "target_date": "2026-07-15",
+      "locked_through": "2026-07-14",
+      "source_report_run_id": "RPT_MB_20260715_ROLL30_V2_CORE100_OTHER50",
+      "active_standard_methods": [
+        "A1"
+      ],
+      "observed_state": {
+        "x2_h5pair": 4,
+        "repeat2_count": 2,
+        "max_frequency": 2,
+        "triple_pass": false
+      },
+      "rules_applied": [],
+      "baseline_method_points": {
+        "A1": {
+          "38": 50,
+          "83": 50
+        },
+        "X2": {},
+        "X3": {},
+        "ROLL7": {}
+      },
+      "shadow_method_points": {
+        "A1": {
+          "38": 50,
+          "83": 50
+        },
+        "X2": {},
+        "X3": {},
+        "ROLL7": {}
+      },
+      "baseline_points_by_code": {
+        "38": 50,
+        "83": 50
+      },
+      "shadow_points_by_code": {
+        "38": 50,
+        "83": 50
+      },
+      "baseline_capital_vnd": 2300000,
+      "shadow_capital_vnd": 2300000,
+      "capital_saving_vnd": 0,
+      "coverage_effect": "NONE",
+      "selection_effect": "NONE",
+      "real_money_effect": false,
+      "pnl_included": false,
+      "promotion_gate": {
+        "minimum_prospective_impacted_cases": 20,
+        "minimum_operating_months": 12,
+        "require_both": true,
+        "delta_pnl_positive": true,
+        "positive_day_rate_not_lower": true,
+        "max_drawdown_not_worse": true,
+        "single_quarter_delta_profit_share_max": 0.5
+      }
     }
   }
 }

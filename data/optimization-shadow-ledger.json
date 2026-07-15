@@ -181,6 +181,125 @@
         "real_money_effect": false,
         "coverage_effect": "NONE"
       },
+      "settlement_status": "SETTLED_SHADOW",
+      "settlement": {
+        "result_codes": [
+          "47",
+          "64",
+          "46",
+          "33",
+          "92",
+          "75",
+          "86",
+          "66",
+          "17",
+          "48",
+          "88",
+          "17",
+          "57",
+          "10",
+          "19",
+          "82",
+          "90",
+          "49",
+          "89",
+          "79",
+          "74",
+          "12",
+          "99",
+          "68",
+          "39",
+          "05",
+          "75"
+        ],
+        "xien2_baseline": {
+          "wins": [],
+          "win_count": 0,
+          "capital_vnd": 300000,
+          "payout_vnd": 0,
+          "pnl_vnd": -300000
+        },
+        "xien2_router": {
+          "wins": [],
+          "win_count": 0,
+          "capital_vnd": 200000,
+          "payout_vnd": 0,
+          "pnl_vnd": -200000
+        },
+        "lo_baseline": {
+          "hits": {
+            "88": 1,
+            "54": 0,
+            "45": 0
+          },
+          "hits_total": 1,
+          "capital_vnd": 3450000,
+          "payout_vnd": 4000000,
+          "pnl_vnd": 550000
+        },
+        "lo_normalized": {
+          "hits": {
+            "88": 1,
+            "54": 0,
+            "45": 0
+          },
+          "hits_total": 1,
+          "capital_vnd": 3450000,
+          "payout_vnd": 4000000,
+          "pnl_vnd": 550000
+        }
+      }
+    },
+    "2026-07-15": {
+      "target_date": "2026-07-15",
+      "locked_through": "2026-07-14",
+      "source_report_run_id": "RPT_MB_20260715_ROLL30_V2_CORE100_OTHER50",
+      "xien2_router": {
+        "rule_version": "XIEN2_CONFLUENCE_ROUTER_V1",
+        "status": "SAME_AS_BASELINE",
+        "active_standard_methods": [
+          "A1"
+        ],
+        "rule_applied": "KEEP_CANONICAL_ALL_PAIRS",
+        "funded_codes": [
+          "38",
+          "83"
+        ],
+        "baseline_pairs": [
+          "38-83"
+        ],
+        "router_pairs": [
+          "38-83"
+        ],
+        "baseline_pair_count": 1,
+        "router_pair_count": 1,
+        "baseline_capital_vnd": 100000,
+        "router_capital_vnd": 100000,
+        "capital_saving_vnd": 0,
+        "real_money_effect": false,
+        "coverage_effect": "NONE",
+        "confirmation_required_if_promoted": true
+      },
+      "triple_normalizer": {
+        "rule_version": "TRIPLE_CONFLUENCE_NORMALIZER_SHADOW_V1",
+        "status": "NOT_APPLICABLE_NOT_TRIPLE_PASS",
+        "active_standard_methods": [
+          "A1"
+        ],
+        "baseline_points_by_code": {
+          "38": 50,
+          "83": 50
+        },
+        "shadow_points_by_code": {
+          "38": 50,
+          "83": 50
+        },
+        "baseline_capital_vnd": 2300000,
+        "shadow_capital_vnd": 2300000,
+        "capital_saving_vnd": 0,
+        "real_money_effect": false,
+        "coverage_effect": "NONE"
+      },
       "settlement_status": "PENDING_RESULT",
       "settlement": null
     }

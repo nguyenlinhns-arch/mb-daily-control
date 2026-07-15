@@ -1,38 +1,33 @@
 {
   "schema_version": "MB_COVERAGE_PRESERVE_OPT_V1",
   "status": "ACTIVE_SHADOW_ONLY",
-  "target_date": "2026-07-14",
-  "locked_through": "2026-07-13",
-  "source_report_run_id": "RPT_MB_20260714_PARALLEL_A1_X2_V1",
+  "target_date": "2026-07-15",
+  "locked_through": "2026-07-14",
+  "source_report_run_id": "RPT_MB_20260715_ROLL30_V2_CORE100_OTHER50",
   "coverage_effect": "NONE",
   "real_money_effect": "NONE_UNTIL_SEPARATE_PROMOTION",
   "xien2_router": {
     "rule_version": "XIEN2_CONFLUENCE_ROUTER_V1",
-    "status": "ROUTED_SHADOW",
+    "status": "SAME_AS_BASELINE",
     "active_standard_methods": [
-      "A1",
-      "X2"
+      "A1"
     ],
-    "rule_applied": "A1_X2_CROSS_ONLY",
+    "rule_applied": "KEEP_CANONICAL_ALL_PAIRS",
     "funded_codes": [
-      "88",
-      "54",
-      "45"
+      "38",
+      "83"
     ],
     "baseline_pairs": [
-      "88-54",
-      "88-45",
-      "54-45"
+      "38-83"
     ],
     "router_pairs": [
-      "88-54",
-      "88-45"
+      "38-83"
     ],
-    "baseline_pair_count": 3,
-    "router_pair_count": 2,
-    "baseline_capital_vnd": 300000,
-    "router_capital_vnd": 200000,
-    "capital_saving_vnd": 100000,
+    "baseline_pair_count": 1,
+    "router_pair_count": 1,
+    "baseline_capital_vnd": 100000,
+    "router_capital_vnd": 100000,
+    "capital_saving_vnd": 0,
     "real_money_effect": false,
     "coverage_effect": "NONE",
     "confirmation_required_if_promoted": true
@@ -41,21 +36,18 @@
     "rule_version": "TRIPLE_CONFLUENCE_NORMALIZER_SHADOW_V1",
     "status": "NOT_APPLICABLE_NOT_TRIPLE_PASS",
     "active_standard_methods": [
-      "A1",
-      "X2"
+      "A1"
     ],
     "baseline_points_by_code": {
-      "88": 50,
-      "54": 50,
-      "45": 50
+      "38": 50,
+      "83": 50
     },
     "shadow_points_by_code": {
-      "88": 50,
-      "54": 50,
-      "45": 50
+      "38": 50,
+      "83": 50
     },
-    "baseline_capital_vnd": 3450000,
-    "shadow_capital_vnd": 3450000,
+    "baseline_capital_vnd": 2300000,
+    "shadow_capital_vnd": 2300000,
     "capital_saving_vnd": 0,
     "real_money_effect": false,
     "coverage_effect": "NONE"

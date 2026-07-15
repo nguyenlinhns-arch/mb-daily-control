@@ -37,10 +37,10 @@ xien2,gross_return_per_winning_pair_vnd,0
 xien2,confirmation_required,False
 xien2,pnl_included,False
 de,rule_version,DE_HEAD_TAIL_WATCHLIST_V1
-de,status,TÁCH KHỎI PRODUCTION · 0Đ
+de,status,A0 · THEO DÕI
 de,method,Đề Gan Lead18 / Head-Tail Strict v2
 de,candidate_count,2
 de,candidate_list,Đầu 2|Đuôi 0
-de,earliest_dates,"{""Đuôi 0"":""2026-08-09"",""Đầu 2"":""2026-08-21""}"
-de,candidate_metrics,"{""Đuôi 0"":{""gan"":24,""gmax"":54,""lead"":5,""occ30"":2,""score"":0.444444},""Đầu 2"":{""gan"":42,""gmax"":38,""lead"":23,""occ30"":0,""score"":1.105263}}"
+de,earliest_dates,"{""Đuôi 0"":""2026-08-09"",""Đầu 2"":""2026-08-22""}"
+de,candidate_metrics,"{""Đuôi 0"":{""gan"":25,""gmax"":54,""lead"":5,""occ30"":1,""score"":0.462963},""Đầu 2"":{""gan"":43,""gmax"":38,""lead"":29,""occ30"":0,""score"":1.131579}}"
 de,capital_vnd,0

@@ -1,6 +1,6 @@
 {
   "schema_version": "MB_DAILY_PLAN_LEDGER_V3_ROLL30_CORE100_OTHER50",
-  "latest_target_date": "2026-07-15",
+  "latest_target_date": "2026-07-16",
   "plans": {
     "2026-07-12": {
       "path": "data/plans/2026-07-12.json",
@@ -313,7 +313,7 @@
         "31": 50
       },
       "capital_vnd": 2300000,
-      "execution_status": "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
+      "execution_status": "REAL_SETTLED_CONFIRMED_AFTER_RESULT",
       "milestones_complete": true,
       "funding_mode": "MB_ROLL30_30_OF_30_PRODUCTION",
       "method_status": {
@@ -329,9 +329,104 @@
         "other_points": 50,
         "no_martingale": true,
         "xien2_enabled": false
+      },
+      "actual_order": {
+        "path": "data/manual-orders/2026-07-15.json",
+        "status": "REAL_SETTLED_CONFIRMED_AFTER_RESULT",
+        "method_id": "ROLL30_RESCUE50",
+        "selection": [
+          "31",
+          "13"
+        ],
+        "points_by_code": {
+          "13": 50,
+          "31": 50
+        },
+        "components": [
+          {
+            "order_id": "ROLL30_RESCUE50_31_13_50",
+            "method_id": "ROLL30_RESCUE50",
+            "label": "MB ROLL30 30/30 Rescue50",
+            "selection": [
+              "31",
+              "13"
+            ],
+            "points_per_code": 50,
+            "points_by_code": {
+              "13": 50,
+              "31": 50
+            },
+            "roles": {
+              "13": "Cover",
+              "31": "Primary"
+            },
+            "system_signal": {
+              "method_id": "ROLL30_RESCUE50",
+              "selection": [
+                "31",
+                "13"
+              ],
+              "points_per_code": 50,
+              "tier": "ROLL30 Rescue50"
+            },
+            "stake_override": {
+              "active": false,
+              "system_points_per_code": 50,
+              "confirmed_points_per_code": 50
+            },
+            "capital_vnd": 2300000,
+            "hits": {
+              "13": 0,
+              "31": 0
+            },
+            "payout_vnd": 0,
+            "pnl_vnd": -2300000,
+            "note": "Người dùng xác nhận đã thực đánh 13 và 31, mỗi số 50 điểm, và thua."
+          }
+        ],
+        "capital_vnd": 2300000,
+        "payout_vnd": 0,
+        "pnl_vnd": -2300000,
+        "pnl_included": true,
+        "confirmed_at": "2026-07-15T22:04:34+07:00",
+        "settled_at": "2026-07-15T22:04:34+07:00",
+        "result_sha256": "121ca6053d4dd28ac8568f38d05f15d655723889b900f16e358086bf1f256e16"
       }
+    },
+    "2026-07-16": {
+      "path": "data/plans/2026-07-16.json",
+      "report_run_id": "RPT_MB_20260716_ROLL30_V2_20260715T220434+0700_CONFIRM_V2",
+      "config_id": "MB_ROLL30_30_OF_30_PROD_V2_CORE100_OTHER50_20260715",
+      "content_hash": "77c7436cc965772faaed99edfd5a17feec27a150430d799f7580a09646e5fbac",
+      "plan_hash": "f25dbc6e4c666e8db549370fbb7b64ee7eaeed7c31b447ea40556e6f342d8fa7",
+      "locked_through": "2026-07-15",
+      "decision": "NATURAL_X2_EXACT50",
+      "selection": "31-13",
+      "points_by_code": {
+        "13": 50,
+        "31": 50
+      },
+      "capital_vnd": 2300000,
+      "execution_status": "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
+      "milestones_complete": true,
+      "funding_mode": "MB_ROLL30_30_OF_30_PRODUCTION",
+      "method_status": {
+        "A1": "A0_HARD_NOISE_NO_QUALIFIED",
+        "X2": "PASS_EXACT_FUNDED",
+        "X3": "A0_NO_EXACT_BASKET",
+        "ROLL7": "NOT_EVALUATED_NATURAL_ACTIVE",
+        "ROLL30": "NOT_EVALUATED_NATURAL_ACTIVE"
+      },
+      "guardrails": {
+        "minimum_funded_points": 50,
+        "core_points": 100,
+        "other_points": 50,
+        "no_martingale": true,
+        "xien2_enabled": false
+      },
+      "settlement_applied_through": "2026-07-15",
+      "personal_cumulative_vnd": 21246000
     }
   },
-  "updated_at": "2026-07-15T10:52:53+07:00"
+  "updated_at": "2026-07-15T22:04:34+07:00"
 }
-

@@ -189,7 +189,8 @@ if __name__ == "__main__":
 
 
 def main() -> None:
-    text = TARGET.read_text(encoding="utf-8")
+    source_target = BASE_TARGET if BASE_TARGET.exists() else TARGET
+    text = source_target.read_text(encoding="utf-8")
     start = text.index(START)
     end = text.index(END, start)
     current = text[start:end]

@@ -5,8 +5,9 @@ Canonical rule:
 - Evaluate A1, X2 Exact and X3 Exact independently.
 - Fund every method that passes on the same draw day.
 - Dedupe the same two-digit code across methods at the highest stake.
-- Use ROLL7 rescue30 only when no standard method passes and the rolling
+- Use ROLL7 rescue50 first when no standard method passes and the rolling
   5-of-7 floor requires a signal day.
+- If Natural and ROLL7 are both A0, use ROLL30 rescue50 so coverage is 30/30.
 """
 from __future__ import annotations
 
@@ -24,10 +25,19 @@ if SPEC is None or SPEC.loader is None:
 base = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(base)
 
-CONFIG_ID = "MB_PARALLEL_EXACT_ROLL7_REAL30_V1_20260712"
-CONTROLLER_RULE = ["A1_INDEPENDENT", "X2_EXACT_INDEPENDENT", "X3_EXACT_INDEPENDENT", "ROLL7_IF_NONE", "A0"]
+CONFIG_ID = "MB_ROLL30_30_OF_30_PROD_V2_CORE100_OTHER50_20260715"
+METHOD_NAME = "MB ROLL30 30/30 Production – Core100/Other50"
+CONTROLLER_RULE = [
+    "A1_INDEPENDENT",
+    "X2_RBK_EXACT_INDEPENDENT",
+    "X3_PROFIT_INDEPENDENT",
+    "ROLL7_IF_REQUIRED",
+    "ROLL30_IF_NONE",
+    "A0_DATA_ONLY",
+]
 X2_POINTS = 50
-ROLL7_POINTS = 30
+ROLL7_POINTS = 50
+ROLL30_POINTS = 50
 
 
 def _fund(points_by_code: dict[str, int], code: str, points: int) -> None:
@@ -80,11 +90,11 @@ def _rescue_codes(features: dict[str, dict[str, Any]], x3: dict[str, Any]) -> tu
         selected = [legs[0][0]]
         if legs[1][2] >= 6:
             selected.append(legs[1][0])
-        return selected, f"ROLL7 X2 Cover58 pair {row['pair']} TV21={row['tv21']:.4f}"
+        return selected, f"X2 Cover58 pair {row['pair']} TV21={row['tv21']:.4f}"
     basket = x3.get("basket") or []
     if basket:
-        return [str(basket[0]["code"])], "ROLL7 X3 top1 fallback"
-    return [], "ROLL7 no valid rescue candidate"
+        return [str(basket[0]["code"])], "X3 generator top1 fallback"
+    return [], "No valid rescue candidate"
 
 
 def make_parallel_plan(
@@ -103,6 +113,14 @@ def make_parallel_plan(
     a1 = base.a1_candidates(features, repeat2_count, max_frequency, target_date)
     x2 = base.build_x2(features, brake, target_date)
     x3 = base.build_x3(features, repeat2_count, max_frequency, target_date)
+    x3_hot = [int(item.get("hot21") or 0) for item in (x3.get("basket") or [])]
+    x3["gate"] = bool(
+        len(x3_hot) == 3
+        and repeat2_count <= 4
+        and max_frequency <= 2
+        and 30 <= sum(x3_hot) <= 34
+        and 11 <= max(x3_hot) <= 14
+    )
 
     methods: list[dict[str, Any]] = []
     points_by_code: dict[str, int] = {}
@@ -150,8 +168,8 @@ def make_parallel_plan(
         for code in codes:
             _fund(points_by_code, code, base.X3_POINTS)
         methods.append({
-            "id": "X3_GROWTH_EXACT",
-            "label": "X3 Growth Exact",
+            "id": "X3_PROFIT_EXACT",
+            "label": "X3 Profit Exact",
             "status": "PASS_REAL_PENDING",
             "codes": codes,
             "points_by_code": {c: base.X3_POINTS for c in codes},
@@ -168,27 +186,44 @@ def make_parallel_plan(
                 for code in rescue:
                     _fund(points_by_code, code, ROLL7_POINTS)
                 methods.append({
-                    "id": "ROLL7_RESCUE30",
+                    "id": "ROLL7_RESCUE50",
                     "label": "ROLL7 5-of-7 Rescue",
                     "status": "PASS_REAL_PENDING",
                     "codes": rescue,
                     "points_by_code": {c: ROLL7_POINTS for c in rescue},
+                })
+        if not methods:
+            rescue, rescue_reason = _rescue_codes(features, x3)
+            if rescue:
+                for code in rescue:
+                    _fund(points_by_code, code, ROLL30_POINTS)
+                methods.append({
+                    "id": "ROLL30_RESCUE50",
+                    "label": "ROLL30 30/30 Rescue",
+                    "status": "PASS_REAL_PENDING",
+                    "codes": rescue,
+                    "points_by_code": {c: ROLL30_POINTS for c in rescue},
                 })
 
     selection = list(points_by_code)
     total_points = sum(points_by_code.values())
     capital = total_points * base.LO_COST_PER_POINT
     pending = bool(selection)
-    standard_count = sum(1 for method in methods if not method["id"].startswith("ROLL7"))
+    standard_count = sum(
+        1 for method in methods
+        if not method["id"].startswith(("ROLL7", "ROLL30"))
+    )
     decision = (
         "A0" if not pending
-        else "ROLL7_RESCUE30" if methods[0]["id"].startswith("ROLL7")
+        else "ROLL7_RESCUE50" if methods[0]["id"].startswith("ROLL7")
+        else "ROLL30_RESCUE50" if methods[0]["id"].startswith("ROLL30")
         else "PARALLEL_EXACT" if standard_count > 1
         else methods[0]["id"]
     )
     method_labels = " + ".join(method["label"] for method in methods)
 
-    out["schema_version"] = "MB_DAILY_WEB_V8_PARALLEL_PLAN"
+    out["schema_version"] = "MB_DAILY_WEB_V16_ROLL30_CORE100_OTHER50"
+    out["method_name"] = METHOD_NAME
     out["config_id"] = CONFIG_ID
     out["funding_policy"] = {
         "mode": "PARALLEL_INDEPENDENT_ALL_EXACT_PASS",
@@ -196,14 +231,20 @@ def make_parallel_plan(
         "no_cross_method_blocking": True,
         "dedupe_same_code_by_max_stake": True,
         "roll7_only_when_no_standard_pass": True,
+        "roll7_before_roll30": True,
+        "roll30_when_natural_and_roll7_a0": True,
+        "minimum_funded_points": 50,
+        "xien2_enabled": False,
     }
     out["stake_rule"] = {
         "a1_core_main_points": 100,
         "a1_volume_main_points": 50,
         "a1_reverse_points": 50,
         "x2_exact_points_per_code": 50,
-        "x3_exact_points_per_code": 50,
-        "roll7_rescue_points_per_code": 30,
+        "x3_profit_points_per_code": 50,
+        "roll7_rescue_points_per_code": 50,
+        "roll30_rescue_points_per_code": 50,
+        "minimum_points_per_funded_code": 50,
         "lo_cost_per_point_vnd": base.LO_COST_PER_POINT,
         "lo_payout_per_hit_point_vnd": base.LO_PAYOUT_PER_HIT_POINT,
         "controller_rule": CONTROLLER_RULE,
@@ -228,8 +269,8 @@ def make_parallel_plan(
         "reason": (
             "Fund all standard methods that pass independently."
             if standard_count
-            else rescue_reason if rescue_required
-            else "No standard method passes and ROLL7 rescue is not required."
+            else rescue_reason if pending
+            else "No valid data-backed rescue candidate."
         ),
         "pnl_status": "NOT_INCLUDED_UNTIL_CONFIRMED",
     }
@@ -264,13 +305,13 @@ def make_parallel_plan(
             "numbers": numbers,
         })
     out["top_signals"] = {
-        "title": f"KE HOACH PARALLEL {target_date.strftime('%d/%m/%Y')}",
+        "title": f"KẾ HOẠCH MB ROLL30 30/30 {target_date.strftime('%d/%m/%Y')}",
         "subtitle": "A0" if not pending else method_labels,
         "total_methods": len(methods),
         "total_numbers": f"{len(selection)} ma",
         "total_points": f"{total_points} diem",
         "total_capital_vnd": capital,
-        "note": "A1/X2/X3 pass methods are all funded; same code is deduped at max stake.",
+        "note": "Core100; mọi mã funded khác 50. Natural A0 thì ROLL7 trước, ROLL30 sau; cùng mã chỉ giữ mức cao nhất.",
         "methods": web_methods,
     }
 
@@ -375,7 +416,7 @@ def self_test() -> None:
     base.self_test()
     points: dict[str, int] = {}
     _fund(points, "54", 50)
-    _fund(points, "54", 30)
+    _fund(points, "54", 50)
     assert points == {"54": 50}
     print("PARALLEL_SELF_TEST_OK")
 

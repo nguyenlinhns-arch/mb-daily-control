@@ -95,8 +95,17 @@ jobs:
               assert points and all(int(value) == 50 for value in points.values()), points
               assert len(points) == 3, points
           if method_id.startswith('ROLL7'):
-              assert points and all(int(value) == 30 for value in points.values()), points
+              assert points and all(int(value) == 50 for value in points.values()), points
               assert 1 <= len(points) <= 2, points
+          if method_id.startswith('ROLL30'):
+              assert points and all(int(value) == 50 for value in points.values()), points
+              assert 1 <= len(points) <= 2, points
+          funded_points = [
+              int(value)
+              for value in points.values()
+              if int(value) > 0
+          ]
+          assert all(value >= 50 for value in funded_points), funded_points
           policy = doc.get('funding_policy') or {}
           assert policy.get('cross_method_blocking') is False or policy.get('no_cross_method_blocking') is True
           print('A1_X2_X3_ROLL7_CURRENT_CARDS_OK')

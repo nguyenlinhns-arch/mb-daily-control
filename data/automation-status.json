@@ -1,1 +1,29 @@
-{"schema_version":"MB_AUTOMATION_STATUS_V4","status":"OK_LAST_VALID_PLAN_PUBLISHED","updated_at":"2026-07-14T19:55:00+07:00","website_payload_overwritten":true,"report_run_id":"RPT_MB_20260715_A1_A0_SETTLED_20260714_V1","target_date":"2026-07-15","locked_through":"2026-07-14","decision":"A0_NO_QUALIFIED_A1","settlement_checked":true,"settlement_date":"2026-07-14","settlement_total_pnl_vnd":550000,"milestones_complete":true,"source_status":"LOCKED_CROSSCHECKED_27_OF_27","source_sha256":"4027f9e6ec3bbb8a2f28bc83e0891f277f6d70b78f29dfc0de85538a56c1996b","website_refresh_seconds":120,"note":"Đã quyết toán lệnh 14/07 và xuất kế hoạch A0 ngày 15/07."}
+{
+  "schema_version": "MB_AUTOMATION_STATUS_V5_ROLL30_CORE100_OTHER50",
+  "status": "OK_LAST_VALID_PLAN_PUBLISHED",
+  "updated_at": "2026-07-15T10:52:53+07:00",
+  "website_payload_overwritten": true,
+  "report_run_id": "RPT_MB_20260715_ROLL30_V2_CORE100_OTHER50",
+  "target_date": "2026-07-15",
+  "locked_through": "2026-07-14",
+  "decision": "ROLL30_RESCUE50",
+  "settlement_checked": true,
+  "settlement_date": "2026-07-14",
+  "settlement_total_pnl_vnd": 550000,
+  "milestones_complete": true,
+  "source_status": "LOCKED_CROSSCHECKED_27_OF_27",
+  "source_sha256": "4027f9e6ec3bbb8a2f28bc83e0891f277f6d70b78f29dfc0de85538a56c1996b",
+  "website_refresh_seconds": 120,
+  "note": "Đã rà soát và xuất kế hoạch 15/07: ROLL30 Rescue 31×50 + 13×50; không cộng giỏ phụ.",
+  "config_id": "MB_ROLL30_30_OF_30_PROD_V2_CORE100_OTHER50_20260715",
+  "content_hash": "9e8aa12fe0dd0fbc003bbbfa6fbbe77934364cf6a771052c35ba28559cc8c757",
+  "selection": "31-13",
+  "points_by_code": {
+    "13": 50,
+    "31": 50
+  },
+  "capital_vnd": 2300000,
+  "minimum_funded_points": 50,
+  "no_30_point_regime": true
+}
+

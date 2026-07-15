@@ -2,7 +2,7 @@
 """Keep a permanent ROLL7 status card in the public next-draw payload.
 
 ROLL7 is a conditional real-money rescue layer, not a fourth standard method:
-- it is funded at 30 points/code only when A1, X2 and X3 are all A0 and the
+- it is funded at 50 points/code only when A1, X2 and X3 are all A0 and the
   rolling 5-of-7 floor requires a signal day;
 - otherwise the card remains visible with zero capital and the exact reason it
   is not activated.
@@ -24,6 +24,7 @@ PAYLOADS = (DATA / "current.json", DATA / "current-override.json")
 LEDGER = DATA / "review-ledger.json"
 ROLL7_ID = "ROLL7_STATUS"
 COST_PER_POINT = 23_000
+ROLL7_POINTS = 50
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -69,7 +70,7 @@ def active_roll7_component(doc: dict[str, Any]) -> dict[str, Any] | None:
         }
     if upper((doc.get("portfolio") or {}).get("decision")).startswith("ROLL7"):
         points = (doc.get("portfolio") or {}).get("points_by_code") or {}
-        return {"id": "ROLL7_RESCUE30", "codes": list(points), "points_by_code": points}
+        return {"id": "ROLL7_RESCUE50", "codes": list(points), "points_by_code": points}
     return None
 
 
@@ -83,13 +84,13 @@ def build_panel(doc: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     if active:
         raw_points = active.get("points_by_code") or {}
         codes = [str(code).zfill(2) for code in (active.get("codes") or list(raw_points))]
-        points_by_code = {code: int(raw_points.get(code, 30) or 30) for code in codes}
+        points_by_code = {code: int(raw_points.get(code, ROLL7_POINTS) or ROLL7_POINTS) for code in codes}
         numbers = [
             {
                 "code": code,
                 "points": points_by_code[code],
                 "capital_vnd": points_by_code[code] * COST_PER_POINT,
-                "role": "ROLL7 rescue30 · kích hoạt để giữ floor 5-of-7",
+                "role": "ROLL7 rescue50 · kích hoạt để giữ floor 5-of-7",
                 "visual_status": "PASS",
             }
             for code in codes
@@ -126,10 +127,10 @@ def build_panel(doc: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     panel = {
         "id": ROLL7_ID,
         "label": "MB ROLL7 · 5-of-7",
-        "method": "ROLL7 rescue30 · chỉ khi A1/X2/X3 đều A0",
+        "method": "ROLL7 rescue50 · chỉ khi A1/X2/X3 đều A0",
         "status": status,
         "visual_status": visual,
-        "points_per_code": 30,
+        "points_per_code": ROLL7_POINTS,
         "points_by_code": points_by_code,
         "code_count": code_count,
         "capital_vnd": capital,
@@ -143,8 +144,8 @@ def build_panel(doc: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
         "id": "ROLL7",
         "label": "MB ROLL7 · 5-of-7",
         "status": state,
-        "role": "REAL30 CONDITIONAL RESCUE",
-        "method": "ROLL7 Rescue30",
+        "role": "OTHER50 CONDITIONAL RESCUE",
+        "method": "ROLL7 Rescue50",
         "layer": "Chỉ xét khi A1, X2, X3 đều A0",
         "selected_numbers": selected,
         "points": total_points,
@@ -182,7 +183,7 @@ def inject(doc: dict[str, Any]) -> bool:
         "target_date": doc.get("target_date"),
         "state": panel["state"],
         "status": panel["status"],
-        "points_per_code": 30,
+        "points_per_code": ROLL7_POINTS,
         "selected_numbers": group["selected_numbers"],
         "points_by_code": group["points_by_code"],
         "capital_vnd": group["capital_vnd"],
@@ -198,7 +199,7 @@ def check(doc: dict[str, Any]) -> None:
     panels = [m for m in methods if upper(m.get("id")) == ROLL7_ID]
     assert len(panels) == 1, panels
     panel = panels[0]
-    assert int(panel.get("points_per_code") or 0) == 30, panel
+    assert int(panel.get("points_per_code") or 0) == ROLL7_POINTS, panel
     assert doc.get("roll7_status"), "roll7_status missing"
     group_ids = {upper(g.get("id")) for g in (doc.get("groups") or [])}
     assert "ROLL7" in group_ids, group_ids

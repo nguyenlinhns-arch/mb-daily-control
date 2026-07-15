@@ -66,6 +66,11 @@ def dedupe(values: list[str]) -> list[str]:
 
 
 def positive_points_map(doc: dict[str, Any]) -> dict[str, int]:
+    # MB ROLL30 30/30 Production has one canonical lô basket only.
+    # When the method explicitly disables Xiên 2, never derive side bets from
+    # otherwise funded lô codes.
+    if (doc.get("funding_policy") or {}).get("xien2_enabled") is False:
+        return {}
     pending = doc.get("pending_order") or {}
     portfolio = doc.get("portfolio") or {}
     raw = pending.get("points_by_code") or portfolio.get("points_by_code") or {}
@@ -147,6 +152,7 @@ def upsert_group(doc: dict[str, Any], group: dict[str, Any]) -> None:
 
 
 def patch(doc: dict[str, Any]) -> dict[str, Any]:
+    disabled = (doc.get("funding_policy") or {}).get("xien2_enabled") is False
     codes = funded_codes(doc)
     pairs = [f"{left}-{right}" for left, right in combinations(codes, 2)]
     pair_count = len(pairs)
@@ -158,7 +164,11 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
     real_capital = 0 if brake_applies else paper_capital
     gross_if_one = GROSS_RETURN_PER_WINNING_PAIR_VND if has_pairs and not brake_applies else 0
 
-    if brake_applies:
+    if disabled:
+        status = "TẮT · KHÔNG CẤP VỐN"
+        state = "DISABLED_BY_METHOD"
+        reason = "MB ROLL30 30/30 chỉ có một giỏ lô canonical; không cộng Xiên 2."
+    elif brake_applies:
         status = "PHANH XIÊN · 2 NGÀY LÔ THUA LIÊN TIẾP · SHADOW 0Đ"
         state = "SHADOW_ONLY_TWO_LO_LOSS_BRAKE"
         loss_text = "; ".join(
@@ -189,42 +199,42 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
         "pairs": pairs,
         "pair_count": pair_count,
         "pair_generation": "ALL_UNORDERED_2_COMBINATIONS",
-        "points_per_pair": POINTS_PER_PAIR,
-        "reference_capital_per_pair_vnd": CAPITAL_PER_PAIR_VND,
-        "capital_per_pair_vnd": 0 if brake_applies else CAPITAL_PER_PAIR_VND,
-        "gross_return_per_winning_pair_vnd": GROSS_RETURN_PER_WINNING_PAIR_VND,
+        "points_per_pair": 0 if disabled else POINTS_PER_PAIR,
+        "reference_capital_per_pair_vnd": 0 if disabled else CAPITAL_PER_PAIR_VND,
+        "capital_per_pair_vnd": 0 if disabled or brake_applies else CAPITAL_PER_PAIR_VND,
+        "gross_return_per_winning_pair_vnd": 0 if disabled else GROSS_RETURN_PER_WINNING_PAIR_VND,
         "paper_capital_vnd": paper_capital,
         "capital_vnd": real_capital,
         "gross_return_if_one_pair_wins_vnd": gross_if_one,
         "brake_active": brake_applies,
         "brake_basis": brake_days,
-        "booking_allowed": has_pairs and not brake_applies,
-        "confirmation_required": has_pairs and not brake_applies,
+        "booking_allowed": has_pairs and not brake_applies and not disabled,
+        "confirmation_required": has_pairs and not brake_applies and not disabled,
         "pnl_included": False,
         "reason": reason,
     }
     doc["xien2_policy"] = {
-        "status": "ACTIVE_RECOMMENDATION_WITH_TWO_LO_LOSS_BRAKE",
+        "status": "DISABLED_BY_MB_ROLL30_METHOD" if disabled else "ACTIVE_RECOMMENDATION_WITH_TWO_LO_LOSS_BRAKE",
         "rule_version": RULE_VERSION,
         "loss_brake_rule_version": LOSS_BRAKE_VERSION,
         "source": "UNIQUE_POSITIVE_STAKE_CODES_IN_CURRENT_PLAN",
         "minimum_codes": 2,
         "pair_generation": "ALL_UNORDERED_2_COMBINATIONS",
         "formula": "n*(n-1)/2",
-        "points_per_pair": POINTS_PER_PAIR,
-        "capital_per_pair_vnd": CAPITAL_PER_PAIR_VND,
-        "gross_return_per_winning_pair_vnd": GROSS_RETURN_PER_WINNING_PAIR_VND,
+        "points_per_pair": 0 if disabled else POINTS_PER_PAIR,
+        "capital_per_pair_vnd": 0 if disabled else CAPITAL_PER_PAIR_VND,
+        "gross_return_per_winning_pair_vnd": 0 if disabled else GROSS_RETURN_PER_WINNING_PAIR_VND,
         "loss_brake_trigger": "TWO_MOST_RECENT_LO_SIGNAL_DAYS_HAVE_NEGATIVE_LO_PNL",
         "loss_brake_effect": "SHOW_PAIRS_AS_SHADOW_ZERO_CAPITAL; NEVER_CHANGE_LO_ORDERS",
-        "confirmation_required_before_booking": True,
+        "confirmation_required_before_booking": not disabled,
     }
     doc["xien2_recommendation"] = recommendation
 
     stake = doc.setdefault("stake_rule", {})
-    stake["xien2_points_per_pair"] = POINTS_PER_PAIR
-    stake["xien2_capital_per_pair_vnd"] = CAPITAL_PER_PAIR_VND
-    stake["xien2_gross_return_per_winning_pair_vnd"] = GROSS_RETURN_PER_WINNING_PAIR_VND
-    stake["xien2_two_lo_loss_brake"] = True
+    stake["xien2_points_per_pair"] = 0 if disabled else POINTS_PER_PAIR
+    stake["xien2_capital_per_pair_vnd"] = 0 if disabled else CAPITAL_PER_PAIR_VND
+    stake["xien2_gross_return_per_winning_pair_vnd"] = 0 if disabled else GROSS_RETURN_PER_WINNING_PAIR_VND
+    stake["xien2_two_lo_loss_brake"] = not disabled
 
     number_caption = "Shadow 0đ · chuẩn 100.000đ/cặp" if brake_applies else f"{CAPITAL_PER_PAIR_VND:,}đ/cặp".replace(",", ".")
     number_role = (
@@ -238,9 +248,9 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
         "method": "Ghép toàn bộ cặp từ các số được cấp vốn thật",
         "status": status,
         "visual_status": "EMPTY" if brake_applies or not has_pairs else "PASS",
-        "points_per_pair": POINTS_PER_PAIR,
-        "reference_capital_per_pair_vnd": CAPITAL_PER_PAIR_VND,
-        "capital_per_pair_vnd": 0 if brake_applies else CAPITAL_PER_PAIR_VND,
+        "points_per_pair": 0 if disabled else POINTS_PER_PAIR,
+        "reference_capital_per_pair_vnd": 0 if disabled else CAPITAL_PER_PAIR_VND,
+        "capital_per_pair_vnd": 0 if disabled or brake_applies else CAPITAL_PER_PAIR_VND,
         "code_count": pair_count,
         "pair_count": pair_count,
         "paper_capital_vnd": paper_capital,
@@ -251,16 +261,16 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
                 "code": pair,
                 "points": 0,
                 "caption": number_caption,
-                "capital_vnd": 0 if brake_applies else CAPITAL_PER_PAIR_VND,
+                "capital_vnd": 0 if disabled or brake_applies else CAPITAL_PER_PAIR_VND,
                 "role": f"{number_role}: {pair}",
-                "visual_status": "EMPTY" if brake_applies else "PASS",
+                "visual_status": "EMPTY" if disabled or brake_applies else "PASS",
             }
             for pair in pairs
         ],
         "empty_slot": not has_pairs,
         "reason": reason,
-        "confirmation_required": has_pairs and not brake_applies,
-        "booking_allowed": has_pairs and not brake_applies,
+        "confirmation_required": has_pairs and not brake_applies and not disabled,
+        "booking_allowed": has_pairs and not brake_applies and not disabled,
     }
     top = doc.setdefault("top_signals", {})
     methods = [
@@ -284,25 +294,25 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
         "layer": f"{pair_count} cặp · vốn thật {real_capital:,}đ".replace(",", "."),
         "selected_numbers": pairs,
         "selection": "|".join(pairs),
-        "points": 0 if brake_applies else pair_count * POINTS_PER_PAIR,
-        "points_per_pair": POINTS_PER_PAIR,
-        "reference_capital_per_pair_vnd": CAPITAL_PER_PAIR_VND,
-        "capital_per_pair_vnd": 0 if brake_applies else CAPITAL_PER_PAIR_VND,
+        "points": 0 if disabled or brake_applies else pair_count * POINTS_PER_PAIR,
+        "points_per_pair": 0 if disabled else POINTS_PER_PAIR,
+        "reference_capital_per_pair_vnd": 0 if disabled else CAPITAL_PER_PAIR_VND,
+        "capital_per_pair_vnd": 0 if disabled or brake_applies else CAPITAL_PER_PAIR_VND,
         "paper_capital_vnd": paper_capital,
         "capital_vnd": real_capital,
         "summary": status,
         "reason": reason,
         "brake_active": brake_applies,
-        "confirmation_required": has_pairs and not brake_applies,
-        "booking_allowed": has_pairs and not brake_applies,
+        "confirmation_required": has_pairs and not brake_applies and not disabled,
+        "booking_allowed": has_pairs and not brake_applies and not disabled,
         "candidates": [
             {
                 "code": pair,
                 "rank": index,
-                "gate": not brake_applies,
-                "status": "SHADOW · PHANH XIÊN" if brake_applies else "KHUYẾN NGHỊ ĐÁNH",
-                "capital_vnd": 0 if brake_applies else CAPITAL_PER_PAIR_VND,
-                "paper_capital_vnd": CAPITAL_PER_PAIR_VND,
+                "gate": not disabled and not brake_applies,
+                "status": "TẮT · KHÔNG CẤP VỐN" if disabled else "SHADOW · PHANH XIÊN" if brake_applies else "KHUYẾN NGHỊ ĐÁNH",
+                "capital_vnd": 0 if disabled or brake_applies else CAPITAL_PER_PAIR_VND,
+                "paper_capital_vnd": 0 if disabled else CAPITAL_PER_PAIR_VND,
                 "reason": (
                     "Cặp vẫn được theo dõi nhưng không cấp vốn vì hai ngày lô có lệnh gần nhất đều âm."
                     if brake_applies
@@ -338,14 +348,15 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
     pnl["today_pending_total_recommended_capital_vnd"] = standard_pending + real_capital
 
     display = doc.setdefault("display_policy", {})
-    display["show_xien2_current_recommendation"] = True
-    display["show_xien2_loss_brake_status"] = True
+    display["show_xien2_current_recommendation"] = not disabled
+    display["show_xien2_loss_brake_status"] = not disabled
 
     automation = doc.setdefault("automation", {})
     automation["xien2_auto_pair_rule_version"] = RULE_VERSION
     automation["xien2_loss_brake_rule_version"] = LOSS_BRAKE_VERSION
     automation["xien2_loss_brake_active"] = brake_applies
     automation["xien2_auto_pair_complete"] = True
+    automation["xien2_disabled_by_method"] = disabled
     return doc
 
 

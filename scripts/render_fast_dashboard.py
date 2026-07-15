@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a zero-dependency A1/X2/X3/ROLL7/Xiên 2/Đề dashboard."""
+"""Render a zero-dependency A1/X2/X3/ROLL7/ROLL30/Xiên 2/Đề dashboard."""
 from __future__ import annotations
 
 import argparse
@@ -37,6 +37,8 @@ def method_key(method: dict[str, Any]) -> str:
     text = f"{method.get('id', '')} {method.get('label', '')}".upper()
     if "XIEN" in text or "XIÊN" in text:
         return "xien2"
+    if "ROLL30" in text:
+        return "roll30"
     if "ROLL7" in text or "5-OF-7" in text:
         return "roll7"
     if "DE_WATCH" in text or "MB ĐỀ" in text or "ĐẦU/ĐUÔI" in text:
@@ -78,19 +80,45 @@ def synthesize_method(doc: dict[str, Any], key: str) -> dict[str, Any]:
         return {
             "id": "ROLL7_STATUS",
             "label": "MB ROLL7 · 5-of-7",
-            "method": "Rescue30 khi A1/X2/X3 đều A0",
+            "method": "Rescue50 khi A1/X2/X3 đều A0",
             "status": state.get("status") or state.get("summary") or "CHƯA KÍCH HOẠT",
             "visual_status": "PASS" if numbers else "EMPTY",
-            "points_per_code": 30,
+            "points_per_code": 50,
             "code_count": len(numbers),
             "capital_vnd": state.get("capital_vnd") or 0,
             "reason": state.get("reason") or "Chỉ xét khi cả A1, X2 và X3 đều A0.",
             "numbers": [
                 {
                     "code": code,
-                    "points": points.get(code, 30),
-                    "capital_vnd": int(points.get(code, 30)) * 23000,
-                    "role": "ROLL7 Rescue30",
+                    "points": points.get(code, 50),
+                    "capital_vnd": int(points.get(code, 50)) * 23000,
+                    "role": "ROLL7 Rescue50",
+                    "visual_status": "PASS",
+                }
+                for code in numbers
+            ],
+        }
+    if key == "roll30":
+        group = group_by_id(doc, "ROLL30")
+        state = doc.get("roll30_status") or group
+        numbers = state.get("selected_numbers") or []
+        points = state.get("points_by_code") or {}
+        return {
+            "id": "ROLL30_RESCUE50",
+            "label": "MB ROLL30 30/30 · Rescue",
+            "method": "Coverage 30/30 · Other50",
+            "status": state.get("status") or state.get("summary") or "CHƯA KÍCH HOẠT",
+            "visual_status": "PASS" if numbers else "EMPTY",
+            "points_per_code": 50,
+            "code_count": len(numbers),
+            "capital_vnd": state.get("capital_vnd") or 0,
+            "reason": state.get("reason") or "Chỉ kích hoạt sau Natural A0 và ROLL7 không phát số.",
+            "numbers": [
+                {
+                    "code": code,
+                    "points": points.get(code, 50),
+                    "capital_vnd": int(points.get(code, 50)) * 23000,
+                    "role": "ROLL30 Rescue50",
                     "visual_status": "PASS",
                 }
                 for code in numbers
@@ -171,7 +199,7 @@ def synthesize_method(doc: dict[str, Any], key: str) -> dict[str, Any]:
 def current_methods(doc: dict[str, Any]) -> list[dict[str, Any]]:
     source = list((doc.get("top_signals") or {}).get("methods") or [])
     found = {method_key(item): item for item in source}
-    return [found.get(key) or synthesize_method(doc, key) for key in ("a1", "x2", "x3", "roll7", "xien2", "de")]
+    return [found.get(key) or synthesize_method(doc, key) for key in ("a1", "x2", "x3", "roll7", "roll30", "xien2", "de")]
 
 
 def number_tile(number: dict[str, Any], method: dict[str, Any]) -> str:
@@ -229,7 +257,7 @@ def de_watch(method: dict[str, Any], doc: dict[str, Any]) -> str:
 def method_card(method: dict[str, Any], doc: dict[str, Any]) -> str:
     key = method_key(method)
     tone = visual_tone(method.get("visual_status") or method.get("status"))
-    symbols = {"a1": "A1", "x2": "X2", "x3": "X3", "roll7": "R7", "xien2": "X2+", "de": "ĐỀ", "other": "MB"}
+    symbols = {"a1": "A1", "x2": "X2", "x3": "X3", "roll7": "R7", "roll30": "R30", "xien2": "X2+", "de": "ĐỀ", "other": "MB"}
     numbers = method.get("numbers") or []
     tiles = "".join(number_tile(item, method) for item in numbers)
     if key == "de":
@@ -285,6 +313,12 @@ def render(doc: dict[str, Any]) -> str:
         if xien.get("brake_active")
         else "Đề hiển thị danh sách đang theo dõi và mốc sớm nhất có thể xét; mốc luôn có điều kiện."
     )
+    sync_meta = (
+        f"Report_Run_ID={doc.get('report_run_id') or '—'} · "
+        f"Config_ID={doc.get('config_id') or '—'} · "
+        f"Data_Lock_Date={locked or '—'} · "
+        f"Content_Hash={doc.get('content_hash') or '—'}"
+    )
 
     return f"""<!doctype html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0d2239"><meta name="description" content="MB Daily Control — kế hoạch XSMB kỳ sắp tới"><title>MB Daily Control · {esc(date_vi(target))}</title>
@@ -293,7 +327,7 @@ def render(doc: dict[str, Any]) -> str:
 </style></head>
 <body data-static-dashboard="1"><div class="wrap"><div class="bar"><div class="brand"><div class="logo">MB</div><div><b>MB Daily Control</b><div style="color:var(--muted);font-size:12px">XSMB Daily Validation</div></div></div><button type="button" onclick="location.reload()">↻ Làm mới</button></div>
 <section class="hero"><div class="eyebrow">KỲ SẮP TỚI · {esc(date_vi(target))}</div><h1>{esc(portfolio.get('title') or (doc.get('top_signals') or {}).get('subtitle') or 'Đang rà soát')}</h1><p>{esc(portfolio.get('reason') or (doc.get('top_signals') or {}).get('note') or '')}</p><div class="stats"><div class="stat"><span>Dữ liệu khóa đến</span><b>{esc(date_vi(locked))}</b></div><div class="stat"><span>Vốn thật kỳ tới</span><b>{vnd(total_capital)}</b></div><div class="stat"><span>Xiên 2</span><b>{esc(xien_stat)}</b></div><div class="stat"><span>Trạng thái lệnh</span><b style="font-size:13px">{esc(execution)}</b></div></div></section>
-<main class="methods">{cards}</main><section class="summary"><div><b>Cập nhật {esc(generated or '—')}</b><br><small>{esc(summary_note)}</small></div><div class="actions"><a class="link" href="{SHEET_URL}" target="_blank" rel="noopener">Mở Google Sheet ↗</a></div></section><div class="foot">A1, X2, X3 xét song song; ROLL7 chỉ khi cả ba A0; Xiên có phanh riêng sau hai ngày lô thua; Đề là Research/Shadow đến khi xác nhận riêng.</div></div></body></html>
+<main class="methods">{cards}</main><section class="summary"><div><b>Cập nhật {esc(generated or '—')}</b><br><small>{esc(summary_note)}</small><br><small style="overflow-wrap:anywhere">{esc(sync_meta)}</small></div><div class="actions"><a class="link" href="{SHEET_URL}" target="_blank" rel="noopener">Mở Google Sheet ↗</a></div></section><div class="foot">MB ROLL30 30/30 Production – Core100/Other50 · Natural xét song song; Natural A0 thì ROLL7 trước, ROLL30 sau; không martingale, không cộng giỏ phụ.</div></div></body></html>
 """
 
 

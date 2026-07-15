@@ -43,20 +43,21 @@ def compact(doc: dict[str, Any]) -> bool:
         return False
 
     before = json.dumps(doc, ensure_ascii=False, sort_keys=True)
-    doc["display_policy"] = {
+    display_policy = doc.setdefault("display_policy", {})
+    display_policy.update({
         "mode": "NEXT_DRAW_ONLY_AFTER_SETTLEMENT",
         "show_target_date_only": True,
         "show_all_current_methods": True,
         "show_nonfunded_current_candidates": True,
         "show_roll7_current_status": True,
-        "show_xien2_current_recommendation": True,
+        "show_xien2_current_recommendation": bool(display_policy.get("show_xien2_current_recommendation", True)),
         "show_de_current_watchlist": True,
         "hide_completed_draw_details": True,
         "hide_latest_27_codes": True,
         "hide_completed_draw_method_cards": True,
         "pnl_display": "CUMULATIVE_AND_NEXT_CAPITAL_ONLY",
         "settlement_applied_through": locked.isoformat(),
-    }
+    })
 
     for key in ("last_settlement", "settlement"):
         doc.pop(key, None)
@@ -76,21 +77,32 @@ def compact(doc: dict[str, Any]) -> bool:
         "settlement_applied",
         "grand_total_pnl_vnd",
         "active_all_real_pnl_vnd",
+        "production_v2_through",
+        "production_v2_last_day_pnl_vnd",
+        "production_v2_cumulative_vnd",
+        "personal_execution_status",
+        "personal_15_07_included",
+        "scenario_if_personal_31_13_confirmed_vnd",
         "today_pending_capital_vnd",
         "today_pending_standard_capital_vnd",
         "today_pending_xien2_capital_vnd",
+        "today_pending_xien2_paper_capital_vnd",
         "today_pending_total_recommended_capital_vnd",
         "today_pending_order",
         "today_included",
     }
     doc["pnl_summary"] = {key: value for key, value in summary.items() if key in allowed}
-    doc["pnl_summary"]["confirmed_through"] = locked.isoformat()
+    # Do not advance the personal cash ledger through a day whose execution
+    # has not been confirmed.  The Production-method ledger is tracked in its
+    # own fields above.
+    if str(summary.get("personal_execution_status") or "").upper() != "UNCONFIRMED_NOT_BOOKED_TO_PERSONAL_LEDGER":
+        doc["pnl_summary"]["confirmed_through"] = locked.isoformat()
     doc["pnl_summary"]["settlement_applied"] = True
 
     groups = doc.get("groups") or []
     doc["groups"] = [
         group for group in groups
-        if str(group.get("id", "")).upper() in {"A1", "X2", "X3", "ROLL7", "XIEN", "XIEN2", "DE", "DE_DIGIT"}
+        if str(group.get("id", "")).upper() in {"A1", "X2", "X3", "ROLL7", "ROLL30", "XIEN", "XIEN2", "DE", "DE_DIGIT"}
     ]
 
     after = json.dumps(doc, ensure_ascii=False, sort_keys=True)

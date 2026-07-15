@@ -54,7 +54,7 @@ jobs:
           from pathlib import Path
 
           items = [
-              (Path("scripts/plan_next_day.py.zlib.b64"), Path("scripts/plan_next_day.py")),
+              (Path("scripts/plan_next_day.py.zlib.b64"), Path("scripts/plan_next_day_base.py")),
               (Path("scripts/build_public_snapshot.py.zlib.b64"), Path("scripts/build_public_snapshot.py")),
           ]
           for packed, target in items:
@@ -285,13 +285,13 @@ jobs:
 
       - name: Commit only when files changed
         run: |
-          if git diff --quiet -- data index.html scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py scripts/render_fast_dashboard.py; then
+          if git diff --quiet -- data index.html scripts/build_public_snapshot.py scripts/export_sheet_sync.py scripts/render_fast_dashboard.py; then
             echo "Không có dữ liệu hoặc kế hoạch mới."
             exit 0
           fi
           git config user.name "mb-daily-control-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data index.html scripts/plan_next_day.py scripts/build_public_snapshot.py scripts/export_sheet_sync.py scripts/render_fast_dashboard.py
+          git add data index.html scripts/build_public_snapshot.py scripts/export_sheet_sync.py scripts/render_fast_dashboard.py
           git commit -m "data: auto settle, record P/L, render fast website and plan $(TZ=Asia/Bangkok date +%F)"
           git pull --rebase origin main
           git push origin HEAD:main

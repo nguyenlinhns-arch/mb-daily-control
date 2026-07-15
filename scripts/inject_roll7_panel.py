@@ -164,14 +164,25 @@ def inject(doc: dict[str, Any]) -> bool:
 
     top = doc.setdefault("top_signals", {})
     methods = [m for m in (top.get("methods") or []) if upper(m.get("id")) != ROLL7_ID]
-    # Keep current A1/X2/X3 order and place ROLL7 last.
-    methods.append(panel)
+    # Keep a stable order with ROLL7 immediately before the optional Xiên
+    # block.  Xiên's own idempotent updater always places Xiên last; using the
+    # same ordering prevents the two workflows from endlessly reordering one
+    # another.
+    xien_index = next(
+        (index for index, item in enumerate(methods) if "XIEN" in upper(item.get("id"))),
+        len(methods),
+    )
+    methods.insert(xien_index, panel)
     top["methods"] = methods
     top["displayed_blocks"] = len(methods)
     top["roll7_note"] = panel["reason"]
 
     groups = [g for g in (doc.get("groups") or []) if upper(g.get("id")) != "ROLL7"]
-    groups.append(group)
+    xien_group_index = next(
+        (index for index, item in enumerate(groups) if upper(item.get("id")) in {"XIEN", "XIEN2"}),
+        len(groups),
+    )
+    groups.insert(xien_group_index, group)
     doc["groups"] = groups
 
     display = doc.setdefault("display_policy", {})

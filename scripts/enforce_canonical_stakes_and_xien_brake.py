@@ -209,7 +209,7 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
     stake["a1_reverse_points"] = 50
     stake["a1_reverse_skip_when_same"] = True
     stake["a1_no_duplicate_same_code"] = True
-    stake["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V3"
+    stake["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V5"
 
     display = doc.setdefault("display_policy", {})
     display["compact_execution_status"] = True
@@ -232,7 +232,7 @@ def patch(doc: dict[str, Any]) -> dict[str, Any]:
 
     automation = doc.setdefault("automation", {})
     automation["canonical_stake_guard_complete"] = True
-    automation["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V3"
+    automation["canonical_stake_guard_version"] = "A1_CORE100_VOLUME50_REVERSE50_NO_DUP_V5"
     automation["compact_public_status_complete"] = True
     return doc
 

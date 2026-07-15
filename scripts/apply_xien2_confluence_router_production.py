@@ -153,6 +153,20 @@ def routed_pairs(doc: dict[str, Any]) -> tuple[dict[str, dict[str, int]], list[s
 
 
 def patch(doc: dict[str, Any]) -> dict[str, Any]:
+    # Production V2 can explicitly disable every Xiên side bet.  In that
+    # regime the canonical lô basket must remain untouched and the legacy
+    # Confluence Router must not silently re-enable a separate ledger.
+    if (doc.get("funding_policy") or {}).get("xien2_enabled") is False:
+        automation = doc.setdefault("automation", {})
+        automation["xien2_confluence_router_complete"] = True
+        automation["xien2_confluence_router_version"] = "DISABLED_BY_METHOD"
+        automation["xien2_router_rule_applied"] = "DISABLED_BY_METHOD"
+        display = doc.setdefault("display_policy", {})
+        display["show_xien2_current_recommendation"] = False
+        display["show_xien2_loss_brake_status"] = False
+        display["show_xien2_router_status"] = False
+        return doc
+
     maps, baseline_pairs, pairs, router_rule, active_standard = routed_pairs(doc)
     existing = copy.deepcopy(doc.get("xien2_recommendation") or {})
     brake_active = bool(existing.get("brake_active")) and bool(pairs)

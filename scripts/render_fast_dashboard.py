@@ -304,15 +304,35 @@ def render(doc: dict[str, Any]) -> str:
     standard_capital = int(portfolio.get("standard_capital_vnd") or portfolio.get("capital_vnd") or pnl.get("today_pending_standard_capital_vnd") or pnl.get("today_pending_capital_vnd") or 0)
     xien_capital = int(xien.get("capital_vnd") or portfolio.get("xien2_recommended_capital_vnd") or 0)
     total_capital = standard_capital + xien_capital
-    execution = pending.get("status") or portfolio.get("pnl_status") or "—"
+    execution = (
+        pending.get("display_status")
+        or portfolio.get("display_status")
+        or pending.get("status")
+        or portfolio.get("pnl_status")
+        or "—"
+    )
     generated = str(doc.get("generated_at") or "").replace("T", " ")[:19]
     xien_pairs = len(xien.get("pairs") or [])
     xien_stat = f"Shadow {xien_pairs} cặp · 0đ" if xien.get("brake_active") else f"{xien_pairs} cặp · {vnd(xien_capital)}"
     xien_disabled = (doc.get("funding_policy") or {}).get("xien2_enabled") is False
-    third_stat_label = "P/L Production 15/07" if xien_disabled else "Xiên 2"
+    settlement = doc.get("settlement") or {}
+    confirmed_date = str(pnl.get("confirmed_through") or "")
+    personal_confirmed = (
+        str(pnl.get("personal_execution_status") or "").startswith("CONFIRMED")
+        and str(settlement.get("date") or "") == confirmed_date
+        and bool(pnl.get("personal_15_07_included"))
+    )
+    third_stat_label = (
+        f"P/L cá nhân {date_vi(confirmed_date)[:5]}"
+        if personal_confirmed
+        else "P/L Production 15/07" if xien_disabled else "Xiên 2"
+    )
     third_stat_value = (
-        vnd(pnl.get("production_v2_last_day_pnl_vnd") or 0, signed=True)
-        if xien_disabled else xien_stat
+        vnd(settlement.get("total_pnl_vnd") or 0, signed=True)
+        if personal_confirmed
+        else vnd(pnl.get("production_v2_last_day_pnl_vnd") or 0, signed=True)
+        if xien_disabled
+        else xien_stat
     )
     summary_note = (
         "Xiên 2 đang bị phanh sau hai ngày lô có lệnh liên tiếp cùng âm; các cặp chỉ Shadow 0đ."

@@ -17,7 +17,7 @@ pnl,confirmed_through,2026-07-14
 pnl,grand_total_pnl_vnd,23546000
 next,target_date,2026-07-15
 next,decision,ROLL30_RESCUE50
-next,selection,13 | 31
+next,selection,31-13
 next,points_by_code,"{""13"":50,""31"":50}"
 next,total_points,100
 next,standard_capital_vnd,2300000

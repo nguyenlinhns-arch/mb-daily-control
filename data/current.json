@@ -25,11 +25,18 @@
       },
       "X2_RBK_Exact": {
         "status": "PASS",
-        "selection": ["31", "13"]
+        "selection": [
+          "31",
+          "13"
+        ]
       },
       "X3_Profit": {
         "status": "A0",
-        "watch": ["31", "15", "32"]
+        "watch": [
+          "31",
+          "15",
+          "32"
+        ]
       }
     },
     "controller": {
@@ -60,29 +67,47 @@
       "92": 2
     },
     "max_frequency": 2,
-    "latest_27": ["19", "72", "01", "11", "06", "35", "85", "47", "18", "92", "38", "44", "83", "19", "86", "95", "57", "00", "70", "08", "77", "80", "33", "72", "53", "05", "92"],
+    "latest_27": [
+      "19",
+      "72",
+      "01",
+      "11",
+      "06",
+      "35",
+      "85",
+      "47",
+      "18",
+      "92",
+      "38",
+      "44",
+      "83",
+      "19",
+      "86",
+      "95",
+      "57",
+      "00",
+      "70",
+      "08",
+      "77",
+      "80",
+      "33",
+      "72",
+      "53",
+      "05",
+      "92"
+    ],
     "source_label": "Khóa đủ 27/27 ngày 15/07/2026; ba nguồn công khai khớp toàn bộ bảng giải."
-  },
-  "settlement": {
-    "date": "2026-07-15",
-    "layer": "ROLL30",
-    "selection": ["31", "13"],
-    "points_by_code": {
-      "31": 50,
-      "13": 50
-    },
-    "total_points": 100,
-    "capital_vnd": 2300000,
-    "total_hits": 0,
-    "payout_vnd": 0,
-    "production_pnl_vnd": -2300000,
-    "production_v2_cumulative_vnd": -2300000,
-    "actual_user_execution": "UNCONFIRMED_NOT_BOOKED_TO_PERSONAL_LEDGER"
   },
   "funding_policy": {
     "id": "MB_ROLL30_30_OF_30_PROD_V2",
     "mode": "FUND_EVERY_EXACT_PASS_METHOD",
-    "scope": ["A1", "X2", "X3", "ROLL7", "ROLL30"],
+    "scope": [
+      "A1",
+      "X2",
+      "X3",
+      "ROLL7",
+      "ROLL30"
+    ],
     "natural_parallel": true,
     "roll7_before_roll30": true,
     "roll30_when_natural_and_roll7_a0": true,
@@ -93,7 +118,13 @@
     "other_points": 50,
     "no_martingale": true,
     "no_progression": true,
-    "excluded_from_production": ["54-45 legacy", "Flex", "Min1", "Xiên", "Đề"]
+    "excluded_from_production": [
+      "54-45 legacy",
+      "Flex",
+      "Min1",
+      "Xiên",
+      "Đề"
+    ]
   },
   "plan": {
     "target_date": "2026-07-16",
@@ -107,7 +138,10 @@
     },
     "X2": {
       "status": "PASS_NATURAL_FUNDED",
-      "selection": ["31", "13"],
+      "selection": [
+        "31",
+        "13"
+      ],
       "points_per_code": 50,
       "points": 100,
       "capital_vnd": 2300000,
@@ -126,7 +160,11 @@
     },
     "X3": {
       "status": "A0_WATCH",
-      "selection": ["31", "15", "32"],
+      "selection": [
+        "31",
+        "15",
+        "32"
+      ],
       "points": 0,
       "capital_vnd": 0,
       "hot21": "11+7+10=28",
@@ -137,7 +175,10 @@
     "roll30": "NOT_EVALUATED_NATURAL_ACTIVE",
     "portfolio": {
       "decision": "LOCKED_NATURAL_X2",
-      "selection": ["31", "13"],
+      "selection": [
+        "31",
+        "13"
+      ],
       "points_by_code": {
         "31": 50,
         "13": 50
@@ -148,13 +189,8 @@
     }
   },
   "pnl_summary": {
-    "production_v2_through": "2026-07-15",
-    "production_v2_cumulative_vnd": -2300000,
-    "personal_confirmed_through": "2026-07-14",
-    "personal_confirmed_cumulative_vnd": 23546000,
-    "personal_15_07_included": false,
-    "personal_15_07_status": "UNCONFIRMED_EXECUTION",
-    "scenario_if_personal_31_13_confirmed_vnd": 21246000
+    "confirmed_through": "2026-07-15",
+    "settlement_applied": true
   },
   "pnl_scenarios_vnd": {
     "hits_0": -2300000,
@@ -163,12 +199,18 @@
     "hits_3": 9700000
   },
   "display_policy": {
-    "mode": "SETTLEMENT_AND_NEXT_DRAW",
-    "show_target_date_only": false,
-    "show_production_settlement": true,
-    "show_personal_ledger_separately": true,
-    "show_latest_27_codes": false,
-    "execution_status_label": "KẾ HOẠCH ĐÃ KHÓA · CHỜ XÁC NHẬN THỰC TẾ"
+    "mode": "NEXT_DRAW_ONLY_AFTER_SETTLEMENT",
+    "show_target_date_only": true,
+    "show_all_current_methods": true,
+    "show_nonfunded_current_candidates": true,
+    "show_roll7_current_status": true,
+    "show_xien2_current_recommendation": true,
+    "show_de_current_watchlist": true,
+    "hide_completed_draw_details": true,
+    "hide_latest_27_codes": true,
+    "hide_completed_draw_method_cards": true,
+    "pnl_display": "CUMULATIVE_AND_NEXT_CAPITAL_ONLY",
+    "settlement_applied_through": "2026-07-15"
   },
   "automation": {
     "status": "PLAN_READY_FOR_WEB",
@@ -181,5 +223,6 @@
     "sheet_sync_complete": true,
     "minimum_funded_points": 50,
     "no_30_point_regime": true
-  }
+  },
+  "groups": []
 }

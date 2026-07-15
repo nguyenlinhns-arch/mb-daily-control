@@ -107,12 +107,19 @@ jobs:
           pending=doc.get('pending_order') or {}
           points=pending.get('points_by_code') or {}
           xien=doc.get('xien2_recommendation') or {}
+          xien_disabled=(doc.get('funding_policy') or {}).get('xien2_enabled') is False
           rare=json.loads(Path('data/rare-state-normalizer-current.json').read_text(encoding='utf-8'))
 
           assert (doc.get('automation') or {}).get('canonical_stake_guard_complete') is True
           assert (doc.get('automation') or {}).get('xien2_confluence_router_complete') is True
-          assert xien.get('rule_version') == 'XIEN2_CONFLUENCE_ROUTER_V1', xien
-          assert (doc.get('xien2_policy') or {}).get('status') == 'ACTIVE_PRODUCTION_CONFLUENCE_ROUTER_WITH_TWO_LO_LOSS_BRAKE'
+          if xien_disabled:
+              assert xien.get('state') == 'DISABLED_BY_METHOD', xien
+              assert not (xien.get('pairs') or []), xien
+              assert int(xien.get('capital_vnd') or 0) == 0, xien
+              assert (doc.get('xien2_policy') or {}).get('status') == 'DISABLED_BY_MB_ROLL30_METHOD'
+          else:
+              assert xien.get('rule_version') == 'XIEN2_CONFLUENCE_ROUTER_V1', xien
+              assert (doc.get('xien2_policy') or {}).get('status') == 'ACTIVE_PRODUCTION_CONFLUENCE_ROUTER_WITH_TWO_LO_LOSS_BRAKE'
           assert rare.get('coverage_effect') == 'NONE'
           assert rare.get('selection_effect') == 'NONE'
           assert rare.get('real_money_effect') is False
@@ -133,7 +140,10 @@ jobs:
           html=Path('index.html').read_text(encoding='utf-8')
           assert 'CHỜ XÁC NHẬN' in html
           assert 'SYSTEM_SIGNAL_NOT_YET_CONFIRMED' not in html
-          assert 'Confluence Router' in html
+          if xien_disabled:
+              assert 'TẮT · KHÔNG CẤP VỐN' in html
+          else:
+              assert 'Confluence Router' in html
           if 'MB A1 Volume' in html:
               block=re.search(r'<article[^>]*>.*?<h3>MB A1 Volume</h3>.*?</article>', html, re.S)
               assert block and '>50 điểm<' in block.group(0), block.group(0) if block else None

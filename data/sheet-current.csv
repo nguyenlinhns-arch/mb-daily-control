@@ -1,7 +1,7 @@
 section,key,value
-meta,config_id,MB_ROLL30_30_OF_30_PROD_V2_CORE100_OTHER50_20260715
-meta,report_run_id,RPT_MB_20260716_ROLL30_V2_20260715T220434+0700_CONFIRM_V2
-meta,generated_at,2026-07-15T22:04:34+07:00
+meta,config_id,MB_ROLL30_30_OF_30_PROD_V4_CU12_COUNT_CU3_SMARTSWAP_CORE100_OTHER50_20260716
+meta,report_run_id,RPT_MB_20260716_PROD_V4_FINAL_REVIEW_20260716T171700+0700
+meta,generated_at,2026-07-16T17:17:00+07:00
 data,locked_through,2026-07-15
 data,data_status,LOCKED_CROSSCHECKED_27_OF_27
 data,code_count,27
@@ -16,14 +16,14 @@ settlement,latest_pnl_vnd,-2300000
 pnl,confirmed_through,2026-07-15
 pnl,grand_total_pnl_vnd,21246000
 next,target_date,2026-07-16
-next,decision,NATURAL_X2_EXACT50
+next,decision,NATURAL_X2_EXACT50_PROD_V4
 next,selection,31 | 13
 next,points_by_code,"{""13"":50,""31"":50}"
 next,total_points,100
 next,standard_capital_vnd,2300000
 next,xien2_recommended_capital_vnd,0
 next,total_recommended_capital_vnd,2300000
-next,execution_status,CHỜ XÁC NHẬN
+next,execution_status,ĐÃ CHỐT · CHỜ KẾT QUẢ
 next,pnl_included,False
 xien2,rule_version,XIEN2_AUTO_FROM_FUNDED_CODES_V2_LOSS_BRAKE
 xien2,status,TẮT · KHÔNG CẤP VỐN

@@ -1,27 +1,13 @@
 name: Enforce A1 Core100 Volume50 permanent lock
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "MB Daily result settlement and next-day plan"
-      - "Apply confirmed manual real orders"
-    types: [completed]
-  schedule:
-    - cron: "8 1 * * *"
-    - cron: "38 12 * * *"
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/plans/**"
-      - "data/automation-policy.json"
-      - "data/a1-staking-policy.json"
-      - "index.html"
-      - "scripts/enforce_a1_core100_volume50.py"
-      - "scripts/finalize_a1_core100_volume50.py"
-      - "scripts/patch_a1_top3_watchlist.py"
-      - ".github/workflows/enforce-a1-core100-volume50.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -32,7 +18,7 @@ concurrency:
 
 jobs:
   enforce:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

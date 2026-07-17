@@ -7,6 +7,45 @@ from scripts import google_sheets_bridge as bridge
 
 
 class SheetsBridgeTests(unittest.TestCase):
+    def test_private_config_resolves_pnl_sheet_id(self):
+        rows = [
+            ["Key", "Value"],
+            ["PNL_SHEET_ID", "private_sheet_id_123456789"],
+            ["CONFIG_VERSION", "MB_V32_PRIVATE_CONFIG_V1"],
+        ]
+        with patch.dict(bridge.os.environ, {}, clear=True), patch.object(
+            bridge, "get_values", return_value=rows
+        ) as reader, patch.object(
+            bridge, "PNL_SHEET_ID_SHA256",
+            bridge.sha256(b"private_sheet_id_123456789").hexdigest(),
+        ):
+            value = bridge.resolve_pnl_sheet_id(object(), "source-id")
+        self.assertEqual(value, "private_sheet_id_123456789")
+        self.assertIn("V32_Private_Config", reader.call_args.args[2])
+
+    def test_private_config_duplicate_key_blocks(self):
+        rows = [
+            ["PNL_SHEET_ID", "private_sheet_id_123456789"],
+            ["PNL_SHEET_ID", "other_private_sheet_987654321"],
+            ["CONFIG_VERSION", "MB_V32_PRIVATE_CONFIG_V1"],
+        ]
+        with patch.dict(bridge.os.environ, {}, clear=True), patch.object(
+            bridge, "get_values", return_value=rows
+        ):
+            with self.assertRaises(bridge.BridgeError):
+                bridge.resolve_pnl_sheet_id(object(), "source-id")
+
+    def test_private_config_wrong_identity_blocks(self):
+        rows = [
+            ["PNL_SHEET_ID", "wrong_private_sheet_123456789"],
+            ["CONFIG_VERSION", "MB_V32_PRIVATE_CONFIG_V1"],
+        ]
+        with patch.dict(bridge.os.environ, {}, clear=True), patch.object(
+            bridge, "get_values", return_value=rows
+        ):
+            with self.assertRaises(bridge.BridgeError):
+                bridge.resolve_pnl_sheet_id(object(), "source-id")
+
     def test_source_operation_retry_does_not_append_twice(self):
         record = {
             "date": "2026-07-17", "status": "LOCKED_WAITING_RESULT",

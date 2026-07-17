@@ -77,11 +77,9 @@ jobs:
       - name: Snapshot source and five personal ledgers
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          MB_PNL_SHEET_ID: ${{ secrets.MB_PNL_SHEET_ID }}
         run: |
           set -euo pipefail
           test -n "$GOOGLE_SERVICE_ACCOUNT_JSON" || { echo "Missing GOOGLE_SERVICE_ACCOUNT_JSON"; exit 2; }
-          test -n "$MB_PNL_SHEET_ID" || { echo "Missing MB_PNL_SHEET_ID"; exit 2; }
           mkdir -p "$RUN_DIR"
           python scripts/google_sheets_bridge.py snapshot \
             --settlement-date "$SETTLEMENT_DATE" \
@@ -100,7 +98,6 @@ jobs:
       - name: Apply Google Sheets and verify readback
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          MB_PNL_SHEET_ID: ${{ secrets.MB_PNL_SHEET_ID }}
         run: |
           set -euo pipefail
           python scripts/google_sheets_bridge.py apply \

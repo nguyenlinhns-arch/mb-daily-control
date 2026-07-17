@@ -47,11 +47,13 @@ một lệnh và không tự ghi 0 cho người không có lệnh.
 
 ### Một lần duy nhất để kích hoạt ghi Google Sheets
 
-Repository cần hai GitHub Actions secrets:
+Repository chỉ cần một GitHub Actions secret:
 
 - `GOOGLE_SERVICE_ACCOUNT_JSON`: JSON của service account; runtime chỉ yêu cầu
   Sheets và Drive read-only scope;
-- `MB_PNL_SHEET_ID`: ID riêng của file “Sổ theo dõi lãi lỗ hàng ngày”.
+
+ID file P/L nằm trong tab ẩn `V32_Private_Config` của Sheet nguồn riêng tư;
+workflow đọc sau khi xác thực nên ID này không xuất hiện trên GitHub.
 
 Bật Google Sheets API và Google Drive API trong project của service account.
 Chia sẻ file nguồn và file P/L cho `client_email` với quyền Editor; thêm chính

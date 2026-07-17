@@ -1,23 +1,13 @@
 name: Enforce current A1/X2/X3/ROLL7 status panels
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["MB Daily result settlement and next-day plan"]
-    types: [completed]
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/current-override.json"
-      - "data/review-ledger.json"
-      - "data/plans/**"
-      - "data/automation-policy.json"
-      - "index.html"
-      - "scripts/enforce_top3_first_block.py"
-      - "scripts/enforce_top3_first_block.py.zlib.b64"
-      - "scripts/inject_roll7_panel.py"
-      - ".github/workflows/enforce-first-block.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -28,7 +18,7 @@ concurrency:
 
 jobs:
   enforce:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

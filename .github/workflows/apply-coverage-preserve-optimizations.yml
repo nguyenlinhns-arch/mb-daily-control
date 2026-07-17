@@ -1,20 +1,13 @@
 name: Apply coverage-preserving optimization shadows
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "MB Daily result settlement and next-day plan"
-      - "Apply automatic Xiên 2 recommendations"
-      - "Apply Đề watchlist and milestones"
-    types: [completed]
-  push:
-    branches: ["main"]
-    paths:
-      - "scripts/apply_coverage_preserve_optimizations.py"
-      - "scripts/inject_optimization_shadow_cards.py"
-      - "data/optimization-policy.json"
-      - ".github/workflows/apply-coverage-preserve-optimizations.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -25,7 +18,7 @@ concurrency:
 
 jobs:
   apply:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

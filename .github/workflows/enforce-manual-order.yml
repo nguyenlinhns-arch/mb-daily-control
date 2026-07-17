@@ -1,20 +1,13 @@
 name: Apply confirmed manual real orders
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "MB Daily result settlement and next-day plan"
-      - "Enforce A1 reverse50 and top status panels"
-      - "Enforce current A1/X2/X3 status panels"
-    types: [completed]
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/manual-orders/**"
-      - "scripts/apply_manual_orders_v2.py"
-      - ".github/workflows/enforce-manual-order.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -25,7 +18,7 @@ concurrency:
 
 jobs:
   apply:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

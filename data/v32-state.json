@@ -1,0 +1,38 @@
+{
+  "schema_version": "MB_V32_STATE_V1",
+  "settled_through": "2026-07-16",
+  "current_month_id": "2026-07",
+  "current_month": {
+    "sessions": 16,
+    "hit_days": 14,
+    "hit_day_rate_pct": 87.5,
+    "profit_days": 11,
+    "profit_day_rate_pct": 68.75,
+    "capital_vnd": 65895000,
+    "payout_vnd": 95600000,
+    "net_profit_vnd": 29705000,
+    "roi_pct": 45.0793,
+    "profit_factor": 3.4973,
+    "max_drawdown_vnd": -5565000,
+    "equity_current_vnd": 29705000,
+    "equity_peak_vnd": 35270000,
+    "gross_profit_vnd": 41600000,
+    "gross_loss_vnd": 11895000
+  },
+  "full": {
+    "sessions": 916,
+    "hit_days": 875,
+    "hit_day_rate_pct": 95.524,
+    "profit_days": 512,
+    "profit_day_rate_pct": 55.8952,
+    "capital_vnd": 3736925000,
+    "payout_vnd": 4711200000,
+    "net_profit_vnd": 974275000,
+    "roi_pct": 26.0716,
+    "profit_factor": null,
+    "max_drawdown_vnd": -16985000,
+    "equity_current_vnd": 974275000,
+    "equity_peak_vnd": 979840000
+  },
+  "seed_note": "Đã đối soát độc lập đến hết 16/07/2026; gross P/L full không khả dụng nên PF full không được suy diễn."
+}

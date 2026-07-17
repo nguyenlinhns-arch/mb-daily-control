@@ -1,0 +1,30 @@
+{
+  "target_date": "2026-07-17",
+  "data_lock_date": "2026-07-16",
+  "status": "LOCKED_WAITING_RESULT",
+  "codes": [
+    "01",
+    "13",
+    "31",
+    "41",
+    "83",
+    "91"
+  ],
+  "number_of_codes": 6,
+  "points_per_code": 30,
+  "points_by_code": {
+    "01": 30,
+    "13": 30,
+    "31": 30,
+    "41": 30,
+    "83": 30,
+    "91": 30
+  },
+  "total_points": 180,
+  "cost_per_point_vnd": 23000,
+  "total_capital_vnd": 4140000,
+  "maximum_loss_vnd": 4140000,
+  "core_100_enabled": false,
+  "other_50_enabled": false,
+  "outcome_known_at_selection": false
+}

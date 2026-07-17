@@ -1,0 +1,43 @@
+{
+  "date": "2026-07-16",
+  "status": "SETTLED_VERIFIED_27_OF_27",
+  "method": "R868Y26 + Gate315 + Empirical Overdue Swap075 / A6_B8",
+  "codes": [
+    "10",
+    "13",
+    "31",
+    "41",
+    "51",
+    "91",
+    "92"
+  ],
+  "points_by_code": {
+    "10": 25,
+    "13": 25,
+    "31": 25,
+    "41": 25,
+    "51": 25,
+    "91": 25,
+    "92": 25
+  },
+  "points_per_code": 25,
+  "total_points": 175,
+  "hits_by_code": {
+    "10": 0,
+    "13": 0,
+    "31": 0,
+    "41": 0,
+    "51": 0,
+    "91": 0,
+    "92": 0
+  },
+  "hit_codes": [],
+  "hit_units": 0,
+  "hit_day": false,
+  "profit_day": false,
+  "capital_vnd": 4025000,
+  "payout_vnd": 0,
+  "pnl_vnd": -4025000,
+  "roi_pct": -100.0,
+  "seed_note": "Forward replay V32; không suy diễn đây là lệnh cá nhân của cả 5 người."
+}

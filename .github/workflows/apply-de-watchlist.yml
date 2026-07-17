@@ -1,28 +1,13 @@
 name: Apply Đề watchlist and milestones
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "MB Daily result settlement and next-day plan"
-      - "Apply automatic Xiên 2 recommendations"
-      - "Enforce next-draw-only website"
-    types: [completed]
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/current-override.json"
-      - "data/plans/**"
-      - "data/history-27.bz2.b64"
-      - "data/history-bootstrap/**"
-      - "data/settlement-ledger.json"
-      - "data/automation-policy.json"
-      - "scripts/apply_de_watchlist.py"
-      - "scripts/export_sheet_sync.py"
-      - "scripts/render_fast_dashboard.py"
-      - "scripts/enforce_next_draw_only.py"
-      - ".github/workflows/apply-de-watchlist.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -33,7 +18,7 @@ concurrency:
 
 jobs:
   apply:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

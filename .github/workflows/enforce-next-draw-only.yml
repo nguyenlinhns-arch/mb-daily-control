@@ -1,17 +1,13 @@
 name: Enforce next-draw-only website
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
-  workflow_run:
-    workflows: ["MB Daily result settlement and next-day plan"]
-    types: [completed]
   workflow_dispatch:
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/current-override.json"
-      - "scripts/enforce_next_draw_only.py"
-      - ".github/workflows/enforce-next-draw-only.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -22,6 +18,7 @@ concurrency:
 
 jobs:
   compact-public-payload:
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main

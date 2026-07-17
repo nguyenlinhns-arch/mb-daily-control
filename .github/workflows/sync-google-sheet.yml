@@ -1,24 +1,13 @@
 name: MB Daily result settlement and next-day plan
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  schedule:
-    # 08:00 giờ Việt Nam (01:00 UTC): rà soát đầy đủ, quyết toán nếu có dữ liệu mới, ghi file và lập kế hoạch kế tiếp.
-    - cron: "0 1 * * *"
-    # 19:30 giờ Việt Nam (12:30 UTC): khóa kết quả ngày, ghi nhận P/L, ghi file và công bố kế hoạch ngày sau.
-    - cron: "30 12 * * *"
-  push:
-    branches: ["main"]
-    paths:
-      - "scripts/sync_from_google_sheet.py"
-      - "scripts/plan_next_day.py.zlib.b64"
-      - "scripts/build_public_snapshot.py.zlib.b64"
-      - "scripts/patch_a1_top3_watchlist.py"
-      - "scripts/export_sheet_sync.py"
-      - "scripts/render_fast_dashboard.py"
-      - "data/automation-policy.json"
-      - "data/history-bootstrap/**"
-      - ".github/workflows/sync-google-sheet.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -29,6 +18,7 @@ concurrency:
 
 jobs:
   pipeline:
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:

@@ -1,34 +1,13 @@
 name: Enforce final canonical stakes and Xiên brake
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "MB Daily result settlement and next-day plan"
-      - "Apply automatic Xiên 2 recommendations"
-      - "Enforce A1 reverse50 and current recommendations"
-      - "Apply Đề watchlist and milestones"
-      - "Apply coverage-preserving optimization shadows"
-      - "Enforce next-draw-only website"
-      - "Keep ROLL7 visible with current method panels"
-    types: [completed]
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/current-override.json"
-      - "data/plans/**"
-      - "data/settlement-ledger.json"
-      - "data/xien2-loss-brake-policy.json"
-      - "data/xien2-confluence-router-policy.json"
-      - "data/rare-state-normalizer-policy.json"
-      - "scripts/enforce_canonical_stakes_and_xien_brake.py"
-      - "scripts/apply_xien2_auto_pairs.py"
-      - "scripts/apply_xien2_confluence_router_production.py"
-      - "scripts/apply_rare_state_stake_normalizer_shadow.py"
-      - "scripts/render_fast_dashboard.py"
-      - "scripts/normalize_static_dashboard.py"
-      - ".github/workflows/enforce-canonical-stakes-final.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -39,7 +18,7 @@ concurrency:
 
 jobs:
   enforce:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

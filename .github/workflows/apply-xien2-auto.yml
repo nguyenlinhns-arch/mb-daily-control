@@ -1,24 +1,13 @@
 name: Apply automatic Xiên 2 recommendations
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - "MB Daily result settlement and next-day plan"
-      - "Enforce A1 reverse50 and current recommendations"
-      - "Enforce next-draw-only website"
-    types: [completed]
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/current-override.json"
-      - "data/plans/**"
-      - "data/automation-policy.json"
-      - "scripts/apply_xien2_auto_pairs.py"
-      - "scripts/export_sheet_sync.py"
-      - "scripts/render_fast_dashboard.py"
-      - ".github/workflows/apply-xien2-auto.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -29,7 +18,7 @@ concurrency:
 
 jobs:
   apply:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

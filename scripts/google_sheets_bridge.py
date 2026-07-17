@@ -28,10 +28,12 @@ SOURCE_HISTORY_MIRROR_TAB = "MB_History_27_IMPORT"
 SOURCE_PLAN_TAB = "V32_Daily_Plan"
 SOURCE_SETTLEMENT_TAB = "V32_Daily_Settlement"
 SOURCE_LOG_TAB = "V32_Automation_Log"
+SOURCE_PRIVATE_CONFIG_TAB = "V32_Private_Config"
 PNL_LOG_TAB = "Nhật ký tự động V32"
 PNL_CONFIG_TAB = "Tự động hóa V32"
 PEOPLE_KEYS = ("p1", "p2", "p3", "p4", "p5")
 SCOPES = ("https://www.googleapis.com/auth/spreadsheets",)
+PNL_SHEET_ID_SHA256 = "c88604c7d065f2590d808bd9a0d5b58ebee49efd09573062fc7798ea0b7c9279"
 
 
 class BridgeError(RuntimeError):
@@ -97,16 +99,50 @@ def quote_tab(title: str) -> str:
     return "'" + title.replace("'", "''") + "'"
 
 
+def verified_pnl_sheet_id(value: str) -> str:
+    if not re.fullmatch(r"[A-Za-z0-9_-]{20,200}", value):
+        raise BridgeError("P/L spreadsheet ID không hợp lệ")
+    if sha256(value.encode("utf-8")).hexdigest() != PNL_SHEET_ID_SHA256:
+        raise BridgeError("P/L spreadsheet ID không khớp khóa định danh")
+    return value
+
+
+def resolve_pnl_sheet_id(
+    service, source_sheet_id: str, explicit: str | None = None
+) -> str:
+    direct = str(explicit or os.environ.get("MB_PNL_SHEET_ID", "")).strip()
+    if direct:
+        return verified_pnl_sheet_id(direct)
+    rows = get_values(
+        service, source_sheet_id,
+        f"{quote_tab(SOURCE_PRIVATE_CONFIG_TAB)}!A1:B20",
+    )
+    pnl_values = [
+        str(row[1]).strip() for row in rows
+        if len(row) >= 2 and str(row[0]).strip() == "PNL_SHEET_ID"
+    ]
+    versions = [
+        str(row[1]).strip() for row in rows
+        if len(row) >= 2 and str(row[0]).strip() == "CONFIG_VERSION"
+    ]
+    if len(pnl_values) != 1 or len(versions) != 1:
+        raise BridgeError("Private config thiếu hoặc trùng khóa bắt buộc")
+    if versions[0] != "MB_V32_PRIVATE_CONFIG_V1":
+        raise BridgeError("Private config sai phiên bản")
+    return verified_pnl_sheet_id(pnl_values[0])
+
+
 def snapshot(args: argparse.Namespace) -> None:
     service = sheets_service()
-    pnl_id = args.pnl_sheet_id or os.environ.get("MB_PNL_SHEET_ID", "").strip()
-    if not pnl_id:
-        raise BridgeError("Thiếu secret MB_PNL_SHEET_ID")
+    pnl_id = resolve_pnl_sheet_id(
+        service, args.source_sheet_id, args.pnl_sheet_id
+    )
     source_titles = metadata_titles(service, args.source_sheet_id)
     pnl_titles = metadata_titles(service, pnl_id)
     required_source = {
         SOURCE_HISTORY_TAB, SOURCE_HISTORY_MIRROR_TAB,
         SOURCE_PLAN_TAB, SOURCE_SETTLEMENT_TAB, SOURCE_LOG_TAB,
+        SOURCE_PRIVATE_CONFIG_TAB,
     }
     missing_source = sorted(required_source - source_titles)
     required_pnl = {PNL_LOG_TAB, PNL_CONFIG_TAB}
@@ -378,10 +414,10 @@ def apply(args: argparse.Namespace) -> None:
         )
     if digest(payload.get("operations", [])) != payload.get("payload_hash"):
         raise BridgeError("Payload hash không khớp")
-    pnl_id = args.pnl_sheet_id or os.environ.get("MB_PNL_SHEET_ID", "").strip()
-    if not pnl_id:
-        raise BridgeError("Thiếu secret MB_PNL_SHEET_ID")
     service = sheets_service()
+    pnl_id = resolve_pnl_sheet_id(
+        service, args.source_sheet_id, args.pnl_sheet_id
+    )
     operation_ids = []
     for operation in payload["operations"]:
         kind = operation["kind"]

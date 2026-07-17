@@ -28,6 +28,10 @@ Dashboard vận hành tĩnh cho kế hoạch MB hằng ngày.
 - `scripts/normalize_static_dashboard.py`: lớp an toàn được workflow Pages áp dụng trước khi deploy.
 - `.github/workflows/pages.yml`: build và triển khai GitHub Pages từ nhánh `main`.
 
+## Bảo vệ V32
+
+Các workflow sinh kế hoạch Core100/Other50 cũ được giữ lại chỉ để rollback thủ công. Chúng không còn chạy theo `push`, `schedule` hoặc `workflow_run`; muốn kích hoạt phải dispatch bằng tay và nhập chính xác `ENABLE_LEGACY`. Nhờ vậy automation cũ không thể ghi đè kế hoạch V32 đang khóa.
+
 Trang công khai: <https://nguyenlinhns-arch.github.io/mb-daily-control/>
 
 Google Sheet vận hành: <https://docs.google.com/spreadsheets/d/1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w/edit>

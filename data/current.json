@@ -92,5 +92,11 @@
     "target_outcome_used": false,
     "july_backtest_independently_reconciled": true,
     "disclaimer": "Backtest là số liệu lịch sử, không bảo đảm kết quả tương lai."
+  },
+  "automation": {
+    "pipeline_version": "MB_V32_DAILY_0600_TXN_V2",
+    "schedule": "06:00 Asia/Bangkok",
+    "status": "MANUAL_CUTOVER_VALIDATED",
+    "activation": "SCHEDULE_ARMED_FAIL_CLOSED_CREDENTIAL_REQUIRED"
   }
 }

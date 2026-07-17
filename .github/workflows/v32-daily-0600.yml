@@ -1,0 +1,141 @@
+name: V32 daily 06:00 — Sheets then website
+
+on:
+  schedule:
+    # 06:00, 06:15 and 06:30 Asia/Bangkok (UTC+7). Retries are idempotent.
+    - cron: "0,15,30 23 * * *"
+  workflow_dispatch:
+    inputs:
+      target_date:
+        description: "Ngày kế hoạch YYYY-MM-DD; để trống dùng ngày Bangkok hiện tại"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v32-daily-production
+  cancel-in-progress: false
+
+jobs:
+  settle-plan-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONHASHSEED: "0"
+      TZ: Asia/Bangkok
+
+    steps:
+      - name: Checkout exact main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Resolve target
+        env:
+          MANUAL_TARGET: ${{ inputs.target_date }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$MANUAL_TARGET" ]]; then
+            [[ "$MANUAL_TARGET" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || exit 2
+            target="$MANUAL_TARGET"
+          else
+            target="$(date +%F)"
+          fi
+          settlement="$(date -d "$target -1 day" +%F)"
+          echo "TARGET_DATE=$target" >> "$GITHUB_ENV"
+          echo "SETTLEMENT_DATE=$settlement" >> "$GITHUB_ENV"
+          echo "RUN_DIR=$RUNNER_TEMP/v32-$target" >> "$GITHUB_ENV"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-v32.txt
+
+      - name: Install frozen runtime
+        run: python -m pip install --requirement requirements-v32.txt
+
+      - name: Fetch frozen engine from private Google Drive
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          test -n "$GOOGLE_SERVICE_ACCOUNT_JSON" || { echo "Missing GOOGLE_SERVICE_ACCOUNT_JSON"; exit 2; }
+          test ! -e engine_v32 || { echo "Public checkout unexpectedly contains engine_v32"; exit 2; }
+          python scripts/fetch_v32_engine.py \
+            --metadata data/v32-engine-runtime.json \
+            --destination engine_v32
+
+      - name: Verify frozen seed and engine
+        run: python scripts/v32_daily.py verify-seed
+
+      - name: Snapshot source and five personal ledgers
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          MB_PNL_SHEET_ID: ${{ secrets.MB_PNL_SHEET_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$GOOGLE_SERVICE_ACCOUNT_JSON" || { echo "Missing GOOGLE_SERVICE_ACCOUNT_JSON"; exit 2; }
+          test -n "$MB_PNL_SHEET_ID" || { echo "Missing MB_PNL_SHEET_ID"; exit 2; }
+          mkdir -p "$RUN_DIR"
+          python scripts/google_sheets_bridge.py snapshot \
+            --settlement-date "$SETTLEMENT_DATE" \
+            --output-xlsx "$RUN_DIR/source.xlsx" \
+            --output-pnl-json "$RUN_DIR/pnl-snapshot.json"
+
+      - name: Prepare immutable transaction
+        run: |
+          set -euo pipefail
+          python scripts/v32_daily.py prepare \
+            --target-date "$TARGET_DATE" \
+            --source-xlsx "$RUN_DIR/source.xlsx" \
+            --pnl-snapshot "$RUN_DIR/pnl-snapshot.json" \
+            --output "$RUN_DIR/transaction"
+
+      - name: Apply Google Sheets and verify readback
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          MB_PNL_SHEET_ID: ${{ secrets.MB_PNL_SHEET_ID }}
+        run: |
+          set -euo pipefail
+          python scripts/google_sheets_bridge.py apply \
+            --payload "$RUN_DIR/transaction/private/sheets_payload.json" \
+            --receipt "$RUN_DIR/sheets-receipt.json"
+
+      - name: Finalize website only after Sheets receipt
+        run: |
+          set -euo pipefail
+          python scripts/v32_daily.py finalize \
+            --output "$RUN_DIR/transaction" \
+            --receipt "$RUN_DIR/sheets-receipt.json"
+
+      - name: Validate public/private boundary
+        run: |
+          set -euo pipefail
+          ! git ls-files engine_v32 | grep .
+          python scripts/validate_dashboard.py index.html data/current.json
+          python -m unittest discover -s tests -p 'test_v32_*.py' -v
+          ! find . -path './.git' -prune -o -type f \
+            \( -iname '*credential*' -o -iname '*service*account*.json' -o -iname '*pnl-snapshot*' -o -iname '*sheets_payload*' \) \
+            -print | grep .
+          git diff --check
+
+      - name: Publish one audited commit
+        run: |
+          set -euo pipefail
+          git config user.name "mb-v32-automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html data/current.json data/v32-state.json \
+            data/v32-plans data/v32-settlements data/v32-transactions
+          if git diff --cached --quiet; then
+            echo "No public changes; transaction already committed."
+            exit 0
+          fi
+          git commit -m "auto: settle and publish V32 $TARGET_DATE"
+          git pull --rebase origin main
+          git push origin HEAD:main

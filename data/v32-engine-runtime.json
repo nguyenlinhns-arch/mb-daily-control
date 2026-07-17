@@ -1,0 +1,12 @@
+{
+  "schema_version": "MB_V32_PRIVATE_DRIVE_ENGINE_V1",
+  "storage": "PRIVATE_GOOGLE_DRIVE",
+  "drive_file_id": "1dZK-IShLKE1R9KJAw3lseCW0t6kDbTCf",
+  "archive_file_name": "mb-v32-engine-20260717-1e06af9c.tar.gz",
+  "archive_size_bytes": 694055,
+  "archive_sha256": "09bb4dbd6890f0d27c4f8519b72deb3b3b18c317c246c4a168182b51ed7a67d1",
+  "engine_file_count": 51,
+  "engine_tree_sha256": "1e06af9c8639099055380e136ee13f5f0c6399c9a437c9cc6150246f16b9fdf3",
+  "frozen_at": "2026-07-17",
+  "acl_required": "OWNER_AND_SERVICE_ACCOUNT_READER_ONLY"
+}

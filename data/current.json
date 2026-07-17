@@ -1,31 +1,44 @@
 {
   "schema_version": "MB_DAILY_WEB_V32_A6B8",
-  "audit_id": "MB-20260717-V32-A6B8",
-  "generated_at": "2026-07-17T10:42:14+07:00",
+  "audit_id": "MB-20260718-V32-A6B8",
+  "generated_at": "2026-07-18T06:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
     "short_name": "V32 · A6_B8",
     "official_name": "R868Y26 + Gate315 + Empirical Overdue Swap075",
-    "production_module": "production_v32_empirical_overdue_swap_r868.py",
+    "production_module": "engine_v32/production_v32_empirical_overdue_swap_r868.py",
     "status": "PRODUCTION_OFFICIAL",
     "rollback_parent": "R868Y26 + Residual Gate315",
     "coverage": "30/30",
-    "promotion_note": "Bản chính thức hiện hành; mọi nhánh mới phải vượt kiểm định nhân quả và ngoài mẫu trước khi thay thế."
+    "promotion_note": "Chỉ thay khi nhánh mới vượt kiểm định nhân quả và ngoài mẫu."
   },
   "plan": {
-    "target_date": "2026-07-17",
-    "data_lock_date": "2026-07-16",
+    "target_date": "2026-07-18",
+    "data_lock_date": "2026-07-17",
     "status": "LOCKED_WAITING_RESULT",
-    "codes": ["01", "13", "31", "41", "83", "91"],
-    "number_of_codes": 6,
-    "points_per_code": 30,
+    "codes": [
+      "31",
+      "33",
+      "40",
+      "54",
+      "55",
+      "57",
+      "60",
+      "90",
+      "91"
+    ],
+    "number_of_codes": 9,
+    "points_per_code": 20,
     "points_by_code": {
-      "01": 30,
-      "13": 30,
-      "31": 30,
-      "41": 30,
-      "83": 30,
-      "91": 30
+      "31": 20,
+      "33": 20,
+      "40": 20,
+      "54": 20,
+      "55": 20,
+      "57": 20,
+      "60": 20,
+      "90": 20,
+      "91": 20
     },
     "total_points": 180,
     "cost_per_point_vnd": 23000,
@@ -37,45 +50,103 @@
   },
   "overlay": {
     "rule": "EMP_OVERDUE_RECENT_N_LE8_M0.75",
-    "eligible_width": true,
-    "proposed_remove": "83",
-    "proposed_add": "80",
-    "normalized_margin": 0.018481,
+    "eligible_width": false,
+    "proposed_remove": "33",
+    "proposed_add": "13",
+    "normalized_margin": -0.049369120949645025,
     "activation_threshold": 0.75,
     "active": false,
     "decision": "KEEP_PARENT_PLAN",
-    "reason": "Biên đề xuất thấp hơn ngưỡng khóa; không đổi số."
+    "reason": "Biên đề xuất thấp hơn ngưỡng khóa hoặc độ rộng không hợp lệ; giữ danh sách cha."
   },
   "stake_policy": [
-    {"condition": "N_LE_6", "points_per_code": 30},
-    {"condition": "N_7_TO_8", "points_per_code": 25},
-    {"condition": "N_GE_9", "points_per_code": 20}
-  ],
-  "backtest": {
-    "july_2026_through_16": {
-      "sessions": 16,
-      "hit_days": 14,
-      "hit_day_rate_pct": 87.5,
-      "profit_days": 11,
-      "profit_day_rate_pct": 68.75,
-      "capital_vnd": 65895000,
-      "payout_vnd": 95600000,
-      "net_profit_vnd": 29705000,
-      "roi_pct": 45.0793,
-      "profit_factor": 3.4973,
-      "max_drawdown_vnd": -5565000
+    {
+      "condition": "N_LE_6",
+      "points_per_code": 30
     },
-    "full_through_2026_07_16": {
-      "sessions": 916,
-      "hit_days": 875,
-      "hit_day_rate_pct": 95.524,
-      "profit_days": 512,
-      "profit_day_rate_pct": 55.8952,
-      "capital_vnd": 3736925000,
-      "payout_vnd": 4711200000,
-      "net_profit_vnd": 974275000,
-      "roi_pct": 26.0716,
-      "max_drawdown_vnd": -16985000
+    {
+      "condition": "N_7_TO_8",
+      "points_per_code": 25
+    },
+    {
+      "condition": "N_GE_9",
+      "points_per_code": 20
+    }
+  ],
+  "latest_settlement": {
+    "date": "2026-07-17",
+    "status": "SETTLED_VERIFIED_27_OF_27",
+    "method": "R868Y26 + Gate315 + Empirical Overdue Swap075 / A6_B8",
+    "codes": [
+      "01",
+      "13",
+      "31",
+      "41",
+      "83",
+      "91"
+    ],
+    "points_by_code": {
+      "01": 30,
+      "13": 30,
+      "31": 30,
+      "41": 30,
+      "83": 30,
+      "91": 30
+    },
+    "points_per_code": 30,
+    "total_points": 180,
+    "hits_by_code": {
+      "01": 0,
+      "13": 2,
+      "31": 0,
+      "41": 0,
+      "83": 0,
+      "91": 0
+    },
+    "hit_codes": [
+      "13"
+    ],
+    "hit_units": 2,
+    "hit_day": true,
+    "profit_day": true,
+    "capital_vnd": 4140000,
+    "payout_vnd": 4800000,
+    "pnl_vnd": 660000,
+    "roi_pct": 15.942028985507246,
+    "draw_hash": "f3508374d4f538f066824c1431a569039d2163940a852446c886dcd4deee887f"
+  },
+  "backtest": {
+    "month_2026_07_through_17": {
+      "sessions": 17,
+      "hit_days": 15,
+      "hit_day_rate_pct": 88.23529411764706,
+      "profit_days": 12,
+      "profit_day_rate_pct": 70.58823529411765,
+      "capital_vnd": 70035000,
+      "payout_vnd": 100400000,
+      "net_profit_vnd": 30365000,
+      "roi_pct": 43.35689298208039,
+      "profit_factor": 3.5527532576712906,
+      "max_drawdown_vnd": -5565000,
+      "equity_current_vnd": 30365000,
+      "equity_peak_vnd": 35270000,
+      "gross_profit_vnd": 42260000,
+      "gross_loss_vnd": 11895000
+    },
+    "full_through_2026_07_17": {
+      "sessions": 917,
+      "hit_days": 876,
+      "hit_day_rate_pct": 95.5288985823337,
+      "profit_days": 513,
+      "profit_day_rate_pct": 55.9432933478735,
+      "capital_vnd": 3741065000,
+      "payout_vnd": 4716000000,
+      "net_profit_vnd": 974935000,
+      "roi_pct": 26.060359817324745,
+      "profit_factor": null,
+      "max_drawdown_vnd": -16985000,
+      "equity_current_vnd": 974935000,
+      "equity_peak_vnd": 979840000
     }
   },
   "constraints": {
@@ -86,17 +157,67 @@
     "same_day_outcome_leakage": false
   },
   "audit": {
+    "input_hash": "e75b4c25fa2d8cdd165fcf316dbcd7c19f3d63438d5d7b89654ca44f3b5ee1a2",
+    "engine_manifest_hash": "6b35414033f42036173e107bed64f43e08d22af960545f4d6e4be4c9626ebeb4",
     "plan_replayed_from_locked_source": true,
     "capital_formula_verified": true,
     "overlay_threshold_verified": true,
     "target_outcome_used": false,
-    "july_backtest_independently_reconciled": true,
+    "causality": {
+      "parent": {
+        "cache_file": "/tmp/branch_c_residual_predictions_v2/pred_a245a701c5cf3615380564ea.npz",
+        "cache_identity_changes_on_source_shock": true,
+        "cache_identity_unchanged_by_target_shock": true,
+        "cache_source_hash": "0e384a208a2156784f3cc9928f4f9f323abc30bc70f33ce1206c248d619bdd0d",
+        "fit_strictly_before_target_month": true,
+        "gate_current_row_shock": 0.0,
+        "last_month_fit": {
+          "month": "2026-07",
+          "target_end": "2026-07-18",
+          "target_start": "2026-07-01",
+          "train_end": "2026-06-30",
+          "train_rows": 54000,
+          "train_start": "2024-12-30"
+        },
+        "source_end": "2026-07-17",
+        "target": "2026-07-18",
+        "target_feature_max_abs_shock": 0.0,
+        "target_low_high_selection_equal_after_shock": {
+          "COUNT_RECENT_HYBRID_ALL_Z2.5_M0": true,
+          "COUNT_RECENT_HYBRID_ALL_Z2_M1.5": true
+        },
+        "target_outcome_in_source_hash": false,
+        "upstream_current_row_shock": {
+          "A849": 0.0,
+          "B851": 0.0,
+          "C864": 0.0,
+          "E867": 0.0,
+          "F852": 0.0,
+          "G853": 0.0,
+          "H848": 0.0,
+          "J853": 0.0,
+          "K852": 0.0,
+          "L854": 0.0,
+          "MAXWIN862": 0.0,
+          "P865B": 0.0,
+          "PROFIT857": 0.0,
+          "R868Y26": 0.0,
+          "S11": 0.0
+        }
+      },
+      "v32": {
+        "reported_selection_matches": true,
+        "target_feature_max_abs_shock": 0.0,
+        "target_proposal_equal_after_shock": true,
+        "target_selection_equal_after_shock": true
+      }
+    },
     "disclaimer": "Backtest là số liệu lịch sử, không bảo đảm kết quả tương lai."
   },
   "automation": {
     "pipeline_version": "MB_V32_DAILY_0600_TXN_V2",
     "schedule": "06:00 Asia/Bangkok",
-    "status": "MANUAL_CUTOVER_VALIDATED",
-    "activation": "SCHEDULE_ARMED_FAIL_CLOSED_CREDENTIAL_REQUIRED"
+    "status": "SHEETS_APPLIED_READBACK_VERIFIED_READY_TO_PUBLISH",
+    "sheets_receipt_hash": "ecb689bf01c7108e3caaeef3c2d23d90c71dcd9974bf42dd69303924958f572b"
   }
 }

@@ -1,23 +1,13 @@
 name: Enforce A1 reverse50 and current recommendations
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["MB Daily result settlement and next-day plan"]
-    types: [completed]
-  push:
-    branches: ["main"]
-    paths:
-      - "data/current.json"
-      - "data/plans/**"
-      - "data/automation-policy.json"
-      - "scripts/enforce_a1_reverse.py"
-      - "scripts/enforce_top3_first_block.py"
-      - "scripts/enforce_top3_first_block.py.zlib.b64"
-      - "scripts/apply_xien2_auto_pairs.py"
-      - "scripts/export_sheet_sync.py"
-      - "scripts/render_fast_dashboard.py"
-      - ".github/workflows/enforce-a1-reverse.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -28,7 +18,7 @@ concurrency:
 
 jobs:
   enforce:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

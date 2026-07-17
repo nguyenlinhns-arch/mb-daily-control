@@ -1,12 +1,13 @@
 name: Apply multi-stake settlement patch
 
+# V32_PRODUCTION_GUARD: legacy writer is manual rollback only.
 on:
   workflow_dispatch:
-  push:
-    branches: ["main"]
-    paths:
-      - "scripts/patch_multi_stake_settlement.py"
-      - ".github/workflows/apply-settlement-patch.yml"
+    inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy bộ điều khiển cũ"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -17,6 +18,7 @@ concurrency:
 
 jobs:
   patch:
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:

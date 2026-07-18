@@ -1,0 +1,52 @@
+{
+  "date": "2026-07-18",
+  "status": "SETTLED_VERIFIED_27_OF_27",
+  "method": "R868Y26 + Gate315 + Empirical Overdue Swap075 / A6_B8",
+  "codes": [
+    "31",
+    "33",
+    "40",
+    "54",
+    "55",
+    "57",
+    "60",
+    "90",
+    "91"
+  ],
+  "points_by_code": {
+    "31": 20,
+    "33": 20,
+    "40": 20,
+    "54": 20,
+    "55": 20,
+    "57": 20,
+    "60": 20,
+    "90": 20,
+    "91": 20
+  },
+  "points_per_code": 20,
+  "total_points": 180,
+  "hits_by_code": {
+    "31": 0,
+    "33": 0,
+    "40": 0,
+    "54": 1,
+    "55": 0,
+    "57": 0,
+    "60": 0,
+    "90": 1,
+    "91": 0
+  },
+  "hit_codes": [
+    "54",
+    "90"
+  ],
+  "hit_units": 2,
+  "hit_day": true,
+  "profit_day": false,
+  "capital_vnd": 4140000,
+  "payout_vnd": 3200000,
+  "pnl_vnd": -940000,
+  "roi_pct": -22.705314009661837,
+  "draw_hash": "f4cbafab52bbfd2701d34c9ea7852bbe3f78b6812fd3812c62366d0bf772204c"
+}

@@ -19,6 +19,11 @@ def vnd(value: int) -> str:
     return f"{value:,}đ".replace(",", ".")
 
 
+def signed_vnd(value: int) -> str:
+    prefix = "+" if value > 0 else ""
+    return prefix + vnd(value)
+
+
 def validate(index_path: Path, data_path: Path) -> None:
     html = index_path.read_text(encoding="utf-8")
     payload = json.loads(data_path.read_text(encoding="utf-8"))
@@ -64,8 +69,8 @@ def validate(index_path: Path, data_path: Path) -> None:
     assert target in html
     assert vnd(plan["total_capital_vnd"]) in html
     for code in codes:
-        expected = f"<b>{code}</b><span>{points[code]} ĐIỂM"
-        assert expected in html, f"Missing rendered code/points: {code}"
+        assert f"<b>{code}</b>" in html, f"Missing rendered code: {code}"
+        assert f"<strong>{points[code]} điểm</strong>" in html
 
     expected_active = (
         bool(overlay["eligible_width"])
@@ -88,6 +93,33 @@ def validate(index_path: Path, data_path: Path) -> None:
         expected_profit = 100 * period["profit_days"] / period["sessions"]
         assert abs(period["hit_day_rate_pct"] - expected_hit) < 0.0001
         assert abs(period["profit_day_rate_pct"] - expected_profit) < 0.0001
+
+    if fusion4:
+        actual = payload["actual_performance"]
+        official_start = date.fromisoformat(actual["official_start_date"])
+        actual_settled = date.fromisoformat(actual["settled_through"])
+        assert official_start == date.fromisoformat(method["locked_from"])
+        assert actual_settled <= lock_day
+        assert actual["current_month_id"] == actual_settled.strftime("%Y-%m") or (
+            actual_settled < official_start
+            and actual["current_month_id"] == official_start.strftime("%Y-%m")
+        )
+        for period_name in ("current_month", "total"):
+            period = actual[period_name]
+            sessions = period["sessions"]
+            assert sessions >= 0
+            assert period["wins"] + period["losses"] <= sessions
+            for streak in (
+                "current_winning_streak", "current_losing_streak",
+                "longest_winning_streak", "longest_losing_streak",
+            ):
+                assert 0 <= period[streak] <= sessions
+            assert period["current_winning_streak"] <= period["longest_winning_streak"]
+            assert period["current_losing_streak"] <= period["longest_losing_streak"]
+            assert signed_vnd(period["net_profit_vnd"]) in html
+        assert "Thống kê thực tế" in html
+        assert "không gồm backtest" in html
+        assert "Chuỗi dài nhất" in html
 
     settlement = payload.get("latest_settlement")
     if settlement is not None:

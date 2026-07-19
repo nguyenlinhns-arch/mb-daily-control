@@ -103,6 +103,31 @@
     "roi_pct": -42.028985507246375,
     "draw_hash": "f4cbafab52bbfd2701d34c9ea7852bbe3f78b6812fd3812c62366d0bf772204c"
   },
+  "actual_performance": {
+    "official_start_date": "2026-07-19",
+    "settled_through": "2026-07-18",
+    "current_month_id": "2026-07",
+    "current_month": {
+      "sessions": 0,
+      "wins": 0,
+      "losses": 0,
+      "current_winning_streak": 0,
+      "current_losing_streak": 0,
+      "longest_winning_streak": 0,
+      "longest_losing_streak": 0,
+      "net_profit_vnd": 0
+    },
+    "total": {
+      "sessions": 0,
+      "wins": 0,
+      "losses": 0,
+      "current_winning_streak": 0,
+      "current_losing_streak": 0,
+      "longest_winning_streak": 0,
+      "longest_losing_streak": 0,
+      "net_profit_vnd": 0
+    }
+  },
   "backtest": {
     "current_month": {
       "sessions": 18,

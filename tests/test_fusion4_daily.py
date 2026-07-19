@@ -41,6 +41,33 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(rendered, (ROOT / "index.html").read_text())
         self.assertNotIn("{{", rendered)
 
+    def test_actual_performance_tracks_wins_losses_and_longest_streaks(self) -> None:
+        period = fusion4.empty_actual_period()
+        for pnl in (100_000, 200_000, -50_000, -50_000):
+            period = fusion4.update_actual_period(period, {"pnl_vnd": pnl})
+        self.assertEqual(period["sessions"], 4)
+        self.assertEqual(period["wins"], 2)
+        self.assertEqual(period["losses"], 2)
+        self.assertEqual(period["longest_winning_streak"], 2)
+        self.assertEqual(period["longest_losing_streak"], 2)
+        self.assertEqual(period["current_winning_streak"], 0)
+        self.assertEqual(period["current_losing_streak"], 2)
+        self.assertEqual(period["net_profit_vnd"], 200_000)
+
+    def test_actual_performance_starts_only_on_official_date(self) -> None:
+        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        before = json.loads(json.dumps(state))
+        settlement = {
+            "date": "2026-07-18",
+            "pnl_vnd": -1,
+            "capital_vnd": 1,
+            "payout_vnd": 0,
+            "hit_day": False,
+            "profit_day": False,
+        }
+        advanced = fusion4.advance_state(before, settlement)
+        self.assertEqual(advanced["actual"], before["actual"])
+
     def test_sheet_records_use_settlement_run_date(self) -> None:
         plan = fusion4.load_plan(date(2026, 7, 19))
         settlement = json.loads(

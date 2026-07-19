@@ -28,6 +28,7 @@ ENGINE_SCRIPT = ROOT / "scripts" / "fusion4_engine.py"
 CONFIG_ID = "MB_FUSION4_180_PROD_V1_20260719"
 METHOD = "MB FUSION4–180"
 PIPELINE_VERSION = "MB_FUSION4_180_DAILY_TXN_V1"
+OFFICIAL_START = date(2026, 7, 19)
 VN = timezone(timedelta(hours=7))
 WEEKDAYS = (
     "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm",
@@ -100,6 +101,45 @@ def settle(plan: dict, draw: list[str]) -> dict:
     return value
 
 
+def empty_actual_period() -> dict:
+    return {
+        "sessions": 0,
+        "wins": 0,
+        "losses": 0,
+        "current_winning_streak": 0,
+        "current_losing_streak": 0,
+        "longest_winning_streak": 0,
+        "longest_losing_streak": 0,
+        "net_profit_vnd": 0,
+    }
+
+
+def update_actual_period(period: dict, settlement: dict) -> dict:
+    value = dict(period)
+    pnl = int(settlement["pnl_vnd"])
+    won = pnl > 0
+    lost = pnl < 0
+    value["sessions"] = int(value.get("sessions", 0)) + 1
+    value["wins"] = int(value.get("wins", 0)) + int(won)
+    value["losses"] = int(value.get("losses", 0)) + int(lost)
+    value["current_winning_streak"] = (
+        int(value.get("current_winning_streak", 0)) + 1 if won else 0
+    )
+    value["current_losing_streak"] = (
+        int(value.get("current_losing_streak", 0)) + 1 if lost else 0
+    )
+    value["longest_winning_streak"] = max(
+        int(value.get("longest_winning_streak", 0)),
+        value["current_winning_streak"],
+    )
+    value["longest_losing_streak"] = max(
+        int(value.get("longest_losing_streak", 0)),
+        value["current_losing_streak"],
+    )
+    value["net_profit_vnd"] = int(value.get("net_profit_vnd", 0)) + pnl
+    return value
+
+
 def advance_state(state: dict, settlement: dict) -> dict:
     value = json.loads(json.dumps(state))
     settled_day = date.fromisoformat(settlement["date"])
@@ -125,6 +165,22 @@ def advance_state(state: dict, settlement: dict) -> dict:
         value[key] = updated
     value["settled_through"] = settlement["date"]
     value["last_settlement_hash"] = digest(settlement)
+    if settled_day >= OFFICIAL_START:
+        actual = value.setdefault("actual", {
+            "official_start_date": OFFICIAL_START.isoformat(),
+            "settled_through": (OFFICIAL_START - timedelta(days=1)).isoformat(),
+            "current_month_id": OFFICIAL_START.strftime("%Y-%m"),
+            "current_month": empty_actual_period(),
+            "total": empty_actual_period(),
+        })
+        if actual.get("current_month_id") != month_id:
+            actual["current_month_id"] = month_id
+            actual["current_month"] = empty_actual_period()
+        actual["current_month"] = update_actual_period(
+            actual["current_month"], settlement
+        )
+        actual["total"] = update_actual_period(actual["total"], settlement)
+        actual["settled_through"] = settlement["date"]
     return value
 
 
@@ -197,27 +253,24 @@ def pct(value: float, digits: int = 2) -> str:
 
 def render(current: dict) -> str:
     plan = current["plan"]
-    settlement = current["latest_settlement"]
-    month = current["backtest"]["current_month"]
-    year = current["backtest"]["current_year"]
+    actual = current["actual_performance"]
+    month = actual["current_month"]
+    total = actual["total"]
     target = date.fromisoformat(plan["target_date"])
     locked = date.fromisoformat(plan["data_lock_date"])
-    settled = date.fromisoformat(settlement["date"])
+    official_start = date.fromisoformat(actual["official_start_date"])
+    actual_settled = date.fromisoformat(actual["settled_through"])
     ranks = [1, 2, 3, 4]
-    hit_codes = settlement.get("hit_codes", [])
-    settlement_replay = str(settlement.get("status", "")).startswith("BACKTEST_")
     replacements = {
         "AUDIT_ID": current["audit_id"],
         "DATA_LOCK_DMY": locked.strftime("%d/%m/%Y"),
-        "DATA_LOCK_DM": locked.strftime("%d/%m"),
         "TARGET_WEEKDAY": WEEKDAYS[target.weekday()],
         "TARGET_DMY": target.strftime("%d/%m/%Y"),
-        "TARGET_DM": target.strftime("%d/%m"),
         "NUMBERS_HTML": "\n          ".join(
-            f'<div class="number"><b>{escape(code)}</b><span>{plan["points_by_code"][code]} ĐIỂM · HẠNG {rank}</span></div>'
+            f'<article class="number"><span>HẠNG {rank}</span><b>{escape(code)}</b>'
+            f'<strong>{plan["points_by_code"][code]} điểm</strong></article>'
             for rank, code in zip(ranks, plan["codes"])
         ),
-        "PLAN_WIDTH": "4",
         "TOTAL_POINTS": "180",
         "CAPITAL_VND": fmt_vnd(plan["total_capital_vnd"]),
         "COPY_PLAN": escape(
@@ -226,60 +279,25 @@ def render(current: dict) -> str:
             + f" điểm — tổng 180 điểm — vốn {fmt_vnd(plan['total_capital_vnd'])}",
             quote=True,
         ),
-        "SETTLEMENT_DMY": settled.strftime("%d/%m/%Y"),
-        "SETTLEMENT_HEADING": "Kiểm định" if settlement_replay else "Quyết toán",
-        "SETTLEMENT_SET_LABEL": "Bộ số replay" if settlement_replay else "Bộ số",
-        "SETTLEMENT_NOTE": (
-            "Replay nhân quả; đây là sổ phương pháp, tách biệt lệnh thực tế trong sổ 5 người và không công khai dữ liệu cá nhân."
-            if settlement_replay else
-            "Lệnh phương pháp đã khóa từ kỳ trước; kết quả được đối chiếu đủ 27/27. Sổ 5 người chỉ quyết toán các lệnh thực tế đã tồn tại."
+        "ACTUAL_START_DMY": official_start.strftime("%d/%m/%Y"),
+        "ACTUAL_STATUS": (
+            f"Đã quyết toán thực tế đến {actual_settled.strftime('%d/%m/%Y')}"
+            if actual_settled >= official_start else
+            "Chưa có phiên thực tế đã quyết toán"
         ),
-        "SETTLEMENT_CODES": "–".join(settlement["codes"]),
-        "SETTLEMENT_HITS": (
-            "Mã trúng: " + ", ".join(hit_codes) + f" · {settlement['hit_units']} nháy"
-            if hit_codes else "Không có mã trúng"
-        ),
-        "SETTLEMENT_CAPITAL": fmt_vnd(settlement["capital_vnd"]),
-        "SETTLEMENT_PAYOUT": fmt_vnd(settlement["payout_vnd"]),
-        "SETTLEMENT_PAYOUT_NOTE": (
-            " + ".join(
-                f"{code} × {settlement['points_by_code'][code]} điểm × "
-                f"{settlement['hits_by_code'][code]} nháy"
-                for code in hit_codes
-            ) + " × 80.000đ"
-            if settlement_replay and hit_codes else
-            "80.000đ/điểm/nháy"
-        ),
-        "SETTLEMENT_PNL_CLASS": "green" if settlement["pnl_vnd"] >= 0 else "red",
-        "SETTLEMENT_PNL": fmt_vnd(settlement["pnl_vnd"], signed=True),
-        "SETTLEMENT_ROI": pct(settlement["roi_pct"]),
-        "MONTH_PERIOD": f"01–{locked.strftime('%d/%m')}",
-        "MONTH_HIT_RATE": pct(month["hit_day_rate_pct"]),
-        "MONTH_HIT_DAYS": str(month["hit_days"]),
-        "MONTH_SESSIONS": str(month["sessions"]),
-        "MONTH_PROFIT_RATE": pct(month["profit_day_rate_pct"]),
-        "MONTH_PROFIT_DAYS": str(month["profit_days"]),
-        "MONTH_NET": fmt_million(month["net_profit_vnd"], signed=True),
-        "MONTH_NET_CLASS": "green" if month["net_profit_vnd"] >= 0 else "red",
-        "MONTH_CAPITAL": fmt_million(month["capital_vnd"]),
-        "MONTH_PF": (
-            f"{month['profit_factor']:.4f}".replace(".", ",")
-            if month.get("profit_factor") is not None else "—"
-        ),
-        "MONTH_ROI": pct(month["roi_pct"], 4),
-        "MONTH_ROI_CLASS": "green" if month["roi_pct"] >= 0 else "red",
-        "MONTH_MAXDD": fmt_million(month["max_drawdown_vnd"]),
-        "YEAR_SESSIONS": str(year["sessions"]),
-        "YEAR_HIT_DAYS": str(year["hit_days"]),
-        "YEAR_HIT_RATE": pct(year["hit_day_rate_pct"], 4),
-        "YEAR_PROFIT_RATE": pct(year["profit_day_rate_pct"], 4),
-        "YEAR_NET": fmt_million(year["net_profit_vnd"], signed=True),
-        "YEAR_NET_CLASS": "green" if year["net_profit_vnd"] >= 0 else "red",
-        "YEAR_CAPITAL": fmt_million(year["capital_vnd"]),
-        "YEAR_ROI": pct(year["roi_pct"], 4),
-        "YEAR_ROI_CLASS": "green" if year["roi_pct"] >= 0 else "red",
-        "YEAR_MAXDD": fmt_million(year["max_drawdown_vnd"]),
-        "YEAR_STREAK": str(year["longest_losing_streak"]),
+        "MONTH_LABEL": f"Tháng {actual['current_month_id'][5:7]}/{actual['current_month_id'][:4]}",
+        "MONTH_WINS": str(month["wins"]),
+        "MONTH_LOSSES": str(month["losses"]),
+        "MONTH_WIN_STREAK": str(month["longest_winning_streak"]),
+        "MONTH_LOSS_STREAK": str(month["longest_losing_streak"]),
+        "MONTH_PNL": fmt_vnd(month["net_profit_vnd"], signed=True),
+        "MONTH_PNL_CLASS": "positive" if month["net_profit_vnd"] >= 0 else "negative",
+        "TOTAL_WINS": str(total["wins"]),
+        "TOTAL_LOSSES": str(total["losses"]),
+        "TOTAL_WIN_STREAK": str(total["longest_winning_streak"]),
+        "TOTAL_LOSS_STREAK": str(total["longest_losing_streak"]),
+        "TOTAL_PNL": fmt_vnd(total["net_profit_vnd"], signed=True),
+        "TOTAL_PNL_CLASS": "positive" if total["net_profit_vnd"] >= 0 else "negative",
     }
     html = TEMPLATE.read_text(encoding="utf-8")
     for key, value in replacements.items():
@@ -373,6 +391,7 @@ def public_payload(target: date, plan: dict, settlement: dict, state: dict,
             {"rank_from": 4, "rank_to": 4, "points_per_code": 30},
         ],
         "latest_settlement": settlement,
+        "actual_performance": state["actual"],
         "backtest": {
             "current_month": state["current_month"],
             "current_year": state["current_year"],

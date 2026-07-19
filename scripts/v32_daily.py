@@ -471,6 +471,20 @@ def parse_total_points(value: Any) -> int | None:
     return int(text) if re.fullmatch(r"[1-9]\d*", text) else None
 
 
+def personal_points_by_code(method: Any, codes: list[str],
+                            total_points: int) -> dict[str, int] | None:
+    """Resolve an actual order's stakes without flattening Fusion4 ranks."""
+    method_name = str(method or "").strip().upper().replace("–", "-")
+    if method_name == "MB FUSION4-180":
+        if len(codes) != 4 or total_points != 180:
+            return None
+        return dict(zip(codes, (50, 50, 50, 30)))
+    if not codes or total_points % len(codes):
+        return None
+    points_each = total_points // len(codes)
+    return {code: points_each for code in codes}
+
+
 def personal_operations(snapshot: dict, day: date, draw: list[str]) -> tuple[list[dict], list[dict]]:
     counts = Counter(draw)
     operations, blocked = [], []
@@ -494,7 +508,11 @@ def personal_operations(snapshot: dict, day: date, draw: list[str]) -> tuple[lis
             matched = True
             codes = parse_person_codes(padded[2])
             total_points = parse_total_points(padded[3])
-            if not codes or not total_points or total_points % len(codes):
+            points_by_code = (
+                personal_points_by_code(padded[1], codes, total_points)
+                if codes and total_points else None
+            )
+            if not points_by_code:
                 blocked.append({
                     "name": name,
                     "sheet_name": entry.get("sheet_name", name),
@@ -502,10 +520,12 @@ def personal_operations(snapshot: dict, day: date, draw: list[str]) -> tuple[lis
                     "reason": "AMBIGUOUS_CODES_OR_POINT_SPLIT",
                 })
                 continue
-            points_each = total_points // len(codes)
             hit_units = sum(counts.get(code, 0) for code in codes)
             capital = total_points * COST_PER_POINT
-            payout = hit_units * points_each * PAYOUT_PER_HIT_POINT
+            payout = sum(
+                counts.get(code, 0) * points_by_code[code] * PAYOUT_PER_HIT_POINT
+                for code in codes
+            )
             pnl = payout - capital
             if padded[4] not in (None, ""):
                 try:
@@ -524,8 +544,14 @@ def personal_operations(snapshot: dict, day: date, draw: list[str]) -> tuple[lis
             capital_text = f"{capital:,}".replace(",", ".")
             payout_text = f"{payout:,}".replace(",", ".")
             pnl_text = f"{pnl:+,}".replace(",", ".")
+            point_values = set(points_by_code.values())
+            stake_text = (
+                f"{next(iter(point_values))} điểm/số"
+                if len(point_values) == 1 else
+                ", ".join(f"{code}×{points_by_code[code]}" for code in codes)
+            )
             note = (
-                f"Tự động V32 06:00: {', '.join(codes)}; {points_each} điểm/số; "
+                f"Tự động V32 06:00: {', '.join(codes)}; {stake_text}; "
                 f"{hit_units} nháy; vốn {capital_text}đ; trả {payout_text}đ; "
                 f"P/L {pnl_text}đ."
             )
@@ -536,11 +562,15 @@ def personal_operations(snapshot: dict, day: date, draw: list[str]) -> tuple[lis
                 "date": day.isoformat(),
                 "codes": codes,
                 "total_points": total_points,
-                "points_per_code": points_each,
+                "points_per_code": (
+                    next(iter(point_values)) if len(point_values) == 1 else None
+                ),
                 "pnl_vnd": pnl,
                 "note": note,
                 "expected_a_to_d_hash": digest(padded[:4]),
             }
+            if len(point_values) != 1:
+                core["points_by_code"] = points_by_code
             operations.append({
                 "kind": "UPDATE_PERSONAL_PNL_IF_BLANK",
                 "operation_id": digest(core),

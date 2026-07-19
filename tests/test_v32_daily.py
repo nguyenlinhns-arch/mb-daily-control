@@ -90,6 +90,33 @@ class V32DailyTests(unittest.TestCase):
         self.assertFalse(blocked)
         self.assertEqual(before, after)
 
+    def test_personal_fusion4_preserves_ranked_50_50_50_30_stakes(self):
+        entries = [
+            {"name": name, "sheet_name": name, "rows": []}
+            for name in v32.PEOPLE
+        ]
+        entries[0]["rows"] = [[
+            "2026-07-19", "MB FUSION4–180", "59, 78, 06, 10", 180,
+            None, None, None, "USER_CONFIRMED_PERSONAL_ORDER",
+        ]]
+        snapshot = {"people": entries}
+        operations, blocked = v32.personal_operations(
+            snapshot, date(2026, 7, 19), ["10"] + ["00"] * 26
+        )
+        self.assertFalse(blocked)
+        settled = [
+            operation for operation in operations
+            if operation["kind"] == "UPDATE_PERSONAL_PNL_IF_BLANK"
+        ]
+        self.assertEqual(len(settled), 1)
+        self.assertEqual(
+            settled[0]["points_by_code"],
+            {"59": 50, "78": 50, "06": 50, "10": 30},
+        )
+        self.assertIsNone(settled[0]["points_per_code"])
+        self.assertEqual(settled[0]["pnl_vnd"], -1_740_000)
+        self.assertIn("59×50, 78×50, 06×50, 10×30", settled[0]["note"])
+
     def test_personal_conflict_blocks(self):
         snapshot = {
             "people": [

@@ -104,12 +104,6 @@
     .positive { color: var(--green); }
     .negative { color: var(--red); }
 
-    .group-pnl { margin-top: 20px; padding: 19px 20px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, var(--card), var(--card-soft)); }
-    .group-pnl-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .group-pnl h3 { margin: 0; font-size: 16px; }
-    .group-pnl-value { margin-top: 12px; font-size: clamp(27px, 5vw, 38px); font-weight: 900; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
-    .group-pnl small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; }
-    .note { margin: 15px 2px 0; color: var(--muted); font-size: 10px; }
     footer { padding: 20px 0 calc(28px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
     .footer-row { display: flex; justify-content: space-between; gap: 16px; }
 
@@ -202,16 +196,6 @@
         </article>
       </div>
 
-      <article class="group-pnl" aria-labelledby="group-pnl-title">
-        <div class="group-pnl-head">
-          <h3 id="group-pnl-title">Lãi/lỗ tổng</h3>
-          <span class="status">Đã đối chiếu đến 18/07/2026</span>
-        </div>
-        <div class="group-pnl-value positive">+18.031.000đ</div>
-        <small>Tổng hợp thực tế của 5 sổ; không công khai chi tiết từng người.</small>
-      </article>
-
-      <p class="note">“Thắng/Thua” tính theo lãi ròng của từng ngày Linh có lệnh; ngày không đánh không tính. Chuỗi liên tiếp là chuỗi dài nhất. Toàn bộ số tiền lấy từ sổ lãi/lỗ thực tế, không lấy từ backtest của phương pháp.</p>
     </section>
   </main>
 

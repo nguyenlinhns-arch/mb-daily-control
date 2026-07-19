@@ -117,15 +117,13 @@ def validate(index_path: Path, data_path: Path) -> None:
             assert signed_vnd(period["net_profit_vnd"]) in html
         assert tracking_start.strftime("%d/%m/%Y") in html
         assert "Lãi/lỗ thực tế của Linh" in html
-        assert "Lãi/lỗ tổng" in html
-        assert "không lấy từ backtest" in html
+        assert "Lãi/lỗ tổng" not in html
         assert "Chuỗi dài nhất" in html
 
         group = payload["group_actual_pnl"]
         assert group["source"] == "AGGREGATE_5_PERSON_GOOGLE_SHEETS_LEDGERS"
         assert group["people_count"] == 5
         assert date.fromisoformat(group["settled_through"]) <= lock_day
-        assert signed_vnd(group["net_profit_vnd"]) in html
 
     settlement = payload.get("latest_settlement")
     if settlement is not None:

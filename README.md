@@ -2,13 +2,13 @@
 
 Dashboard và pipeline vận hành hằng ngày cho phương pháp **MB FUSION4–180**.
 
-## Lệnh đã khóa ngày 19/07/2026
+## Lệnh đã khóa ngày 20/07/2026
 
-- Hạng 1–3: **59, 78, 06 × 50 điểm**.
-- Hạng 4: **10 × 30 điểm**.
+- Hạng 1–3: **21, 91, 60 × 50 điểm**.
+- Hạng 4: **15 × 30 điểm**.
 - Tổng: **180 điểm**, vốn/lỗ tối đa **4.140.000đ** theo giá vốn
   23.000đ/điểm.
-- Dữ liệu chỉ khóa đến hết 18/07/2026; kết quả 19/07 không được dùng khi chọn.
+- Dữ liệu chỉ khóa đến hết 19/07/2026; kết quả 20/07 không được dùng khi chọn.
 
 Fusion4 xếp hạng theo công thức đã khóa:
 
@@ -17,12 +17,12 @@ Fusion4 xếp hạng theo công thức đã khóa:
 A1 được giữ ở lớp kiểm toán nghiên cứu; với cấu hình cố định bốn số, A1 không
 thay đổi thứ tự chọn. Không dùng Core100/Other50, overlay hay gấp thếp.
 
-## Đối soát đến 18/07/2026
+## Đối soát đến 19/07/2026
 
-Replay nhân quả của Fusion4 ngày 18/07 chọn `57, 55, 91, 54` theo mức
-`50–50–50–30`. Mã 54 xuất hiện một nháy: vốn 4.140.000đ, trả 2.400.000đ,
-P/L phương pháp **-1.740.000đ**. Đây là replay của sổ phương pháp, không phải
-lệnh cá nhân thực tế.
+Lệnh Fusion4 ngày 19/07 là `59, 78, 06, 10` theo mức `50–50–50–30`.
+Mã 78 xuất hiện một nháy: vốn 4.140.000đ, trả 4.000.000đ, P/L phương pháp
+**-140.000đ**. Lệnh cá nhân của Linh cùng ngày trùng với lệnh Fusion4 và đã
+được quyết toán riêng; không cộng trùng hai sổ.
 
 Lệnh thực tế của từng người luôn tách riêng. Pipeline chỉ quyết toán dòng đã có
 dữ liệu A:D; không tự gán lệnh, không tự ghi 0 và không suy diễn P/L cho người

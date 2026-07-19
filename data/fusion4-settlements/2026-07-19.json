@@ -1,0 +1,38 @@
+{
+  "date": "2026-07-19",
+  "status": "SETTLED_VERIFIED_27_OF_27",
+  "method": "MB FUSION4–180",
+  "codes": [
+    "59",
+    "78",
+    "06",
+    "10"
+  ],
+  "points_by_code": {
+    "59": 50,
+    "78": 50,
+    "06": 50,
+    "10": 30
+  },
+  "points_per_code": null,
+  "total_points": 180,
+  "hits_by_code": {
+    "59": 0,
+    "78": 1,
+    "06": 0,
+    "10": 0
+  },
+  "hit_codes": [
+    "78"
+  ],
+  "hit_units": 1,
+  "hit_day": true,
+  "profit_day": false,
+  "capital_vnd": 4140000,
+  "payout_vnd": 4000000,
+  "pnl_vnd": -140000,
+  "roi_pct": -3.3816425120772946,
+  "draw_hash": "63b45223af87c19487ef41459f852edc04faea5e9d47428a00bd3ed549249ff3",
+  "config_id": "MB_FUSION4_180_PROD_V1_20260719",
+  "ledger_scope": "METHOD_THEORETICAL_SEPARATE_FROM_PERSONAL_ACTUAL"
+}

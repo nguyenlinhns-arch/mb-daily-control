@@ -88,7 +88,7 @@ class Fusion4DailyTests(unittest.TestCase):
     def test_personal_actual_uses_linh_order_not_method_result(self) -> None:
         state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
         settlement = {
-            "date": "2026-07-19",
+            "date": "2026-07-20",
             "pnl_vnd": 3_860_000,
             "capital_vnd": 4_140_000,
             "payout_vnd": 8_000_000,
@@ -103,24 +103,24 @@ class Fusion4DailyTests(unittest.TestCase):
             "pnl_was_blank": True,
         }]
         advanced = fusion4.advance_personal_actual(
-            method_advanced, date(2026, 7, 19), operations
+            method_advanced, date(2026, 7, 20), operations
         )
         actual = advanced["actual"]
-        self.assertEqual(actual["settled_through"], "2026-07-19")
-        self.assertEqual(actual["current_month"]["sessions"], 15)
+        self.assertEqual(actual["settled_through"], "2026-07-20")
+        self.assertEqual(actual["current_month"]["sessions"], 16)
         self.assertEqual(actual["current_month"]["wins"], 9)
         self.assertEqual(actual["current_month"]["current_winning_streak"], 1)
-        self.assertEqual(actual["current_month"]["net_profit_vnd"], 19_326_000)
+        self.assertEqual(actual["current_month"]["net_profit_vnd"], 19_186_000)
         self.assertEqual(actual["total"], actual["current_month"])
 
     def test_no_linh_order_advances_check_date_without_fake_result(self) -> None:
         state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
         advanced = fusion4.advance_personal_actual(
-            state, date(2026, 7, 19), [
+            state, date(2026, 7, 20), [
                 {"kind": "LOG_PERSONAL_NO_ORDER", "name": "p1"}
             ]
         )
-        self.assertEqual(advanced["actual"]["settled_through"], "2026-07-19")
+        self.assertEqual(advanced["actual"]["settled_through"], "2026-07-20")
         self.assertEqual(advanced["actual"]["total"], state["actual"]["total"])
 
     def test_group_total_adds_only_new_blank_pnl_cells(self) -> None:

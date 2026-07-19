@@ -1,6 +1,8 @@
 {
   "pipeline_version": "MB_V32_DAILY_0600_TXN_V2",
-  "status": "COMMITTED",
+  "status": "SUPERSEDED_WRONG_METHOD",
+  "superseded_by": "data/fusion4-transactions/2026-07-20.json",
+  "superseded_at": "2026-07-19T20:25:17+07:00",
   "target_date": "2026-07-20",
   "previous_date": "2026-07-19",
   "input_hash": "8253b7c1258a5b10575d928cea1b41aa424df076f7430b138bf9dba74ce2b650",

@@ -1,6 +1,8 @@
 {
   "date": "2026-07-19",
-  "status": "SETTLED_VERIFIED_27_OF_27",
+  "status": "VOID_WRONG_METHOD_MB_FUSION4_180",
+  "superseded_by": "data/fusion4-settlements/2026-07-19.json",
+  "superseded_at": "2026-07-19T20:25:17+07:00",
   "method": "R868Y26 + Gate315 + Empirical Overdue Swap075 / A6_B8",
   "codes": [
     "06",

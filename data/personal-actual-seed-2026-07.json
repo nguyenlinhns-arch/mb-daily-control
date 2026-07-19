@@ -3,7 +3,7 @@
   "owner_slot": "p1",
   "source": "AUDITED_PERSONAL_GOOGLE_SHEETS_LEDGER",
   "start_date": "2026-07-01",
-  "checked_through": "2026-07-18",
+  "checked_through": "2026-07-19",
   "rows": [
     {"date": "2026-07-01", "pnl_vnd": 2850000},
     {"date": "2026-07-06", "pnl_vnd": 4250000},
@@ -18,20 +18,21 @@
     {"date": "2026-07-15", "pnl_vnd": -2300000},
     {"date": "2026-07-16", "pnl_vnd": -2300000},
     {"date": "2026-07-17", "pnl_vnd": 660000},
-    {"date": "2026-07-18", "pnl_vnd": -940000}
+    {"date": "2026-07-18", "pnl_vnd": -940000},
+    {"date": "2026-07-19", "pnl_vnd": -140000}
   ],
   "summary": {
-    "sessions": 14,
+    "sessions": 15,
     "wins": 8,
-    "losses": 6,
+    "losses": 7,
     "current_winning_streak": 0,
-    "current_losing_streak": 1,
+    "current_losing_streak": 2,
     "longest_winning_streak": 3,
     "longest_losing_streak": 2,
-    "net_profit_vnd": 18666000
+    "net_profit_vnd": 18526000
   },
   "group_actual_pnl": {
     "people_count": 5,
-    "net_profit_vnd": 18031000
+    "net_profit_vnd": 17891000
   }
 }

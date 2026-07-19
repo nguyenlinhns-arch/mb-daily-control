@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="description" content="Các số đã chọn và thống kê vận hành thực tế MB FUSION4–180.">
+  <meta name="description" content="Các số đã chọn, đề đầu hôm nay và thống kê vận hành thực tế MB FUSION4–180.">
   <meta name="theme-color" content="#08111f">
   <meta name="color-scheme" content="dark">
   <title>MB Daily Control · 20/07/2026</title>
@@ -19,6 +19,7 @@
       --blue: #74a8ff;
       --green: #5ce1a2;
       --red: #ff8f99;
+      --amber: #f3c875;
       --shadow: 0 24px 70px rgba(0, 0, 0, .28);
     }
 
@@ -84,6 +85,47 @@
     }
     .copy:focus-visible { outline: 3px solid rgba(116, 168, 255, .35); outline-offset: 2px; }
 
+    .de-head { margin-top: 18px; }
+    .de-head-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(220px, .75fr);
+      gap: 18px;
+      padding: 20px;
+      border: 1px solid #3a4a63;
+      border-radius: 21px;
+      background: linear-gradient(145deg, rgba(18, 30, 48, .98), rgba(10, 20, 35, .98));
+      box-shadow: 0 14px 40px rgba(0, 0, 0, .18);
+    }
+    .de-head-title { margin: 0; font-size: clamp(21px, 4vw, 28px); letter-spacing: -.035em; }
+    .de-head-lead { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 13px; margin-top: 11px; }
+    .de-head-decision {
+      font-size: clamp(30px, 6vw, 46px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.045em;
+    }
+    .de-head-decision.a0 { color: var(--amber); }
+    .de-head-decision.play { color: var(--green); }
+    .de-head-watch { color: var(--text); font-size: 15px; font-weight: 800; }
+    .de-head-reason { margin: 11px 0 0; color: var(--muted); font-size: 12px; }
+    .de-head-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      align-content: start;
+    }
+    .de-kpi {
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(8, 18, 31, .68);
+    }
+    .de-kpi span { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+    .de-kpi strong { display: block; margin-top: 3px; font-size: 15px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .de-kpi.wide { grid-column: 1 / -1; }
+    .de-head-sync { color: var(--muted); font-size: 10px; }
+
     .performance { margin-top: 36px; }
     .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
     h2 { margin: 0; font-size: clamp(22px, 4vw, 30px); letter-spacing: -.035em; }
@@ -121,6 +163,7 @@
       .plan-foot { align-items: end; }
       .totals { gap: 7px 18px; }
       .copy { min-height: 40px; padding-inline: 12px; font-size: 12px; }
+      .de-head-card { grid-template-columns: 1fr; padding: 17px 14px; }
       .section-head { display: block; }
       .status { margin-top: 6px; text-align: left; }
       .stats { grid-template-columns: 1fr; }
@@ -161,6 +204,27 @@
         </div>
         <button class="copy" type="button" data-plan="20/07/2026: 21×50, 91×50, 60×50, 15×30 điểm — tổng 180 điểm — vốn 4.140.000đ" onclick="copyPlan(this)">Sao chép</button>
       </div>
+    </section>
+
+    <section class="de-head" aria-labelledby="de-head-title" data-target-dmy="20/07/2026">
+      <article class="de-head-card">
+        <div>
+          <p class="eyebrow">Đề đầu hôm nay</p>
+          <h2 class="de-head-title" id="de-head-title">Đề Đầu–Đuôi Absolute v3.0</h2>
+          <div class="de-head-lead">
+            <strong class="de-head-decision a0" id="de-head-decision">Chờ rà soát</strong>
+            <span class="de-head-watch" id="de-head-watch">Vốn đề 0đ</span>
+          </div>
+          <p class="de-head-reason" id="de-head-reason">Đang kiểm tra dữ liệu Đề đầu cho đúng ngày kế hoạch.</p>
+        </div>
+        <div class="de-head-side" aria-label="Chỉ số Đề đầu">
+          <div class="de-kpi"><span>Ứng viên</span><strong id="de-head-candidate">—</strong></div>
+          <div class="de-kpi"><span>Trạng thái</span><strong id="de-head-status">WAIT</strong></div>
+          <div class="de-kpi"><span>Gan / Gmax</span><strong id="de-head-gan">—</strong></div>
+          <div class="de-kpi"><span>Score</span><strong id="de-head-score">—</strong></div>
+          <div class="de-kpi wide"><span>Cập nhật</span><strong class="de-head-sync" id="de-head-sync">Chưa có dữ liệu cùng ngày</strong></div>
+        </div>
+      </article>
     </section>
 
     <section class="performance" aria-labelledby="performance-title">
@@ -216,6 +280,58 @@
         button.textContent = "Không thể sao chép";
       });
     }
+
+    function formatScore(value) {
+      return Number(value).toLocaleString("vi-VN", {
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4
+      });
+    }
+
+    function setDeHeadWaiting(message) {
+      document.getElementById("de-head-decision").textContent = "Chờ rà soát";
+      document.getElementById("de-head-decision").className = "de-head-decision a0";
+      document.getElementById("de-head-watch").textContent = "Vốn đề 0đ";
+      document.getElementById("de-head-candidate").textContent = "—";
+      document.getElementById("de-head-status").textContent = "WAIT";
+      document.getElementById("de-head-gan").textContent = "—";
+      document.getElementById("de-head-score").textContent = "—";
+      document.getElementById("de-head-reason").textContent = message;
+      document.getElementById("de-head-sync").textContent = "Không dùng dữ liệu cũ";
+    }
+
+    async function loadDeHead() {
+      var section = document.querySelector(".de-head");
+      try {
+        var response = await fetch("data/de-head-current.json?v=" + Date.now(), { cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        var item = await response.json();
+        if (item.target_dmy !== section.dataset.targetDmy) {
+          setDeHeadWaiting("Chưa có kết quả rà Đề đầu cho đúng ngày kế hoạch.");
+          return;
+        }
+
+        var isPlay = item.decision === "PLAY";
+        var decision = isPlay ? "Đầu " + item.selected_head : "A0";
+        var candidate = item.watch_head == null ? "—" : "Đầu " + item.watch_head;
+        document.getElementById("de-head-decision").textContent = decision;
+        document.getElementById("de-head-decision").className = "de-head-decision " + (isPlay ? "play" : "a0");
+        document.getElementById("de-head-watch").textContent = isPlay
+          ? item.points + " điểm · vốn " + Number(item.capital_vnd).toLocaleString("vi-VN") + "đ"
+          : "Theo dõi " + candidate + " · vốn đề 0đ";
+        document.getElementById("de-head-candidate").textContent = candidate;
+        document.getElementById("de-head-status").textContent = item.status;
+        document.getElementById("de-head-gan").textContent = item.gan + " / " + item.gmax;
+        document.getElementById("de-head-score").textContent = formatScore(item.score);
+        document.getElementById("de-head-reason").textContent = item.reason;
+        document.getElementById("de-head-sync").textContent =
+          "Khóa " + item.data_lock_dmy + " · " + item.method_short;
+      } catch (error) {
+        setDeHeadWaiting("Không đọc được dữ liệu Đề đầu; giữ A0 và không suy đoán.");
+      }
+    }
+
+    loadDeHead();
   </script>
 </body>
 </html>

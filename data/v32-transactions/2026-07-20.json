@@ -1,0 +1,39 @@
+{
+  "pipeline_version": "MB_V32_DAILY_0600_TXN_V2",
+  "status": "COMMITTED",
+  "target_date": "2026-07-20",
+  "previous_date": "2026-07-19",
+  "input_hash": "8253b7c1258a5b10575d928cea1b41aa424df076f7430b138bf9dba74ce2b650",
+  "immutable": {
+    "pipeline_version": "MB_V32_DAILY_0600_TXN_V2",
+    "target_date": "2026-07-20",
+    "previous_plan_hash": "526b71e4e0c88a32777b7e1294c935fea6703781b77e0132e2d9b478f6fec38c",
+    "history_prefix_hash": "5a2f9049db39a65dc22c5e5563661e0cd76a811243169fd2137ed84d395700c2",
+    "state_before_hash": "119df611e5166600d18ea3c55397239203a8ec0588582db535176215cc658cce",
+    "personal_inputs_hash": "2c2491cddad5774c17e87758338a35b290743c8eaf88e2e720e59e81937b316c",
+    "sheet_binding_hash": "2856d354f0c521ea9e25ab57ede79ec7f8311378ae6e6ec01d24adb03795295f",
+    "template_hash": "28edbd8c3304263503fee7d82ce9a8038485ee695a4722a5a47240aecb24d7f8",
+    "pipeline_code_hash": "d14e934e31eb95379889c19094fc912831a5302c3b4d00ca1ab9466fded4e4e6",
+    "engine_manifest_hash": "6b35414033f42036173e107bed64f43e08d22af960545f4d6e4be4c9626ebeb4"
+  },
+  "settlement_hash": "40addf7dc0f9e73dbbae01e48dbcfd618a5feb7289386a62896f7fd9709fa4fc",
+  "plan_hash": "8f0833f664ea2f59d9a1a8394e99b9c0e39014bbe12f17f0b93cad7d324da936",
+  "public_json_hash": "381d2060e1a1716386902fb31f5f95cb9e0935c6afad84f174ee882bf52aa4f7",
+  "public_html_hash": "5d9e85c8219a9c73a906673828842ed7d113ceb4d0d401b3356fd6e515a12886",
+  "state_after_hash": "4b4e74e5066eb02f4da428a975e343be1ff0dad69b2d48e341c96911539a8961",
+  "sheets_payload_hash": "184a9ea62aab8e347d0e88a5bf42262fe0ad336d5c45d48ccef603e5d5e310d1",
+  "sheets_operation_ids": [
+    "383415af96888846f231121f67d81a2a1b3840a52c2243042f314f32721125cd",
+    "99e818c973983a1500dbb1dd0daaf1d04c1e3cb98ae380093943963102711be5",
+    "75a0b9faa4c7246edde98705c4eba24a9fbb729ea2d6f2f00a16c89e232f7f8d",
+    "416ceed87c87024f435f72a7ab098c0ecc8d1dc5bade801e45353e79e62a83d7",
+    "c817754f305ee8a441a6f7c73a0c5c787b11156e0e8fcac1866210b777463652",
+    "8c8db85c214578b5f242bec54032388e96ecac29dd5ab53e3362f88f8d1eb0a1",
+    "ac527490effb197356036aae42a0ec8e64dce618d70dfa2b873af922ce7d557d"
+  ],
+  "prepared_at": "2026-07-19T19:45:21+07:00",
+  "sheets_receipt_hash": "d0c4d90c78ad2667b2927dc4aa94732d8455730e61e3d3f7ba56d50813957e9c",
+  "final_public_json_hash": "87518b53f806573980303ee6d9f8967e83564825efd8ea98c73183907f336d8f",
+  "final_public_html_hash": "527bba5f8e0dc6c39c454ff54ee5798ca699dfd55b61f722d8687fb99ce823f2",
+  "committed_at": "2026-07-19T19:48:29+07:00"
+}

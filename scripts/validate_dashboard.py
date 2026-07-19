@@ -70,7 +70,10 @@ def validate(index_path: Path, data_path: Path) -> None:
     assert vnd(plan["total_capital_vnd"]) in html
     for code in codes:
         assert f"<b>{code}</b>" in html, f"Missing rendered code: {code}"
-        assert f"<strong>{points[code]} điểm</strong>" in html
+        if fusion4:
+            assert f"<strong>{points[code]} điểm</strong>" in html
+        else:
+            assert f"<span>{points[code]} ĐIỂM</span>" in html
 
     expected_active = (
         bool(overlay["eligible_width"])

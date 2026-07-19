@@ -56,7 +56,7 @@ class Fusion4DailyTests(unittest.TestCase):
 
     def test_july_performance_seed_matches_published_state(self) -> None:
         seed = json.loads(
-            (ROOT / "data" / "fusion4-performance-seed-2026-07.json").read_text()
+            (ROOT / "data" / "personal-actual-seed-2026-07.json").read_text()
         )
         period = fusion4.empty_actual_period()
         for row in seed["rows"]:
@@ -66,8 +66,12 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(period, state["actual"]["current_month"])
         self.assertEqual(period, state["actual"]["total"])
         self.assertEqual(state["actual"]["tracking_start_date"], "2026-07-01")
+        self.assertEqual(
+            seed["group_actual_pnl"]["net_profit_vnd"],
+            state["group_actual_pnl"]["net_profit_vnd"],
+        )
 
-    def test_actual_performance_starts_only_on_official_date(self) -> None:
+    def test_method_settlement_never_changes_personal_actual(self) -> None:
         state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
         before = json.loads(json.dumps(state))
         settlement = {
@@ -81,7 +85,7 @@ class Fusion4DailyTests(unittest.TestCase):
         advanced = fusion4.advance_state(before, settlement)
         self.assertEqual(advanced["actual"], before["actual"])
 
-    def test_first_official_result_continues_july_seed(self) -> None:
+    def test_personal_actual_uses_linh_order_not_method_result(self) -> None:
         state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
         settlement = {
             "date": "2026-07-19",
@@ -91,14 +95,55 @@ class Fusion4DailyTests(unittest.TestCase):
             "hit_day": True,
             "profit_day": True,
         }
-        advanced = fusion4.advance_state(state, settlement)
+        method_advanced = fusion4.advance_state(state, settlement)
+        operations = [{
+            "kind": "UPDATE_PERSONAL_PNL_IF_BLANK",
+            "name": "p1",
+            "pnl_vnd": 660_000,
+            "pnl_was_blank": True,
+        }]
+        advanced = fusion4.advance_personal_actual(
+            method_advanced, date(2026, 7, 19), operations
+        )
         actual = advanced["actual"]
         self.assertEqual(actual["settled_through"], "2026-07-19")
-        self.assertEqual(actual["current_month"]["sessions"], 19)
-        self.assertEqual(actual["current_month"]["wins"], 10)
+        self.assertEqual(actual["current_month"]["sessions"], 15)
+        self.assertEqual(actual["current_month"]["wins"], 9)
         self.assertEqual(actual["current_month"]["current_winning_streak"], 1)
-        self.assertEqual(actual["current_month"]["net_profit_vnd"], 30_940_000)
+        self.assertEqual(actual["current_month"]["net_profit_vnd"], 19_326_000)
         self.assertEqual(actual["total"], actual["current_month"])
+
+    def test_no_linh_order_advances_check_date_without_fake_result(self) -> None:
+        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        advanced = fusion4.advance_personal_actual(
+            state, date(2026, 7, 19), [
+                {"kind": "LOG_PERSONAL_NO_ORDER", "name": "p1"}
+            ]
+        )
+        self.assertEqual(advanced["actual"]["settled_through"], "2026-07-19")
+        self.assertEqual(advanced["actual"]["total"], state["actual"]["total"])
+
+    def test_group_total_adds_only_new_blank_pnl_cells(self) -> None:
+        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        values = (18_666_000, 0, -920_000, 285_000, 0)
+        snapshot = {"people": []}
+        for i, value in enumerate(values, start=1):
+            pnl_cell = 285_000 if i == 4 else None
+            snapshot["people"].append({
+                "name": f"p{i}",
+                "ledger_total_pnl_vnd": value,
+                "rows": [[], [], [], [], [], ["2026-07-19", "", "", "", pnl_cell]],
+            })
+        operations = [
+            {"kind": "UPDATE_PERSONAL_PNL_IF_BLANK", "name": "p1",
+             "row": 6, "pnl_vnd": 100_000},
+            {"kind": "UPDATE_PERSONAL_PNL_IF_BLANK", "name": "p4",
+             "row": 6, "pnl_vnd": 285_000},
+        ]
+        advanced = fusion4.reconcile_group_actual(
+            state, date(2026, 7, 19), snapshot, operations
+        )
+        self.assertEqual(advanced["group_actual_pnl"]["net_profit_vnd"], 18_131_000)
 
     def test_sheet_records_use_settlement_run_date(self) -> None:
         plan = fusion4.load_plan(date(2026, 7, 19))

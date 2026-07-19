@@ -97,15 +97,11 @@ def validate(index_path: Path, data_path: Path) -> None:
     if fusion4:
         actual = payload["actual_performance"]
         tracking_start = date.fromisoformat(actual["tracking_start_date"])
-        official_start = date.fromisoformat(actual["official_start_date"])
         actual_settled = date.fromisoformat(actual["settled_through"])
-        assert tracking_start <= official_start
-        assert official_start == date.fromisoformat(method["locked_from"])
+        assert actual["source"] == "LINH_ACTUAL_GOOGLE_SHEETS_LEDGER"
+        assert tracking_start <= actual_settled
         assert actual_settled <= lock_day
-        assert actual["current_month_id"] == actual_settled.strftime("%Y-%m") or (
-            actual_settled < official_start
-            and actual["current_month_id"] == official_start.strftime("%Y-%m")
-        )
+        assert actual["current_month_id"] == actual_settled.strftime("%Y-%m")
         for period_name in ("current_month", "total"):
             period = actual[period_name]
             sessions = period["sessions"]
@@ -120,9 +116,16 @@ def validate(index_path: Path, data_path: Path) -> None:
             assert period["current_losing_streak"] <= period["longest_losing_streak"]
             assert signed_vnd(period["net_profit_vnd"]) in html
         assert tracking_start.strftime("%d/%m/%Y") in html
-        assert "Thống kê thắng/thua" in html
-        assert "kiểm định nhân quả" in html
+        assert "Lãi/lỗ thực tế của Linh" in html
+        assert "Lãi/lỗ tổng" in html
+        assert "không lấy từ backtest" in html
         assert "Chuỗi dài nhất" in html
+
+        group = payload["group_actual_pnl"]
+        assert group["source"] == "AGGREGATE_5_PERSON_GOOGLE_SHEETS_LEDGERS"
+        assert group["people_count"] == 5
+        assert date.fromisoformat(group["settled_through"]) <= lock_day
+        assert signed_vnd(group["net_profit_vnd"]) in html
 
     settlement = payload.get("latest_settlement")
     if settlement is not None:

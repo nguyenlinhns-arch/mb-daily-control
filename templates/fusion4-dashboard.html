@@ -104,6 +104,11 @@
     .positive { color: var(--green); }
     .negative { color: var(--red); }
 
+    .group-pnl { margin-top: 20px; padding: 19px 20px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, var(--card), var(--card-soft)); }
+    .group-pnl-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .group-pnl h3 { margin: 0; font-size: 16px; }
+    .group-pnl-value { margin-top: 12px; font-size: clamp(27px, 5vw, 38px); font-weight: 900; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+    .group-pnl small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; }
     .note { margin: 15px 2px 0; color: var(--muted); font-size: 10px; }
     footer { padding: 20px 0 calc(28px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
     .footer-row { display: flex; justify-content: space-between; gap: 16px; }
@@ -164,8 +169,8 @@
     <section class="performance" aria-labelledby="performance-title">
       <div class="section-head">
         <div>
-          <h2 id="performance-title">Thống kê thắng/thua</h2>
-          <p class="scope">Tính liên tục từ {{ACTUAL_START_DMY}}</p>
+          <h2 id="performance-title">Lãi/lỗ thực tế của Linh</h2>
+          <p class="scope">Chỉ tính ngày có lệnh, từ {{ACTUAL_START_DMY}}</p>
         </div>
         <div class="status">{{ACTUAL_STATUS}}</div>
       </div>
@@ -194,7 +199,16 @@
         </article>
       </div>
 
-      <p class="note">01–18/07 là kiểm định nhân quả theo đúng lệnh 50–50–50–30; từ {{OFFICIAL_START_DMY}} là vận hành chính thức. “Thắng/Thua” tính theo lãi ròng từng ngày; chuỗi liên tiếp là chuỗi dài nhất.</p>
+      <article class="group-pnl" aria-labelledby="group-pnl-title">
+        <div class="group-pnl-head">
+          <h3 id="group-pnl-title">Lãi/lỗ tổng</h3>
+          <span class="status">{{GROUP_STATUS}}</span>
+        </div>
+        <div class="group-pnl-value {{GROUP_PNL_CLASS}}">{{GROUP_PNL}}</div>
+        <small>Tổng hợp thực tế của 5 sổ; không công khai chi tiết từng người.</small>
+      </article>
+
+      <p class="note">“Thắng/Thua” tính theo lãi ròng của từng ngày Linh có lệnh; ngày không đánh không tính. Chuỗi liên tiếp là chuỗi dài nhất. Toàn bộ số tiền lấy từ sổ lãi/lỗ thực tế, không lấy từ backtest của phương pháp.</p>
     </section>
   </main>
 

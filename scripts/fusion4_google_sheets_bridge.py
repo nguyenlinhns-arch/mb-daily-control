@@ -183,26 +183,27 @@ def snapshot(args: argparse.Namespace) -> None:
     missing_tabs = sorted(set(bindings.values()) - pnl_titles)
     if missing_tabs:
         raise BridgeError(f"Có {len(missing_tabs)} tab cá nhân cấu hình nhưng không tồn tại")
-    settlement_date = args.settlement_date
     people = []
     for key in PEOPLE_KEYS:
         tab = bindings[key]
-        dates = get_values(service, pnl_id, f"{quote_tab(tab)}!A6:A1005")
-        row_numbers = [
-            offset for offset, row in enumerate(dates, start=6)
-            if row and parse_date(row[0]) == settlement_date
-        ]
-        sparse_rows: list[list[Any]] = []
-        if row_numbers:
-            sparse_rows = [[] for _ in range(max(row_numbers))]
-            for row_number in row_numbers:
-                values = get_values(
-                    service, pnl_id,
-                    f"{quote_tab(tab)}!A{row_number}:H{row_number}",
-                )
-                if values:
-                    sparse_rows[row_number - 1] = values[0]
-        people.append({"name": key, "sheet_name": tab, "rows": sparse_rows})
+        ledger_rows = get_values(
+            service, pnl_id, f"{quote_tab(tab)}!A6:H1005"
+        )
+        rows: list[list[Any]] = [[] for _ in range(5)] + ledger_rows
+        total_pnl = 0
+        for row in ledger_rows:
+            padded = list(row) + [None] * max(0, 5 - len(row))
+            if padded[4] not in (None, ""):
+                try:
+                    total_pnl += int(float(padded[4]))
+                except (TypeError, ValueError) as exc:
+                    raise BridgeError(f"P/L không phải số trong sổ {key}") from exc
+        people.append({
+            "name": key,
+            "sheet_name": tab,
+            "rows": rows,
+            "ledger_total_pnl_vnd": total_pnl,
+        })
     private = {
         "schema_version": "MB_FUSION4_PNL_SNAPSHOT_V1",
         "private": True,

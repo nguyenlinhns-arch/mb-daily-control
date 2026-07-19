@@ -28,8 +28,6 @@ ENGINE_SCRIPT = ROOT / "scripts" / "fusion4_engine.py"
 CONFIG_ID = "MB_FUSION4_180_PROD_V1_20260719"
 METHOD = "MB FUSION4–180"
 PIPELINE_VERSION = "MB_FUSION4_180_DAILY_TXN_V1"
-TRACKING_START = date(2026, 7, 1)
-OFFICIAL_START = date(2026, 7, 19)
 VN = timezone(timedelta(hours=7))
 WEEKDAYS = (
     "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm",
@@ -166,23 +164,77 @@ def advance_state(state: dict, settlement: dict) -> dict:
         value[key] = updated
     value["settled_through"] = settlement["date"]
     value["last_settlement_hash"] = digest(settlement)
-    if settled_day >= OFFICIAL_START:
-        actual = value.setdefault("actual", {
-            "tracking_start_date": TRACKING_START.isoformat(),
-            "official_start_date": OFFICIAL_START.isoformat(),
-            "settled_through": (OFFICIAL_START - timedelta(days=1)).isoformat(),
-            "current_month_id": OFFICIAL_START.strftime("%Y-%m"),
-            "current_month": empty_actual_period(),
-            "total": empty_actual_period(),
-        })
-        if actual.get("current_month_id") != month_id:
-            actual["current_month_id"] = month_id
-            actual["current_month"] = empty_actual_period()
+    return value
+
+
+def advance_personal_actual(state: dict, day: date, operations: list[dict]) -> dict:
+    """Advance Linh's actual ledger summary, never the method replay result."""
+    value = json.loads(json.dumps(state))
+    actual = value["actual"]
+    previous_checked = date.fromisoformat(actual["settled_through"])
+    if day <= previous_checked:
+        raise PipelineError("Sổ thực tế Linh đã đối chiếu đến ngày bằng hoặc mới hơn")
+    month_id = day.strftime("%Y-%m")
+    if actual.get("current_month_id") != month_id:
+        actual["current_month_id"] = month_id
+        actual["current_month"] = empty_actual_period()
+    pnl_rows = [
+        int(operation["pnl_vnd"])
+        for operation in operations
+        if operation.get("kind") == "UPDATE_PERSONAL_PNL_IF_BLANK"
+        and operation.get("name") == "p1"
+    ]
+    if pnl_rows:
+        daily = {"pnl_vnd": sum(pnl_rows)}
         actual["current_month"] = update_actual_period(
-            actual["current_month"], settlement
+            actual["current_month"], daily
         )
-        actual["total"] = update_actual_period(actual["total"], settlement)
-        actual["settled_through"] = settlement["date"]
+        actual["total"] = update_actual_period(actual["total"], daily)
+    actual["settled_through"] = day.isoformat()
+    return value
+
+
+def ledger_total(entry: dict) -> int:
+    if "ledger_total_pnl_vnd" in entry:
+        return int(entry["ledger_total_pnl_vnd"])
+    total = 0
+    for row in entry.get("rows", []):
+        padded = list(row) + [None] * max(0, 5 - len(row))
+        if padded[4] not in (None, ""):
+            total += int(float(padded[4]))
+    return total
+
+
+def reconcile_group_actual(state: dict, day: date, snapshot: dict,
+                           operations: list[dict]) -> dict:
+    """Reconcile the privacy-safe aggregate of all five actual ledgers."""
+    value = json.loads(json.dumps(state))
+    people = snapshot.get("people", [])
+    names = [entry.get("name") for entry in people]
+    if len(names) != 5 or len(set(names)) != 5 or set(names) != set(common.PEOPLE):
+        raise PipelineError("Không đủ đúng 5 sổ cá nhân để tính lãi/lỗ tổng")
+    total = sum(ledger_total(entry) for entry in people)
+    by_name = {entry["name"]: entry for entry in people}
+    for operation in operations:
+        if operation.get("kind") != "UPDATE_PERSONAL_PNL_IF_BLANK":
+            continue
+        if "pnl_was_blank" in operation:
+            was_blank = operation["pnl_was_blank"] is True
+        else:
+            entry = by_name[operation["name"]]
+            row_number = int(operation["row"])
+            rows = entry.get("rows", [])
+            row = rows[row_number - 1] if row_number <= len(rows) else []
+            padded = list(row) + [None] * max(0, 5 - len(row))
+            was_blank = padded[4] in (None, "")
+        if was_blank:
+            total += int(operation["pnl_vnd"])
+    value["group_actual_pnl"] = {
+        "source": "AGGREGATE_5_PERSON_GOOGLE_SHEETS_LEDGERS",
+        "people_count": 5,
+        "settled_through": day.isoformat(),
+        "net_profit_vnd": total,
+    }
     return value
 
 
@@ -260,9 +312,10 @@ def render(current: dict) -> str:
     total = actual["total"]
     target = date.fromisoformat(plan["target_date"])
     locked = date.fromisoformat(plan["data_lock_date"])
-    official_start = date.fromisoformat(actual["official_start_date"])
     tracking_start = date.fromisoformat(actual["tracking_start_date"])
     actual_settled = date.fromisoformat(actual["settled_through"])
+    group = current["group_actual_pnl"]
+    group_settled = date.fromisoformat(group["settled_through"])
     ranks = [1, 2, 3, 4]
     replacements = {
         "AUDIT_ID": current["audit_id"],
@@ -283,12 +336,7 @@ def render(current: dict) -> str:
             quote=True,
         ),
         "ACTUAL_START_DMY": tracking_start.strftime("%d/%m/%Y"),
-        "OFFICIAL_START_DMY": official_start.strftime("%d/%m/%Y"),
-        "ACTUAL_STATUS": (
-            f"Đã cập nhật đến {actual_settled.strftime('%d/%m/%Y')}"
-            if actual_settled >= official_start else
-            f"Đã kiểm định đến {actual_settled.strftime('%d/%m/%Y')}"
-        ),
+        "ACTUAL_STATUS": f"Đã đối chiếu Google Sheets đến {actual_settled.strftime('%d/%m/%Y')}",
         "MONTH_LABEL": f"Tháng {actual['current_month_id'][5:7]}/{actual['current_month_id'][:4]}",
         "MONTH_WINS": str(month["wins"]),
         "MONTH_LOSSES": str(month["losses"]),
@@ -302,6 +350,9 @@ def render(current: dict) -> str:
         "TOTAL_LOSS_STREAK": str(total["longest_losing_streak"]),
         "TOTAL_PNL": fmt_vnd(total["net_profit_vnd"], signed=True),
         "TOTAL_PNL_CLASS": "positive" if total["net_profit_vnd"] >= 0 else "negative",
+        "GROUP_STATUS": f"Đã đối chiếu đến {group_settled.strftime('%d/%m/%Y')}",
+        "GROUP_PNL": fmt_vnd(group["net_profit_vnd"], signed=True),
+        "GROUP_PNL_CLASS": "positive" if group["net_profit_vnd"] >= 0 else "negative",
     }
     html = TEMPLATE.read_text(encoding="utf-8")
     for key, value in replacements.items():
@@ -321,7 +372,9 @@ def source_operation(kind: str, record: dict) -> dict:
 
 
 def build_sheet_payload(target: date, plan: dict, settlement: dict,
-                        snapshot: dict, input_hash: str) -> dict:
+                        snapshot: dict, input_hash: str,
+                        personal: list[dict] | None = None,
+                        blocked: list[dict] | None = None) -> dict:
     # Stable across the scheduled retries so operation IDs remain idempotent.
     created = f"{(target - timedelta(days=1)).isoformat()}T19:15:00+07:00"
     settlement_record = {
@@ -342,9 +395,10 @@ def build_sheet_payload(target: date, plan: dict, settlement: dict,
         "pnl_vnd": None, "hit_units": None, "source_date": plan["data_lock_date"],
         "input_hash": input_hash, "created_at": created,
     }
-    personal, blocked = common.personal_operations(
-        snapshot, date.fromisoformat(settlement["date"]), snapshot["draw"]
-    )
+    if personal is None or blocked is None:
+        personal, blocked = common.personal_operations(
+            snapshot, date.fromisoformat(settlement["date"]), snapshot["draw"]
+        )
     for operation in personal:
         if operation.get("note"):
             operation["note"] = operation["note"].replace(
@@ -396,6 +450,7 @@ def public_payload(target: date, plan: dict, settlement: dict, state: dict,
         ],
         "latest_settlement": settlement,
         "actual_performance": state["actual"],
+        "group_actual_pnl": state["group_actual_pnl"],
         "backtest": {
             "current_month": state["current_month"],
             "current_year": state["current_year"],
@@ -406,6 +461,7 @@ def public_payload(target: date, plan: dict, settlement: dict, state: dict,
             "duplicate_codes": 0, "martingale": False,
             "same_day_outcome_leakage": False,
             "personal_actual_pnl_is_separate": True,
+            "public_group_pnl_is_aggregate_only": True,
         },
         "audit": {
             "source_history_primary_equals_mirror": True,
@@ -422,6 +478,7 @@ def public_payload(target: date, plan: dict, settlement: dict, state: dict,
             "schedule": "19:15 Asia/Bangkok",
             "status": "PREPARED_SHEETS_REQUIRED_BEFORE_PUBLISH",
             "personal_ledger_policy": "ONLY_SETTLE_EXISTING_ACTUAL_ORDERS",
+            "website_pnl_source": "PERSONAL_AND_5_LEDGER_ACTUALS",
         },
     }
 
@@ -443,11 +500,16 @@ def prepare(args: argparse.Namespace) -> None:
             f"State đang đến {state_before.get('settled_through')}, cần {expected_through}"
         )
     prefix = [[day.isoformat(), history[day]] for day in sorted(history) if day <= previous]
+    ledger_totals = [
+        {"name": entry.get("name"), "pnl_vnd": ledger_total(entry)}
+        for entry in snapshot.get("people", [])
+    ]
     immutable = {
         "pipeline_version": PIPELINE_VERSION, "target_date": target.isoformat(),
         "previous_plan_hash": digest(previous_plan),
         "history_prefix_hash": digest(prefix), "state_before_hash": digest(state_before),
         "personal_inputs_hash": common.personal_input_fingerprint(snapshot, previous),
+        "personal_ledger_totals_hash": digest(ledger_totals),
         "template_hash": sha256(TEMPLATE.read_bytes()).hexdigest(),
         "pipeline_code_hash": sha256(Path(__file__).read_bytes()).hexdigest(),
         "engine_wrapper_hash": sha256(ENGINE_SCRIPT.read_bytes()).hexdigest(),
@@ -470,15 +532,20 @@ def prepare(args: argparse.Namespace) -> None:
         raise PipelineError("Transaction FUSION4 cùng ngày đã tồn tại nhưng xung đột")
 
     settlement = settle(previous_plan, history[previous])
+    snapshot["draw"] = history[previous]
+    personal, blocked = common.personal_operations(snapshot, previous, snapshot["draw"])
     state = advance_state(state_before, settlement)
+    state = advance_personal_actual(state, previous, personal)
+    state = reconcile_group_actual(state, previous, snapshot, personal)
     engine_workbook = output / "private" / "engine-input.xlsx"
     common.write_truncated_engine_workbook(history, previous, engine_workbook)
     engine = run_engine(previous, engine_workbook, output)
     plan = make_plan(engine, target, previous)
     current = public_payload(target, plan, settlement, state, engine, input_hash)
     html = render(current)
-    snapshot["draw"] = history[previous]
-    sheets = build_sheet_payload(target, plan, settlement, snapshot, input_hash)
+    sheets = build_sheet_payload(
+        target, plan, settlement, snapshot, input_hash, personal, blocked
+    )
     transaction = {
         "pipeline_version": PIPELINE_VERSION, "status": "PREPARED",
         "target_date": str(target), "previous_date": str(previous),

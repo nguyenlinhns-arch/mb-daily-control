@@ -41,6 +41,31 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(rendered, (ROOT / "index.html").read_text())
         self.assertNotIn("{{", rendered)
 
+    def test_sheet_records_use_settlement_run_date(self) -> None:
+        plan = fusion4.load_plan(date(2026, 7, 19))
+        settlement = json.loads(
+            (ROOT / "data" / "fusion4-settlements" / "2026-07-18.json").read_text()
+        )
+        snapshot = {
+            "draw": ["00"] * 27,
+            "people": [
+                {"name": name, "sheet_name": name, "rows": []}
+                for name in ("p1", "p2", "p3", "p4", "p5")
+            ],
+        }
+        payload = fusion4.build_sheet_payload(
+            date(2026, 7, 19), plan, settlement, snapshot, "input-hash"
+        )
+        source_records = [
+            operation["record"] for operation in payload["operations"]
+            if operation["kind"].startswith("UPSERT_SOURCE_")
+        ]
+        self.assertTrue(source_records)
+        self.assertTrue(all(
+            record["created_at"] == "2026-07-18T19:15:00+07:00"
+            for record in source_records
+        ))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -301,7 +301,7 @@ def source_operation(kind: str, record: dict) -> dict:
 def build_sheet_payload(target: date, plan: dict, settlement: dict,
                         snapshot: dict, input_hash: str) -> dict:
     # Stable across the scheduled retries so operation IDs remain idempotent.
-    created = f"{target.isoformat()}T19:15:00+07:00"
+    created = f"{(target - timedelta(days=1)).isoformat()}T19:15:00+07:00"
     settlement_record = {
         "record_type": "SETTLEMENT", "date": settlement["date"],
         "status": settlement["status"], "method": METHOD,

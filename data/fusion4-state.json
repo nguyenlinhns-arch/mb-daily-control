@@ -63,29 +63,30 @@
   },
   "last_settlement_hash": "1e4082f2d3ab401d30069a7205dc725779c2b2fd79e8f50cb54d5732960fc006",
   "actual": {
+    "tracking_start_date": "2026-07-01",
     "official_start_date": "2026-07-19",
     "settled_through": "2026-07-18",
     "current_month_id": "2026-07",
     "current_month": {
-      "sessions": 0,
-      "wins": 0,
-      "losses": 0,
+      "sessions": 18,
+      "wins": 9,
+      "losses": 9,
       "current_winning_streak": 0,
-      "current_losing_streak": 0,
-      "longest_winning_streak": 0,
-      "longest_losing_streak": 0,
-      "net_profit_vnd": 0
+      "current_losing_streak": 1,
+      "longest_winning_streak": 3,
+      "longest_losing_streak": 3,
+      "net_profit_vnd": 27080000
     },
     "total": {
-      "sessions": 0,
-      "wins": 0,
-      "losses": 0,
+      "sessions": 18,
+      "wins": 9,
+      "losses": 9,
       "current_winning_streak": 0,
-      "current_losing_streak": 0,
-      "longest_winning_streak": 0,
-      "longest_losing_streak": 0,
-      "net_profit_vnd": 0
+      "current_losing_streak": 1,
+      "longest_winning_streak": 3,
+      "longest_losing_streak": 3,
+      "net_profit_vnd": 27080000
     }
   },
-  "note": "Backtest ledger is theoretical. Personal actual orders remain in the five-person P/L workbook."
+  "note": "Website performance starts with causal replay 01-18/07/2026 and continues with official operation from 19/07/2026. Personal actual orders remain separate."
 }

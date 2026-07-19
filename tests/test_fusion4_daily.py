@@ -54,6 +54,19 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(period["current_losing_streak"], 2)
         self.assertEqual(period["net_profit_vnd"], 200_000)
 
+    def test_july_performance_seed_matches_published_state(self) -> None:
+        seed = json.loads(
+            (ROOT / "data" / "fusion4-performance-seed-2026-07.json").read_text()
+        )
+        period = fusion4.empty_actual_period()
+        for row in seed["rows"]:
+            period = fusion4.update_actual_period(period, row)
+        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        self.assertEqual(period, seed["summary"])
+        self.assertEqual(period, state["actual"]["current_month"])
+        self.assertEqual(period, state["actual"]["total"])
+        self.assertEqual(state["actual"]["tracking_start_date"], "2026-07-01")
+
     def test_actual_performance_starts_only_on_official_date(self) -> None:
         state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
         before = json.loads(json.dumps(state))
@@ -67,6 +80,25 @@ class Fusion4DailyTests(unittest.TestCase):
         }
         advanced = fusion4.advance_state(before, settlement)
         self.assertEqual(advanced["actual"], before["actual"])
+
+    def test_first_official_result_continues_july_seed(self) -> None:
+        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        settlement = {
+            "date": "2026-07-19",
+            "pnl_vnd": 3_860_000,
+            "capital_vnd": 4_140_000,
+            "payout_vnd": 8_000_000,
+            "hit_day": True,
+            "profit_day": True,
+        }
+        advanced = fusion4.advance_state(state, settlement)
+        actual = advanced["actual"]
+        self.assertEqual(actual["settled_through"], "2026-07-19")
+        self.assertEqual(actual["current_month"]["sessions"], 19)
+        self.assertEqual(actual["current_month"]["wins"], 10)
+        self.assertEqual(actual["current_month"]["current_winning_streak"], 1)
+        self.assertEqual(actual["current_month"]["net_profit_vnd"], 30_940_000)
+        self.assertEqual(actual["total"], actual["current_month"])
 
     def test_sheet_records_use_settlement_run_date(self) -> None:
         plan = fusion4.load_plan(date(2026, 7, 19))

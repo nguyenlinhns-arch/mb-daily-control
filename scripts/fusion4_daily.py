@@ -28,6 +28,7 @@ ENGINE_SCRIPT = ROOT / "scripts" / "fusion4_engine.py"
 CONFIG_ID = "MB_FUSION4_180_PROD_V1_20260719"
 METHOD = "MB FUSION4–180"
 PIPELINE_VERSION = "MB_FUSION4_180_DAILY_TXN_V1"
+TRACKING_START = date(2026, 7, 1)
 OFFICIAL_START = date(2026, 7, 19)
 VN = timezone(timedelta(hours=7))
 WEEKDAYS = (
@@ -167,6 +168,7 @@ def advance_state(state: dict, settlement: dict) -> dict:
     value["last_settlement_hash"] = digest(settlement)
     if settled_day >= OFFICIAL_START:
         actual = value.setdefault("actual", {
+            "tracking_start_date": TRACKING_START.isoformat(),
             "official_start_date": OFFICIAL_START.isoformat(),
             "settled_through": (OFFICIAL_START - timedelta(days=1)).isoformat(),
             "current_month_id": OFFICIAL_START.strftime("%Y-%m"),
@@ -259,6 +261,7 @@ def render(current: dict) -> str:
     target = date.fromisoformat(plan["target_date"])
     locked = date.fromisoformat(plan["data_lock_date"])
     official_start = date.fromisoformat(actual["official_start_date"])
+    tracking_start = date.fromisoformat(actual["tracking_start_date"])
     actual_settled = date.fromisoformat(actual["settled_through"])
     ranks = [1, 2, 3, 4]
     replacements = {
@@ -279,11 +282,12 @@ def render(current: dict) -> str:
             + f" điểm — tổng 180 điểm — vốn {fmt_vnd(plan['total_capital_vnd'])}",
             quote=True,
         ),
-        "ACTUAL_START_DMY": official_start.strftime("%d/%m/%Y"),
+        "ACTUAL_START_DMY": tracking_start.strftime("%d/%m/%Y"),
+        "OFFICIAL_START_DMY": official_start.strftime("%d/%m/%Y"),
         "ACTUAL_STATUS": (
-            f"Đã quyết toán thực tế đến {actual_settled.strftime('%d/%m/%Y')}"
+            f"Đã cập nhật đến {actual_settled.strftime('%d/%m/%Y')}"
             if actual_settled >= official_start else
-            "Chưa có phiên thực tế đã quyết toán"
+            f"Đã kiểm định đến {actual_settled.strftime('%d/%m/%Y')}"
         ),
         "MONTH_LABEL": f"Tháng {actual['current_month_id'][5:7]}/{actual['current_month_id'][:4]}",
         "MONTH_WINS": str(month["wins"]),

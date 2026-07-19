@@ -96,8 +96,10 @@ def validate(index_path: Path, data_path: Path) -> None:
 
     if fusion4:
         actual = payload["actual_performance"]
+        tracking_start = date.fromisoformat(actual["tracking_start_date"])
         official_start = date.fromisoformat(actual["official_start_date"])
         actual_settled = date.fromisoformat(actual["settled_through"])
+        assert tracking_start <= official_start
         assert official_start == date.fromisoformat(method["locked_from"])
         assert actual_settled <= lock_day
         assert actual["current_month_id"] == actual_settled.strftime("%Y-%m") or (
@@ -108,7 +110,7 @@ def validate(index_path: Path, data_path: Path) -> None:
             period = actual[period_name]
             sessions = period["sessions"]
             assert sessions >= 0
-            assert period["wins"] + period["losses"] <= sessions
+            assert period["wins"] + period["losses"] == sessions
             for streak in (
                 "current_winning_streak", "current_losing_streak",
                 "longest_winning_streak", "longest_losing_streak",
@@ -117,8 +119,9 @@ def validate(index_path: Path, data_path: Path) -> None:
             assert period["current_winning_streak"] <= period["longest_winning_streak"]
             assert period["current_losing_streak"] <= period["longest_losing_streak"]
             assert signed_vnd(period["net_profit_vnd"]) in html
-        assert "Thống kê thực tế" in html
-        assert "không gồm backtest" in html
+        assert tracking_start.strftime("%d/%m/%Y") in html
+        assert "Thống kê thắng/thua" in html
+        assert "kiểm định nhân quả" in html
         assert "Chuỗi dài nhất" in html
 
     settlement = payload.get("latest_settlement")

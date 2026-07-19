@@ -1,0 +1,40 @@
+{
+  "schema_version": "MB_FUSION4_PERFORMANCE_SEED_V1",
+  "method": "MB FUSION4–180",
+  "config_id": "MB_FUSION4_180_PROD_V1_20260719",
+  "basis": "CAUSAL_REPLAY_THROUGH_2026_07_18_THEN_OFFICIAL_OPERATION",
+  "start_date": "2026-07-01",
+  "replay_end_date": "2026-07-18",
+  "official_start_date": "2026-07-19",
+  "ranked_points": [50, 50, 50, 30],
+  "rows": [
+    {"date": "2026-07-01", "codes": ["14", "91", "83", "52"], "pnl_vnd": -140000},
+    {"date": "2026-07-02", "codes": ["51", "14", "90", "52"], "pnl_vnd": 2260000},
+    {"date": "2026-07-03", "codes": ["56", "55", "92", "13"], "pnl_vnd": 2260000},
+    {"date": "2026-07-04", "codes": ["31", "94", "87", "55"], "pnl_vnd": 10260000},
+    {"date": "2026-07-05", "codes": ["06", "05", "31", "12"], "pnl_vnd": -140000},
+    {"date": "2026-07-06", "codes": ["55", "91", "83", "76"], "pnl_vnd": 11860000},
+    {"date": "2026-07-07", "codes": ["92", "06", "60", "21"], "pnl_vnd": 2260000},
+    {"date": "2026-07-08", "codes": ["82", "60", "55", "13"], "pnl_vnd": -4140000},
+    {"date": "2026-07-09", "codes": ["58", "21", "94", "51"], "pnl_vnd": 3860000},
+    {"date": "2026-07-10", "codes": ["32", "06", "52", "43"], "pnl_vnd": -1740000},
+    {"date": "2026-07-11", "codes": ["13", "41", "01", "32"], "pnl_vnd": 2260000},
+    {"date": "2026-07-12", "codes": ["80", "94", "47", "88"], "pnl_vnd": -140000},
+    {"date": "2026-07-13", "codes": ["61", "80", "47", "31"], "pnl_vnd": 2260000},
+    {"date": "2026-07-14", "codes": ["40", "52", "81", "88"], "pnl_vnd": -1740000},
+    {"date": "2026-07-15", "codes": ["28", "06", "41", "60"], "pnl_vnd": -140000},
+    {"date": "2026-07-16", "codes": ["91", "10", "51", "41"], "pnl_vnd": -4140000},
+    {"date": "2026-07-17", "codes": ["01", "91", "13", "41"], "pnl_vnd": 3860000},
+    {"date": "2026-07-18", "codes": ["57", "55", "91", "54"], "pnl_vnd": -1740000}
+  ],
+  "summary": {
+    "sessions": 18,
+    "wins": 9,
+    "losses": 9,
+    "current_winning_streak": 0,
+    "current_losing_streak": 1,
+    "longest_winning_streak": 3,
+    "longest_losing_streak": 3,
+    "net_profit_vnd": 27080000
+  }
+}

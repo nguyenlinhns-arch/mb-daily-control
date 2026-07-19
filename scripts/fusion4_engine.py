@@ -178,6 +178,42 @@ def v32_cap10(raw: tuple[int, ...], base: set[int], overdue: np.ndarray):
     return capped, priority_selected
 
 
+def summarize_replay(rows: list[dict[str, Any]]) -> dict[str, int]:
+    summary = {
+        "sessions": 0,
+        "wins": 0,
+        "losses": 0,
+        "current_winning_streak": 0,
+        "current_losing_streak": 0,
+        "longest_winning_streak": 0,
+        "longest_losing_streak": 0,
+        "net_profit_vnd": 0,
+    }
+    for row in rows:
+        pnl = int(row["pnl_vnd"])
+        won = pnl > 0
+        lost = pnl < 0
+        summary["sessions"] += 1
+        summary["wins"] += int(won)
+        summary["losses"] += int(lost)
+        summary["current_winning_streak"] = (
+            summary["current_winning_streak"] + 1 if won else 0
+        )
+        summary["current_losing_streak"] = (
+            summary["current_losing_streak"] + 1 if lost else 0
+        )
+        summary["longest_winning_streak"] = max(
+            summary["longest_winning_streak"],
+            summary["current_winning_streak"],
+        )
+        summary["longest_losing_streak"] = max(
+            summary["longest_losing_streak"],
+            summary["current_losing_streak"],
+        )
+        summary["net_profit_vnd"] += pnl
+    return summary
+
+
 def build_plan(source_xlsx: Path, source_end: date) -> dict:
     os.environ["MB_V32_SOURCE_XLSX"] = str(source_xlsx.resolve())
     sys.path.insert(0, str(ENGINE))
@@ -244,24 +280,31 @@ def build_plan(source_xlsx: Path, source_end: date) -> dict:
             v32_live.LOCKED_RULE.pool,
         )
         v32_raw_all, _ = empirical.apply_rule(v32_live.LOCKED_RULE, control, proposal)
-        j = result_index[target]
-        raw_codes = tuple(map(int, v32_raw_all[j]))
-        capped, priority_selected = v32_cap10(raw_codes, base_sets[j], overdue_all[j])
-        outside = sorted(
-            set(range(100)) - set(raw_codes),
-            key=lambda code: (-float(overdue_all[j, code]), code),
-        )
-        total_order = priority_selected + outside
-        priority_rank = np.empty(100, np.int16)
-        priority_rank[total_order] = np.arange(1, 101, dtype=np.int16)
-        max10_member = np.zeros(100, np.float32)
-        max10_member[capped] = 1.0
-
-        r4 = rank01(hgb_score[-1:])[0]
-        r10 = 1.0 - (priority_rank.astype(np.float32) - 1) / 99
-        fused = 0.75 * r4 + 0.25 * r10 + 0.50 * max10_member
         codes = np.arange(100)
-        order = np.lexsort((codes, -fused))[:4]
+
+        def select(day: date, hgb_row: np.ndarray):
+            j = result_index[day]
+            raw_codes = tuple(map(int, v32_raw_all[j]))
+            capped, priority_selected = v32_cap10(
+                raw_codes, base_sets[j], overdue_all[j]
+            )
+            outside = sorted(
+                set(range(100)) - set(raw_codes),
+                key=lambda code: (-float(overdue_all[j, code]), code),
+            )
+            total_order = priority_selected + outside
+            priority_rank = np.empty(100, np.int16)
+            priority_rank[total_order] = np.arange(1, 101, dtype=np.int16)
+            max10_member = np.zeros(100, np.float32)
+            max10_member[capped] = 1.0
+            r4 = rank01(hgb_row.reshape(1, -1))[0]
+            r10 = 1.0 - (priority_rank.astype(np.float32) - 1) / 99
+            fused = 0.75 * r4 + 0.25 * r10 + 0.50 * max10_member
+            order = np.lexsort((codes, -fused))[:4]
+            return order, fused, r4, r10, max10_member, priority_rank, capped
+
+        (order, fused, r4, r10, max10_member,
+         priority_rank, capped) = select(target, hgb_score[-1])
         code_strings = [f"{int(code):02d}" for code in order]
         points = [50, 50, 50, 30]
         points_by_code = dict(zip(code_strings, points))
@@ -277,6 +320,31 @@ def build_plan(source_xlsx: Path, source_end: date) -> dict:
             "v32_cap10": [f"{i:02d}" for i in capped],
             "codes": code_strings, "points": points_by_code,
         }
+        replay_start = source_end.replace(day=1)
+        replay_rows = []
+        for i, day in enumerate(eval_days):
+            if not replay_start <= day <= source_end:
+                continue
+            replay_order, *_ = select(day, hgb_score[i])
+            replay_codes = [f"{int(code):02d}" for code in replay_order]
+            replay_points = dict(zip(replay_codes, points))
+            hits = {
+                code: int(y_count[i, int(code)]) for code in replay_codes
+            }
+            capital = sum(replay_points.values()) * COST_PER_POINT
+            payout = sum(
+                hits[code] * replay_points[code] * 80_000
+                for code in replay_codes
+            )
+            replay_rows.append({
+                "date": str(day),
+                "codes": replay_codes,
+                "points_by_code": replay_points,
+                "hits_by_code": hits,
+                "capital_vnd": capital,
+                "payout_vnd": payout,
+                "pnl_vnd": payout - capital,
+            })
         return {
             "schema_version": "MB_FUSION4_ENGINE_PLAN_V1",
             "source_end": str(source_end),
@@ -303,6 +371,12 @@ def build_plan(source_xlsx: Path, source_end: date) -> dict:
                 ],
                 "a1_role": "AUDIT_CONFIRMATION_ONLY_IN_FIXED_K4",
                 "static_voter_manifest_sha256": STATIC_MANIFEST_SHA256,
+            },
+            "causal_replay_current_month": {
+                "start_date": str(replay_start),
+                "end_date": str(source_end),
+                "rows": replay_rows,
+                "summary": summarize_replay(replay_rows),
             },
             "causality": {
                 "source_mode": source_mode,

@@ -1,90 +1,81 @@
 # MB Daily Control
 
-Dashboard vận hành tĩnh cho kế hoạch MB hằng ngày.
+Dashboard và pipeline vận hành hằng ngày cho phương pháp **MB FUSION4–180**.
 
-## Lệnh khóa 17/07/2026
+## Lệnh đã khóa ngày 19/07/2026
 
-- Phương pháp chính thức: **V32 · R868Y26 + Gate315 + Empirical Overdue Swap075 / A6_B8**
-- Số: **01, 13, 31, 41, 83, 91**
-- Mức: **30 điểm/số**
-- Tổng: **180 điểm = 4.140.000đ** theo giá vốn 23.000đ/điểm
-- Dữ liệu khóa đến hết **16/07/2026**; chưa dùng kết quả 17/07
-- Overlay không kích hoạt: đề xuất `83 → 80`, biên `0,018481 < 0,75`
+- Hạng 1–3: **59, 78, 06 × 50 điểm**.
+- Hạng 4: **10 × 30 điểm**.
+- Tổng: **180 điểm**, vốn/lỗ tối đa **4.140.000đ** theo giá vốn
+  23.000đ/điểm.
+- Dữ liệu chỉ khóa đến hết 18/07/2026; kết quả 19/07 không được dùng khi chọn.
 
-## Quy tắc vốn A6_B8
+Fusion4 xếp hạng theo công thức đã khóa:
 
-| Độ rộng | Điểm mỗi số |
-|---|---:|
-| N ≤ 6 | 30 |
-| N = 7–8 | 25 |
-| N ≥ 9 | 20 |
+`0,75 × hạng Max4 + 0,25 × ưu tiên Max10 + 0,50 nếu thuộc tập Max10`
 
-`Core100/Other50` đã ngừng áp dụng cho phương pháp này.
+A1 được giữ ở lớp kiểm toán nghiên cứu; với cấu hình cố định bốn số, A1 không
+thay đổi thứ tự chọn. Không dùng Core100/Other50, overlay hay gấp thếp.
 
-## Vận hành
+## Đối soát đến 18/07/2026
 
-- `index.html`: dashboard hoàn chỉnh, không phụ thuộc JavaScript hay API để hiển thị lệnh.
-- `data/current.json`: dữ liệu máy đọc được, cùng kế hoạch với giao diện.
-- `scripts/normalize_static_dashboard.py`: lớp an toàn được workflow Pages áp dụng trước khi deploy.
-- `.github/workflows/pages.yml`: build và triển khai GitHub Pages từ nhánh `main`.
+Replay nhân quả của Fusion4 ngày 18/07 chọn `57, 55, 91, 54` theo mức
+`50–50–50–30`. Mã 54 xuất hiện một nháy: vốn 4.140.000đ, trả 2.400.000đ,
+P/L phương pháp **-1.740.000đ**. Đây là replay của sổ phương pháp, không phải
+lệnh cá nhân thực tế.
 
-## Tự động hóa V32 lúc 06:00
+Lệnh thực tế của từng người luôn tách riêng. Pipeline chỉ quyết toán dòng đã có
+dữ liệu A:D; không tự gán lệnh, không tự ghi 0 và không suy diễn P/L cho người
+không có lệnh.
 
-Workflow `.github/workflows/v32-daily-0600.yml` chạy lúc 06:00 Asia/Bangkok và
-retry idempotent lúc 06:15, 06:30. Thứ tự giao dịch cố định:
+## Tự động hóa lúc 19:15
 
-1. đọc đủ 27/27 kết quả kỳ trước và snapshot A:D của năm sổ cá nhân;
-2. quyết toán lệnh V32 đã khóa;
-3. ghi Google Sheets, rồi đọc lại đúng operation ID/hash;
-4. tải engine/model V32 từ Google Drive riêng tư, kiểm tra SHA-256 + manifest,
-   rồi sinh lệnh kỳ kế tiếp;
-5. chỉ khi bước 3 đạt mới cập nhật `current.json`, HTML và đẩy `main` để Pages deploy.
+Workflow `.github/workflows/fusion4-daily-1915.yml` chạy lúc 19:15
+Asia/Bangkok, retry idempotent lúc 19:30 và 19:45:
 
-Nếu thiếu kết quả, sai hash, A:D cá nhân đổi trong lúc chạy, P/L có sẵn mâu
-thuẫn hoặc Google trả lỗi, workflow dừng và giữ nguyên website gần nhất. Retry
-không ghi trùng. Pipeline chỉ quyết toán dòng cá nhân đã có; không tự gán cùng
-một lệnh và không tự ghi 0 cho người không có lệnh.
+1. đọc đủ 27/27 kết quả ngày hiện tại và đối chiếu hai tab lịch sử;
+2. quyết toán lệnh Fusion4 đã khóa và các lệnh cá nhân thực tế đang có;
+3. ghi Google Sheets rồi đọc lại đúng operation ID/hash;
+4. tải runtime riêng tư, sinh và khóa kế hoạch cho ngày sau;
+5. chỉ khi Sheets/readback đạt mới cập nhật JSON, website và đẩy nhánh `main`.
 
-### Một lần duy nhất để kích hoạt ghi Google Sheets
+Thiếu kết quả, sai hash, thay đổi A:D trong lúc chạy, P/L có sẵn mâu thuẫn hoặc
+Google trả lỗi đều làm pipeline dừng fail-closed; website gần nhất được giữ
+nguyên. Lịch V32 cũ đã bị gỡ và chỉ còn rollback thủ công có xác nhận.
 
-Repository chỉ cần một GitHub Actions secret:
+Các tab transaction hiện hành:
 
-- `GOOGLE_SERVICE_ACCOUNT_JSON`: JSON của service account; runtime chỉ yêu cầu
-  Sheets và Drive read-only scope;
+- nguồn: `FUSION4_Daily_Plan`, `FUSION4_Daily_Settlement`,
+  `FUSION4_Automation_Log`;
+- P/L: `Tự động hóa FUSION4`, `Nhật ký FUSION4`, `MB FUSION4` và năm tab cá
+  nhân được ánh xạ bằng các slot `p1`–`p5`.
 
-ID file P/L nằm trong tab ẩn `V32_Private_Config` của Sheet nguồn riêng tư;
-workflow đọc sau khi xác thực nên ID này không xuất hiện trên GitHub.
+Sổ `MB FUSION4` là sổ phương pháp lý thuyết. Năm tab cá nhân là sổ lệnh thật;
+hai phạm vi không được cộng lẫn.
 
-Bật Google Sheets API và Google Drive API trong project của service account.
-Chia sẻ file nguồn và file P/L cho `client_email` với quyền Editor; thêm chính
-email đó vào mọi protected range đang bao phủ cột E hoặc H của năm tab cá nhân
-(kể cả protection toàn tab). Chia sẻ riêng file runtime
-`mb-v32-engine-20260717-1e06af9c.tar.gz` trong thư mục Drive
-`MB Daily Control - Private Runtime` với quyền Reader. Không bật link sharing.
+## Thành phần chính
 
-Engine/model không nằm trong repository công khai. File Drive được khóa bằng
+- `index.html`: dashboard tĩnh đã render, không cần API để hiện lệnh.
+- `data/current.json`: payload công khai cùng nội dung với giao diện.
+- `data/fusion4-*`: plan, settlement, state và transaction audit.
+- `scripts/fusion4_engine.py`: wrapper xếp hạng Fusion4 trên runtime riêng tư.
+- `scripts/fusion4_daily.py`: giao dịch fail-closed từ kết quả đến website.
+- `scripts/fusion4_google_sheets_bridge.py`: snapshot, ghi Sheets và readback.
+- `scripts/validate_dashboard.py`: chặn publish nếu HTML/JSON/vốn lệch nhau.
+
+Repository cần secret `GOOGLE_SERVICE_ACCOUNT_JSON`. Service account phải có
+quyền Editor ở file nguồn và file P/L, quyền Reader ở runtime Drive, đồng thời
+được phép ghi các protected range cột E/H của năm tab cá nhân. ID file P/L nằm
+trong tab ẩn `V32_Private_Config` để tương thích runtime và không xuất hiện trên
+website.
+
+Runtime/model không nằm trong repository công khai. Gói Drive được kiểm tra
 SHA-256 `09bb4dbd6890f0d27c4f8519b72deb3b3b18c317c246c4a168182b51ed7a67d1`
 và tree hash `1e06af9c8639099055380e136ee13f5f0c6399c9a437c9cc6150246f16b9fdf3`;
-sai một byte thì workflow dừng trước khi đọc dữ liệu vận hành. Secret chỉ được
-inject ở bước tải engine, snapshot và apply; không xuất hiện trong bước cài
-dependency, chạy engine, test hay publish.
-
-Các tab transaction chính thức:
-
-- nguồn: `V32_Daily_Plan`, `V32_Daily_Settlement`, `V32_Automation_Log`;
-- P/L: `Tự động hóa V32`, `Nhật ký tự động V32` và năm tab cá nhân được ánh
-  xạ bằng các slot riêng tư `p1`–`p5` trong chính file P/L.
-
-Năm slot đã được ánh xạ trực tiếp tới năm tab hiện hữu, kể cả slot thứ năm.
-Repository công khai chỉ dùng khóa `p1`–`p5`; tên thật chỉ được đọc từ tab cấu
-hình riêng tư trong file P/L khi workflow chạy.
-
-## Bảo vệ V32
-
-Các workflow sinh kế hoạch Core100/Other50 cũ được giữ lại chỉ để rollback thủ công. Chúng không còn chạy theo `push`, `schedule` hoặc `workflow_run`; muốn kích hoạt phải dispatch bằng tay và nhập chính xác `ENABLE_LEGACY`. Nhờ vậy automation cũ không thể ghi đè kế hoạch V32 đang khóa.
+sai một byte thì pipeline dừng.
 
 Trang công khai: <https://nguyenlinhns-arch.github.io/mb-daily-control/>
 
-Google Sheet vận hành: <https://docs.google.com/spreadsheets/d/1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w/edit>
+Google Sheet nguồn: <https://docs.google.com/spreadsheets/d/1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w/edit>
 
 Backtest là số liệu lịch sử, không bảo đảm kết quả tương lai.

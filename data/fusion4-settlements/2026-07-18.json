@@ -1,0 +1,20 @@
+{
+  "date": "2026-07-18",
+  "status": "BACKTEST_CAUSAL_REPLAY_27_OF_27",
+  "ledger_scope": "METHOD_THEORETICAL_SEPARATE_FROM_PERSONAL_ACTUAL",
+  "method": "MB FUSION4–180",
+  "config_id": "MB_FUSION4_180_PROD_V1_20260719",
+  "codes": ["57", "55", "91", "54"],
+  "points_by_code": {"57": 50, "55": 50, "91": 50, "54": 30},
+  "total_points": 180,
+  "hits_by_code": {"57": 0, "55": 0, "91": 0, "54": 1},
+  "hit_codes": ["54"],
+  "hit_units": 1,
+  "hit_day": true,
+  "profit_day": false,
+  "capital_vnd": 4140000,
+  "payout_vnd": 2400000,
+  "pnl_vnd": -1740000,
+  "roi_pct": -42.028985507246375,
+  "draw_hash": "f4cbafab52bbfd2701d34c9ea7852bbe3f78b6812fd3812c62366d0bf772204c"
+}

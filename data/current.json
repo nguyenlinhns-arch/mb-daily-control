@@ -1,231 +1,186 @@
 {
-  "schema_version": "MB_DAILY_WEB_V32_A6B8",
-  "audit_id": "MB-20260719-V32-A6B8",
-  "generated_at": "2026-07-19T06:00:00+07:00",
+  "schema_version": "MB_FUSION4_180_WEB_V1",
+  "audit_id": "MB-20260719-FUSION4-180",
+  "generated_at": "2026-07-19T08:00:00+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
-    "short_name": "V32 · A6_B8",
-    "official_name": "R868Y26 + Gate315 + Empirical Overdue Swap075",
-    "production_module": "engine_v32/production_v32_empirical_overdue_swap_r868.py",
+    "short_name": "MB FUSION4–180",
+    "official_name": "MB FUSION4–180",
+    "config_id": "MB_FUSION4_180_PROD_V1_20260719",
     "status": "PRODUCTION_OFFICIAL",
-    "rollback_parent": "R868Y26 + Residual Gate315",
-    "coverage": "30/30",
-    "promotion_note": "Chỉ thay khi nhánh mới vượt kiểm định nhân quả và ngoài mẫu."
+    "locked_from": "2026-07-19",
+    "ranking_formula": "0.75*Max4_rank + 0.25*Max10_priority_rank + 0.50*I(code_in_Max10)",
+    "a1_role": "AUDIT_CONFIRMATION_ONLY_IN_FIXED_K4",
+    "promotion_note": "Chỉ thay khi nhánh mới vượt kiểm định nhân quả và tiêu chí rủi ro đã khóa."
   },
   "plan": {
     "target_date": "2026-07-19",
     "data_lock_date": "2026-07-18",
     "status": "LOCKED_WAITING_RESULT",
+    "method": "MB FUSION4–180",
+    "config_id": "MB_FUSION4_180_PROD_V1_20260719",
     "codes": [
-      "06",
-      "10",
-      "13",
       "59",
-      "60",
       "78",
-      "79",
-      "91"
+      "06",
+      "10"
     ],
-    "number_of_codes": 8,
-    "points_per_code": 25,
+    "number_of_codes": 4,
+    "ranked_points": [
+      50,
+      50,
+      50,
+      30
+    ],
     "points_by_code": {
-      "06": 25,
-      "10": 25,
-      "13": 25,
-      "59": 25,
-      "60": 25,
-      "78": 25,
-      "79": 25,
-      "91": 25
+      "59": 50,
+      "78": 50,
+      "06": 50,
+      "10": 30
     },
-    "total_points": 200,
+    "total_points": 180,
     "cost_per_point_vnd": 23000,
-    "total_capital_vnd": 4600000,
-    "maximum_loss_vnd": 4600000,
+    "total_capital_vnd": 4140000,
+    "maximum_loss_vnd": 4140000,
     "core_100_enabled": false,
     "other_50_enabled": false,
-    "outcome_known_at_selection": false
+    "outcome_known_at_selection": false,
+    "selection_input_hash": "68389431cc7d83540d3a3cf2d6cb62499abbb5e808bab0f811d56f1b90626c48"
   },
   "overlay": {
-    "rule": "EMP_OVERDUE_RECENT_N_LE8_M0.75",
-    "eligible_width": true,
-    "proposed_remove": "59",
-    "proposed_add": "19",
-    "normalized_margin": 0.15759662906384372,
-    "activation_threshold": 0.75,
     "active": false,
-    "decision": "KEEP_PARENT_PLAN",
-    "reason": "Biên đề xuất thấp hơn ngưỡng khóa hoặc độ rộng không hợp lệ; giữ danh sách cha."
+    "eligible_width": false,
+    "normalized_margin": 0,
+    "activation_threshold": 1,
+    "decision": "DISABLED_BY_FIXED_FUSION4"
   },
   "stake_policy": [
     {
-      "condition": "N_LE_6",
+      "rank_from": 1,
+      "rank_to": 3,
+      "points_per_code": 50
+    },
+    {
+      "rank_from": 4,
+      "rank_to": 4,
       "points_per_code": 30
-    },
-    {
-      "condition": "N_7_TO_8",
-      "points_per_code": 25
-    },
-    {
-      "condition": "N_GE_9",
-      "points_per_code": 20
     }
   ],
   "latest_settlement": {
     "date": "2026-07-18",
-    "status": "SETTLED_VERIFIED_27_OF_27",
-    "method": "R868Y26 + Gate315 + Empirical Overdue Swap075 / A6_B8",
+    "status": "BACKTEST_CAUSAL_REPLAY_27_OF_27",
+    "ledger_scope": "METHOD_THEORETICAL_SEPARATE_FROM_PERSONAL_ACTUAL",
+    "method": "MB FUSION4–180",
+    "config_id": "MB_FUSION4_180_PROD_V1_20260719",
     "codes": [
-      "31",
-      "33",
-      "40",
-      "54",
-      "55",
       "57",
-      "60",
-      "90",
-      "91"
+      "55",
+      "91",
+      "54"
     ],
     "points_by_code": {
-      "31": 20,
-      "33": 20,
-      "40": 20,
-      "54": 20,
-      "55": 20,
-      "57": 20,
-      "60": 20,
-      "90": 20,
-      "91": 20
+      "57": 50,
+      "55": 50,
+      "91": 50,
+      "54": 30
     },
-    "points_per_code": 20,
     "total_points": 180,
     "hits_by_code": {
-      "31": 0,
-      "33": 0,
-      "40": 0,
-      "54": 1,
-      "55": 0,
       "57": 0,
-      "60": 0,
-      "90": 1,
-      "91": 0
+      "55": 0,
+      "91": 0,
+      "54": 1
     },
     "hit_codes": [
-      "54",
-      "90"
+      "54"
     ],
-    "hit_units": 2,
+    "hit_units": 1,
     "hit_day": true,
     "profit_day": false,
     "capital_vnd": 4140000,
-    "payout_vnd": 3200000,
-    "pnl_vnd": -940000,
-    "roi_pct": -22.705314009661837,
+    "payout_vnd": 2400000,
+    "pnl_vnd": -1740000,
+    "roi_pct": -42.028985507246375,
     "draw_hash": "f4cbafab52bbfd2701d34c9ea7852bbe3f78b6812fd3812c62366d0bf772204c"
   },
   "backtest": {
-    "month_2026_07_through_18": {
+    "current_month": {
       "sessions": 18,
       "hit_days": 16,
       "hit_day_rate_pct": 88.88888888888889,
-      "profit_days": 12,
-      "profit_day_rate_pct": 66.66666666666667,
-      "capital_vnd": 74175000,
-      "payout_vnd": 103600000,
-      "net_profit_vnd": 29425000,
-      "roi_pct": 39.669700033704075,
-      "profit_factor": 3.292559407869108,
-      "max_drawdown_vnd": -5845000,
-      "equity_current_vnd": 29425000,
-      "equity_peak_vnd": 35270000,
-      "gross_profit_vnd": 42260000,
-      "gross_loss_vnd": 12835000
+      "profit_days": 9,
+      "profit_day_rate_pct": 50.0,
+      "capital_vnd": 74520000,
+      "payout_vnd": 101600000,
+      "net_profit_vnd": 27080000,
+      "roi_pct": 36.33923778851315,
+      "profit_factor": 2.926031294452347,
+      "max_drawdown_vnd": -6020000,
+      "longest_losing_streak": 3,
+      "gross_profit_vnd": 41140000,
+      "gross_loss_vnd": 14060000
     },
-    "full_through_2026_07_18": {
+    "current_year": {
+      "sessions": 195,
+      "hit_days": 175,
+      "hit_day_rate_pct": 89.74358974358975,
+      "profit_days": 94,
+      "profit_day_rate_pct": 48.205128205128204,
+      "capital_vnd": 807300000,
+      "payout_vnd": 1154400000,
+      "net_profit_vnd": 347100000,
+      "roi_pct": 42.99516908212561,
+      "profit_factor": 3.86055711224658,
+      "max_drawdown_vnd": -12700000,
+      "longest_losing_streak": 5,
+      "gross_profit_vnd": 468440000,
+      "gross_loss_vnd": 121340000
+    },
+    "full": {
       "sessions": 918,
-      "hit_days": 877,
-      "hit_day_rate_pct": 95.53376906318083,
-      "profit_days": 513,
-      "profit_day_rate_pct": 55.88235294117647,
-      "capital_vnd": 3745205000,
-      "payout_vnd": 4719200000,
-      "net_profit_vnd": 973995000,
-      "roi_pct": 26.00645358531776,
-      "profit_factor": null,
-      "max_drawdown_vnd": -16985000,
-      "equity_current_vnd": 973995000,
-      "equity_peak_vnd": 979840000
+      "hit_days": 726,
+      "hit_day_rate_pct": 79.08496732026144,
+      "profit_days": 383,
+      "profit_day_rate_pct": 41.72113289760348,
+      "capital_vnd": 3800520000,
+      "payout_vnd": 4745600000,
+      "net_profit_vnd": 945080000,
+      "roi_pct": 24.86712344626525,
+      "profit_factor": 1.9623052642297119,
+      "max_drawdown_vnd": -43040000,
+      "longest_losing_streak": 12,
+      "gross_profit_vnd": 1927180000,
+      "gross_loss_vnd": 982100000
     }
   },
   "constraints": {
-    "maximum_total_codes": 12,
-    "maximum_online_codes": 4,
+    "fixed_total_codes": 4,
+    "maximum_total_points": 180,
     "duplicate_codes": 0,
-    "preserve_base": true,
-    "same_day_outcome_leakage": false
+    "martingale": false,
+    "same_day_outcome_leakage": false,
+    "personal_actual_pnl_is_separate": true
   },
   "audit": {
-    "input_hash": "0eafe821c48ca3ec1938177260f3d9e9c5e0f25fe8e1f83a931e6484ea6b4f04",
-    "engine_manifest_hash": "6b35414033f42036173e107bed64f43e08d22af960545f4d6e4be4c9626ebeb4",
+    "source_history_primary_equals_mirror": true,
+    "source_history_date": "2026-07-18",
+    "source_result_units": 27,
+    "ranking_artifact_sha256": "b2c076c7bffdde97662c424b5a66c1526af49e67c97eaea7833a30d4fffe0df1",
+    "feature_audit_sha256": "5d40f792e2d2dbf90cae20f4acfd02fe08123f63a6b2a35d223cfb0dc10a0f7d",
     "plan_replayed_from_locked_source": true,
     "capital_formula_verified": true,
-    "overlay_threshold_verified": true,
     "target_outcome_used": false,
-    "causality": {
-      "parent": {
-        "cache_file": "/tmp/branch_c_residual_predictions_v2/pred_53a8844c0b89e9ff366c2ab8.npz",
-        "cache_identity_changes_on_source_shock": true,
-        "cache_identity_unchanged_by_target_shock": true,
-        "cache_source_hash": "898b57129a12e081ededadb263e16dd776ecf61923dbdad7ef01a9a7d8e2ea2d",
-        "fit_strictly_before_target_month": true,
-        "gate_current_row_shock": 0.0,
-        "last_month_fit": {
-          "month": "2026-07",
-          "target_end": "2026-07-19",
-          "target_start": "2026-07-01",
-          "train_end": "2026-06-30",
-          "train_rows": 54000,
-          "train_start": "2024-12-30"
-        },
-        "source_end": "2026-07-18",
-        "target": "2026-07-19",
-        "target_feature_max_abs_shock": 0.0,
-        "target_low_high_selection_equal_after_shock": {
-          "COUNT_RECENT_HYBRID_ALL_Z2.5_M0": true,
-          "COUNT_RECENT_HYBRID_ALL_Z2_M1.5": true
-        },
-        "target_outcome_in_source_hash": false,
-        "upstream_current_row_shock": {
-          "A849": 0.0,
-          "B851": 0.0,
-          "C864": 0.0,
-          "E867": 0.0,
-          "F852": 0.0,
-          "G853": 0.0,
-          "H848": 0.0,
-          "J853": 0.0,
-          "K852": 0.0,
-          "L854": 0.0,
-          "MAXWIN862": 0.0,
-          "P865B": 0.0,
-          "PROFIT857": 0.0,
-          "R868Y26": 0.0,
-          "S11": 0.0
-        }
-      },
-      "v32": {
-        "reported_selection_matches": true,
-        "target_feature_max_abs_shock": 0.0,
-        "target_proposal_equal_after_shock": true,
-        "target_selection_equal_after_shock": true
-      }
-    },
+    "same_day_shock_selection_equal": true,
     "disclaimer": "Backtest là số liệu lịch sử, không bảo đảm kết quả tương lai."
   },
   "automation": {
-    "pipeline_version": "MB_V32_DAILY_0600_TXN_V2",
-    "schedule": "06:00 Asia/Bangkok",
+    "pipeline_version": "MB_FUSION4_180_DAILY_TXN_V1",
+    "schedule": "19:15 Asia/Bangkok",
+    "retry_schedule": "19:30, 19:45 Asia/Bangkok",
     "status": "SHEETS_APPLIED_READBACK_VERIFIED_READY_TO_PUBLISH",
-    "sheets_receipt_hash": "ebd6554bbdc0bb9ace156f48fb8ef1c5b6026484999b65b3275f0ffec5e934df"
+    "source_sheet_status": "VERIFIED_27_OF_27",
+    "personal_ledger_policy": "ONLY_SETTLE_EXISTING_ACTUAL_ORDERS",
+    "five_person_review_status": "READBACK_VERIFIED_NO_INFERRED_PNL",
+    "sheets_payload_hash": "b507eb5ecf2236494a4c5c11017169ed0bc0be909da99b385ee72c679973d3e2"
   }
 }

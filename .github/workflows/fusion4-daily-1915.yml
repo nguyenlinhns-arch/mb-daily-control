@@ -1,27 +1,25 @@
-name: V32 legacy — manual rollback only
+name: Fusion4 daily 19:15 — results, Sheets, plan, website
 
 on:
+  schedule:
+    # 19:15, 19:30 and 19:45 Asia/Bangkok (UTC+7). Retries are idempotent.
+    - cron: "15,30,45 12 * * *"
   workflow_dispatch:
     inputs:
       target_date:
-        description: "Ngày kế hoạch YYYY-MM-DD; để trống dùng ngày Bangkok hiện tại"
+        description: "Ngày kế hoạch YYYY-MM-DD; để trống dùng ngày mai tại Bangkok"
         required: false
-        type: string
-      confirm_legacy:
-        description: "Nhập ENABLE_V32_LEGACY để xác nhận rollback thủ công"
-        required: true
         type: string
 
 permissions:
   contents: write
 
 concurrency:
-  group: v32-daily-production
+  group: fusion4-daily-production
   cancel-in-progress: false
 
 jobs:
   settle-plan-publish:
-    if: ${{ inputs.confirm_legacy == 'ENABLE_V32_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -36,7 +34,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Resolve target
+      - name: Resolve settlement and next plan dates
         env:
           MANUAL_TARGET: ${{ inputs.target_date }}
         run: |
@@ -45,12 +43,12 @@ jobs:
             [[ "$MANUAL_TARGET" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || exit 2
             target="$MANUAL_TARGET"
           else
-            target="$(date +%F)"
+            target="$(date -d '+1 day' +%F)"
           fi
           settlement="$(date -d "$target -1 day" +%F)"
           echo "TARGET_DATE=$target" >> "$GITHUB_ENV"
           echo "SETTLEMENT_DATE=$settlement" >> "$GITHUB_ENV"
-          echo "RUN_DIR=$RUNNER_TEMP/v32-$target" >> "$GITHUB_ENV"
+          echo "RUN_DIR=$RUNNER_TEMP/fusion4-$target" >> "$GITHUB_ENV"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -73,25 +71,24 @@ jobs:
             --metadata data/v32-engine-runtime.json \
             --destination engine_v32
 
-      - name: Verify frozen seed and engine
-        run: python scripts/v32_daily.py verify-seed
+      - name: Verify Fusion4 seed
+        run: python scripts/fusion4_daily.py verify-seed
 
       - name: Snapshot source and five personal ledgers
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -euo pipefail
-          test -n "$GOOGLE_SERVICE_ACCOUNT_JSON" || { echo "Missing GOOGLE_SERVICE_ACCOUNT_JSON"; exit 2; }
           mkdir -p "$RUN_DIR"
-          python scripts/google_sheets_bridge.py snapshot \
+          python scripts/fusion4_google_sheets_bridge.py snapshot \
             --settlement-date "$SETTLEMENT_DATE" \
             --output-xlsx "$RUN_DIR/source.xlsx" \
             --output-pnl-json "$RUN_DIR/pnl-snapshot.json"
 
-      - name: Prepare immutable transaction
+      - name: Prepare immutable Fusion4 transaction
         run: |
           set -euo pipefail
-          python scripts/v32_daily.py prepare \
+          python scripts/fusion4_daily.py prepare \
             --target-date "$TARGET_DATE" \
             --source-xlsx "$RUN_DIR/source.xlsx" \
             --pnl-snapshot "$RUN_DIR/pnl-snapshot.json" \
@@ -102,14 +99,14 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -euo pipefail
-          python scripts/google_sheets_bridge.py apply \
+          python scripts/fusion4_google_sheets_bridge.py apply \
             --payload "$RUN_DIR/transaction/private/sheets_payload.json" \
             --receipt "$RUN_DIR/sheets-receipt.json"
 
       - name: Finalize website only after Sheets receipt
         run: |
           set -euo pipefail
-          python scripts/v32_daily.py finalize \
+          python scripts/fusion4_daily.py finalize \
             --output "$RUN_DIR/transaction" \
             --receipt "$RUN_DIR/sheets-receipt.json"
 
@@ -118,7 +115,7 @@ jobs:
           set -euo pipefail
           ! git ls-files engine_v32 | grep .
           python scripts/validate_dashboard.py index.html data/current.json
-          python -m unittest discover -s tests -p 'test_v32_*.py' -v
+          python -m unittest discover -s tests -p 'test_fusion4_*.py' -v
           ! find . -path './.git' -prune -o -type f \
             \( -iname '*credential*' -o -iname '*service*account*.json' -o -iname '*pnl-snapshot*' -o -iname '*sheets_payload*' \) \
             -print | grep .
@@ -127,14 +124,14 @@ jobs:
       - name: Publish one audited commit
         run: |
           set -euo pipefail
-          git config user.name "mb-v32-automation"
+          git config user.name "mb-fusion4-automation"
           git config user.email "actions@users.noreply.github.com"
-          git add index.html data/current.json data/v32-state.json \
-            data/v32-plans data/v32-settlements data/v32-transactions
+          git add index.html data/current.json data/fusion4-state.json \
+            data/fusion4-plans data/fusion4-settlements data/fusion4-transactions
           if git diff --cached --quiet; then
             echo "No public changes; transaction already committed."
             exit 0
           fi
-          git commit -m "auto: settle and publish V32 $TARGET_DATE"
+          git commit -m "auto: settle and publish Fusion4 $TARGET_DATE"
           git pull --rebase origin main
           git push origin HEAD:main

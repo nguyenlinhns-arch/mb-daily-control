@@ -26,6 +26,7 @@ def validate(index_path: Path, data_path: Path) -> None:
     plan = payload["plan"]
     overlay = payload["overlay"]
     automation = payload.get("automation", {})
+    fusion4 = payload.get("schema_version") == "MB_FUSION4_180_WEB_V1"
 
     assert method["status"] == "PRODUCTION_OFFICIAL"
     assert plan["status"] == "LOCKED_WAITING_RESULT"
@@ -43,9 +44,15 @@ def validate(index_path: Path, data_path: Path) -> None:
     assert 1 <= len(codes) <= 12
     assert all(len(code) == 2 and code.isdigit() for code in codes)
     assert set(codes) == set(points)
-    expected_points = 30 if len(codes) <= 6 else 25 if len(codes) <= 8 else 20
-    assert plan["points_per_code"] == expected_points
-    assert all(value == expected_points for value in points.values())
+    if fusion4:
+        assert [points[code] for code in codes] == [50, 50, 50, 30]
+        assert plan["ranked_points"] == [50, 50, 50, 30]
+        assert plan["number_of_codes"] == 4
+        assert plan["total_points"] == 180
+    else:
+        expected_points = 30 if len(codes) <= 6 else 25 if len(codes) <= 8 else 20
+        assert plan["points_per_code"] == expected_points
+        assert all(value == expected_points for value in points.values())
     assert sum(points.values()) == plan["total_points"]
     assert plan["total_points"] * plan["cost_per_point_vnd"] == plan["total_capital_vnd"]
     assert plan["maximum_loss_vnd"] == plan["total_capital_vnd"]
@@ -57,7 +64,7 @@ def validate(index_path: Path, data_path: Path) -> None:
     assert target in html
     assert vnd(plan["total_capital_vnd"]) in html
     for code in codes:
-        expected = f"<b>{code}</b><span>{points[code]} ĐIỂM</span>"
+        expected = f"<b>{code}</b><span>{points[code]} ĐIỂM"
         assert expected in html, f"Missing rendered code/points: {code}"
 
     expected_active = (

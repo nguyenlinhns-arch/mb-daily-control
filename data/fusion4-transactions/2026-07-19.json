@@ -1,0 +1,27 @@
+{
+  "pipeline_version": "MB_FUSION4_180_CUTOVER_V1",
+  "status": "COMMITTED_CUTOVER",
+  "target_date": "2026-07-19",
+  "previous_date": "2026-07-18",
+  "input_hash": "68389431cc7d83540d3a3cf2d6cb62499abbb5e808bab0f811d56f1b90626c48",
+  "source_history_crosscheck": "MB_History_27_EQ_MB_History_27_IMPORT_27_OF_27",
+  "plan_hash": "eb75582314c520b52f201fc90539e1a954f6e445588107e286476e2e0033ca8c",
+  "settlement_hash": "1e4082f2d3ab401d30069a7205dc725779c2b2fd79e8f50cb54d5732960fc006",
+  "state_hash": "3a2c22ea25cdf0b4c82167d344a1a21919727aafe10c4318740f25d4b62bc566",
+  "public_json_hash": "f320e635e73ebcc4da09a18e728cba264697aa86c6243fcec1370b1c5cc5a9e7",
+  "public_html_hash": "325448906bd85c093628a28fc9c1890d2beff90b7012474750505f9810dd8b6f",
+  "sheets_payload_hash": "b507eb5ecf2236494a4c5c11017169ed0bc0be909da99b385ee72c679973d3e2",
+  "sheets_operation_ids": [
+    "6a0dfad6934a990552ce036e889d782256b37b06c336162274aeab5846b074e0",
+    "584efc3b2ebb014cfa1df3129b5eff8d292a558edc406f9d14d09cc8a33edee1"
+  ],
+  "personal_ledger_review": {
+    "slots_reviewed": 5,
+    "existing_actual_orders_settled": 1,
+    "no_order_rows_not_inferred": 4,
+    "personal_rows_created": 0
+  },
+  "sheets_readback_verified": true,
+  "personal_actual_separate_from_method_replay": true,
+  "committed_at": "2026-07-19T08:00:00+07:00"
+}

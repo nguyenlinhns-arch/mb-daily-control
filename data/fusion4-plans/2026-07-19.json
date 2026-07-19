@@ -1,0 +1,19 @@
+{
+  "target_date": "2026-07-19",
+  "data_lock_date": "2026-07-18",
+  "status": "LOCKED_WAITING_RESULT",
+  "method": "MB FUSION4–180",
+  "config_id": "MB_FUSION4_180_PROD_V1_20260719",
+  "codes": ["59", "78", "06", "10"],
+  "number_of_codes": 4,
+  "ranked_points": [50, 50, 50, 30],
+  "points_by_code": {"59": 50, "78": 50, "06": 50, "10": 30},
+  "total_points": 180,
+  "cost_per_point_vnd": 23000,
+  "total_capital_vnd": 4140000,
+  "maximum_loss_vnd": 4140000,
+  "core_100_enabled": false,
+  "other_50_enabled": false,
+  "outcome_known_at_selection": false,
+  "selection_input_hash": "68389431cc7d83540d3a3cf2d6cb62499abbb5e808bab0f811d56f1b90626c48"
+}

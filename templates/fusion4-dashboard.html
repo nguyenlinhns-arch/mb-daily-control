@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="description" content="Kế hoạch MB Daily Control ngày 19/07/2026 theo phương pháp MB FUSION4–180.">
+  <meta name="description" content="Kế hoạch MB Daily Control ngày {{TARGET_DMY}} theo phương pháp MB FUSION4–180.">
   <meta name="theme-color" content="#07130f">
   <meta name="color-scheme" content="dark">
-  <title>MB Daily Control · Kế hoạch 19/07/2026</title>
+  <title>MB Daily Control · Kế hoạch {{TARGET_DMY}}</title>
   <style>
     /* MB_STATUS_SAFE_V1 */
     :root {
@@ -283,7 +283,7 @@
     }
   </style>
 </head>
-<body data-static-dashboard="1" data-audit-id="MB-20260719-FUSION4-180">
+<body data-static-dashboard="1" data-audit-id="{{AUDIT_ID}}">
   <a class="skip-link" href="#main">Bỏ qua điều hướng</a>
 
   <header class="site-header">
@@ -296,7 +296,7 @@
         </div>
       </div>
       <div class="header-meta">
-        <span>Dữ liệu đến 18/07/2026</span>
+        <span>Dữ liệu đến {{DATA_LOCK_DMY}}</span>
         <span class="status-pill"><span class="status-dot" aria-hidden="true"></span> CHÍNH THỨC</span>
       </div>
     </div>
@@ -305,25 +305,22 @@
   <main id="main" class="shell">
     <section class="hero" aria-labelledby="plan-title">
       <div class="hero-main">
-        <p class="eyebrow">Lệnh đã khóa · Chủ Nhật</p>
-        <h1 id="plan-title">Kế hoạch 19/07/2026</h1>
+        <p class="eyebrow">Lệnh đã khóa · {{TARGET_WEEKDAY}}</p>
+        <h1 id="plan-title">Kế hoạch {{TARGET_DMY}}</h1>
         <p class="hero-sub"><strong>Đúng MB FUSION4–180 chính thức.</strong> Cố định bốn số; ba hạng đầu 50 điểm, hạng tư 30 điểm; không tăng điểm sau thua.</p>
 
         <div class="numbers" style="--plan-cols:4" aria-label="Các số được chọn và số điểm">
-          <div class="number"><b>59</b><span>50 ĐIỂM · HẠNG 1</span></div>
-          <div class="number"><b>78</b><span>50 ĐIỂM · HẠNG 2</span></div>
-          <div class="number"><b>06</b><span>50 ĐIỂM · HẠNG 3</span></div>
-          <div class="number"><b>10</b><span>30 ĐIỂM · HẠNG 4</span></div>
+          {{NUMBERS_HTML}}
         </div>
 
         <div class="plan-strip" aria-label="Tổng hợp vốn">
-          <div class="plan-stat"><small>Số lượng</small><strong>4 số</strong></div>
-          <div class="plan-stat"><small>Tổng khối lượng</small><strong>180 điểm</strong></div>
-          <div class="plan-stat"><small>Vốn / lỗ tối đa</small><strong class="accent">4.140.000đ</strong></div>
+          <div class="plan-stat"><small>Số lượng</small><strong>{{PLAN_WIDTH}} số</strong></div>
+          <div class="plan-stat"><small>Tổng khối lượng</small><strong>{{TOTAL_POINTS}} điểm</strong></div>
+          <div class="plan-stat"><small>Vốn / lỗ tối đa</small><strong class="accent">{{CAPITAL_VND}}</strong></div>
         </div>
 
         <div class="actions">
-          <button class="button" id="copy-plan" type="button" data-copy="19/07/2026: 59×50, 78×50, 06×50, 10×30 điểm — tổng 180 điểm — vốn 4.140.000đ">Sao chép lệnh</button>
+          <button class="button" id="copy-plan" type="button" data-copy="{{COPY_PLAN}}">Sao chép lệnh</button>
           <a class="button primary" href="data/current.json">Dữ liệu JSON</a>
           <a class="button" href="#audit-title">Xem dấu kiểm</a>
         </div>
@@ -342,22 +339,22 @@
           <div class="decision-row"><dt>Dữ liệu nguồn</dt><dd class="good">27/27 · khớp đôi</dd></div>
           <div class="decision-row"><dt>Đồng bộ</dt><dd>Sheets đã xác minh</dd></div>
           <div class="decision-row"><dt>Tự động</dt><dd class="good">19:15 · đã bật</dd></div>
-          <div class="decision-row"><dt>Kết quả 19/07</dt><dd>Chưa dùng khi chọn</dd></div>
+          <div class="decision-row"><dt>Kết quả {{TARGET_DM}}</dt><dd>Chưa dùng khi chọn</dd></div>
         </dl>
-        <p class="risk-note">Mức vốn hôm nay là mức lỗ tối đa của lệnh: <strong>4.140.000đ</strong>. Không gấp thếp hoặc thay số sau khi khóa.</p>
+        <p class="risk-note">Mức vốn hôm nay là mức lỗ tối đa của lệnh: <strong>{{CAPITAL_VND}}</strong>. Không gấp thếp hoặc thay số sau khi khóa.</p>
       </aside>
     </section>
 
     <section class="section" aria-labelledby="settlement-title">
       <div class="section-heading">
-        <h2 id="settlement-title">Kiểm định MB FUSION4–180 · 18/07/2026</h2>
-        <p>Replay nhân quả; đây là sổ phương pháp, tách biệt lệnh thực tế trong sổ 5 người và không công khai dữ liệu cá nhân.</p>
+        <h2 id="settlement-title">{{SETTLEMENT_HEADING}} MB FUSION4–180 · {{SETTLEMENT_DMY}}</h2>
+        <p>{{SETTLEMENT_NOTE}}</p>
       </div>
       <div class="metrics">
-        <article class="metric"><small>Bộ số replay</small><strong>57–55–91–54</strong><span>Mã trúng: 54 · 1 nháy</span></article>
-        <article class="metric"><small>Vốn phương pháp</small><strong>4.140.000đ</strong><span>50–50–50–30</span></article>
-        <article class="metric"><small>Trả thưởng</small><strong>2.400.000đ</strong><span>54 × 30 điểm × 1 nháy × 80.000đ</span></article>
-        <article class="metric"><small>Lãi/lỗ phương pháp</small><strong class="red">-1.740.000đ</strong><span>ROI -42,03%</span></article>
+        <article class="metric"><small>{{SETTLEMENT_SET_LABEL}}</small><strong>{{SETTLEMENT_CODES}}</strong><span>{{SETTLEMENT_HITS}}</span></article>
+        <article class="metric"><small>Vốn phương pháp</small><strong>{{SETTLEMENT_CAPITAL}}</strong><span>50–50–50–30</span></article>
+        <article class="metric"><small>Trả thưởng</small><strong>{{SETTLEMENT_PAYOUT}}</strong><span>{{SETTLEMENT_PAYOUT_NOTE}}</span></article>
+        <article class="metric"><small>Lãi/lỗ phương pháp</small><strong class="{{SETTLEMENT_PNL_CLASS}}">{{SETTLEMENT_PNL}}</strong><span>ROI {{SETTLEMENT_ROI}}</span></article>
       </div>
     </section>
 
@@ -367,10 +364,10 @@
         <p>Hai thước đo được tách riêng: có số xuất hiện không đồng nghĩa ngày đó có lãi.</p>
       </div>
       <div class="metrics">
-        <article class="metric"><small>Ngày có hit · 01–18/07</small><strong>88,89%</strong><span>16/18 ngày</span></article>
-        <article class="metric"><small>Ngày thực lãi · 01–18/07</small><strong>50,00%</strong><span>9/18 ngày</span></article>
-        <article class="metric"><small>Lãi ròng · 01–18/07</small><strong class="green">+27,080tr</strong><span>Vốn 74,520tr · PF 2,9260</span></article>
-        <article class="metric"><small>ROI vốn · 01–18/07</small><strong class="green">36,3392%</strong><span>MaxDD nội kỳ -6,020tr</span></article>
+        <article class="metric"><small>Ngày có hit · {{MONTH_PERIOD}}</small><strong>{{MONTH_HIT_RATE}}</strong><span>{{MONTH_HIT_DAYS}}/{{MONTH_SESSIONS}} ngày</span></article>
+        <article class="metric"><small>Ngày thực lãi · {{MONTH_PERIOD}}</small><strong>{{MONTH_PROFIT_RATE}}</strong><span>{{MONTH_PROFIT_DAYS}}/{{MONTH_SESSIONS}} ngày</span></article>
+        <article class="metric"><small>Lãi ròng · {{MONTH_PERIOD}}</small><strong class="{{MONTH_NET_CLASS}}">{{MONTH_NET}}</strong><span>Vốn {{MONTH_CAPITAL}} · PF {{MONTH_PF}}</span></article>
+        <article class="metric"><small>ROI vốn · {{MONTH_PERIOD}}</small><strong class="{{MONTH_ROI_CLASS}}">{{MONTH_ROI}}</strong><span>MaxDD nội kỳ {{MONTH_MAXDD}}</span></article>
       </div>
     </section>
 
@@ -401,14 +398,14 @@
 
     <section class="section" aria-labelledby="full-title">
       <div class="section-heading">
-        <h2 id="full-title">Kiểm định năm 2026 đến 18/07</h2>
-        <p>195 phiên nhân quả; 2026 là pseudo-holdout vì các nhánh nguồn đã từng được nghiên cứu trên giai đoạn này.</p>
+        <h2 id="full-title">Kiểm định năm 2026 đến {{DATA_LOCK_DM}}</h2>
+        <p>{{YEAR_SESSIONS}} phiên nhân quả; 2026 là pseudo-holdout vì các nhánh nguồn đã từng được nghiên cứu trên giai đoạn này.</p>
       </div>
       <div class="metrics">
-        <article class="metric"><small>Tổng số phiên</small><strong>195</strong><span>175 ngày có hit</span></article>
-        <article class="metric"><small>Tỷ lệ ngày có hit</small><strong>89,7436%</strong><span>Ngày thực lãi 48,2051%</span></article>
-        <article class="metric"><small>Lãi ròng</small><strong class="green">+347,100tr</strong><span>Trên vốn 807,300tr</span></article>
-        <article class="metric"><small>ROI / MaxDD</small><strong class="green">42,9952%</strong><span>MaxDD -12,700tr · chuỗi thua 5</span></article>
+        <article class="metric"><small>Tổng số phiên</small><strong>{{YEAR_SESSIONS}}</strong><span>{{YEAR_HIT_DAYS}} ngày có hit</span></article>
+        <article class="metric"><small>Tỷ lệ ngày có hit</small><strong>{{YEAR_HIT_RATE}}</strong><span>Ngày thực lãi {{YEAR_PROFIT_RATE}}</span></article>
+        <article class="metric"><small>Lãi ròng</small><strong class="{{YEAR_NET_CLASS}}">{{YEAR_NET}}</strong><span>Trên vốn {{YEAR_CAPITAL}}</span></article>
+        <article class="metric"><small>ROI / MaxDD</small><strong class="{{YEAR_ROI_CLASS}}">{{YEAR_ROI}}</strong><span>MaxDD {{YEAR_MAXDD}} · chuỗi thua {{YEAR_STREAK}}</span></article>
       </div>
     </section>
 
@@ -418,9 +415,9 @@
         <p>Các điều kiện tối thiểu phải đồng thời đạt trước khi coi lệnh là hợp lệ.</p>
       </div>
       <div class="audit-grid">
-        <article class="audit-item"><span>Đã replay</span><p>Lệnh sinh lại từ nguồn đã khóa đến 18/07.</p></article>
+        <article class="audit-item"><span>Đã replay</span><p>Lệnh sinh lại từ nguồn đã khóa đến {{DATA_LOCK_DM}}.</p></article>
         <article class="audit-item"><span>Đúng công thức vốn</span><p>(50 + 50 + 50 + 30) × 23.000đ = 4.140.000đ.</p></article>
-        <article class="audit-item"><span>Không nhìn trước</span><p>Kết quả 19/07 không tham gia chọn số.</p></article>
+        <article class="audit-item"><span>Không nhìn trước</span><p>Kết quả {{TARGET_DM}} không tham gia chọn số.</p></article>
         <article class="audit-item"><span>Đúng cấu hình</span><p>Config MB_FUSION4_180_PROD_V1_20260719; bốn số, không overlay.</p></article>
       </div>
 
@@ -436,7 +433,7 @@
 
   <footer>
     <div class="shell footer-row">
-      <p>MB Daily Control · Audit ID: MB-20260719-FUSION4-180</p>
+      <p>MB Daily Control · Audit ID: {{AUDIT_ID}}</p>
       <p>Backtest là dữ liệu lịch sử, không bảo đảm kết quả tương lai.</p>
     </div>
   </footer>

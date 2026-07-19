@@ -12,12 +12,33 @@
       "total_capital_vnd"
     ]
   },
+  "middle_section": {
+    "title": "Đề đầu hôm nay",
+    "source": "data/de-head-current.json",
+    "position": "below_plan_above_actual_performance",
+    "always_visible": true,
+    "stale_policy": "WAIT_A0_NO_INFERENCE",
+    "required_fields": [
+      "target_dmy",
+      "status",
+      "decision",
+      "watch_head",
+      "gan",
+      "gmax",
+      "score",
+      "capital_vnd",
+      "reason"
+    ]
+  },
   "bottom_section": {
     "title": "Thống kê thực tế",
     "source": "actual_performance",
     "owner": "Linh",
     "tracking_start_date": "2026-07-01",
-    "periods": ["current_month", "total"],
+    "periods": [
+      "current_month",
+      "total"
+    ],
     "required_metrics": [
       "wins",
       "losses",

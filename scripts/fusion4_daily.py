@@ -314,8 +314,6 @@ def render(current: dict) -> str:
     locked = date.fromisoformat(plan["data_lock_date"])
     tracking_start = date.fromisoformat(actual["tracking_start_date"])
     actual_settled = date.fromisoformat(actual["settled_through"])
-    group = current["group_actual_pnl"]
-    group_settled = date.fromisoformat(group["settled_through"])
     ranks = [1, 2, 3, 4]
     replacements = {
         "AUDIT_ID": current["audit_id"],
@@ -336,6 +334,7 @@ def render(current: dict) -> str:
             quote=True,
         ),
         "ACTUAL_START_DMY": tracking_start.strftime("%d/%m/%Y"),
+        "ACTUAL_SETTLED_DMY": actual_settled.strftime("%d/%m/%Y"),
         "ACTUAL_STATUS": f"Đã đối chiếu Google Sheets đến {actual_settled.strftime('%d/%m/%Y')}",
         "MONTH_LABEL": f"Tháng {actual['current_month_id'][5:7]}/{actual['current_month_id'][:4]}",
         "MONTH_WINS": str(month["wins"]),
@@ -350,9 +349,6 @@ def render(current: dict) -> str:
         "TOTAL_LOSS_STREAK": str(total["longest_losing_streak"]),
         "TOTAL_PNL": fmt_vnd(total["net_profit_vnd"], signed=True),
         "TOTAL_PNL_CLASS": "positive" if total["net_profit_vnd"] >= 0 else "negative",
-        "GROUP_STATUS": f"Đã đối chiếu đến {group_settled.strftime('%d/%m/%Y')}",
-        "GROUP_PNL": fmt_vnd(group["net_profit_vnd"], signed=True),
-        "GROUP_PNL_CLASS": "positive" if group["net_profit_vnd"] >= 0 else "negative",
     }
     html = TEMPLATE.read_text(encoding="utf-8")
     for key, value in replacements.items():
@@ -628,6 +624,13 @@ def verify_seed(_: argparse.Namespace) -> None:
     print("FUSION4_SEED_OK")
 
 
+def render_current(_: argparse.Namespace) -> None:
+    """Render the public page from the already-verified current payload."""
+    current = read_json(DATA / "current.json")
+    write_text(ROOT / "index.html", render(current))
+    print(f"FUSION4_RENDERED={current['plan']['target_date']}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
@@ -643,6 +646,8 @@ def main() -> None:
     finalize_parser.set_defaults(func=finalize)
     verify_parser = sub.add_parser("verify-seed")
     verify_parser.set_defaults(func=verify_seed)
+    render_parser = sub.add_parser("render-current")
+    render_parser.set_defaults(func=render_current)
     args = parser.parse_args()
     try:
         args.func(args)

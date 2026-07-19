@@ -9,9 +9,26 @@ import math
 from pathlib import Path
 
 
+ROOT = Path(__file__).resolve().parents[1]
+LAYOUT_POLICY = ROOT / "data" / "website-layout-policy.json"
+
 FORBIDDEN_PUBLIC_TEXT = (
     "Đang tải kế hoạch kỳ sắp tới",
     "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
+    "Lãi/lỗ tổng",
+    "Backtest",
+    "P/L phương pháp",
+)
+
+REQUIRED_LAYOUT_TEXT = (
+    "Kế hoạch kỳ sắp tới",
+    "Thống kê thực tế",
+    "Số ngày thắng",
+    "Số ngày thua",
+    "Chuỗi thắng dài nhất",
+    "Chuỗi thua dài nhất",
+    "Lãi/lỗ thực tế",
+    "Tổng thực tế",
 )
 
 
@@ -27,11 +44,22 @@ def signed_vnd(value: int) -> str:
 def validate(index_path: Path, data_path: Path) -> None:
     html = index_path.read_text(encoding="utf-8")
     payload = json.loads(data_path.read_text(encoding="utf-8"))
+    layout = json.loads(LAYOUT_POLICY.read_text(encoding="utf-8"))
     method = payload["method"]
     plan = payload["plan"]
     overlay = payload["overlay"]
     automation = payload.get("automation", {})
     fusion4 = payload.get("schema_version") == "MB_FUSION4_180_WEB_V1"
+
+    assert layout["schema_version"] == "MB_DAILY_WEBSITE_LAYOUT_V1"
+    assert layout["fail_closed"] is True
+    assert layout["top_section"]["source"] == "plan"
+    assert layout["bottom_section"]["source"] == "actual_performance"
+    assert layout["bottom_section"]["owner"] == "Linh"
+    assert layout["bottom_section"]["tracking_start_date"] == "2026-07-01"
+    assert layout["forbidden_visible_sources"] == [
+        "backtest", "group_actual_pnl", "latest_settlement",
+    ]
 
     assert method["status"] == "PRODUCTION_OFFICIAL"
     assert plan["status"] == "LOCKED_WAITING_RESULT"
@@ -87,6 +115,8 @@ def validate(index_path: Path, data_path: Path) -> None:
     assert "MB_STATUS_SAFE_V1" in html
     for forbidden in FORBIDDEN_PUBLIC_TEXT:
         assert forbidden not in html
+    for required in REQUIRED_LAYOUT_TEXT:
+        assert required in html, f"Thiếu thành phần bố cục bắt buộc: {required}"
 
     for period in payload["backtest"].values():
         assert period["sessions"] > 0
@@ -119,9 +149,9 @@ def validate(index_path: Path, data_path: Path) -> None:
             assert period["current_losing_streak"] <= period["longest_losing_streak"]
             assert signed_vnd(period["net_profit_vnd"]) in html
         assert tracking_start.strftime("%d/%m/%Y") in html
-        assert "Lãi/lỗ thực tế của Linh" in html
-        assert "Lãi/lỗ tổng" not in html
-        assert "Chuỗi dài nhất" in html
+        assert "Lệnh thực tế của Linh" in html
+        assert actual_settled.strftime("%d/%m/%Y") in html
+        assert html.index("Kế hoạch kỳ sắp tới") < html.index("Thống kê thực tế")
 
         group = payload["group_actual_pnl"]
         assert group["source"] == "AGGREGATE_5_PERSON_GOOGLE_SHEETS_LEDGERS"

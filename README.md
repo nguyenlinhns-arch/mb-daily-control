@@ -76,6 +76,20 @@ sai một byte thì pipeline dừng.
 
 Trang công khai: <https://nguyenlinhns-arch.github.io/mb-daily-control/>
 
+## Hợp đồng bố cục website
+
+Bố cục công khai được khóa trong `data/website-layout-policy.json` và được
+kiểm tra fail-closed trước khi xuất bản:
+
+1. Phần trên chỉ hiển thị **kế hoạch kỳ sắp tới**: ngày đánh, từng số, điểm
+   từng số, tổng điểm và tổng vốn.
+2. Phần dưới chỉ hiển thị **lệnh thực tế của Linh** từ 01/07/2026 đến kỳ đã
+   đối chiếu gần nhất, tách `Tháng hiện tại` và `Tổng thực tế`; mỗi khối có số
+   ngày thắng, số ngày thua, chuỗi thắng dài nhất, chuỗi thua dài nhất và
+   lãi/lỗ thực tế.
+3. Không hiển thị backtest, P/L lý thuyết của phương pháp hoặc tổng P/L 5 người
+   trong khu vực thống kê công khai.
+
 Google Sheet nguồn: <https://docs.google.com/spreadsheets/d/1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w/edit>
 
 Backtest là số liệu lịch sử, không bảo đảm kết quả tương lai.

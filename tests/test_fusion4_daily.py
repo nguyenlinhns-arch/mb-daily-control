@@ -41,6 +41,32 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(rendered, (ROOT / "index.html").read_text())
         self.assertNotIn("{{", rendered)
 
+    def test_public_layout_is_next_plan_then_linh_actual_only(self) -> None:
+        current = json.loads((ROOT / "data" / "current.json").read_text())
+        policy = json.loads(
+            (ROOT / "data" / "website-layout-policy.json").read_text()
+        )
+        rendered = fusion4.render(current)
+        self.assertTrue(policy["fail_closed"])
+        self.assertEqual(policy["top_section"]["source"], "plan")
+        self.assertEqual(
+            policy["bottom_section"]["source"], "actual_performance"
+        )
+        self.assertLess(
+            rendered.index("Kế hoạch kỳ sắp tới"),
+            rendered.index("Thống kê thực tế"),
+        )
+        for label in (
+            "Số ngày thắng", "Số ngày thua", "Chuỗi thắng dài nhất",
+            "Chuỗi thua dài nhất", "Lãi/lỗ thực tế", "Tổng thực tế",
+        ):
+            self.assertIn(label, rendered)
+        self.assertIn("01/07/2026–19/07/2026", rendered)
+        self.assertNotIn("Lãi/lỗ tổng", rendered)
+        self.assertNotIn("Backtest", rendered)
+        self.assertNotIn("P/L phương pháp", rendered)
+        self.assertNotIn("+17.891.000đ", rendered)
+
     def test_actual_performance_tracks_wins_losses_and_longest_streaks(self) -> None:
         period = fusion4.empty_actual_period()
         for pnl in (100_000, 200_000, -50_000, -50_000):

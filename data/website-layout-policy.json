@@ -1,0 +1,35 @@
+{
+  "schema_version": "MB_DAILY_WEBSITE_LAYOUT_V1",
+  "effective_from": "2026-07-19",
+  "top_section": {
+    "title": "Kế hoạch kỳ sắp tới",
+    "source": "plan",
+    "required_fields": [
+      "target_date",
+      "codes",
+      "points_by_code",
+      "total_points",
+      "total_capital_vnd"
+    ]
+  },
+  "bottom_section": {
+    "title": "Thống kê thực tế",
+    "source": "actual_performance",
+    "owner": "Linh",
+    "tracking_start_date": "2026-07-01",
+    "periods": ["current_month", "total"],
+    "required_metrics": [
+      "wins",
+      "losses",
+      "longest_winning_streak",
+      "longest_losing_streak",
+      "net_profit_vnd"
+    ]
+  },
+  "forbidden_visible_sources": [
+    "backtest",
+    "group_actual_pnl",
+    "latest_settlement"
+  ],
+  "fail_closed": true
+}

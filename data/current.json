@@ -1,7 +1,7 @@
 {
   "schema_version": "MB_FUSION4_180_WEB_V1",
-  "audit_id": "MB-20260720-FUSION4-180",
-  "generated_at": "2026-07-19T20:25:17+07:00",
+  "audit_id": "MB-20260721-FUSION4-180",
+  "generated_at": "2026-07-20T19:54:46+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
     "short_name": "MB FUSION4–180",
@@ -14,16 +14,16 @@
     "promotion_note": "Chỉ thay khi nhánh mới vượt kiểm định nhân quả và tiêu chí rủi ro đã khóa."
   },
   "plan": {
-    "target_date": "2026-07-20",
-    "data_lock_date": "2026-07-19",
+    "target_date": "2026-07-21",
+    "data_lock_date": "2026-07-20",
     "status": "LOCKED_WAITING_RESULT",
     "method": "MB FUSION4–180",
     "config_id": "MB_FUSION4_180_PROD_V1_20260719",
     "codes": [
-      "21",
-      "91",
-      "60",
-      "15"
+      "09",
+      "08",
+      "92",
+      "90"
     ],
     "number_of_codes": 4,
     "ranked_points": [
@@ -33,10 +33,10 @@
       30
     ],
     "points_by_code": {
-      "21": 50,
-      "91": 50,
-      "60": 50,
-      "15": 30
+      "09": 50,
+      "08": 50,
+      "92": 50,
+      "90": 30
     },
     "total_points": 180,
     "cost_per_point_vnd": 23000,
@@ -45,7 +45,7 @@
     "core_100_enabled": false,
     "other_50_enabled": false,
     "outcome_known_at_selection": false,
-    "selection_input_hash": "d0c6863d32248c856d39a1094e22111d13686f258be008cc53228a5b77cd11b0"
+    "selection_input_hash": "fe8dfda7bf561ea031fd9a04b0273f1e67df49466213007e37cf45719b683cbe"
   },
   "overlay": {
     "active": false,
@@ -67,31 +67,31 @@
     }
   ],
   "latest_settlement": {
-    "date": "2026-07-19",
+    "date": "2026-07-20",
     "status": "SETTLED_VERIFIED_27_OF_27",
     "method": "MB FUSION4–180",
     "codes": [
-      "59",
-      "78",
-      "06",
-      "10"
+      "21",
+      "91",
+      "60",
+      "15"
     ],
     "points_by_code": {
-      "59": 50,
-      "78": 50,
-      "06": 50,
-      "10": 30
+      "21": 50,
+      "91": 50,
+      "60": 50,
+      "15": 30
     },
     "points_per_code": null,
     "total_points": 180,
     "hits_by_code": {
-      "59": 0,
-      "78": 1,
-      "06": 0,
-      "10": 0
+      "21": 0,
+      "91": 0,
+      "60": 1,
+      "15": 0
     },
     "hit_codes": [
-      "78"
+      "60"
     ],
     "hit_units": 1,
     "hit_day": true,
@@ -100,99 +100,99 @@
     "payout_vnd": 4000000,
     "pnl_vnd": -140000,
     "roi_pct": -3.3816425120772946,
-    "draw_hash": "63b45223af87c19487ef41459f852edc04faea5e9d47428a00bd3ed549249ff3",
+    "draw_hash": "df79130f410ce901b24300dd0b46be018dbed4ee89c471ba5b720324509f222c",
     "config_id": "MB_FUSION4_180_PROD_V1_20260719",
     "ledger_scope": "METHOD_THEORETICAL_SEPARATE_FROM_PERSONAL_ACTUAL"
   },
   "actual_performance": {
     "source": "LINH_ACTUAL_GOOGLE_SHEETS_LEDGER",
     "tracking_start_date": "2026-07-01",
-    "settled_through": "2026-07-19",
+    "settled_through": "2026-07-20",
     "current_month_id": "2026-07",
     "current_month": {
-      "sessions": 15,
+      "sessions": 16,
       "wins": 8,
-      "losses": 7,
+      "losses": 8,
       "current_winning_streak": 0,
-      "current_losing_streak": 2,
+      "current_losing_streak": 3,
       "longest_winning_streak": 3,
-      "longest_losing_streak": 2,
-      "net_profit_vnd": 18526000
+      "longest_losing_streak": 3,
+      "net_profit_vnd": 17886000
     },
     "total": {
-      "sessions": 15,
+      "sessions": 16,
       "wins": 8,
-      "losses": 7,
+      "losses": 8,
       "current_winning_streak": 0,
-      "current_losing_streak": 2,
+      "current_losing_streak": 3,
       "longest_winning_streak": 3,
-      "longest_losing_streak": 2,
-      "net_profit_vnd": 18526000
+      "longest_losing_streak": 3,
+      "net_profit_vnd": 17886000
     }
   },
   "group_actual_pnl": {
     "source": "AGGREGATE_5_PERSON_GOOGLE_SHEETS_LEDGERS",
     "people_count": 5,
-    "settled_through": "2026-07-19",
-    "net_profit_vnd": 17891000
+    "settled_through": "2026-07-20",
+    "net_profit_vnd": 17251000
   },
   "backtest": {
     "current_month": {
-      "sessions": 19,
-      "hit_days": 17,
-      "hit_day_rate_pct": 89.47368421052632,
+      "sessions": 20,
+      "hit_days": 18,
+      "hit_day_rate_pct": 90.0,
       "profit_days": 9,
-      "profit_day_rate_pct": 47.36842105263158,
-      "capital_vnd": 78660000,
-      "payout_vnd": 105600000,
-      "net_profit_vnd": 26940000,
-      "roi_pct": 34.248665141113655,
-      "profit_factor": 2.897183098591549,
+      "profit_day_rate_pct": 45.0,
+      "capital_vnd": 82800000,
+      "payout_vnd": 109600000,
+      "net_profit_vnd": 26800000,
+      "roi_pct": 32.367149758454104,
+      "profit_factor": 2.868898186889819,
       "max_drawdown_vnd": -6020000,
-      "equity_current_vnd": 26940000,
+      "equity_current_vnd": 26800000,
       "equity_peak_vnd": 30980000,
       "gross_profit_vnd": 41140000,
-      "gross_loss_vnd": 14200000,
+      "gross_loss_vnd": 14340000,
       "longest_losing_streak": 3,
-      "current_losing_streak": 2
+      "current_losing_streak": 3
     },
     "current_year": {
-      "sessions": 196,
-      "hit_days": 176,
-      "hit_day_rate_pct": 89.79591836734694,
+      "sessions": 197,
+      "hit_days": 177,
+      "hit_day_rate_pct": 89.84771573604061,
       "profit_days": 94,
-      "profit_day_rate_pct": 47.95918367346939,
-      "capital_vnd": 811440000,
-      "payout_vnd": 1158400000,
-      "net_profit_vnd": 346960000,
-      "roi_pct": 42.758552696440894,
-      "profit_factor": 3.8561080013170894,
+      "profit_day_rate_pct": 47.71573604060914,
+      "capital_vnd": 815580000,
+      "payout_vnd": 1162400000,
+      "net_profit_vnd": 346820000,
+      "roi_pct": 42.52433850756517,
+      "profit_factor": 3.8516691333662227,
       "max_drawdown_vnd": -12700000,
-      "equity_current_vnd": 346960000,
+      "equity_current_vnd": 346820000,
       "equity_peak_vnd": 351000000,
       "gross_profit_vnd": 468440000,
-      "gross_loss_vnd": 121480000,
+      "gross_loss_vnd": 121620000,
       "longest_losing_streak": 5,
-      "current_losing_streak": 2
+      "current_losing_streak": 3
     },
     "full": {
-      "sessions": 919,
-      "hit_days": 727,
-      "hit_day_rate_pct": 79.10772578890098,
+      "sessions": 920,
+      "hit_days": 728,
+      "hit_day_rate_pct": 79.1304347826087,
       "profit_days": 383,
-      "profit_day_rate_pct": 41.67573449401523,
-      "capital_vnd": 3804660000,
-      "payout_vnd": 4749600000,
-      "net_profit_vnd": 944940000,
-      "roi_pct": 24.83638485436281,
-      "profit_factor": 1.9620255741977521,
+      "profit_day_rate_pct": 41.630434782608695,
+      "capital_vnd": 3808800000,
+      "payout_vnd": 4753600000,
+      "net_profit_vnd": 944800000,
+      "roi_pct": 24.805713085486243,
+      "profit_factor": 1.9617459638836297,
       "max_drawdown_vnd": -43040000,
-      "equity_current_vnd": 944940000,
+      "equity_current_vnd": 944800000,
       "equity_peak_vnd": 948980000,
       "gross_profit_vnd": 1927180000,
-      "gross_loss_vnd": 982240000,
+      "gross_loss_vnd": 982380000,
       "longest_losing_streak": 12,
-      "current_losing_streak": 2
+      "current_losing_streak": 3
     }
   },
   "constraints": {
@@ -206,17 +206,17 @@
   },
   "audit": {
     "source_history_primary_equals_mirror": true,
-    "source_history_date": "2026-07-19",
+    "source_history_date": "2026-07-20",
     "source_result_units": 27,
-    "input_hash": "9e1863b9514594612355c8dc7d2e56e3d184153007bdae99b197d152bba1778f",
-    "selection_input_hash": "d0c6863d32248c856d39a1094e22111d13686f258be008cc53228a5b77cd11b0",
+    "input_hash": "e82ff48f5edb0aa76f4c1683c562d76835efe4950fec2eaec7a5ed24654567a6",
+    "selection_input_hash": "fe8dfda7bf561ea031fd9a04b0273f1e67df49466213007e37cf45719b683cbe",
     "static_voter_manifest_sha256": "dc7fd19ea9c9fe0043f31d74ee70261c076e1f49c0f21111a6944a6c5bb00d9c",
     "plan_replayed_from_locked_source": true,
     "capital_formula_verified": true,
     "target_outcome_used": false,
     "causality": {
       "source_mode": "workbook",
-      "source_end": "2026-07-19",
+      "source_end": "2026-07-20",
       "frozen_upstream_end": "2026-07-15",
       "target_outcome_sum": 0,
       "fit_log_last": [
@@ -226,8 +226,8 @@
         36500
       ],
       "generation_log_last": {
-        "target": "2026-07-20",
-        "history_end": "2026-07-19",
+        "target": "2026-07-21",
+        "history_end": "2026-07-20",
         "target_outcome_visible": false,
         "code_model_train_rows": {
           "EXTRA365_D6_L35": 2992,
@@ -245,6 +245,6 @@
     "status": "SHEETS_APPLIED_READBACK_VERIFIED_READY_TO_PUBLISH",
     "personal_ledger_policy": "ONLY_SETTLE_EXISTING_ACTUAL_ORDERS",
     "website_pnl_source": "PERSONAL_AND_5_LEDGER_ACTUALS",
-    "sheets_receipt_hash": "43cf486c6d334a046ffaad785b752941588f8cf4be6e7c6bdf0295b22f622534"
+    "sheets_receipt_hash": "171254b2d154141e19dfcc95ea519b23a0980aae9d40b3bcef2a547e2393ab85"
   }
 }

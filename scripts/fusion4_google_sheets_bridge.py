@@ -17,8 +17,12 @@ import re
 import sys
 from typing import Any
 
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
+try:
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+except ModuleNotFoundError:  # Unit tests do not need the optional API client.
+    service_account = None
+    build = None
 from openpyxl import Workbook
 
 
@@ -52,6 +56,8 @@ def digest(value: Any) -> str:
 
 
 def load_credentials():
+    if service_account is None:
+        raise BridgeError("Thiếu dependency google-auth/google-api-python-client")
     raw = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
     if not raw:
         raise BridgeError("Thiếu secret GOOGLE_SERVICE_ACCOUNT_JSON")
@@ -69,6 +75,8 @@ def load_credentials():
 
 
 def sheets_service():
+    if build is None:
+        raise BridgeError("Thiếu dependency google-api-python-client")
     return build("sheets", "v4", credentials=load_credentials(), cache_discovery=False)
 
 
@@ -399,6 +407,27 @@ def apply_personal_operation(service, pnl_id: str, operation: dict) -> None:
         raise BridgeError(f"Readback cá nhân thất bại: op={operation['operation_id'][:12]}")
 
 
+def verify_manual_adjustment(service, pnl_id: str, operation: dict) -> None:
+    """Verify a user-entered outside P/L adjustment without rewriting it."""
+    tab = operation["sheet_name"]
+    row_number = int(operation["row"])
+    range_name = f"{quote_tab(tab)}!A{row_number}:H{row_number}"
+    rows = get_values(service, pnl_id, range_name)
+    if not rows:
+        raise BridgeError(
+            f"Dòng điều chỉnh ngoài biến mất: op={operation['operation_id'][:12]}"
+        )
+    row = pad(rows[0], 8)
+    if digest(row[:5]) != operation["expected_a_to_e_hash"]:
+        raise BridgeError(
+            f"Điều chỉnh ngoài đã thay đổi: op={operation['operation_id'][:12]}"
+        )
+    if int(float(row[4])) != operation["pnl_vnd"]:
+        raise BridgeError(
+            f"P/L điều chỉnh ngoài sai: op={operation['operation_id'][:12]}"
+        )
+
+
 def append_log(
     service, spreadsheet_id: str, tab: str, payload: dict,
     operation: dict, status: str,
@@ -473,6 +502,12 @@ def apply(args: argparse.Namespace) -> None:
             append_log(
                 service, pnl_id, PNL_LOG_TAB,
                 payload, operation, "APPLIED_READBACK_VERIFIED",
+            )
+        elif kind == "RECORD_PERSONAL_MANUAL_ADJUSTMENT":
+            verify_manual_adjustment(service, pnl_id, operation)
+            append_log(
+                service, pnl_id, PNL_LOG_TAB,
+                payload, operation, "MANUAL_ADJUSTMENT_READBACK_VERIFIED",
             )
         elif kind == "LOG_PERSONAL_NO_ORDER":
             append_log(

@@ -181,7 +181,10 @@ def advance_personal_actual(state: dict, day: date, operations: list[dict]) -> d
     pnl_rows = [
         int(operation["pnl_vnd"])
         for operation in operations
-        if operation.get("kind") == "UPDATE_PERSONAL_PNL_IF_BLANK"
+        if operation.get("kind") in {
+            "UPDATE_PERSONAL_PNL_IF_BLANK",
+            "RECORD_PERSONAL_MANUAL_ADJUSTMENT",
+        }
         and operation.get("name") == "p1"
     ]
     if pnl_rows:

@@ -503,9 +503,36 @@ def personal_operations(snapshot: dict, day: date, draw: list[str]) -> tuple[lis
             padded = list(row) + [None] * (8 - len(row))
             if parse_person_date(padded[0]) != day:
                 continue
-            if str(padded[1] or "").strip().lower() == "số dư đầu kỳ":
+            method_name = str(padded[1] or "").strip().lower()
+            if method_name == "số dư đầu kỳ":
                 continue
             matched = True
+            if method_name == "đánh ngoài":
+                try:
+                    manual_pnl = int(float(padded[4]))
+                except (TypeError, ValueError):
+                    manual_pnl = None
+                if manual_pnl is None or str(padded[2] or "").strip() not in {
+                    "", "Khoản ngoài"
+                } or padded[3] not in (None, "", 0, "0"):
+                    blocked.append({
+                        "name": name,
+                        "sheet_name": entry.get("sheet_name", name),
+                        "row": offset,
+                        "reason": "INVALID_MANUAL_OUTSIDE_ADJUSTMENT",
+                    })
+                    continue
+                core = {
+                    "kind": "RECORD_PERSONAL_MANUAL_ADJUSTMENT",
+                    "name": name,
+                    "sheet_name": entry.get("sheet_name", name),
+                    "row": offset,
+                    "date": day.isoformat(),
+                    "pnl_vnd": manual_pnl,
+                    "expected_a_to_e_hash": digest(padded[:5]),
+                }
+                operations.append({"operation_id": digest(core), **core})
+                continue
             codes = parse_person_codes(padded[2])
             total_points = parse_total_points(padded[3])
             points_by_code = (

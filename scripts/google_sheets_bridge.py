@@ -17,8 +17,12 @@ import re
 import sys
 from typing import Any
 
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
+try:
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+except ModuleNotFoundError:  # Unit tests do not need the optional API client.
+    service_account = None
+    build = None
 from openpyxl import Workbook
 
 
@@ -51,6 +55,8 @@ def digest(value: Any) -> str:
 
 
 def load_credentials():
+    if service_account is None:
+        raise BridgeError("Thiếu dependency google-auth/google-api-python-client")
     raw = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
     if not raw:
         raise BridgeError("Thiếu secret GOOGLE_SERVICE_ACCOUNT_JSON")
@@ -68,6 +74,8 @@ def load_credentials():
 
 
 def sheets_service():
+    if build is None:
+        raise BridgeError("Thiếu dependency google-api-python-client")
     return build("sheets", "v4", credentials=load_credentials(), cache_discovery=False)
 
 

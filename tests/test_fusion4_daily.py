@@ -14,6 +14,23 @@ import fusion4_daily as fusion4
 
 
 class Fusion4DailyTests(unittest.TestCase):
+    def state_through_seed(self) -> dict:
+        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        seed = json.loads(
+            (ROOT / "data" / "personal-actual-seed-2026-07.json").read_text()
+        )
+        state["actual"] = {
+            "tracking_start_date": seed["start_date"],
+            "settled_through": seed["checked_through"],
+            "current_month_id": "2026-07",
+            "current_month": json.loads(json.dumps(seed["summary"])),
+            "total": json.loads(json.dumps(seed["summary"])),
+        }
+        state["group_actual_pnl"] = json.loads(
+            json.dumps(seed["group_actual_pnl"])
+        )
+        return state
+
     def test_locked_seed_plan_has_fixed_180_point_stakes(self) -> None:
         plan = fusion4.load_plan(date(2026, 7, 19))
         self.assertEqual(plan["codes"], ["59", "78", "06", "10"])
@@ -61,7 +78,10 @@ class Fusion4DailyTests(unittest.TestCase):
             "Chuỗi thua dài nhất", "Lãi/lỗ thực tế", "Tổng thực tế",
         ):
             self.assertIn(label, rendered)
-        self.assertIn("01/07/2026–19/07/2026", rendered)
+        settled = date.fromisoformat(
+            current["actual_performance"]["settled_through"]
+        ).strftime("%d/%m/%Y")
+        self.assertIn(f"01/07/2026–{settled}", rendered)
         self.assertNotIn("Lãi/lỗ tổng", rendered)
         self.assertNotIn("Backtest", rendered)
         self.assertNotIn("P/L phương pháp", rendered)
@@ -80,7 +100,7 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(period["current_losing_streak"], 2)
         self.assertEqual(period["net_profit_vnd"], 200_000)
 
-    def test_july_performance_seed_matches_published_state(self) -> None:
+    def test_july_performance_seed_is_valid_published_prefix(self) -> None:
         seed = json.loads(
             (ROOT / "data" / "personal-actual-seed-2026-07.json").read_text()
         )
@@ -89,16 +109,19 @@ class Fusion4DailyTests(unittest.TestCase):
             period = fusion4.update_actual_period(period, row)
         state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
         self.assertEqual(period, seed["summary"])
-        self.assertEqual(period, state["actual"]["current_month"])
-        self.assertEqual(period, state["actual"]["total"])
-        self.assertEqual(state["actual"]["tracking_start_date"], "2026-07-01")
-        self.assertEqual(
-            seed["group_actual_pnl"]["net_profit_vnd"],
-            state["group_actual_pnl"]["net_profit_vnd"],
+        self.assertGreaterEqual(
+            state["actual"]["current_month"]["sessions"], period["sessions"]
         )
+        self.assertGreaterEqual(
+            date.fromisoformat(state["actual"]["settled_through"]),
+            date.fromisoformat(seed["checked_through"]),
+        )
+        self.assertEqual(state["actual"]["tracking_start_date"], "2026-07-01")
+        self.assertEqual(seed["group_actual_pnl"]["people_count"], 5)
+        self.assertEqual(state["group_actual_pnl"]["people_count"], 5)
 
     def test_method_settlement_never_changes_personal_actual(self) -> None:
-        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        state = self.state_through_seed()
         before = json.loads(json.dumps(state))
         settlement = {
             "date": "2026-07-18",
@@ -112,7 +135,7 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(advanced["actual"], before["actual"])
 
     def test_personal_actual_uses_linh_order_not_method_result(self) -> None:
-        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        state = self.state_through_seed()
         settlement = {
             "date": "2026-07-20",
             "pnl_vnd": 3_860_000,
@@ -139,8 +162,32 @@ class Fusion4DailyTests(unittest.TestCase):
         self.assertEqual(actual["current_month"]["net_profit_vnd"], 19_186_000)
         self.assertEqual(actual["total"], actual["current_month"])
 
+    def test_personal_actual_includes_confirmed_outside_adjustment(self) -> None:
+        state = self.state_through_seed()
+        operations = [
+            {
+                "kind": "UPDATE_PERSONAL_PNL_IF_BLANK",
+                "name": "p1",
+                "pnl_vnd": -140_000,
+            },
+            {
+                "kind": "RECORD_PERSONAL_MANUAL_ADJUSTMENT",
+                "name": "p1",
+                "pnl_vnd": -500_000,
+            },
+        ]
+        advanced = fusion4.advance_personal_actual(
+            state, date(2026, 7, 20), operations
+        )
+        actual = advanced["actual"]
+        self.assertEqual(actual["current_month"]["sessions"], 16)
+        self.assertEqual(actual["current_month"]["losses"], 8)
+        self.assertEqual(actual["current_month"]["current_losing_streak"], 3)
+        self.assertEqual(actual["current_month"]["longest_losing_streak"], 3)
+        self.assertEqual(actual["current_month"]["net_profit_vnd"], 17_886_000)
+
     def test_no_linh_order_advances_check_date_without_fake_result(self) -> None:
-        state = json.loads((ROOT / "data" / "fusion4-state.json").read_text())
+        state = self.state_through_seed()
         advanced = fusion4.advance_personal_actual(
             state, date(2026, 7, 20), [
                 {"kind": "LOG_PERSONAL_NO_ORDER", "name": "p1"}

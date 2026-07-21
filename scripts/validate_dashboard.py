@@ -94,7 +94,9 @@ def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
     assert total["start_date"] == actual["tracking_start_date"]
     assert total["settled_through"] == actual["settled_through"]
     assert total["net_profit_vnd"] == actual["total_net_profit_vnd"]
-    assert "Tổng từ 01/07/2026 đến 20/07/2026" in html
+    reviewed_through = actual.get("reviewed_through", actual["settled_through"])
+    reviewed_dmy = date.fromisoformat(reviewed_through).strftime("%d/%m/%Y")
+    assert f"Tổng từ 01/07/2026 đến {reviewed_dmy}" in html
     assert "Chuỗi thắng dài nhất" in html
     assert "Chuỗi thua dài nhất" in html
     assert "Tổng lãi/lỗ" in html
@@ -103,7 +105,7 @@ def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
     de = json.loads(de_path.read_text(encoding="utf-8"))
     assert de["target_date"] == plan["target_date"]
     assert de["data_lock_date"] == plan["data_lock_date"]
-    assert de["decision"] in {"NO_TRADE", "PLAY"}
+    assert de["decision"] in {"NO_TRADE", "PLAY", "ELIGIBLE_REFERENCE"}
     assert de["watch_head"] is not None and de["watch_tail"] is not None
     assert de["capital_vnd"] >= 0
     assert "mốc sớm nhất có thể vào tiền" in html
@@ -117,7 +119,7 @@ def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
 def validate(index_path: Path, data_path: Path) -> None:
     html = index_path.read_text(encoding="utf-8")
     payload = json.loads(data_path.read_text(encoding="utf-8"))
-    if payload.get("schema_version") == "MB_SONG_LOC_100_WEB_V1":
+    if payload.get("schema_version", "").startswith("MB_SONG_LOC_100_WEB_V"):
         validate_song_loc(html, payload, data_path)
         return
     layout = json.loads(LAYOUT_POLICY.read_text(encoding="utf-8"))

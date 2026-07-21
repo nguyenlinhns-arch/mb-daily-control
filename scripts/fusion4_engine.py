@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Generate the next MB FUSION4–180 plan from a t-1 source workbook.
+"""Generate the next MB plan from a t-1 source workbook.
 
 The private V32 engine supplies the locked Max4/Max10 source features.  This
-public wrapper only applies the frozen Fusion4 ranking and stake policy.
+public wrapper applies either the frozen Fusion4 policy or SONG LỘC 100.
 """
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ ENGINE = ROOT / "engine_v32"
 START = date(2024, 1, 1)
 COST_PER_POINT = 23_000
 CONFIG_ID = "MB_FUSION4_180_PROD_V1_20260719"
+SONG_LOC_CONFIG_ID = "MB_SONG_LOC_100_PROD_V1_20260721"
 
 STATIC_VOTER_PATHS = (
     "base", "rows", "rows_v10", "v11_path.rows", "rows_v11",
@@ -214,7 +215,10 @@ def summarize_replay(rows: list[dict[str, Any]]) -> dict[str, int]:
     return summary
 
 
-def build_plan(source_xlsx: Path, source_end: date) -> dict:
+def build_plan(source_xlsx: Path, source_end: date, method: str = "fusion4") -> dict:
+    if method not in {"fusion4", "song-loc"}:
+        raise FusionEngineError(f"Phương pháp không hỗ trợ: {method}")
+    config_id = SONG_LOC_CONFIG_ID if method == "song-loc" else CONFIG_ID
     os.environ["MB_V32_SOURCE_XLSX"] = str(source_xlsx.resolve())
     sys.path.insert(0, str(ENGINE))
     previous_cwd = Path.cwd()
@@ -299,22 +303,33 @@ def build_plan(source_xlsx: Path, source_end: date) -> dict:
             max10_member[capped] = 1.0
             r4 = rank01(hgb_row.reshape(1, -1))[0]
             r10 = 1.0 - (priority_rank.astype(np.float32) - 1) / 99
-            fused = 0.75 * r4 + 0.25 * r10 + 0.50 * max10_member
-            order = np.lexsort((codes, -fused))[:4]
+            if method == "song-loc":
+                fused = r4 + 0.08 * r10 - 0.50 * r4 * r10 + 0.73 * max10_member
+            else:
+                fused = 0.75 * r4 + 0.25 * r10 + 0.50 * max10_member
+            order = np.lexsort((codes, -fused))[:10]
             return order, fused, r4, r10, max10_member, priority_rank, capped
 
         (order, fused, r4, r10, max10_member,
          priority_rank, capped) = select(target, hgb_score[-1])
-        code_strings = [f"{int(code):02d}" for code in order]
-        points = [50, 50, 50, 30]
+        ranked_codes = [f"{int(code):02d}" for code in order]
+        if method == "song-loc":
+            code_strings = ranked_codes[1:3]
+            points = [50, 50]
+        else:
+            code_strings = ranked_codes[:4]
+            points = [50, 50, 50, 30]
         points_by_code = dict(zip(code_strings, points))
-        if len(set(code_strings)) != 4 or sum(points_by_code.values()) != 180:
-            raise FusionEngineError("Fusion4 plan invariant failed")
+        expected_count = 2 if method == "song-loc" else 4
+        expected_points = 100 if method == "song-loc" else 180
+        if (len(set(code_strings)) != expected_count
+                or sum(points_by_code.values()) != expected_points):
+            raise FusionEngineError("Plan invariant failed")
         if int(y_count[-1].sum()) != 0:
             raise FusionEngineError("Kết quả kỳ mục tiêu đã lộ vào engine")
         selection_material = {
             "target": str(target), "data_lock": str(source_end),
-            "config": CONFIG_ID,
+            "config": config_id,
             "hgb": {f"{i:02d}": float(hgb_score[-1, i]) for i in range(100)},
             "v32_rank": {f"{i:02d}": int(priority_rank[i]) for i in range(100)},
             "v32_cap10": [f"{i:02d}" for i in capped],
@@ -326,7 +341,8 @@ def build_plan(source_xlsx: Path, source_end: date) -> dict:
             if not replay_start <= day <= source_end:
                 continue
             replay_order, *_ = select(day, hgb_score[i])
-            replay_codes = [f"{int(code):02d}" for code in replay_order]
+            replay_ranked = [f"{int(code):02d}" for code in replay_order]
+            replay_codes = replay_ranked[1:3] if method == "song-loc" else replay_ranked[:4]
             replay_points = dict(zip(replay_codes, points))
             hits = {
                 code: int(y_count[i, int(code)]) for code in replay_codes
@@ -346,18 +362,27 @@ def build_plan(source_xlsx: Path, source_end: date) -> dict:
                 "pnl_vnd": payout - capital,
             })
         return {
-            "schema_version": "MB_FUSION4_ENGINE_PLAN_V1",
+            "schema_version": (
+                "MB_SONG_LOC_100_ENGINE_PLAN_V1"
+                if method == "song-loc" else "MB_FUSION4_ENGINE_PLAN_V1"
+            ),
             "source_end": str(source_end),
             "target_date": str(target),
-            "config_id": CONFIG_ID,
+            "config_id": config_id,
+            "method": "SONG LỘC 100" if method == "song-loc" else "MB FUSION4–180",
+            "rank_1_excluded": ranked_codes[0] if method == "song-loc" else None,
             "codes": code_strings,
             "points_by_code": points_by_code,
-            "total_points": 180,
-            "capital_vnd": 180 * COST_PER_POINT,
+            "total_points": expected_points,
+            "capital_vnd": expected_points * COST_PER_POINT,
             "outcome_known_at_selection": False,
             "selection_input_hash": digest(selection_material),
             "ranking": {
-                "formula": "0.75*Max4_rank + 0.25*Max10_priority_rank + 0.50*I(code_in_Max10)",
+                "formula": (
+                    "R4 + 0.08*R10 - 0.50*R4*R10 + 0.73*I(Max10)"
+                    if method == "song-loc"
+                    else "0.75*Max4_rank + 0.25*Max10_priority_rank + 0.50*I(code_in_Max10)"
+                ),
                 "top10": [
                     {
                         "rank": rank + 1,
@@ -396,9 +421,10 @@ def main() -> None:
     parser.add_argument("--source-xlsx", type=Path, required=True)
     parser.add_argument("--source-end", type=date.fromisoformat, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--method", choices=("fusion4", "song-loc"), default="fusion4")
     args = parser.parse_args()
     try:
-        plan = build_plan(args.source_xlsx, args.source_end)
+        plan = build_plan(args.source_xlsx, args.source_end, args.method)
     except (AssertionError, KeyError, ValueError, FusionEngineError) as exc:
         print(f"FUSION4_ENGINE_BLOCKED: {exc}", file=sys.stderr)
         raise SystemExit(2) from exc

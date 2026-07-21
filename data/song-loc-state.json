@@ -1,0 +1,15 @@
+{
+  "schema_version": "MB_SONG_LOC_STATE_V1",
+  "project": "MB SONG LỘC",
+  "method": "SONG LỘC 100",
+  "config_id": "MB_SONG_LOC_100_PROD_V1_20260721",
+  "effective_from": "2026-07-21",
+  "settled_through": "2026-07-21",
+  "planned_through": "2026-07-22",
+  "latest_settlement": "data/song-loc-settlements/2026-07-21.json",
+  "latest_plan": "data/song-loc-plans/2026-07-22.json",
+  "latest_transaction": "data/song-loc-transactions/2026-07-22.json",
+  "actual_orders_reviewed_through": "2026-07-21",
+  "actual_order_status_for_2026_07_21": "NO_ORDER",
+  "updated_at": "2026-07-21T19:16:00+07:00"
+}

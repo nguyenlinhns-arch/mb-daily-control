@@ -39,6 +39,7 @@ jobs:
           python3 scripts/normalize_static_dashboard.py index.html _site/index.html
           cp _site/index.html _site/fast/index.html
           cp data/current.json _site/data/current.json
+          cp data/de-head-current.json _site/data/de-head-current.json
           printf '%s\n' "static-dashboard-${GITHUB_SHA}" > _site/version.txt
           touch _site/.nojekyll
           test -s _site/index.html

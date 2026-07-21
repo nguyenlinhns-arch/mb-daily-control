@@ -1,0 +1,25 @@
+{
+  "schema_version": "MB_SONG_LOC_SETTLEMENT_V1",
+  "date": "2026-07-21",
+  "plan_hash": "c5dd3562290f23b14ef16fb449f2a30f053fee7c3ee7d8de337afe50cb0377cd",
+  "locked_codes": [
+    {"code": "08", "points": 50, "hits": 0, "payout_vnd": 0},
+    {"code": "92", "points": 50, "hits": 0, "payout_vnd": 0}
+  ],
+  "verified_results": ["70", "07", "70", "06", "44", "51", "17", "62", "06", "72", "47", "75", "51", "53", "63", "98", "26", "89", "84", "88", "53", "88", "74", "97", "94", "83", "09"],
+  "result_units": 27,
+  "unique_codes": 22,
+  "capital_vnd": 2300000,
+  "payout_vnd": 0,
+  "net_profit_vnd": -2300000,
+  "roi_percent": -100.0,
+  "method_cumulative_from_effective_date_vnd": -2300000,
+  "actual_order_status": "NO_ORDER",
+  "actual_ledger_impact_vnd": 0,
+  "sources": [
+    "https://xoso.com.vn/xsmb-21-07-2026.html",
+    "https://xosodaiphat.com/xsmb-21-07-2026.html"
+  ],
+  "status": "SETTLED_VERIFIED_2_SOURCES_27_OF_27",
+  "settled_at": "2026-07-21T19:16:00+07:00"
+}

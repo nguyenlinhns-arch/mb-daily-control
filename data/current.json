@@ -39,9 +39,26 @@
       {
         "month_id": "2026-07",
         "label": "Tháng 07/2026",
+        "start_date": "2026-07-01",
+        "settled_through": "2026-07-20",
+        "sessions": 16,
+        "wins": 8,
+        "losses": 8,
+        "longest_winning_streak": 3,
+        "longest_losing_streak": 3,
         "net_profit_vnd": 17886000
       }
     ],
+    "total": {
+      "start_date": "2026-07-01",
+      "settled_through": "2026-07-20",
+      "sessions": 16,
+      "wins": 8,
+      "losses": 8,
+      "longest_winning_streak": 3,
+      "longest_losing_streak": 3,
+      "net_profit_vnd": 17886000
+    },
     "total_net_profit_vnd": 17886000
   },
   "de_head_tail": {

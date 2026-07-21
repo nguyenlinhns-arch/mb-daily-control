@@ -82,8 +82,21 @@ def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
     assert monthly
     assert sum(period["net_profit_vnd"] for period in monthly) == actual["total_net_profit_vnd"]
     for period in monthly:
+        assert period["sessions"] == period["wins"] + period["losses"]
         assert period["label"] in html
+        assert f'{period["wins"]} ngày' in html
+        assert f'{period["losses"]} ngày' in html
+        assert f'{period["longest_winning_streak"]} ngày' in html
+        assert f'{period["longest_losing_streak"]} ngày' in html
         assert signed_vnd(period["net_profit_vnd"]) in html
+    total = actual["total"]
+    assert total["sessions"] == total["wins"] + total["losses"]
+    assert total["start_date"] == actual["tracking_start_date"]
+    assert total["settled_through"] == actual["settled_through"]
+    assert total["net_profit_vnd"] == actual["total_net_profit_vnd"]
+    assert "Tổng từ 01/07/2026 đến 20/07/2026" in html
+    assert "Chuỗi thắng dài nhất" in html
+    assert "Chuỗi thua dài nhất" in html
     assert "Tổng lãi/lỗ" in html
     assert signed_vnd(actual["total_net_profit_vnd"]) in html
     de_path = data_path.parent / "de-head-current.json"
@@ -93,6 +106,9 @@ def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
     assert de["decision"] in {"NO_TRADE", "PLAY"}
     assert de["watch_head"] is not None and de["watch_tail"] is not None
     assert de["capital_vnd"] >= 0
+    assert "mốc sớm nhất có thể vào tiền" in html
+    assert "de-head-earliest-head" in html
+    assert "de-head-earliest-tail" in html
     assert 'data-static-dashboard="1"' in html
     assert "MB_STATUS_SAFE_V1" in html
     print("SONG_LOC_DASHBOARD_VALIDATION_OK", plan["target_date"], ",".join(codes))

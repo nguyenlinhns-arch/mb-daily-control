@@ -28,8 +28,18 @@
       "gmax",
       "score",
       "capital_vnd",
-      "reason"
-    ]
+      "reason",
+      "head_earliest_entry_dmy",
+      "head_earliest_conditions",
+      "tail_earliest_entry_dmy",
+      "tail_earliest_conditions"
+    ],
+    "earliest_entry_display": {
+      "required": true,
+      "semantics": "CONDITIONAL_LOWER_BOUND",
+      "rule": "Hiển thị riêng mốc sớm nhất cho Đầu và Đuôi; ngày chỉ là cận dưới có điều kiện, không phải lệnh chắc chắn.",
+      "unknown_label": "Chưa xác định ngày"
+    }
   },
   "bottom_section": {
     "title": "Lãi/lỗ",

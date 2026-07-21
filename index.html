@@ -125,6 +125,9 @@
     .de-kpi strong { display: block; margin-top: 3px; font-size: 15px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
     .de-kpi.wide { grid-column: 1 / -1; }
     .de-head-sync { color: var(--muted); font-size: 10px; }
+    .de-entry-gate strong { color: var(--text); font-size: 16px; }
+    .de-entry-gate strong.conditional { color: var(--amber); }
+    .de-entry-gate small { display: block; margin-top: 6px; color: var(--muted); font-size: 10px; line-height: 1.45; }
 
     .performance { margin-top: 36px; }
     .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
@@ -221,6 +224,16 @@
           <div class="de-kpi"><span>Trạng thái</span><strong id="de-head-status">WAIT</strong></div>
           <div class="de-kpi"><span>Gan / Gmax</span><strong id="de-head-gan">—</strong></div>
           <div class="de-kpi"><span>Score</span><strong id="de-head-score">—</strong></div>
+          <div class="de-kpi wide de-entry-gate">
+            <span>Đầu · mốc sớm nhất có thể vào tiền</span>
+            <strong class="conditional" id="de-head-earliest-head">Đang xác định</strong>
+            <small id="de-head-earliest-head-note">Phải đồng thời đạt toàn bộ điều kiện của phương pháp.</small>
+          </div>
+          <div class="de-kpi wide de-entry-gate">
+            <span>Đuôi · mốc sớm nhất có thể vào tiền</span>
+            <strong class="conditional" id="de-head-earliest-tail">Đang xác định</strong>
+            <small id="de-head-earliest-tail-note">Phải đồng thời đạt toàn bộ điều kiện của phương pháp.</small>
+          </div>
           <div class="de-kpi wide"><span>Cập nhật</span><strong class="de-head-sync" id="de-head-sync">Chưa có dữ liệu cùng ngày</strong></div>
         </div>
       </article>
@@ -299,6 +312,10 @@
       document.getElementById("de-head-gan").textContent = "—";
       document.getElementById("de-head-score").textContent = "—";
       document.getElementById("de-head-reason").textContent = message;
+      document.getElementById("de-head-earliest-head").textContent = "Chưa thể xác định";
+      document.getElementById("de-head-earliest-head-note").textContent = "Cần dữ liệu khóa đúng ngày để tính đủ gate.";
+      document.getElementById("de-head-earliest-tail").textContent = "Chưa thể xác định";
+      document.getElementById("de-head-earliest-tail-note").textContent = "Cần dữ liệu khóa đúng ngày để tính đủ gate.";
       document.getElementById("de-head-sync").textContent = "Không dùng dữ liệu cũ";
     }
 
@@ -332,6 +349,18 @@
         document.getElementById("de-head-score").textContent =
           formatScore(item.score) + " · " + formatScore(item.tail_score);
         document.getElementById("de-head-reason").textContent = item.reason;
+        var headLabel = item.watch_head == null ? "Đầu" : "Đầu " + item.watch_head;
+        var tailLabel = item.watch_tail == null ? "Đuôi" : "Đuôi " + item.watch_tail;
+        document.getElementById("de-head-earliest-head").textContent = item.head_earliest_entry_dmy
+          ? headLabel + ": " + item.head_earliest_entry_dmy + " (có điều kiện)"
+          : headLabel + ": chưa xác định ngày";
+        document.getElementById("de-head-earliest-head-note").textContent =
+          item.head_earliest_conditions || "Chưa đủ dữ liệu để xác định điều kiện vào tiền.";
+        document.getElementById("de-head-earliest-tail").textContent = item.tail_earliest_entry_dmy
+          ? tailLabel + ": " + item.tail_earliest_entry_dmy + " (có điều kiện)"
+          : tailLabel + ": chưa xác định ngày";
+        document.getElementById("de-head-earliest-tail-note").textContent =
+          item.tail_earliest_conditions || "Chưa đủ dữ liệu để xác định điều kiện vào tiền.";
         document.getElementById("de-head-sync").textContent =
           "Khóa " + item.data_lock_dmy + " · " + item.method_short;
       } catch (error) {

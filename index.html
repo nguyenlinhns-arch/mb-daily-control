@@ -3,401 +3,370 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="description" content="Kế hoạch MB SONG LỘC, hiệu quả SONG LỘC 100 và sổ tiền thật được tách riêng, cập nhật đến 20/07/2026.">
-  <meta name="theme-color" content="#07101d">
+  <meta name="description" content="Kế hoạch MB SONG LỘC, đề đầu/đuôi và lãi/lỗ thực tế theo tháng.">
+  <meta name="theme-color" content="#08111f">
   <meta name="color-scheme" content="dark">
-  <title>MB SONG LỘC · 21/07/2026</title>
+  <title>MB SONG LỘC · 22/07/2026</title>
   <style>
+    /* MB_STATUS_SAFE_V1 */
     :root {
-      --bg: #06101d;
-      --panel: #0e1c2f;
-      --panel-2: #0a1728;
-      --line: #233953;
-      --line-strong: #315779;
-      --text: #f4f7fb;
-      --muted: #91a4bc;
-      --blue: #79b2ff;
-      --green: #61e2a8;
-      --red: #ff939d;
-      --amber: #f5ca76;
-      --shadow: 0 22px 64px rgba(0,0,0,.28);
+      --bg: #07101d;
+      --card: #101c2d;
+      --card-soft: #0c1727;
+      --line: #21324a;
+      --text: #f6f8fc;
+      --muted: #91a0b8;
+      --blue: #74a8ff;
+      --green: #5ce1a2;
+      --red: #ff8f99;
+      --amber: #f3c875;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .28);
     }
+
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-width: 320px;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 50% -10%, rgba(49,111,190,.27), transparent 34rem),
+        radial-gradient(circle at 50% -15%, rgba(57, 111, 194, .24), transparent 34rem),
         var(--bg);
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.45;
       -webkit-font-smoothing: antialiased;
     }
+
     button { font: inherit; }
-    .shell { width: min(1040px, calc(100% - 28px)); margin: 0 auto; }
-    header { padding: 24px 0 14px; }
-    .brand { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-    .brand-name { margin: 0; font-size: 14px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
-    .brand-status { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
-    .brand-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(97,226,168,.09); }
-    main { padding: 10px 0 54px; }
-    .hero {
-      padding: clamp(20px, 4vw, 36px);
-      border: 1px solid #2d4e70;
-      border-radius: 28px;
-      background: linear-gradient(145deg, rgba(24,45,71,.98), rgba(10,24,42,.98));
+    .shell { width: min(920px, calc(100% - 28px)); margin: 0 auto; }
+    header { padding: 26px 0 16px; }
+    .brand { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .brand-name { margin: 0; font-size: 14px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .brand-note { color: var(--muted); font-size: 11px; }
+
+    main { padding: 10px 0 56px; }
+    .plan {
+      padding: clamp(20px, 4vw, 34px);
+      border: 1px solid #2a4262;
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(24, 42, 66, .96), rgba(12, 24, 41, .96));
       box-shadow: var(--shadow);
     }
-    .hero-head { display: flex; align-items: end; justify-content: space-between; gap: 22px; }
-    .eyebrow { margin: 0 0 7px; color: var(--blue); font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-    h1, h2, h3 { margin-top: 0; }
-    h1 { margin-bottom: 0; font-size: clamp(29px, 5vw, 46px); line-height: 1.04; letter-spacing: -.045em; }
-    .hero-meta { color: var(--muted); font-size: 12px; text-align: right; }
-    .lock-badge { display: inline-block; margin-top: 7px; padding: 5px 9px; border: 1px solid rgba(97,226,168,.28); border-radius: 999px; color: var(--green); background: rgba(97,226,168,.07); font-size: 10px; font-weight: 800; }
-    .numbers { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 13px; margin-top: 27px; }
-    .number-card { padding: 17px 10px 16px; border: 1px solid #315b83; border-radius: 19px; background: rgba(7,22,39,.66); text-align: center; }
-    .number-card span { display: block; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .1em; }
-    .number-card b { display: block; margin: 5px 0 8px; font-size: clamp(38px, 7vw, 58px); line-height: 1; letter-spacing: -.055em; font-variant-numeric: tabular-nums; }
-    .number-card strong { display: block; color: var(--blue); font-size: 12px; }
-    .hero-foot { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-top: 21px; padding-top: 18px; border-top: 1px solid var(--line); }
-    .totals { display: flex; flex-wrap: wrap; gap: 10px 28px; }
+    .plan-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+    .eyebrow { margin: 0 0 6px; color: var(--blue); font-size: 11px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(27px, 5vw, 43px); line-height: 1.05; letter-spacing: -.045em; }
+    .plan-meta { color: var(--muted); font-size: 12px; text-align: right; }
+
+    .numbers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 26px; }
+    .number {
+      padding: 15px 8px 14px;
+      border: 1px solid #29486e;
+      border-radius: 18px;
+      background: rgba(10, 25, 45, .72);
+      text-align: center;
+    }
+    .number span { display: block; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+    .number b { display: block; margin: 5px 0 7px; font-size: clamp(34px, 7vw, 52px); line-height: 1; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+    .number strong { display: block; color: var(--blue); font-size: 12px; }
+
+    .plan-foot { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 20px; padding-top: 17px; border-top: 1px solid var(--line); }
+    .totals { display: flex; flex-wrap: wrap; gap: 8px 24px; }
     .total span { display: block; color: var(--muted); font-size: 10px; }
-    .total strong { display: block; margin-top: 3px; font-size: 16px; font-variant-numeric: tabular-nums; }
-    .copy { min-height: 42px; padding: 9px 15px; border: 1px solid #4779aa; border-radius: 12px; background: #193d67; color: #edf5ff; font-weight: 850; cursor: pointer; }
-    .copy:focus-visible { outline: 3px solid rgba(121,178,255,.35); outline-offset: 2px; }
-    .hero-note { margin: 15px 0 0; color: var(--muted); font-size: 11px; }
-    .section { margin-top: 38px; }
-    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
-    .section-head h2 { margin-bottom: 0; font-size: clamp(23px, 4vw, 32px); letter-spacing: -.04em; }
-    .section-note { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
-    .status-text { color: var(--blue); font-size: 11px; text-align: right; }
-    .performance-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
-    .card { overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); }
-    .card h3 { margin: 0; padding: 15px 17px; border-bottom: 1px solid var(--line); font-size: 14px; }
-    .metric-list { margin: 0; }
-    .metric { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 11px 17px; border-bottom: 1px solid rgba(35,57,83,.68); }
-    .metric:last-child { border-bottom: 0; }
-    .metric dt { color: var(--muted); font-size: 11px; }
-    .metric dd { margin: 0; font-size: 15px; font-weight: 850; text-align: right; font-variant-numeric: tabular-nums; }
-    .metric.primary { padding-block: 15px; background: var(--panel-2); }
-    .metric.primary dd { font-size: 20px; }
+    .total strong { display: block; margin-top: 2px; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .copy {
+      min-height: 42px;
+      padding: 9px 14px;
+      border: 1px solid #376398;
+      border-radius: 12px;
+      background: #18365d;
+      color: #eaf2ff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .copy:focus-visible { outline: 3px solid rgba(116, 168, 255, .35); outline-offset: 2px; }
+
+    .de-head { margin-top: 18px; }
+    .de-head-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(220px, .75fr);
+      gap: 18px;
+      padding: 20px;
+      border: 1px solid #3a4a63;
+      border-radius: 21px;
+      background: linear-gradient(145deg, rgba(18, 30, 48, .98), rgba(10, 20, 35, .98));
+      box-shadow: 0 14px 40px rgba(0, 0, 0, .18);
+    }
+    .de-head-title { margin: 0; font-size: clamp(21px, 4vw, 28px); letter-spacing: -.035em; }
+    .de-head-lead { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 13px; margin-top: 11px; }
+    .de-head-decision {
+      font-size: clamp(30px, 6vw, 46px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.045em;
+    }
+    .de-head-decision.a0 { color: var(--amber); }
+    .de-head-decision.play { color: var(--green); }
+    .de-head-watch { color: var(--text); font-size: 15px; font-weight: 800; }
+    .de-head-reason { margin: 11px 0 0; color: var(--muted); font-size: 12px; }
+    .de-head-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      align-content: start;
+    }
+    .de-kpi {
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(8, 18, 31, .68);
+    }
+    .de-kpi span { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+    .de-kpi strong { display: block; margin-top: 3px; font-size: 15px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .de-kpi.wide { grid-column: 1 / -1; }
+    .de-head-sync { color: var(--muted); font-size: 10px; }
+    .de-entry-gate strong { color: var(--text); font-size: 16px; }
+    .de-entry-gate strong.conditional { color: var(--amber); }
+    .de-entry-gate small { display: block; margin-top: 6px; color: var(--muted); font-size: 10px; line-height: 1.45; }
+
+    .performance { margin-top: 36px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+    h2 { margin: 0; font-size: clamp(22px, 4vw, 30px); letter-spacing: -.035em; }
+    .scope { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .status { color: var(--blue); font-size: 11px; text-align: right; }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .stat-card { overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--card); }
+    .stat-card.full { grid-column: 1 / -1; }
+    .stat-card h3 { margin: 0; padding: 16px 18px; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .stat-list { margin: 0; }
+    .stat-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 13px 18px; border-bottom: 1px solid rgba(33, 50, 74, .72); }
+    .stat-row:last-child { border-bottom: 0; }
+    .stat-row dt { color: var(--muted); font-size: 12px; }
+    .stat-row dt small { display: block; margin-top: 1px; color: #65758e; font-size: 9px; }
+    .stat-row dd { margin: 0; font-size: 18px; font-weight: 850; font-variant-numeric: tabular-nums; }
+    .stat-row.profit { padding-block: 16px; background: var(--card-soft); }
+    .stat-row.profit dd { font-size: 21px; }
     .positive { color: var(--green); }
     .negative { color: var(--red); }
-    .amber { color: var(--amber); }
-    .split-grid { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(280px,.9fr); gap: 14px; }
-    .personal-card { padding: 19px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); }
-    .personal-kpis { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; }
-    .kpi { padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); }
-    .kpi span { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
-    .kpi strong { display: block; margin-top: 4px; font-size: 17px; font-variant-numeric: tabular-nums; }
-    .personal-profit { margin-top: 10px; padding: 17px; border: 1px solid rgba(97,226,168,.2); border-radius: 15px; background: rgba(97,226,168,.06); }
-    .personal-profit span { display: block; color: var(--muted); font-size: 10px; }
-    .personal-profit strong { display: block; margin-top: 4px; color: var(--green); font-size: 28px; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
-    .separation { margin: 12px 0 0; color: var(--muted); font-size: 10px; }
-    .de-card { padding: 19px; border: 1px solid #3d4f68; border-radius: 20px; background: linear-gradient(145deg, rgba(18,31,50,.98), rgba(9,21,36,.98)); }
-    .de-title { margin-bottom: 12px; font-size: 18px; }
-    .de-decision { font-size: 32px; font-weight: 900; letter-spacing: -.04em; }
-    .de-decision.a0 { color: var(--amber); }
-    .de-decision.play { color: var(--green); }
-    .de-watch { margin-top: 5px; font-size: 14px; font-weight: 800; }
-    .de-reason { margin: 12px 0 0; color: var(--muted); font-size: 11px; }
-    .de-mini { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 14px; }
-    .de-mini div { padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: rgba(7,18,31,.58); }
-    .de-mini span { display: block; color: var(--muted); font-size: 9px; }
-    .de-mini strong { display: block; margin-top: 3px; font-size: 13px; }
-    .audit { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
-    .audit-item { padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: var(--panel-2); }
-    .audit-item span { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
-    .audit-item strong { display: block; margin-top: 5px; font-size: 13px; overflow-wrap: anywhere; }
-    footer { padding: 21px 0 calc(28px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
-    .footer-row { display: flex; justify-content: space-between; gap: 18px; }
-    @media (max-width: 860px) {
-      .performance-grid { grid-template-columns: 1fr 1fr; }
-      .performance-grid .card:last-child { grid-column: 1 / -1; }
-      .split-grid { grid-template-columns: 1fr; }
-    }
+
+    footer { padding: 20px 0 calc(28px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .footer-row { display: flex; justify-content: space-between; gap: 16px; }
+
     @media (max-width: 640px) {
-      .shell { width: min(100% - 20px,1040px); }
-      header { padding-top: 17px; }
-      .brand-status { font-size: 9px; }
-      .hero { padding: 19px 14px; border-radius: 22px; }
-      .hero-head { display: block; }
-      .hero-meta { margin-top: 8px; text-align: left; }
-      .numbers { gap: 8px; margin-top: 20px; }
-      .number-card { padding: 13px 5px 12px; border-radius: 15px; }
-      .number-card b { font-size: clamp(34px,12vw,47px); }
-      .hero-foot { align-items: end; }
-      .totals { gap: 8px 18px; }
-      .copy { padding-inline: 12px; font-size: 12px; }
+      .shell { width: min(100% - 20px, 920px); }
+      header { padding-top: 18px; }
+      .brand-note { display: none; }
+      .plan { padding: 19px 14px; border-radius: 21px; }
+      .plan-head { display: block; }
+      .plan-meta { margin-top: 7px; text-align: left; }
+      .numbers { gap: 7px; margin-top: 20px; }
+      .number { padding: 12px 4px 11px; border-radius: 14px; }
+      .number b { margin-block: 5px; font-size: clamp(30px, 11vw, 42px); }
+      .number strong { font-size: 10px; }
+      .plan-foot { align-items: end; }
+      .totals { gap: 7px 18px; }
+      .copy { min-height: 40px; padding-inline: 12px; font-size: 12px; }
+      .de-head-card { grid-template-columns: 1fr; padding: 17px 14px; }
       .section-head { display: block; }
-      .status-text { margin-top: 6px; text-align: left; }
-      .performance-grid { grid-template-columns: 1fr; }
-      .performance-grid .card:last-child { grid-column: auto; }
-      .personal-kpis { grid-template-columns: 1fr 1fr; }
-      .audit { grid-template-columns: 1fr; }
+      .status { margin-top: 6px; text-align: left; }
+      .stats { grid-template-columns: 1fr; }
       .footer-row { display: block; }
       .footer-row span { display: block; margin-top: 5px; }
     }
   </style>
 </head>
-<body data-audit-id="MB-20260721-SONG-LOC-100-PROD">
+<body data-static-dashboard="1" data-audit-id="MB-20260722-SONG-LOC-100">
   <header>
     <div class="shell brand">
       <p class="brand-name">MB SONG LỘC</p>
-      <span class="brand-status">PRODUCTION OFFICIAL · từ 21/07/2026</span>
+      <span class="brand-note">Dữ liệu khóa đến 21/07/2026</span>
     </div>
   </header>
 
   <main class="shell">
-    <section class="hero" aria-labelledby="plan-title">
-      <div class="hero-head">
+    <section class="plan" aria-labelledby="plan-title">
+      <div class="plan-head">
         <div>
-          <p class="eyebrow">Kế hoạch SONG LỘC 100</p>
-          <h1 id="plan-title">Thứ Ba, 21/07/2026</h1>
+          <p class="eyebrow">Kế hoạch kỳ sắp tới</p>
+          <h1 id="plan-title">Thứ Tư, 22/07/2026</h1>
         </div>
-        <div class="hero-meta">
-          Khóa dữ liệu 20/07/2026<br>
-          <span class="lock-badge" id="data-status">27/27 · ĐÃ ĐỐI CHIẾU</span>
-        </div>
+        <div class="plan-meta">SONG LỘC 100<br>50–50 điểm</div>
       </div>
 
       <div class="numbers" aria-label="Hai số SONG LỘC 100 và số điểm">
-        <article class="number-card"><span>HẠNG 2</span><b id="code-r2">08</b><strong id="points-r2">50 điểm</strong></article>
-        <article class="number-card"><span>HẠNG 3</span><b id="code-r3">92</b><strong id="points-r3">50 điểm</strong></article>
+        <article class="number"><span>HẠNG 2</span><b>87</b><strong>50 điểm</strong></article>
+        <article class="number"><span>HẠNG 3</span><b>10</b><strong>50 điểm</strong></article>
       </div>
 
-      <div class="hero-foot">
+      <div class="plan-foot">
         <div class="totals">
-          <div class="total"><span>Tổng điểm</span><strong id="total-points">100 điểm</strong></div>
-          <div class="total"><span>Tổng vốn</span><strong id="total-capital">2.300.000đ</strong></div>
+          <div class="total"><span>Tổng điểm</span><strong>100 điểm</strong></div>
+          <div class="total"><span>Tổng vốn</span><strong>2.300.000đ</strong></div>
         </div>
-        <button class="copy" type="button" id="copy-plan" data-plan="21/07/2026: 08×50, 92×50 điểm — tổng 100 điểm — vốn 2.300.000đ — SONG LỘC 100">Sao chép</button>
+        <button class="copy" type="button" data-plan="22/07/2026: 87×50, 10×50 điểm — tổng 100 điểm — vốn 2.300.000đ — SONG LỘC 100" onclick="copyPlan(this)">Sao chép</button>
       </div>
-      <p class="hero-note">Bỏ hạng 1 là <strong id="rank-one">09</strong> theo luật R23 · không số đảo · không mở số thứ ba hoặc thứ tư · không gấp thếp.</p>
+      <p class="scope">Đã khóa · bỏ hạng 1 là 28 theo luật R23 · không mở hạng 4, không số đảo, không gấp thếp.</p>
     </section>
 
-    <section class="section" aria-labelledby="method-performance-title">
-      <div class="section-head">
+    <section class="de-head" aria-labelledby="de-head-title" data-target-dmy="22/07/2026">
+      <article class="de-head-card">
         <div>
-          <p class="eyebrow">Sổ phương pháp</p>
-          <h2 id="method-performance-title">Hiệu quả SONG LỘC 100</h2>
-          <p class="section-note">Backtest đã khóa · cơ cấu cố định 02 số × 50 điểm · không trộn với sổ tiền thật.</p>
-        </div>
-        <div class="status-text">Đánh giá đến 20/07/2026</div>
-      </div>
-
-      <div class="performance-grid" id="method-performance-grid">
-        <article class="card" data-period="full">
-          <h3>01/01/2024–20/07/2026</h3>
-          <dl class="metric-list">
-            <div class="metric"><dt>Số phiên</dt><dd data-field="sessions">920</dd></div>
-            <div class="metric"><dt>Ngày có lãi</dt><dd data-field="profitable_days">514</dd></div>
-            <div class="metric"><dt>Tỷ lệ ngày có lãi</dt><dd data-field="win_rate_pct">55,87%</dd></div>
-            <div class="metric primary"><dt>Lãi ròng</dt><dd class="positive" data-field="net_profit_vnd">+636.000.000đ</dd></div>
-            <div class="metric"><dt>ROI</dt><dd data-field="roi_pct">30,06%</dd></div>
-            <div class="metric"><dt>Max drawdown</dt><dd class="negative" data-field="max_drawdown_vnd">−27.100.000đ</dd></div>
-            <div class="metric"><dt>Chuỗi thua dài nhất</dt><dd data-field="longest_losing_streak">7 phiên</dd></div>
-          </dl>
-        </article>
-
-        <article class="card" data-period="ytd_2026">
-          <h3>Năm 2026 · đến 20/07</h3>
-          <dl class="metric-list">
-            <div class="metric"><dt>Số phiên</dt><dd data-field="sessions">197</dd></div>
-            <div class="metric"><dt>Ngày có lãi</dt><dd data-field="profitable_days">129</dd></div>
-            <div class="metric"><dt>Tỷ lệ ngày có lãi</dt><dd data-field="win_rate_pct">65,48%</dd></div>
-            <div class="metric primary"><dt>Lãi ròng</dt><dd class="positive" data-field="net_profit_vnd">+278.900.000đ</dd></div>
-            <div class="metric"><dt>ROI</dt><dd data-field="roi_pct">61,55%</dd></div>
-            <div class="metric"><dt>Max drawdown</dt><dd class="negative" data-field="max_drawdown_vnd">−12.100.000đ</dd></div>
-            <div class="metric"><dt>Chuỗi thua dài nhất</dt><dd data-field="longest_losing_streak">5 phiên</dd></div>
-          </dl>
-        </article>
-
-        <article class="card" data-period="july_2026">
-          <h3>01/07–20/07/2026</h3>
-          <dl class="metric-list">
-            <div class="metric"><dt>Số phiên</dt><dd data-field="sessions">20</dd></div>
-            <div class="metric"><dt>Ngày có lãi / trượt</dt><dd data-field="win_loss_days">10 / 10</dd></div>
-            <div class="metric"><dt>Tổng vốn / trả thưởng</dt><dd data-field="capital_payout">46,0 / 76,0 triệu</dd></div>
-            <div class="metric primary"><dt>Lãi ròng</dt><dd class="positive" data-field="net_profit_vnd">+30.000.000đ</dd></div>
-            <div class="metric"><dt>ROI</dt><dd data-field="roi_pct">65,22%</dd></div>
-            <div class="metric"><dt>Max drawdown</dt><dd class="negative" data-field="max_drawdown_vnd">−12.100.000đ</dd></div>
-          </dl>
-        </article>
-      </div>
-      <p class="section-note" id="backtest-disclaimer">Đây là kết quả backtest đã khóa, không phải cam kết kết quả tương lai.</p>
-    </section>
-
-    <section class="section" aria-labelledby="actual-title">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Sổ tiền thật</p>
-          <h2 id="actual-title">Lãi/lỗ của Linh</h2>
-          <p class="section-note">Theo Google Sheets · chỉ ghi lệnh thực tế đã xác nhận · không sửa ngược sổ phương pháp.</p>
-        </div>
-        <div class="status-text">Đã quyết toán đến 20/07/2026</div>
-      </div>
-
-      <div class="split-grid">
-        <article class="personal-card">
-          <div class="personal-kpis">
-            <div class="kpi"><span>Số phiên</span><strong id="actual-sessions">16</strong></div>
-            <div class="kpi"><span>Ngày thắng</span><strong id="actual-wins">8</strong></div>
-            <div class="kpi"><span>Ngày thua</span><strong id="actual-losses">8</strong></div>
-            <div class="kpi"><span>Chuỗi T / Thua</span><strong id="actual-streaks">3 / 3</strong></div>
+          <p class="eyebrow">Đề đầu/đuôi ngày 22/07</p>
+          <h2 class="de-head-title" id="de-head-title">Đề Đầu–Đuôi Absolute v3.0</h2>
+          <div class="de-head-lead">
+            <strong class="de-head-decision a0" id="de-head-decision">Chờ rà soát</strong>
+            <span class="de-head-watch" id="de-head-watch">Vốn đề 0đ</span>
           </div>
-          <div class="personal-profit"><span>Tổng lãi/lỗ từ 01/07/2026</span><strong id="actual-net">+17.886.000đ</strong></div>
-          <p class="separation" id="separation-note">Sổ tiền thật được theo dõi riêng; không dùng để sửa ngược sổ phương pháp hoặc số liệu backtest.</p>
-        </article>
-
-        <article class="de-card" data-target-dmy="21/07/2026">
-          <p class="eyebrow">Nhánh tham chiếu độc lập</p>
-          <h3 class="de-title">Đề Đầu–Đuôi Absolute v3.0</h3>
-          <div class="de-decision a0" id="de-decision">A0</div>
-          <div class="de-watch" id="de-watch">Theo dõi Đầu 5 · Đuôi 6 · vốn 0đ</div>
-          <p class="de-reason" id="de-reason">Đang đọc dữ liệu cùng ngày.</p>
-          <div class="de-mini">
-            <div><span>Gan / Gmax</span><strong id="de-gan">19/40 · 25/43</strong></div>
-            <div><span>Score</span><strong id="de-score">0,4750 · 0,5814</strong></div>
-            <div><span>Trạng thái</span><strong id="de-status">A0</strong></div>
-            <div><span>Khóa dữ liệu</span><strong id="de-lock">20/07/2026</strong></div>
+          <p class="de-head-reason" id="de-head-reason">Đang kiểm tra dữ liệu Đề đầu/đuôi cho đúng ngày kế hoạch.</p>
+        </div>
+        <div class="de-head-side" aria-label="Chỉ số Đề đầu">
+          <div class="de-kpi"><span>Ứng viên</span><strong id="de-head-candidate">—</strong></div>
+          <div class="de-kpi"><span>Trạng thái</span><strong id="de-head-status">WAIT</strong></div>
+          <div class="de-kpi"><span>Gan / Gmax</span><strong id="de-head-gan">—</strong></div>
+          <div class="de-kpi"><span>Score</span><strong id="de-head-score">—</strong></div>
+          <div class="de-kpi wide de-entry-gate">
+            <span>Đầu · mốc sớm nhất có thể vào tiền</span>
+            <strong class="conditional" id="de-head-earliest-head">Đang xác định</strong>
+            <small id="de-head-earliest-head-note">Phải đồng thời đạt toàn bộ điều kiện của phương pháp.</small>
           </div>
-        </article>
-      </div>
+          <div class="de-kpi wide de-entry-gate">
+            <span>Đuôi · mốc sớm nhất có thể vào tiền</span>
+            <strong class="conditional" id="de-head-earliest-tail">Đang xác định</strong>
+            <small id="de-head-earliest-tail-note">Phải đồng thời đạt toàn bộ điều kiện của phương pháp.</small>
+          </div>
+          <div class="de-kpi wide"><span>Cập nhật</span><strong class="de-head-sync" id="de-head-sync">Chưa có dữ liệu cùng ngày</strong></div>
+        </div>
+      </article>
     </section>
 
-    <section class="section" aria-labelledby="audit-title">
+    <section class="performance" aria-labelledby="performance-title">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Đối chiếu</p>
-          <h2 id="audit-title">Dấu vết dữ liệu</h2>
+          <h2 id="performance-title">Lãi/lỗ</h2>
+          <p class="scope">Sổ tiền thật của Linh · thống kê theo tháng và cộng dồn từ 01/07/2026</p>
         </div>
+        <div class="status">Đã rà soát lệnh thực tế đến 21/07/2026</div>
       </div>
-      <div class="audit">
-        <div class="audit-item"><span>Nguồn kết quả</span><strong>XSMB_Source_2024_2026_MB_v1.3</strong></div>
-        <div class="audit-item"><span>Khóa lịch sử</span><strong>20/07/2026 · đủ 27/27</strong></div>
-        <div class="audit-item"><span>Cấu hình</span><strong>MB_SONG_LOC_100_PROD_V1_20260721</strong></div>
+
+      <div class="stats">
+        <article class="stat-card">
+          <h3>Tháng 07/2026 · rà soát đến 21/07</h3>
+          <dl class="stat-list">
+            <div class="stat-row"><dt>Số ngày thắng</dt><dd>8 ngày</dd></div>
+            <div class="stat-row"><dt>Số ngày thua</dt><dd>8 ngày</dd></div>
+            <div class="stat-row"><dt>Chuỗi thắng dài nhất</dt><dd>3 ngày</dd></div>
+            <div class="stat-row"><dt>Chuỗi thua dài nhất</dt><dd>3 ngày</dd></div>
+            <div class="stat-row profit"><dt>Lãi/lỗ trong tháng</dt><dd class="positive">+17.886.000đ</dd></div>
+          </dl>
+        </article>
+
+        <article class="stat-card">
+          <h3>Tổng từ 01/07/2026 đến 21/07/2026</h3>
+          <dl class="stat-list">
+            <div class="stat-row"><dt>Số ngày thắng</dt><dd>8 ngày</dd></div>
+            <div class="stat-row"><dt>Số ngày thua</dt><dd>8 ngày</dd></div>
+            <div class="stat-row"><dt>Chuỗi thắng dài nhất</dt><dd>3 ngày</dd></div>
+            <div class="stat-row"><dt>Chuỗi thua dài nhất</dt><dd>3 ngày</dd></div>
+            <div class="stat-row profit"><dt>Tổng lãi/lỗ</dt><dd class="positive">+17.886.000đ</dd></div>
+          </dl>
+        </article>
       </div>
+
     </section>
   </main>
 
   <footer>
     <div class="shell footer-row">
       <span>SONG LỘC 100 · 02 số × 50 điểm · tổng 100 điểm/ngày.</span>
-      <span>Kết quả backtest không bảo đảm kết quả tương lai.</span>
+      <span>Thống kê chỉ phản ánh kết quả đã ghi nhận, không đảm bảo kết quả tương lai.</span>
     </div>
   </footer>
 
   <script>
-    const money = new Intl.NumberFormat("vi-VN");
-    const decimal = new Intl.NumberFormat("vi-VN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    function formatMoney(value, signed = false) {
-      const n = Number(value || 0);
-      const sign = signed && n > 0 ? "+" : "";
-      return sign + money.format(n) + "đ";
-    }
-
-    function formatPct(value) {
-      return decimal.format(Number(value || 0)) + "%";
-    }
-
-    function setText(selector, value) {
-      const el = document.querySelector(selector);
-      if (el != null && value != null) el.textContent = value;
-    }
-
-    function fillPeriod(period) {
-      const card = document.querySelector('[data-period="' + period.id + '"]');
-      if (!card) return;
-      setText('[data-period="' + period.id + '"] h3', period.label);
-      const direct = {
-        sessions: money.format(period.sessions),
-        profitable_days: money.format(period.profitable_days),
-        win_rate_pct: formatPct(period.win_rate_pct),
-        net_profit_vnd: formatMoney(period.net_profit_vnd, true),
-        roi_pct: formatPct(period.roi_pct),
-        max_drawdown_vnd: formatMoney(period.max_drawdown_vnd),
-        longest_losing_streak: period.longest_losing_streak == null ? "—" : period.longest_losing_streak + " phiên"
-      };
-      Object.entries(direct).forEach(function ([field, value]) {
-        const el = card.querySelector('[data-field="' + field + '"]');
-        if (el) el.textContent = value;
+    function copyPlan(button) {
+      navigator.clipboard.writeText(button.dataset.plan).then(function () {
+        var old = button.textContent;
+        button.textContent = "Đã sao chép";
+        setTimeout(function () { button.textContent = old; }, 1600);
+      }).catch(function () {
+        button.textContent = "Không thể sao chép";
       });
-      const winLoss = card.querySelector('[data-field="win_loss_days"]');
-      if (winLoss) winLoss.textContent = period.profitable_days + " / " + period.losing_days;
-      const capPay = card.querySelector('[data-field="capital_payout"]');
-      if (capPay) capPay.textContent = decimal.format(period.total_capital_vnd / 1000000) + " / " + decimal.format(period.total_payout_vnd / 1000000) + " triệu";
     }
 
-    async function loadDashboard() {
-      try {
-        const response = await fetch("data/current.json?v=" + Date.now(), { cache: "no-store" });
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        const data = await response.json();
-        const plan = data.plan;
-        setText("#code-r2", plan.codes[0]);
-        setText("#code-r3", plan.codes[1]);
-        setText("#points-r2", plan.points_by_code[plan.codes[0]] + " điểm");
-        setText("#points-r3", plan.points_by_code[plan.codes[1]] + " điểm");
-        setText("#total-points", plan.total_points + " điểm");
-        setText("#total-capital", formatMoney(plan.total_capital_vnd));
-        setText("#rank-one", plan.rank_1_excluded);
-        const copy = document.getElementById("copy-plan");
-        copy.dataset.plan = plan.target_dmy + ": " + plan.codes[0] + "×" + plan.points_by_code[plan.codes[0]] + ", " + plan.codes[1] + "×" + plan.points_by_code[plan.codes[1]] + " điểm — tổng " + plan.total_points + " điểm — vốn " + formatMoney(plan.total_capital_vnd) + " — SONG LỘC 100";
-        data.method_performance.periods.forEach(fillPeriod);
-        setText("#backtest-disclaimer", data.method_performance.disclaimer);
-        const actual = data.actual_performance.total;
-        setText("#actual-sessions", actual.sessions);
-        setText("#actual-wins", actual.wins);
-        setText("#actual-losses", actual.losses);
-        setText("#actual-streaks", actual.longest_winning_streak + " / " + actual.longest_losing_streak);
-        setText("#actual-net", formatMoney(actual.net_profit_vnd, true));
-        setText("#separation-note", data.actual_performance.separation_note);
-      } catch (error) {
-        document.body.dataset.dataStatus = "fallback-static";
-      }
+    function formatScore(value) {
+      return Number(value).toLocaleString("vi-VN", {
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4
+      });
+    }
+
+    function setDeHeadWaiting(message) {
+      document.getElementById("de-head-decision").textContent = "Chờ rà soát";
+      document.getElementById("de-head-decision").className = "de-head-decision a0";
+      document.getElementById("de-head-watch").textContent = "Vốn đề 0đ";
+      document.getElementById("de-head-candidate").textContent = "—";
+      document.getElementById("de-head-status").textContent = "WAIT";
+      document.getElementById("de-head-gan").textContent = "—";
+      document.getElementById("de-head-score").textContent = "—";
+      document.getElementById("de-head-reason").textContent = message;
+      document.getElementById("de-head-earliest-head").textContent = "Chưa thể xác định";
+      document.getElementById("de-head-earliest-head-note").textContent = "Cần dữ liệu khóa đúng ngày để tính đủ gate.";
+      document.getElementById("de-head-earliest-tail").textContent = "Chưa thể xác định";
+      document.getElementById("de-head-earliest-tail-note").textContent = "Cần dữ liệu khóa đúng ngày để tính đủ gate.";
+      document.getElementById("de-head-sync").textContent = "Không dùng dữ liệu cũ";
     }
 
     async function loadDeHead() {
-      const card = document.querySelector(".de-card");
+      var section = document.querySelector(".de-head");
       try {
-        const response = await fetch("data/de-head-current.json?v=" + Date.now(), { cache: "no-store" });
+        var response = await fetch("data/de-head-current.json?v=" + Date.now(), { cache: "no-store" });
         if (!response.ok) throw new Error("HTTP " + response.status);
-        const item = await response.json();
-        if (item.target_dmy !== card.dataset.targetDmy) throw new Error("stale target");
-        const isPlay = item.decision === "PLAY";
-        const decision = isPlay ? (item.selected_tail != null ? "Đuôi " + item.selected_tail : "Đầu " + item.selected_head) : "A0";
-        const candidate = [item.watch_head == null ? null : "Đầu " + item.watch_head, item.watch_tail == null ? null : "Đuôi " + item.watch_tail].filter(Boolean).join(" · ");
-        setText("#de-decision", decision);
-        document.getElementById("de-decision").className = "de-decision " + (isPlay ? "play" : "a0");
-        setText("#de-watch", isPlay ? item.points + " điểm · vốn " + formatMoney(item.capital_vnd) : "Theo dõi " + candidate + " · vốn 0đ");
-        setText("#de-reason", item.reason);
-        setText("#de-gan", item.gan + "/" + item.gmax + " · " + item.tail_gan + "/" + item.tail_gmax);
-        setText("#de-score", Number(item.score).toLocaleString("vi-VN", {minimumFractionDigits:4,maximumFractionDigits:4}) + " · " + Number(item.tail_score).toLocaleString("vi-VN", {minimumFractionDigits:4,maximumFractionDigits:4}));
-        setText("#de-status", item.status);
-        setText("#de-lock", item.data_lock_dmy);
+        var item = await response.json();
+        if (item.target_dmy !== section.dataset.targetDmy) {
+          setDeHeadWaiting("Chưa có kết quả rà Đề đầu cho đúng ngày kế hoạch.");
+          return;
+        }
+
+        var isPlay = item.decision === "PLAY";
+        var isEligible = item.decision === "ELIGIBLE_REFERENCE";
+        var decision = (isPlay || isEligible)
+          ? (item.selected_tail != null ? "Đuôi " + item.selected_tail : "Đầu " + item.selected_head)
+          : "A0";
+        var headCandidate = item.watch_head == null ? null : "Đầu " + item.watch_head;
+        var tailCandidate = item.watch_tail == null ? null : "Đuôi " + item.watch_tail;
+        var candidate = [headCandidate, tailCandidate].filter(Boolean).join(" · ") || "—";
+        document.getElementById("de-head-decision").textContent = decision;
+        document.getElementById("de-head-decision").className = "de-head-decision " + ((isPlay || isEligible) ? "play" : "a0");
+        document.getElementById("de-head-watch").textContent = isPlay
+          ? item.points + " điểm · vốn " + Number(item.capital_vnd).toLocaleString("vi-VN") + "đ"
+          : (isEligible ? "Đạt gate tham chiếu · chưa tự động cấp vốn" : "Theo dõi " + candidate + " · vốn đề 0đ");
+        document.getElementById("de-head-candidate").textContent = candidate;
+        document.getElementById("de-head-status").textContent = item.status;
+        document.getElementById("de-head-gan").textContent =
+          item.gan + "/" + item.gmax + " · " + item.tail_gan + "/" + item.tail_gmax;
+        document.getElementById("de-head-score").textContent =
+          formatScore(item.score) + " · " + formatScore(item.tail_score);
+        document.getElementById("de-head-reason").textContent = item.reason;
+        var headLabel = item.watch_head == null ? "Đầu" : "Đầu " + item.watch_head;
+        var tailLabel = item.watch_tail == null ? "Đuôi" : "Đuôi " + item.watch_tail;
+        document.getElementById("de-head-earliest-head").textContent = item.head_earliest_entry_dmy
+          ? headLabel + ": " + item.head_earliest_entry_dmy + " (có điều kiện)"
+          : headLabel + ": chưa xác định ngày";
+        document.getElementById("de-head-earliest-head-note").textContent =
+          item.head_earliest_conditions || "Chưa đủ dữ liệu để xác định điều kiện vào tiền.";
+        document.getElementById("de-head-earliest-tail").textContent = item.tail_earliest_entry_dmy
+          ? tailLabel + ": " + item.tail_earliest_entry_dmy + " (có điều kiện)"
+          : tailLabel + ": chưa xác định ngày";
+        document.getElementById("de-head-earliest-tail-note").textContent =
+          item.tail_earliest_conditions || "Chưa đủ dữ liệu để xác định điều kiện vào tiền.";
+        document.getElementById("de-head-sync").textContent =
+          "Khóa " + item.data_lock_dmy + " · " + item.method_short;
       } catch (error) {
-        setText("#de-reason", "Chưa đọc được dữ liệu cùng ngày; giữ A0 và không suy đoán.");
+        setDeHeadWaiting("Không đọc được dữ liệu Đề đầu; giữ A0 và không suy đoán.");
       }
     }
 
-    document.getElementById("copy-plan").addEventListener("click", async function () {
-      const button = this;
-      try {
-        await navigator.clipboard.writeText(button.dataset.plan);
-        const old = button.textContent;
-        button.textContent = "Đã sao chép";
-        setTimeout(function () { button.textContent = old; }, 1500);
-      } catch (error) {
-        button.textContent = "Không thể sao chép";
-      }
-    });
-
-    loadDashboard();
     loadDeHead();
   </script>
 </body>

@@ -1,7 +1,7 @@
 {
   "schema_version": "MB_SONG_LOC_100_WEB_V2",
   "audit_id": "MB-20260722-SONG-LOC-100",
-  "generated_at": "2026-07-21T19:16:00+07:00",
+  "generated_at": "2026-07-21T21:05:00+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
     "project_name": "MB SONG LỘC",
@@ -15,14 +15,24 @@
   },
   "latest_settlement": {
     "date": "2026-07-21",
-    "locked_codes": ["08", "92"],
-    "hits_by_code": {"08": 0, "92": 0},
+    "locked_codes": [
+      "08",
+      "92"
+    ],
+    "hits_by_code": {
+      "08": 0,
+      "92": 0
+    },
     "total_hits": 0,
     "capital_vnd": 2300000,
     "payout_vnd": 0,
     "net_profit_vnd": -2300000,
     "roi_percent": -100.0,
-    "status": "SETTLED_VERIFIED_2_SOURCES_27_OF_27"
+    "status": "SETTLED_VERIFIED_3_SOURCES_27_OF_27",
+    "result_label": "TRƯỢT",
+    "method_sheet_row": "SONG LỘC 100!A13:S13",
+    "actual_sheet_row": "Linh!A13:H13",
+    "notes": "08 và 92 đều không xuất hiện trong 27 giải ngày 21/07/2026."
   },
   "plan": {
     "target_date": "2026-07-22",
@@ -30,9 +40,18 @@
     "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
     "status": "LOCKED_WAITING_RESULT",
     "rank_1_excluded": "28",
-    "codes": ["87", "10"],
-    "ranks": [2, 3],
-    "points_by_code": {"87": 50, "10": 50},
+    "codes": [
+      "87",
+      "10"
+    ],
+    "ranks": [
+      2,
+      3
+    ],
+    "points_by_code": {
+      "87": 50,
+      "10": 50
+    },
     "total_points": 100,
     "cost_per_point_vnd": 23000,
     "total_capital_vnd": 2300000,
@@ -46,36 +65,48 @@
   "actual_performance": {
     "scope": "LINH_ACTUAL_GOOGLE_SHEETS_LEDGER",
     "tracking_start_date": "2026-07-01",
-    "settled_through": "2026-07-20",
+    "settled_through": "2026-07-21",
     "reviewed_through": "2026-07-21",
-    "latest_review": {"date": "2026-07-21", "status": "NO_ORDER"},
+    "latest_review": {
+      "date": "2026-07-21",
+      "status": "SETTLED_REAL_ORDER",
+      "method": "SONG LỘC 100",
+      "codes": [
+        "08",
+        "92"
+      ],
+      "points": 100,
+      "net_profit_vnd": -2300000,
+      "result": "Thua",
+      "sheet_row": "Linh!A13:H13"
+    },
     "monthly": [
       {
         "month_id": "2026-07",
         "label": "Tháng 07/2026",
         "start_date": "2026-07-01",
-        "settled_through": "2026-07-20",
+        "settled_through": "2026-07-21",
         "reviewed_through": "2026-07-21",
-        "sessions": 16,
+        "sessions": 17,
         "wins": 8,
-        "losses": 8,
+        "losses": 9,
         "longest_winning_streak": 3,
-        "longest_losing_streak": 3,
-        "net_profit_vnd": 17886000
+        "longest_losing_streak": 4,
+        "net_profit_vnd": 15586000
       }
     ],
     "total": {
       "start_date": "2026-07-01",
-      "settled_through": "2026-07-20",
+      "settled_through": "2026-07-21",
       "reviewed_through": "2026-07-21",
-      "sessions": 16,
+      "sessions": 17,
       "wins": 8,
-      "losses": 8,
+      "losses": 9,
       "longest_winning_streak": 3,
-      "longest_losing_streak": 3,
-      "net_profit_vnd": 17886000
+      "longest_losing_streak": 4,
+      "net_profit_vnd": 15586000
     },
-    "total_net_profit_vnd": 17886000
+    "total_net_profit_vnd": 15586000
   },
   "de_head_tail": {
     "source": "data/de-head-current.json",
@@ -90,8 +121,10 @@
     "source_spreadsheet": "XSMB_Source_2024_2026_MB_v1.3",
     "source_history_date": "2026-07-21",
     "source_result_units": 27,
-    "source_crosscheck_count": 2,
+    "source_crosscheck_count": 3,
     "target_outcome_used": false,
+    "profit_loss_spreadsheet": "Sổ theo dõi lãi lỗ hàng ngày",
+    "method_ledger_separated": true,
     "disclaimer": "Kết quả thống kê không bảo đảm kết quả tương lai."
   }
 }

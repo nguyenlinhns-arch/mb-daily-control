@@ -19,9 +19,18 @@
     "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
     "status": "LOCKED_WAITING_RESULT",
     "rank_1_excluded": "09",
-    "codes": ["08", "92"],
-    "ranks": [2, 3],
-    "points_by_code": {"08": 50, "92": 50},
+    "codes": [
+      "08",
+      "92"
+    ],
+    "ranks": [
+      2,
+      3
+    ],
+    "points_by_code": {
+      "92": 50,
+      "08": 50
+    },
     "total_points": 100,
     "cost_per_point_vnd": 23000,
     "total_capital_vnd": 2300000,
@@ -38,7 +47,7 @@
     "sessions": 20,
     "profit_days": 10,
     "loss_days": 10,
-    "profit_day_rate_pct": 50.0,
+    "profit_day_rate_pct": 50,
     "total_hit_units": 19,
     "longest_winning_streak": 4,
     "longest_losing_streak": 5,
@@ -48,26 +57,206 @@
     "roi_pct": 65.2173913043,
     "max_drawdown_vnd": -12100000,
     "ledger": [
-      {"date":"2026-07-01","codes":["91","83"],"hits":1,"pnl_vnd":1700000,"cumulative_vnd":1700000},
-      {"date":"2026-07-02","codes":["08","51"],"hits":2,"pnl_vnd":5700000,"cumulative_vnd":7400000},
-      {"date":"2026-07-03","codes":["92","55"],"hits":1,"pnl_vnd":1700000,"cumulative_vnd":9100000},
-      {"date":"2026-07-04","codes":["87","76"],"hits":3,"pnl_vnd":9700000,"cumulative_vnd":18800000},
-      {"date":"2026-07-05","codes":["96","10"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":16500000},
-      {"date":"2026-07-06","codes":["55","83"],"hits":4,"pnl_vnd":13700000,"cumulative_vnd":30200000},
-      {"date":"2026-07-07","codes":["06","60"],"hits":1,"pnl_vnd":1700000,"cumulative_vnd":31900000},
-      {"date":"2026-07-08","codes":["60","55"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":29600000},
-      {"date":"2026-07-09","codes":["58","91"],"hits":3,"pnl_vnd":9700000,"cumulative_vnd":39300000},
-      {"date":"2026-07-10","codes":["32","55"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":37000000},
-      {"date":"2026-07-11","codes":["01","91"],"hits":1,"pnl_vnd":1700000,"cumulative_vnd":38700000},
-      {"date":"2026-07-12","codes":["80","88"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":36400000},
-      {"date":"2026-07-13","codes":["80","31"],"hits":2,"pnl_vnd":5700000,"cumulative_vnd":42100000},
-      {"date":"2026-07-14","codes":["81","52"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":39800000},
-      {"date":"2026-07-15","codes":["28","60"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":37500000},
-      {"date":"2026-07-16","codes":["91","51"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":35200000},
-      {"date":"2026-07-17","codes":["91","41"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":32900000},
-      {"date":"2026-07-18","codes":["33","91"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":30600000},
-      {"date":"2026-07-19","codes":["10","78"],"hits":1,"pnl_vnd":1700000,"cumulative_vnd":32300000},
-      {"date":"2026-07-20","codes":["91","21"],"hits":0,"pnl_vnd":-2300000,"cumulative_vnd":30000000}
+      {
+        "date": "2026-07-01",
+        "codes": [
+          "91",
+          "83"
+        ],
+        "hits": 1,
+        "pnl_vnd": 1700000,
+        "cumulative_vnd": 1700000
+      },
+      {
+        "date": "2026-07-02",
+        "codes": [
+          "08",
+          "51"
+        ],
+        "hits": 2,
+        "pnl_vnd": 5700000,
+        "cumulative_vnd": 7400000
+      },
+      {
+        "date": "2026-07-03",
+        "codes": [
+          "92",
+          "55"
+        ],
+        "hits": 1,
+        "pnl_vnd": 1700000,
+        "cumulative_vnd": 9100000
+      },
+      {
+        "date": "2026-07-04",
+        "codes": [
+          "87",
+          "76"
+        ],
+        "hits": 3,
+        "pnl_vnd": 9700000,
+        "cumulative_vnd": 18800000
+      },
+      {
+        "date": "2026-07-05",
+        "codes": [
+          "96",
+          "10"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 16500000
+      },
+      {
+        "date": "2026-07-06",
+        "codes": [
+          "55",
+          "83"
+        ],
+        "hits": 4,
+        "pnl_vnd": 13700000,
+        "cumulative_vnd": 30200000
+      },
+      {
+        "date": "2026-07-07",
+        "codes": [
+          "06",
+          "60"
+        ],
+        "hits": 1,
+        "pnl_vnd": 1700000,
+        "cumulative_vnd": 31900000
+      },
+      {
+        "date": "2026-07-08",
+        "codes": [
+          "60",
+          "55"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 29600000
+      },
+      {
+        "date": "2026-07-09",
+        "codes": [
+          "58",
+          "91"
+        ],
+        "hits": 3,
+        "pnl_vnd": 9700000,
+        "cumulative_vnd": 39300000
+      },
+      {
+        "date": "2026-07-10",
+        "codes": [
+          "32",
+          "55"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 37000000
+      },
+      {
+        "date": "2026-07-11",
+        "codes": [
+          "01",
+          "91"
+        ],
+        "hits": 1,
+        "pnl_vnd": 1700000,
+        "cumulative_vnd": 38700000
+      },
+      {
+        "date": "2026-07-12",
+        "codes": [
+          "80",
+          "88"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 36400000
+      },
+      {
+        "date": "2026-07-13",
+        "codes": [
+          "80",
+          "31"
+        ],
+        "hits": 2,
+        "pnl_vnd": 5700000,
+        "cumulative_vnd": 42100000
+      },
+      {
+        "date": "2026-07-14",
+        "codes": [
+          "81",
+          "52"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 39800000
+      },
+      {
+        "date": "2026-07-15",
+        "codes": [
+          "28",
+          "60"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 37500000
+      },
+      {
+        "date": "2026-07-16",
+        "codes": [
+          "91",
+          "51"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 35200000
+      },
+      {
+        "date": "2026-07-17",
+        "codes": [
+          "91",
+          "41"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 32900000
+      },
+      {
+        "date": "2026-07-18",
+        "codes": [
+          "33",
+          "91"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 30600000
+      },
+      {
+        "date": "2026-07-19",
+        "codes": [
+          "10",
+          "78"
+        ],
+        "hits": 1,
+        "pnl_vnd": 1700000,
+        "cumulative_vnd": 32300000
+      },
+      {
+        "date": "2026-07-20",
+        "codes": [
+          "91",
+          "21"
+        ],
+        "hits": 0,
+        "pnl_vnd": -2300000,
+        "cumulative_vnd": 30000000
+      }
     ]
   },
   "actual_performance": {
@@ -88,7 +277,12 @@
     "decision": "NO_TRADE",
     "watch_head": "5",
     "watch_tail": "6",
-    "capital_vnd": 0
+    "capital_vnd": 0,
+    "earliest_entry_semantics": "CONDITIONAL_LOWER_BOUND",
+    "head_earliest_entry_dmy": "",
+    "head_earliest_label": "Chưa xác định ngày",
+    "tail_earliest_entry_dmy": "22/07/2026",
+    "tail_earliest_label": "Sớm nhất 22/07/2026 nếu toàn bộ gate đạt"
   },
   "audit": {
     "source_spreadsheet": "XSMB_Source_2024_2026_MB_v1.3",

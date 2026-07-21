@@ -1,11 +1,12 @@
-name: Fusion4 daily 19:15 — results, Sheets, plan, website
+name: Legacy Fusion4 daily — manual rollback only
 
 on:
-  schedule:
-    # 19:15, 19:30 and 19:45 Asia/Bangkok (UTC+7). Retries are idempotent.
-    - cron: "15,30,45 12 * * *"
   workflow_dispatch:
     inputs:
+      confirm_legacy:
+        description: "Nhập ENABLE_LEGACY để chạy lại FUSION4 cũ"
+        required: true
+        type: string
       target_date:
         description: "Ngày kế hoạch YYYY-MM-DD; để trống dùng ngày mai tại Bangkok"
         required: false
@@ -20,6 +21,7 @@ concurrency:
 
 jobs:
   settle-plan-publish:
+    if: ${{ inputs.confirm_legacy == 'ENABLE_LEGACY' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

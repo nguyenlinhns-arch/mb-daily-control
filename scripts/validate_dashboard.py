@@ -74,20 +74,18 @@ def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
     assert "SONG LỘC 100" in html
     assert "FUSION4" not in html
     assert "180 điểm" not in html
-    method_perf = payload["method_performance"]
-    ledger = method_perf["ledger"]
-    assert method_perf["sessions"] == len(ledger)
-    assert method_perf["profit_days"] + method_perf["loss_days"] == len(ledger)
-    assert sum(row["pnl_vnd"] for row in ledger) == method_perf["net_profit_vnd"]
-    assert ledger[-1]["cumulative_vnd"] == method_perf["net_profit_vnd"]
-    assert method_perf["capital_vnd"] == len(ledger) * 2_300_000
-    assert method_perf["payout_vnd"] - method_perf["capital_vnd"] == method_perf["net_profit_vnd"]
-    assert signed_vnd(method_perf["net_profit_vnd"]) in html
+    assert "method_performance" not in payload
+    assert "Sổ phương pháp" not in html
+    assert "Lãi/lỗ phương pháp" not in html
     actual = payload["actual_performance"]
-    assert actual["separate_from_method_ledger"] is True
-    assert actual["wins"] + actual["losses"] == actual["sessions"]
-    assert signed_vnd(actual["net_profit_vnd"]) in html
-    assert "Không cộng lẫn" in html
+    monthly = actual["monthly"]
+    assert monthly
+    assert sum(period["net_profit_vnd"] for period in monthly) == actual["total_net_profit_vnd"]
+    for period in monthly:
+        assert period["label"] in html
+        assert signed_vnd(period["net_profit_vnd"]) in html
+    assert "Tổng lãi/lỗ" in html
+    assert signed_vnd(actual["total_net_profit_vnd"]) in html
     de_path = data_path.parent / "de-head-current.json"
     de = json.loads(de_path.read_text(encoding="utf-8"))
     assert de["target_date"] == plan["target_date"]

@@ -1,7 +1,7 @@
 {
-  "schema_version": "MB_SONG_LOC_100_WEB_V1",
-  "audit_id": "MB-20260721-SONG-LOC-100",
-  "generated_at": "2026-07-21T13:30:00+07:00",
+  "schema_version": "MB_SONG_LOC_100_WEB_V2",
+  "audit_id": "MB-20260721-SONG-LOC-100-PROD",
+  "generated_at": "2026-07-21T16:40:00+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
     "project_name": "MB SONG LỘC",
@@ -11,11 +11,14 @@
     "status": "PRODUCTION_OFFICIAL",
     "effective_from": "2026-07-21",
     "ranking_formula": "R4 + 0.08*R10 - 0.50*R4*R10 + 0.73*I(Max10)",
-    "selection_rule": "Loại hạng 1; chọn đúng hạng 2 và hạng 3"
+    "selection_rule": "Không lấy hạng 1; chọn đúng hạng 2 và hạng 3",
+    "staking_rule": "50 điểm hạng 2 + 50 điểm hạng 3; tổng 100 điểm/ngày"
   },
   "plan": {
     "target_date": "2026-07-21",
+    "target_dmy": "21/07/2026",
     "data_lock_date": "2026-07-20",
+    "data_lock_dmy": "20/07/2026",
     "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
     "status": "LOCKED_WAITING_RESULT",
     "rank_1_excluded": "09",
@@ -24,6 +27,7 @@
     "points_by_code": {"08": 50, "92": 50},
     "total_points": 100,
     "cost_per_point_vnd": 23000,
+    "payout_per_point_per_hit_vnd": 80000,
     "total_capital_vnd": 2300000,
     "maximum_loss_vnd": 2300000,
     "outcome_known_at_selection": false,
@@ -31,10 +35,65 @@
     "no_reverse": true,
     "no_extra_codes": true
   },
+  "method_performance": {
+    "scope": "SONG_LOC_100_BACKTEST_LOCKED",
+    "evaluation_start_date": "2024-01-01",
+    "settled_through": "2026-07-20",
+    "periods": [
+      {
+        "id": "full",
+        "label": "01/01/2024–20/07/2026",
+        "sessions": 920,
+        "hit_days": 514,
+        "profitable_days": 514,
+        "losing_days": 406,
+        "win_rate_pct": 55.87,
+        "total_capital_vnd": 2116000000,
+        "total_payout_vnd": 2752000000,
+        "net_profit_vnd": 636000000,
+        "roi_pct": 30.06,
+        "max_drawdown_vnd": -27100000,
+        "longest_losing_streak": 7
+      },
+      {
+        "id": "ytd_2026",
+        "label": "Năm 2026 · đến 20/07",
+        "sessions": 197,
+        "hit_days": 129,
+        "profitable_days": 129,
+        "losing_days": 68,
+        "win_rate_pct": 65.48,
+        "total_capital_vnd": 453100000,
+        "total_payout_vnd": 732000000,
+        "net_profit_vnd": 278900000,
+        "roi_pct": 61.55,
+        "max_drawdown_vnd": -12100000,
+        "longest_losing_streak": 5
+      },
+      {
+        "id": "july_2026",
+        "label": "01/07–20/07/2026",
+        "sessions": 20,
+        "hit_days": 10,
+        "profitable_days": 10,
+        "losing_days": 10,
+        "win_rate_pct": 50.0,
+        "total_capital_vnd": 46000000,
+        "total_payout_vnd": 76000000,
+        "net_profit_vnd": 30000000,
+        "roi_pct": 65.22,
+        "max_drawdown_vnd": -12100000,
+        "longest_losing_streak": null
+      }
+    ],
+    "disclaimer": "Đây là kết quả backtest đã khóa, không phải cam kết kết quả tương lai."
+  },
   "actual_performance": {
     "scope": "LINH_ACTUAL_GOOGLE_SHEETS_LEDGER",
+    "label": "Sổ tiền thật của Linh",
     "tracking_start_date": "2026-07-01",
     "settled_through": "2026-07-20",
+    "pending_plan_date": "2026-07-21",
     "monthly": [
       {
         "month_id": "2026-07",
@@ -59,7 +118,8 @@
       "longest_losing_streak": 3,
       "net_profit_vnd": 17886000
     },
-    "total_net_profit_vnd": 17886000
+    "total_net_profit_vnd": 17886000,
+    "separation_note": "Sổ tiền thật được theo dõi riêng; không dùng để sửa ngược sổ phương pháp hoặc số liệu backtest."
   },
   "de_head_tail": {
     "source": "data/de-head-current.json",
@@ -74,6 +134,8 @@
     "source_history_date": "2026-07-20",
     "source_result_units": 27,
     "target_outcome_used": false,
+    "profit_loss_spreadsheet": "Sổ theo dõi lãi lỗ hàng ngày",
+    "method_ledger_separated": true,
     "disclaimer": "Kết quả backtest không bảo đảm kết quả tương lai."
   }
 }

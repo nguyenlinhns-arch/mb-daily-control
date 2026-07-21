@@ -28,46 +28,26 @@
       "gmax",
       "score",
       "capital_vnd",
-      "reason",
-      "head_earliest_entry_dmy",
-      "head_earliest_conditions",
-      "tail_earliest_entry_dmy",
-      "tail_earliest_conditions"
-    ],
-    "earliest_entry_display": {
-      "required": true,
-      "semantics": "CONDITIONAL_LOWER_BOUND",
-      "rule": "Hiển thị riêng mốc sớm nhất cho Đầu và Đuôi; ngày chỉ là cận dưới có điều kiện, không phải lệnh chắc chắn.",
-      "unknown_label": "Chưa xác định ngày"
-    }
+      "reason"
+    ]
   },
   "bottom_section": {
     "title": "Lãi/lỗ",
-    "sources": [
-      "method_performance",
-      "actual_performance"
-    ],
-    "separation_required": true,
-    "actual_owner": "Linh",
+    "source": "actual_performance",
+    "owner": "Linh",
     "tracking_start_date": "2026-07-01",
-    "method_required_metrics": [
-      "profit_days",
-      "loss_days",
-      "total_hit_units",
-      "longest_winning_streak",
-      "longest_losing_streak",
-      "net_profit_vnd",
-      "roi_pct"
+    "periods": [
+      "monthly",
+      "total"
     ],
-    "actual_required_metrics": [
-      "wins",
-      "losses",
-      "longest_winning_streak",
-      "longest_losing_streak",
-      "net_profit_vnd"
+    "required_metrics": [
+      "monthly[].month_id",
+      "monthly[].net_profit_vnd",
+      "total_net_profit_vnd"
     ]
   },
   "forbidden_visible_sources": [
+    "method_performance",
     "group_actual_pnl",
     "latest_settlement"
   ],

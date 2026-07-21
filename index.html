@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="description" content="Các số đã chọn, đề đầu hôm nay và thống kê vận hành thực tế MB FUSION4–180.">
+  <meta name="description" content="Kế hoạch MB SONG LỘC, đề đầu/đuôi và lãi/lỗ phương pháp tách biệt với tiền thật.">
   <meta name="theme-color" content="#08111f">
   <meta name="color-scheme" content="dark">
-  <title>MB Daily Control · 21/07/2026</title>
+  <title>MB SONG LỘC · 21/07/2026</title>
   <style>
     /* MB_STATUS_SAFE_V1 */
     :root {
@@ -57,7 +57,7 @@
     h1 { margin: 0; font-size: clamp(27px, 5vw, 43px); line-height: 1.05; letter-spacing: -.045em; }
     .plan-meta { color: var(--muted); font-size: 12px; text-align: right; }
 
-    .numbers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 26px; }
+    .numbers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 26px; }
     .number {
       padding: 15px 8px 14px;
       border: 1px solid #29486e;
@@ -172,10 +172,10 @@
     }
   </style>
 </head>
-<body data-static-dashboard="1" data-audit-id="MB-20260721-FUSION4-180">
+<body data-static-dashboard="1" data-audit-id="MB-20260721-SONG-LOC-100">
   <header>
     <div class="shell brand">
-      <p class="brand-name">MB Daily Control</p>
+      <p class="brand-name">MB SONG LỘC</p>
       <span class="brand-note">Dữ liệu khóa đến 20/07/2026</span>
     </div>
   </header>
@@ -187,35 +187,34 @@
           <p class="eyebrow">Kế hoạch kỳ sắp tới</p>
           <h1 id="plan-title">Thứ Ba, 21/07/2026</h1>
         </div>
-        <div class="plan-meta">MB FUSION4–180<br>50–50–50–30</div>
+        <div class="plan-meta">SONG LỘC 100<br>50–50 điểm</div>
       </div>
 
-      <div class="numbers" aria-label="Bốn số đã chọn và số điểm">
-        <article class="number"><span>HẠNG 1</span><b>09</b><strong>50 điểm</strong></article>
-          <article class="number"><span>HẠNG 2</span><b>08</b><strong>50 điểm</strong></article>
-          <article class="number"><span>HẠNG 3</span><b>92</b><strong>50 điểm</strong></article>
-          <article class="number"><span>HẠNG 4</span><b>90</b><strong>30 điểm</strong></article>
+      <div class="numbers" aria-label="Hai số SONG LỘC 100 và số điểm">
+        <article class="number"><span>HẠNG 2</span><b>08</b><strong>50 điểm</strong></article>
+        <article class="number"><span>HẠNG 3</span><b>92</b><strong>50 điểm</strong></article>
       </div>
 
       <div class="plan-foot">
         <div class="totals">
-          <div class="total"><span>Tổng điểm</span><strong>180 điểm</strong></div>
-          <div class="total"><span>Tổng vốn</span><strong>4.140.000đ</strong></div>
+          <div class="total"><span>Tổng điểm</span><strong>100 điểm</strong></div>
+          <div class="total"><span>Tổng vốn</span><strong>2.300.000đ</strong></div>
         </div>
-        <button class="copy" type="button" data-plan="21/07/2026: 09×50, 08×50, 92×50, 90×30 điểm — tổng 180 điểm — vốn 4.140.000đ" onclick="copyPlan(this)">Sao chép</button>
+        <button class="copy" type="button" data-plan="21/07/2026: 08×50, 92×50 điểm — tổng 100 điểm — vốn 2.300.000đ — SONG LỘC 100" onclick="copyPlan(this)">Sao chép</button>
       </div>
+      <p class="scope">Đã khóa · bỏ hạng 1 là 09 theo luật R23 · không mở hạng 4, không số đảo, không gấp thếp.</p>
     </section>
 
     <section class="de-head" aria-labelledby="de-head-title" data-target-dmy="21/07/2026">
       <article class="de-head-card">
         <div>
-          <p class="eyebrow">Đề đầu hôm nay</p>
+          <p class="eyebrow">Đề đầu/đuôi hôm nay</p>
           <h2 class="de-head-title" id="de-head-title">Đề Đầu–Đuôi Absolute v3.0</h2>
           <div class="de-head-lead">
             <strong class="de-head-decision a0" id="de-head-decision">Chờ rà soát</strong>
             <span class="de-head-watch" id="de-head-watch">Vốn đề 0đ</span>
           </div>
-          <p class="de-head-reason" id="de-head-reason">Đang kiểm tra dữ liệu Đề đầu cho đúng ngày kế hoạch.</p>
+          <p class="de-head-reason" id="de-head-reason">Đang kiểm tra dữ liệu Đề đầu/đuôi cho đúng ngày kế hoạch.</p>
         </div>
         <div class="de-head-side" aria-label="Chỉ số Đề đầu">
           <div class="de-kpi"><span>Ứng viên</span><strong id="de-head-candidate">—</strong></div>
@@ -230,26 +229,28 @@
     <section class="performance" aria-labelledby="performance-title">
       <div class="section-head">
         <div>
-          <h2 id="performance-title">Thống kê thực tế</h2>
-          <p class="scope">Lệnh thực tế của Linh từ 01/07/2026 đến 20/07/2026</p>
+          <h2 id="performance-title">Lãi/lỗ</h2>
+          <p class="scope">Tách riêng sổ phương pháp SONG LỘC 100 và sổ tiền thật của Linh</p>
         </div>
         <div class="status">Đã đối chiếu Google Sheets đến 20/07/2026</div>
       </div>
 
       <div class="stats">
         <article class="stat-card">
-          <h3>Tháng 07/2026 · đến 20/07/2026</h3>
+          <h3>Sổ phương pháp · 01/07–20/07/2026</h3>
           <dl class="stat-list">
-            <div class="stat-row"><dt>Số ngày thắng</dt><dd>8</dd></div>
-            <div class="stat-row"><dt>Số ngày thua</dt><dd>8</dd></div>
-            <div class="stat-row"><dt>Chuỗi thắng dài nhất</dt><dd>3 ngày</dd></div>
-            <div class="stat-row"><dt>Chuỗi thua dài nhất</dt><dd>3 ngày</dd></div>
-            <div class="stat-row profit"><dt>Lãi/lỗ thực tế</dt><dd class="positive">+17.886.000đ</dd></div>
+            <div class="stat-row"><dt>Số ngày có lãi</dt><dd>10/20</dd></div>
+            <div class="stat-row"><dt>Số ngày thua</dt><dd>10/20</dd></div>
+            <div class="stat-row"><dt>Tổng nháy</dt><dd>19</dd></div>
+            <div class="stat-row"><dt>Chuỗi thắng / thua dài nhất</dt><dd>4 / 5 ngày</dd></div>
+            <div class="stat-row"><dt>Vốn / trả thưởng</dt><dd>46tr / 76tr</dd></div>
+            <div class="stat-row"><dt>ROI</dt><dd>+65,22%</dd></div>
+            <div class="stat-row profit"><dt>Lãi/lỗ phương pháp</dt><dd class="positive">+30.000.000đ</dd></div>
           </dl>
         </article>
 
         <article class="stat-card">
-          <h3>Tổng thực tế · 01/07/2026–20/07/2026</h3>
+          <h3>Sổ tiền thật của Linh · 01/07–20/07/2026</h3>
           <dl class="stat-list">
             <div class="stat-row"><dt>Số ngày thắng</dt><dd>8</dd></div>
             <div class="stat-row"><dt>Số ngày thua</dt><dd>8</dd></div>
@@ -257,6 +258,7 @@
             <div class="stat-row"><dt>Chuỗi thua dài nhất</dt><dd>3 ngày</dd></div>
             <div class="stat-row profit"><dt>Lãi/lỗ thực tế</dt><dd class="positive">+17.886.000đ</dd></div>
           </dl>
+          <p class="scope">Không cộng lẫn với backtest SONG LỘC 100.</p>
         </article>
       </div>
 
@@ -265,7 +267,7 @@
 
   <footer>
     <div class="shell footer-row">
-      <span>Tự động quyết toán và lập kế hoạch lúc 19:15 hằng ngày.</span>
+      <span>SONG LỘC 100 · 02 số × 50 điểm · tổng 100 điểm/ngày.</span>
       <span>Thống kê chỉ phản ánh kết quả đã ghi nhận, không đảm bảo kết quả tương lai.</span>
     </div>
   </footer>
@@ -312,8 +314,12 @@
         }
 
         var isPlay = item.decision === "PLAY";
-        var decision = isPlay ? "Đầu " + item.selected_head : "A0";
-        var candidate = item.watch_head == null ? "—" : "Đầu " + item.watch_head;
+        var decision = isPlay
+          ? (item.selected_tail != null ? "Đuôi " + item.selected_tail : "Đầu " + item.selected_head)
+          : "A0";
+        var headCandidate = item.watch_head == null ? null : "Đầu " + item.watch_head;
+        var tailCandidate = item.watch_tail == null ? null : "Đuôi " + item.watch_tail;
+        var candidate = [headCandidate, tailCandidate].filter(Boolean).join(" · ") || "—";
         document.getElementById("de-head-decision").textContent = decision;
         document.getElementById("de-head-decision").className = "de-head-decision " + (isPlay ? "play" : "a0");
         document.getElementById("de-head-watch").textContent = isPlay
@@ -321,8 +327,10 @@
           : "Theo dõi " + candidate + " · vốn đề 0đ";
         document.getElementById("de-head-candidate").textContent = candidate;
         document.getElementById("de-head-status").textContent = item.status;
-        document.getElementById("de-head-gan").textContent = item.gan + " / " + item.gmax;
-        document.getElementById("de-head-score").textContent = formatScore(item.score);
+        document.getElementById("de-head-gan").textContent =
+          item.gan + "/" + item.gmax + " · " + item.tail_gan + "/" + item.tail_gmax;
+        document.getElementById("de-head-score").textContent =
+          formatScore(item.score) + " · " + formatScore(item.tail_score);
         document.getElementById("de-head-reason").textContent = item.reason;
         document.getElementById("de-head-sync").textContent =
           "Khóa " + item.data_lock_dmy + " · " + item.method_short;

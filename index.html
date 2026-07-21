@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="description" content="Kế hoạch MB SONG LỘC, đề đầu/đuôi và lãi/lỗ phương pháp tách biệt với tiền thật.">
+  <meta name="description" content="Kế hoạch MB SONG LỘC, đề đầu/đuôi và lãi/lỗ thực tế theo tháng.">
   <meta name="theme-color" content="#08111f">
   <meta name="color-scheme" content="dark">
   <title>MB SONG LỘC · 21/07/2026</title>
@@ -125,9 +125,6 @@
     .de-kpi strong { display: block; margin-top: 3px; font-size: 15px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
     .de-kpi.wide { grid-column: 1 / -1; }
     .de-head-sync { color: var(--muted); font-size: 10px; }
-    .de-entry-gate strong { color: var(--text); font-size: 16px; }
-    .de-entry-gate strong.conditional { color: var(--amber); }
-    .de-entry-gate small { display: block; margin-top: 6px; color: var(--muted); font-size: 10px; line-height: 1.45; }
 
     .performance { margin-top: 36px; }
     .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
@@ -137,6 +134,7 @@
 
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .stat-card { overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--card); }
+    .stat-card.full { grid-column: 1 / -1; }
     .stat-card h3 { margin: 0; padding: 16px 18px; border-bottom: 1px solid var(--line); font-size: 15px; }
     .stat-list { margin: 0; }
     .stat-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 13px 18px; border-bottom: 1px solid rgba(33, 50, 74, .72); }
@@ -224,16 +222,6 @@
           <div class="de-kpi"><span>Trạng thái</span><strong id="de-head-status">WAIT</strong></div>
           <div class="de-kpi"><span>Gan / Gmax</span><strong id="de-head-gan">—</strong></div>
           <div class="de-kpi"><span>Score</span><strong id="de-head-score">—</strong></div>
-          <div class="de-kpi wide de-entry-gate">
-            <span>Đầu · mốc sớm nhất có thể vào tiền</span>
-            <strong class="conditional" id="de-head-earliest-head">Đang xác định</strong>
-            <small id="de-head-earliest-head-note">Phải đồng thời đạt toàn bộ điều kiện của phương pháp.</small>
-          </div>
-          <div class="de-kpi wide de-entry-gate">
-            <span>Đuôi · mốc sớm nhất có thể vào tiền</span>
-            <strong class="conditional" id="de-head-earliest-tail">Đang xác định</strong>
-            <small id="de-head-earliest-tail-note">Phải đồng thời đạt toàn bộ điều kiện của phương pháp.</small>
-          </div>
           <div class="de-kpi wide"><span>Cập nhật</span><strong class="de-head-sync" id="de-head-sync">Chưa có dữ liệu cùng ngày</strong></div>
         </div>
       </article>
@@ -243,35 +231,18 @@
       <div class="section-head">
         <div>
           <h2 id="performance-title">Lãi/lỗ</h2>
-          <p class="scope">Tách riêng sổ phương pháp SONG LỘC 100 và sổ tiền thật của Linh</p>
+          <p class="scope">Lãi/lỗ thực tế của Linh, tổng hợp theo từng tháng</p>
         </div>
         <div class="status">Đã đối chiếu Google Sheets đến 20/07/2026</div>
       </div>
 
       <div class="stats">
-        <article class="stat-card">
-          <h3>Sổ phương pháp · 01/07–20/07/2026</h3>
+        <article class="stat-card full">
+          <h3>Lãi/lỗ thực tế · cập nhật đến 20/07/2026</h3>
           <dl class="stat-list">
-            <div class="stat-row"><dt>Số ngày có lãi</dt><dd>10/20</dd></div>
-            <div class="stat-row"><dt>Số ngày thua</dt><dd>10/20</dd></div>
-            <div class="stat-row"><dt>Tổng nháy</dt><dd>19</dd></div>
-            <div class="stat-row"><dt>Chuỗi thắng / thua dài nhất</dt><dd>4 / 5 ngày</dd></div>
-            <div class="stat-row"><dt>Vốn / trả thưởng</dt><dd>46tr / 76tr</dd></div>
-            <div class="stat-row"><dt>ROI</dt><dd>+65,22%</dd></div>
-            <div class="stat-row profit"><dt>Lãi/lỗ phương pháp</dt><dd class="positive">+30.000.000đ</dd></div>
+            <div class="stat-row"><dt>Tháng 07/2026</dt><dd class="positive">+17.886.000đ</dd></div>
+            <div class="stat-row profit"><dt>Tổng lãi/lỗ</dt><dd class="positive">+17.886.000đ</dd></div>
           </dl>
-        </article>
-
-        <article class="stat-card">
-          <h3>Sổ tiền thật của Linh · 01/07–20/07/2026</h3>
-          <dl class="stat-list">
-            <div class="stat-row"><dt>Số ngày thắng</dt><dd>8</dd></div>
-            <div class="stat-row"><dt>Số ngày thua</dt><dd>8</dd></div>
-            <div class="stat-row"><dt>Chuỗi thắng dài nhất</dt><dd>3 ngày</dd></div>
-            <div class="stat-row"><dt>Chuỗi thua dài nhất</dt><dd>3 ngày</dd></div>
-            <div class="stat-row profit"><dt>Lãi/lỗ thực tế</dt><dd class="positive">+17.886.000đ</dd></div>
-          </dl>
-          <p class="scope">Không cộng lẫn với backtest SONG LỘC 100.</p>
         </article>
       </div>
 
@@ -312,10 +283,6 @@
       document.getElementById("de-head-gan").textContent = "—";
       document.getElementById("de-head-score").textContent = "—";
       document.getElementById("de-head-reason").textContent = message;
-      document.getElementById("de-head-earliest-head").textContent = "Chưa thể xác định";
-      document.getElementById("de-head-earliest-head-note").textContent = "Cần dữ liệu khóa đúng ngày để tính đủ gate.";
-      document.getElementById("de-head-earliest-tail").textContent = "Chưa thể xác định";
-      document.getElementById("de-head-earliest-tail-note").textContent = "Cần dữ liệu khóa đúng ngày để tính đủ gate.";
       document.getElementById("de-head-sync").textContent = "Không dùng dữ liệu cũ";
     }
 
@@ -349,18 +316,6 @@
         document.getElementById("de-head-score").textContent =
           formatScore(item.score) + " · " + formatScore(item.tail_score);
         document.getElementById("de-head-reason").textContent = item.reason;
-        var headLabel = item.watch_head == null ? "Đầu" : "Đầu " + item.watch_head;
-        var tailLabel = item.watch_tail == null ? "Đuôi" : "Đuôi " + item.watch_tail;
-        document.getElementById("de-head-earliest-head").textContent = item.head_earliest_entry_dmy
-          ? headLabel + ": " + item.head_earliest_entry_dmy + " (có điều kiện)"
-          : headLabel + ": chưa xác định ngày";
-        document.getElementById("de-head-earliest-head-note").textContent =
-          item.head_earliest_conditions || "Chưa đủ dữ liệu để xác định điều kiện vào tiền.";
-        document.getElementById("de-head-earliest-tail").textContent = item.tail_earliest_entry_dmy
-          ? tailLabel + ": " + item.tail_earliest_entry_dmy + " (có điều kiện)"
-          : tailLabel + ": chưa xác định ngày";
-        document.getElementById("de-head-earliest-tail-note").textContent =
-          item.tail_earliest_conditions || "Chưa đủ dữ liệu để xác định điều kiện vào tiền.";
         document.getElementById("de-head-sync").textContent =
           "Khóa " + item.data_lock_dmy + " · " + item.method_short;
       } catch (error) {

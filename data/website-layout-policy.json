@@ -1,6 +1,6 @@
 {
-  "schema_version": "MB_DAILY_WEBSITE_LAYOUT_V1",
-  "effective_from": "2026-07-19",
+  "schema_version": "MB_SONG_LOC_WEBSITE_LAYOUT_V1",
+  "effective_from": "2026-07-21",
   "top_section": {
     "title": "Kế hoạch kỳ sắp tới",
     "source": "plan",
@@ -13,7 +13,7 @@
     ]
   },
   "middle_section": {
-    "title": "Đề đầu hôm nay",
+    "title": "Đề đầu/đuôi hôm nay",
     "source": "data/de-head-current.json",
     "position": "below_plan_above_actual_performance",
     "always_visible": true,
@@ -23,6 +23,7 @@
       "status",
       "decision",
       "watch_head",
+      "watch_tail",
       "gan",
       "gmax",
       "score",
@@ -31,15 +32,24 @@
     ]
   },
   "bottom_section": {
-    "title": "Thống kê thực tế",
-    "source": "actual_performance",
-    "owner": "Linh",
-    "tracking_start_date": "2026-07-01",
-    "periods": [
-      "current_month",
-      "total"
+    "title": "Lãi/lỗ",
+    "sources": [
+      "method_performance",
+      "actual_performance"
     ],
-    "required_metrics": [
+    "separation_required": true,
+    "actual_owner": "Linh",
+    "tracking_start_date": "2026-07-01",
+    "method_required_metrics": [
+      "profit_days",
+      "loss_days",
+      "total_hit_units",
+      "longest_winning_streak",
+      "longest_losing_streak",
+      "net_profit_vnd",
+      "roi_pct"
+    ],
+    "actual_required_metrics": [
       "wins",
       "losses",
       "longest_winning_streak",
@@ -48,7 +58,6 @@
     ]
   },
   "forbidden_visible_sources": [
-    "backtest",
     "group_actual_pnl",
     "latest_settlement"
   ],

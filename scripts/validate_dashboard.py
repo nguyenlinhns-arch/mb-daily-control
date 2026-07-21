@@ -41,9 +41,71 @@ def signed_vnd(value: int) -> str:
     return prefix + vnd(value)
 
 
+def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
+    method = payload["method"]
+    plan = payload["plan"]
+    assert method["official_name"] == "SONG LỘC 100"
+    assert method["technical_code"] == "FUSION2–100 R23 OPT"
+    assert method["status"] == "PRODUCTION_OFFICIAL"
+    assert plan["status"] == "LOCKED_WAITING_RESULT"
+    assert plan["data_status"] == "LOCKED_CROSSCHECKED_27_OF_27"
+    assert plan["outcome_known_at_selection"] is False
+    codes = plan["codes"]
+    points = plan["points_by_code"]
+    assert len(codes) == len(set(codes)) == 2
+    assert plan["ranks"] == [2, 3]
+    assert plan["rank_1_excluded"] not in codes
+    assert list(points) == codes
+    assert [points[code] for code in codes] == [50, 50]
+    assert plan["total_points"] == 100
+    assert sum(points.values()) == 100
+    assert plan["total_capital_vnd"] == 2_300_000
+    assert plan["maximum_loss_vnd"] == 2_300_000
+    assert plan["total_points"] * plan["cost_per_point_vnd"] == 2_300_000
+    target_day = date.fromisoformat(plan["target_date"])
+    lock_day = date.fromisoformat(plan["data_lock_date"])
+    assert target_day == lock_day + timedelta(days=1)
+    assert target_day.strftime("%d/%m/%Y") in html
+    assert vnd(plan["total_capital_vnd"]) in html
+    for code in codes:
+        assert f"<b>{code}</b>" in html
+        assert "<strong>50 điểm</strong>" in html
+    assert "MB SONG LỘC" in html
+    assert "SONG LỘC 100" in html
+    assert "FUSION4" not in html
+    assert "180 điểm" not in html
+    method_perf = payload["method_performance"]
+    ledger = method_perf["ledger"]
+    assert method_perf["sessions"] == len(ledger)
+    assert method_perf["profit_days"] + method_perf["loss_days"] == len(ledger)
+    assert sum(row["pnl_vnd"] for row in ledger) == method_perf["net_profit_vnd"]
+    assert ledger[-1]["cumulative_vnd"] == method_perf["net_profit_vnd"]
+    assert method_perf["capital_vnd"] == len(ledger) * 2_300_000
+    assert method_perf["payout_vnd"] - method_perf["capital_vnd"] == method_perf["net_profit_vnd"]
+    assert signed_vnd(method_perf["net_profit_vnd"]) in html
+    actual = payload["actual_performance"]
+    assert actual["separate_from_method_ledger"] is True
+    assert actual["wins"] + actual["losses"] == actual["sessions"]
+    assert signed_vnd(actual["net_profit_vnd"]) in html
+    assert "Không cộng lẫn" in html
+    de_path = data_path.parent / "de-head-current.json"
+    de = json.loads(de_path.read_text(encoding="utf-8"))
+    assert de["target_date"] == plan["target_date"]
+    assert de["data_lock_date"] == plan["data_lock_date"]
+    assert de["decision"] in {"NO_TRADE", "PLAY"}
+    assert de["watch_head"] is not None and de["watch_tail"] is not None
+    assert de["capital_vnd"] >= 0
+    assert 'data-static-dashboard="1"' in html
+    assert "MB_STATUS_SAFE_V1" in html
+    print("SONG_LOC_DASHBOARD_VALIDATION_OK", plan["target_date"], ",".join(codes))
+
+
 def validate(index_path: Path, data_path: Path) -> None:
     html = index_path.read_text(encoding="utf-8")
     payload = json.loads(data_path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") == "MB_SONG_LOC_100_WEB_V1":
+        validate_song_loc(html, payload, data_path)
+        return
     layout = json.loads(LAYOUT_POLICY.read_text(encoding="utf-8"))
     method = payload["method"]
     plan = payload["plan"]

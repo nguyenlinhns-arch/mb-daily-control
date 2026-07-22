@@ -1,7 +1,7 @@
 {
-  "schema_version": "MB_SONG_LOC_100_WEB_V2",
-  "audit_id": "MB-20260722-SONG-LOC-100-REV55-10",
-  "generated_at": "2026-07-22T15:18:00+07:00",
+  "schema_version": "MB_SONG_LOC_100_WEB_V3_SIMPLE",
+  "audit_id": "MB-20260722-SONG-LOC-100-55POINTS",
+  "generated_at": "2026-07-22T15:45:00+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
     "project_name": "MB SONG LỘC",
@@ -10,20 +10,12 @@
     "config_id": "MB_SONG_LOC_100_PROD_V1_20260721",
     "status": "PRODUCTION_OFFICIAL",
     "effective_from": "2026-07-21",
-    "ranking_formula": "R4 + 0.08*R10 - 0.50*R4*R10 + 0.73*I(Max10)",
-    "selection_rule": "Loại hạng 1; chọn đúng hạng 2 và hạng 3",
-    "selection_revision": "METHOD_UPDATE_CONFIRMED_20260722_55_10"
+    "display_rule": "Chỉ hiển thị số hôm nay và số điểm; không hiển thị hạng."
   },
   "latest_settlement": {
     "date": "2026-07-21",
-    "locked_codes": [
-      "08",
-      "92"
-    ],
-    "hits_by_code": {
-      "08": 0,
-      "92": 0
-    },
+    "locked_codes": ["08", "92"],
+    "hits_by_code": {"08": 0, "92": 0},
     "total_hits": 0,
     "capital_vnd": 2300000,
     "payout_vnd": 0,
@@ -35,32 +27,37 @@
     "actual_sheet_row": "Linh!A13:H13",
     "notes": "08 và 92 đều không xuất hiện trong 27 giải ngày 21/07/2026."
   },
+  "today_order": {
+    "date": "2026-07-22",
+    "date_dmy": "22/07/2026",
+    "codes": ["55", "10"],
+    "codes_display": "55 – 10",
+    "points_by_code": {"55": 55, "10": 55},
+    "points_display": "55–55",
+    "total_points": 110,
+    "cost_per_point_vnd": 23000,
+    "capital_vnd": 2530000,
+    "status": "CHỜ KẾT QUẢ",
+    "profit_loss_label": "Chưa quyết toán",
+    "sheet_method_row": "SONG LỘC 100!A14:S14",
+    "sheet_actual_row": "Linh!A14:H14",
+    "source": "USER_CONFIRMED_55_10_X55_POINTS"
+  },
   "plan": {
     "target_date": "2026-07-22",
     "target_dmy": "22/07/2026",
     "data_lock_date": "2026-07-21",
     "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
     "status": "LOCKED_WAITING_RESULT",
-    "rank_1_excluded": "28",
-    "codes": [
-      "55",
-      "10"
-    ],
-    "ranks": [
-      2,
-      3
-    ],
-    "points_by_code": {
-      "55": 50,
-      "10": 50
-    },
-    "total_points": 100,
+    "codes": ["55", "10"],
+    "points_by_code": {"55": 55, "10": 55},
+    "total_points": 110,
     "cost_per_point_vnd": 23000,
-    "total_capital_vnd": 2300000,
-    "maximum_loss_vnd": 2300000,
-    "plan_hash": "32413b7eef347cff02ca34d825ef1061b9497fc7fe09c73c0337b8f254177aa6",
-    "revision_status": "METHOD_UPDATE_CONFIRMED",
-    "revision_note": "Theo phương pháp mới, chọn 55–10 thay cho 87–10.",
+    "total_capital_vnd": 2530000,
+    "maximum_loss_vnd": 2530000,
+    "plan_hash": "a5d70c35bfdd283d196c4d54176ddc30047ff2a3702b051b1328e7e55b615b1d",
+    "revision_status": "USER_CONFIRMED_POINTS_55_EACH",
+    "revision_note": "Hôm nay đánh 55–10, mỗi số 55 điểm.",
     "outcome_known_at_selection": false,
     "no_martingale": true,
     "no_reverse": true,
@@ -75,30 +72,25 @@
       "date": "2026-07-21",
       "status": "SETTLED_REAL_ORDER",
       "method": "SONG LỘC 100",
-      "codes": [
-        "08",
-        "92"
-      ],
+      "codes": ["08", "92"],
       "points": 100,
       "net_profit_vnd": -2300000,
       "result": "Thua",
       "sheet_row": "Linh!A13:H13"
     },
-    "monthly": [
-      {
-        "month_id": "2026-07",
-        "label": "Tháng 07/2026",
-        "start_date": "2026-07-01",
-        "settled_through": "2026-07-21",
-        "reviewed_through": "2026-07-22",
-        "sessions": 17,
-        "wins": 8,
-        "losses": 9,
-        "longest_winning_streak": 3,
-        "longest_losing_streak": 4,
-        "net_profit_vnd": 15586000
-      }
-    ],
+    "monthly": [{
+      "month_id": "2026-07",
+      "label": "Tháng 07/2026",
+      "start_date": "2026-07-01",
+      "settled_through": "2026-07-21",
+      "reviewed_through": "2026-07-22",
+      "sessions": 17,
+      "wins": 8,
+      "losses": 9,
+      "longest_winning_streak": 3,
+      "longest_losing_streak": 4,
+      "net_profit_vnd": 15586000
+    }],
     "total": {
       "start_date": "2026-07-01",
       "settled_through": "2026-07-21",
@@ -114,33 +106,18 @@
     "pending_order": {
       "date": "2026-07-22",
       "date_dmy": "22/07/2026",
-      "codes": [
-        "55",
-        "10"
-      ],
+      "codes": ["55", "10"],
       "codes_display": "55 – 10",
-      "points_by_code": {
-        "55": 50,
-        "10": 50
-      },
-      "points_display": "50–50",
-      "total_points": 100,
-      "capital_vnd": 2300000,
+      "points_by_code": {"55": 55, "10": 55},
+      "points_display": "55–55",
+      "total_points": 110,
+      "capital_vnd": 2530000,
       "status": "CHỜ KẾT QUẢ",
       "profit_loss_label": "Chưa quyết toán",
       "method": "SONG LỘC 100",
       "sheet_row": "Linh!A14:H14",
-      "source": "USER_CONFIRMED_METHOD_UPDATE_55_10"
+      "source": "USER_CONFIRMED_55_10_X55_POINTS"
     }
-  },
-  "de_head_tail": {
-    "source": "data/de-head-current.json",
-    "target_date": "2026-07-22",
-    "decision": "ELIGIBLE_REFERENCE",
-    "selected_tail": "6",
-    "watch_head": "5",
-    "watch_tail": "6",
-    "capital_vnd": 0
   },
   "audit": {
     "source_spreadsheet": "XSMB_Source_2024_2026_MB_v1.3",
@@ -149,11 +126,9 @@
     "source_crosscheck_count": 3,
     "target_outcome_used": false,
     "profit_loss_spreadsheet": "Sổ theo dõi lãi lỗ hàng ngày",
-    "method_ledger_separated": true,
     "method_sheet_row": "SONG LỘC 100!A14:S14",
     "actual_pending_row": "Linh!A14:H14",
-    "disclaimer": "Kết quả thống kê không bảo đảm kết quả tương lai.",
-    "plan_corrected_at": "2026-07-22T15:18:00+07:00",
-    "plan_correction": "87–10 → 55–10 theo phương pháp mới."
+    "display_mode": "SIMPLE_TODAY_CODES_AND_POINTS_ONLY",
+    "updated_at": "2026-07-22T15:45:00+07:00"
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": "MB_SONG_LOC_100_WEB_V2",
-  "audit_id": "MB-20260722-SONG-LOC-100",
-  "generated_at": "2026-07-22T13:35:00+07:00",
+  "audit_id": "MB-20260722-SONG-LOC-100-REV55-10",
+  "generated_at": "2026-07-22T15:18:00+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
     "project_name": "MB SONG LỘC",
@@ -11,7 +11,8 @@
     "status": "PRODUCTION_OFFICIAL",
     "effective_from": "2026-07-21",
     "ranking_formula": "R4 + 0.08*R10 - 0.50*R4*R10 + 0.73*I(Max10)",
-    "selection_rule": "Loại hạng 1; chọn đúng hạng 2 và hạng 3"
+    "selection_rule": "Loại hạng 1; chọn đúng hạng 2 và hạng 3",
+    "selection_revision": "METHOD_UPDATE_CONFIRMED_20260722_55_10"
   },
   "latest_settlement": {
     "date": "2026-07-21",
@@ -36,12 +37,13 @@
   },
   "plan": {
     "target_date": "2026-07-22",
+    "target_dmy": "22/07/2026",
     "data_lock_date": "2026-07-21",
     "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
     "status": "LOCKED_WAITING_RESULT",
     "rank_1_excluded": "28",
     "codes": [
-      "87",
+      "55",
       "10"
     ],
     "ranks": [
@@ -49,14 +51,16 @@
       3
     ],
     "points_by_code": {
-      "87": 50,
+      "55": 50,
       "10": 50
     },
     "total_points": 100,
     "cost_per_point_vnd": 23000,
     "total_capital_vnd": 2300000,
     "maximum_loss_vnd": 2300000,
-    "plan_hash": "7ab5b5640750b1366a22602eecd307805aeafcdd2cb086c4e4484bb4d78c0d27",
+    "plan_hash": "32413b7eef347cff02ca34d825ef1061b9497fc7fe09c73c0337b8f254177aa6",
+    "revision_status": "METHOD_UPDATE_CONFIRMED",
+    "revision_note": "Theo phương pháp mới, chọn 55–10 thay cho 87–10.",
     "outcome_known_at_selection": false,
     "no_martingale": true,
     "no_reverse": true,
@@ -66,7 +70,7 @@
     "scope": "LINH_ACTUAL_GOOGLE_SHEETS_LEDGER",
     "tracking_start_date": "2026-07-01",
     "settled_through": "2026-07-21",
-    "reviewed_through": "2026-07-21",
+    "reviewed_through": "2026-07-22",
     "latest_review": {
       "date": "2026-07-21",
       "status": "SETTLED_REAL_ORDER",
@@ -86,7 +90,7 @@
         "label": "Tháng 07/2026",
         "start_date": "2026-07-01",
         "settled_through": "2026-07-21",
-        "reviewed_through": "2026-07-21",
+        "reviewed_through": "2026-07-22",
         "sessions": 17,
         "wins": 8,
         "losses": 9,
@@ -98,7 +102,7 @@
     "total": {
       "start_date": "2026-07-01",
       "settled_through": "2026-07-21",
-      "reviewed_through": "2026-07-21",
+      "reviewed_through": "2026-07-22",
       "sessions": 17,
       "wins": 8,
       "losses": 9,
@@ -111,19 +115,22 @@
       "date": "2026-07-22",
       "date_dmy": "22/07/2026",
       "codes": [
-        "10",
-        "55"
+        "55",
+        "10"
       ],
-      "codes_display": "10 – 55",
+      "codes_display": "55 – 10",
       "points_by_code": {
-        "10": 50,
-        "55": 50
+        "55": 50,
+        "10": 50
       },
       "points_display": "50–50",
       "total_points": 100,
+      "capital_vnd": 2300000,
       "status": "CHỜ KẾT QUẢ",
       "profit_loss_label": "Chưa quyết toán",
-      "source": "USER_CONFIRMED_WEBSITE_ROW"
+      "method": "SONG LỘC 100",
+      "sheet_row": "Linh!A14:H14",
+      "source": "USER_CONFIRMED_METHOD_UPDATE_55_10"
     }
   },
   "de_head_tail": {
@@ -143,7 +150,10 @@
     "target_outcome_used": false,
     "profit_loss_spreadsheet": "Sổ theo dõi lãi lỗ hàng ngày",
     "method_ledger_separated": true,
+    "method_sheet_row": "SONG LỘC 100!A14:S14",
+    "actual_pending_row": "Linh!A14:H14",
     "disclaimer": "Kết quả thống kê không bảo đảm kết quả tương lai.",
-    "website_pending_order_updated_at": "2026-07-22T13:35:00+07:00"
+    "plan_corrected_at": "2026-07-22T15:18:00+07:00",
+    "plan_correction": "87–10 → 55–10 theo phương pháp mới."
   }
 }

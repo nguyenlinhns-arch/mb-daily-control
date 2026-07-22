@@ -1,7 +1,7 @@
 {
   "schema_version": "MB_SONG_LOC_100_WEB_V2",
   "audit_id": "MB-20260722-SONG-LOC-100",
-  "generated_at": "2026-07-21T21:05:00+07:00",
+  "generated_at": "2026-07-22T13:35:00+07:00",
   "timezone": "Asia/Bangkok",
   "method": {
     "project_name": "MB SONG LỘC",
@@ -106,7 +106,25 @@
       "longest_losing_streak": 4,
       "net_profit_vnd": 15586000
     },
-    "total_net_profit_vnd": 15586000
+    "total_net_profit_vnd": 15586000,
+    "pending_order": {
+      "date": "2026-07-22",
+      "date_dmy": "22/07/2026",
+      "codes": [
+        "10",
+        "55"
+      ],
+      "codes_display": "10 – 55",
+      "points_by_code": {
+        "10": 50,
+        "55": 50
+      },
+      "points_display": "50–50",
+      "total_points": 100,
+      "status": "CHỜ KẾT QUẢ",
+      "profit_loss_label": "Chưa quyết toán",
+      "source": "USER_CONFIRMED_WEBSITE_ROW"
+    }
   },
   "de_head_tail": {
     "source": "data/de-head-current.json",
@@ -125,6 +143,7 @@
     "target_outcome_used": false,
     "profit_loss_spreadsheet": "Sổ theo dõi lãi lỗ hàng ngày",
     "method_ledger_separated": true,
-    "disclaimer": "Kết quả thống kê không bảo đảm kết quả tương lai."
+    "disclaimer": "Kết quả thống kê không bảo đảm kết quả tương lai.",
+    "website_pending_order_updated_at": "2026-07-22T13:35:00+07:00"
   }
 }

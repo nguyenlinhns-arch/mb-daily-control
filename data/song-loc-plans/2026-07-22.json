@@ -1,19 +1,18 @@
 {
-  "schema_version": "MB_SONG_LOC_PLAN_V2",
+  "schema_version": "MB_SONG_LOC_PLAN_V3_SIMPLE",
   "target_date": "2026-07-22",
+  "target_dmy": "22/07/2026",
   "data_lock_date": "2026-07-21",
   "config_id": "MB_SONG_LOC_100_PROD_V1_20260721",
   "status": "LOCKED_WAITING_RESULT",
-  "formula": "R4 + 0.08*R10 - 0.50*R4*R10 + 0.73*I(Max10)",
-  "ranking": ["28", "55", "10", "87", "06", "60", "90", "52", "83", "17"],
-  "rank_1_excluded": "28",
+  "display_rule": "Chỉ hiển thị đúng số hôm nay và số điểm.",
   "selected": [
-    {"rank": 2, "code": "55", "points": 50},
-    {"rank": 3, "code": "10", "points": 50}
+    {"code": "55", "points": 55},
+    {"code": "10", "points": 55}
   ],
-  "total_points": 100,
+  "total_points": 110,
   "cost_per_point_vnd": 23000,
-  "total_capital_vnd": 2300000,
+  "total_capital_vnd": 2530000,
   "no_reverse": true,
   "no_extra_codes": true,
   "no_martingale": true,
@@ -21,14 +20,14 @@
     "history_through": "2026-07-21",
     "target_outcome_used": false
   },
-  "plan_hash": "32413b7eef347cff02ca34d825ef1061b9497fc7fe09c73c0337b8f254177aa6",
-  "original_selection": ["87", "10"],
+  "plan_hash": "a5d70c35bfdd283d196c4d54176ddc30047ff2a3702b051b1328e7e55b615b1d",
   "revision": {
-    "status": "METHOD_UPDATE_CONFIRMED",
+    "status": "USER_CONFIRMED_55_10_X55_POINTS",
     "selection": ["55", "10"],
-    "reason": "Theo phương pháp mới, chọn 55–10.",
-    "confirmed_at": "2026-07-22T15:18:00+07:00"
+    "points_each": 55,
+    "reason": "Hôm nay đánh 55–10 x 55 điểm/số.",
+    "confirmed_at": "2026-07-22T15:45:00+07:00"
   },
   "locked_at": "2026-07-21T19:16:00+07:00",
-  "revised_at": "2026-07-22T15:18:00+07:00"
+  "revised_at": "2026-07-22T15:45:00+07:00"
 }

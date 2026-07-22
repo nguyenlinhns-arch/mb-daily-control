@@ -1,14 +1,14 @@
 {
-  "schema_version": "MB_SONG_LOC_PLAN_V1",
+  "schema_version": "MB_SONG_LOC_PLAN_V2",
   "target_date": "2026-07-22",
   "data_lock_date": "2026-07-21",
   "config_id": "MB_SONG_LOC_100_PROD_V1_20260721",
   "status": "LOCKED_WAITING_RESULT",
   "formula": "R4 + 0.08*R10 - 0.50*R4*R10 + 0.73*I(Max10)",
-  "ranking": ["28", "87", "10", "55", "06", "60", "90", "52", "83", "17"],
+  "ranking": ["28", "55", "10", "87", "06", "60", "90", "52", "83", "17"],
   "rank_1_excluded": "28",
   "selected": [
-    {"rank": 2, "code": "87", "points": 50},
+    {"rank": 2, "code": "55", "points": 50},
     {"rank": 3, "code": "10", "points": 50}
   ],
   "total_points": 100,
@@ -21,6 +21,14 @@
     "history_through": "2026-07-21",
     "target_outcome_used": false
   },
-  "plan_hash": "7ab5b5640750b1366a22602eecd307805aeafcdd2cb086c4e4484bb4d78c0d27",
-  "locked_at": "2026-07-21T19:16:00+07:00"
+  "plan_hash": "32413b7eef347cff02ca34d825ef1061b9497fc7fe09c73c0337b8f254177aa6",
+  "original_selection": ["87", "10"],
+  "revision": {
+    "status": "METHOD_UPDATE_CONFIRMED",
+    "selection": ["55", "10"],
+    "reason": "Theo phương pháp mới, chọn 55–10.",
+    "confirmed_at": "2026-07-22T15:18:00+07:00"
+  },
+  "locked_at": "2026-07-21T19:16:00+07:00",
+  "revised_at": "2026-07-22T15:18:00+07:00"
 }

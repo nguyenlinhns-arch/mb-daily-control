@@ -1,6 +1,6 @@
 {
-  "schema_version": "MB_SONG_LOC_TRANSACTION_V1",
-  "transaction_id": "MB-20260722-SONG-LOC-100",
+  "schema_version": "MB_SONG_LOC_TRANSACTION_V2",
+  "transaction_id": "MB-20260722-SONG-LOC-100-REV55-10",
   "settlement_date": "2026-07-21",
   "plan_date": "2026-07-22",
   "checks": {
@@ -11,21 +11,33 @@
     "history_primary_write_readback": "PASS",
     "history_import_write_readback": "PASS",
     "method_settlement_write_readback": "PASS",
-    "personal_ledgers_review": "PASS_NO_ORDER",
-    "plan_write_readback": "PASS",
+    "personal_ledgers_review": "PASS_PENDING_ORDER_55_10",
+    "plan_write_readback": "PASS_REVISED_55_10",
     "causality_no_target_outcome": "PASS",
-    "website_validation": "PASS_PUBLIC_READBACK"
+    "website_source_validation": "PASS_GITHUB_AND_DOCS_READBACK",
+    "website_public_validation": "PENDING_EDGE_REFRESH"
   },
   "source_sheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
   "actual_ledger_id": "14UwClVbGkeiG0GdPKMy6K48biWps69TBw8ZP7cURfnY",
   "settlement_file": "data/song-loc-settlements/2026-07-21.json",
   "plan_file": "data/song-loc-plans/2026-07-22.json",
+  "method_sheet_row": "SONG LỘC 100!A14:S14",
+  "actual_sheet_row": "Linh!A14:H14",
   "public_readback": {
-    "url": "https://nguyenlinhns-arch.github.io/mb-daily-control/",
-    "pages_commit": "1c0769a42f72049c1f4104ba223f8530f9bd3240",
-    "verified_plan_codes": ["87", "10"],
-    "verified_actual_net_profit_vnd": 17886000,
-    "verified_at": "2026-07-21T19:31:00+07:00"
+    "url": "https://nguyenlinhns-arch.github.io/mb-daily-control/live-20260722-1518.html?build=WEB_SYNC_20260722_1518_55_10",
+    "root_index_commit": "7b3c88919579aa78f41462bb060f00db95266850",
+    "docs_index_commit": "5fa8a3ffc36e8d748be6da4895639d2c6bf3d5f8",
+    "unique_root_commit": "8e73ce9069bd2f136def73340a09dae4422c15c3",
+    "unique_docs_commit": "a085821498bce28cc6a4d41bfd433f0139deba65",
+    "verified_plan_codes": ["55", "10"],
+    "verified_actual_net_profit_vnd": 15586000,
+    "source_verified_at": "2026-07-22T15:18:00+07:00"
   },
-  "updated_at": "2026-07-21T19:31:00+07:00"
+  "revision": {
+    "from": ["87", "10"],
+    "to": ["55", "10"],
+    "reason": "Theo phương pháp mới, chọn 55–10.",
+    "confirmed_by_user": true
+  },
+  "updated_at": "2026-07-22T15:18:00+07:00"
 }

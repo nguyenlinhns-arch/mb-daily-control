@@ -1,0 +1,18 @@
+{
+  "schema_version": "MB_SONG_LOC_SETTLEMENT_V1",
+  "date": "2026-07-22",
+  "codes": ["55", "10"],
+  "points_by_code": {"55": 55, "10": 55},
+  "hits_by_code": {"55": 0, "10": 1},
+  "total_hits": 1,
+  "total_points": 110,
+  "capital_vnd": 2530000,
+  "return_vnd": 4400000,
+  "net_profit_vnd": 1870000,
+  "roi_percent": 73.91,
+  "result_label": "CÓ LÃI",
+  "method_sheet_row": "SONG LỘC 100!A14:S14",
+  "actual_sheet_row": "Linh!A14:H14",
+  "notes": "55 không về; 10 về 1 nháy; mỗi số 55 điểm.",
+  "settled_at": "2026-07-22T16:00:00+07:00"
+}

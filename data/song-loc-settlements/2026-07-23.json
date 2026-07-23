@@ -15,15 +15,11 @@
   "result_label": "CÓ LÃI",
   "method_cumulative_profit_vnd": 1100000,
   "method_sheet_row": "SONG LỘC 100!A15:S15",
-  "actual_sheet_row": "Linh!A15:H15",
-  "actual_order_separate": true,
-  "actual_order_method": "MB CHAMPION",
-  "actual_net_profit_vnd": -2300000,
-  "actual_cumulative_profit_vnd": 15156000,
+  "private_actual_ledger_status": "SETTLED_SEPARATELY_NOT_PUBLISHED",
   "sources": [
     "https://xoso.com.vn/xsmb-23-07-2026.html",
     "https://xosodaiphat.com/xsmb-23-07-2026.html"
   ],
-  "notes": "09 không về; 90 về 1 nháy. Phương pháp SONG LỘC 100 và lệnh tiền thật của Linh được quyết toán tách biệt.",
+  "notes": "09 không về; 90 về 1 nháy. Sổ phương pháp và sổ tiền thật được quyết toán tách biệt.",
   "settled_at": "2026-07-23T19:20:00+07:00"
 }

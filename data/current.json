@@ -1,6 +1,6 @@
 {
   "schema_version": "MB_PUBLIC_PRIVACY_V1",
-  "generated_at": "2026-07-23T19:20:00+07:00",
+  "generated_at": "2026-07-23T23:52:00+07:00",
   "timezone": "Asia/Bangkok",
   "status": "PRIVATE_FINANCIAL_DATA_REDACTED",
   "reviewed_through": "2026-07-23",
@@ -8,12 +8,18 @@
     "financial_values": "REDACTED",
     "personal_ledger": "REDACTED",
     "method_ledger": "NOT_PUBLISHED",
-    "backtest": "NOT_PUBLISHED"
+    "backtest": "NOT_PUBLISHED",
+    "signal_page": "plan/"
   },
   "source_verification": {
     "date": "2026-07-23",
     "independent_sources": 2,
     "result_units": 27,
     "status": "MATCHED_EXACTLY"
+  },
+  "next_plan": {
+    "target_date": "2026-07-24",
+    "status": "PUBLISHED",
+    "public_path": "plan/"
   }
 }

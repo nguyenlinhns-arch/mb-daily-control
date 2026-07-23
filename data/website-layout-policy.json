@@ -1,6 +1,7 @@
 {
-  "schema_version": "MB_SONG_LOC_WEBSITE_LAYOUT_V1",
-  "effective_from": "2026-07-21",
+  "schema_version": "MB_DAILY_CONTROL_LAYOUT_V2",
+  "effective_from": "2026-07-24",
+  "canonical_public_path": "/mb-daily-control/",
   "top_section": {
     "title": "Kế hoạch kỳ sắp tới",
     "source": "plan",
@@ -9,49 +10,43 @@
       "codes",
       "points_by_code",
       "total_points",
-      "total_capital_vnd"
+      "total_capital_vnd",
+      "data_lock_date",
+      "outcome_known_at_selection"
     ]
+  },
+  "score_section": {
+    "title": "Bảng chấm điểm công khai",
+    "source": "plan.scores_by_code",
+    "position": "below_plan"
   },
   "middle_section": {
     "title": "Đề đầu/đuôi hôm nay",
     "source": "data/de-head-current.json",
-    "position": "below_plan_above_actual_performance",
+    "position": "below_score_above_xien2",
     "always_visible": true,
-    "stale_policy": "WAIT_A0_NO_INFERENCE",
-    "required_fields": [
-      "target_dmy",
-      "status",
-      "decision",
-      "watch_head",
-      "watch_tail",
-      "gan",
-      "gmax",
-      "score",
-      "capital_vnd",
-      "reason",
-      "head_earliest_entry_dmy",
-      "head_earliest_conditions",
-      "tail_earliest_entry_dmy",
-      "tail_earliest_conditions"
-    ],
-    "earliest_entry_display": {
-      "required": true,
-      "semantics": "CONDITIONAL_LOWER_BOUND",
-      "rule": "Hiển thị riêng mốc sớm nhất cho Đầu và Đuôi; ngày chỉ là cận dưới có điều kiện, không phải lệnh chắc chắn.",
-      "unknown_label": "Chưa xác định ngày"
-    }
+    "stale_policy": "WAIT_A0_NO_INFERENCE"
+  },
+  "xien2_section": {
+    "title": "Khối thực chiến Xiên 2",
+    "source": "xien2",
+    "position": "below_de_above_actual_performance",
+    "required_metrics": [
+      "wins",
+      "losses",
+      "net_profit_vnd",
+      "pairs",
+      "total_capital_vnd",
+      "payout_per_winning_pair_vnd"
+    ]
   },
   "bottom_section": {
-    "title": "Lãi/lỗ",
+    "title": "Lãi/lỗ thực tế của Linh",
     "source": "actual_performance",
     "owner": "Linh",
     "tracking_start_date": "2026-07-01",
-    "periods": [
-      "monthly",
-      "total"
-    ],
+    "periods": ["monthly", "total"],
     "required_metrics": [
-      "monthly[].month_id",
       "monthly[].wins",
       "monthly[].losses",
       "monthly[].longest_winning_streak",
@@ -61,14 +56,14 @@
       "total.losses",
       "total.longest_winning_streak",
       "total.longest_losing_streak",
-      "total.net_profit_vnd",
-      "total_net_profit_vnd"
+      "total.net_profit_vnd"
     ]
   },
   "forbidden_visible_sources": [
     "method_performance",
     "group_actual_pnl",
-    "latest_settlement"
+    "latest_settlement",
+    "backtest"
   ],
   "fail_closed": true
 }

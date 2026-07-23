@@ -1,0 +1,25 @@
+{
+  "schema_version": "MB_SONG_LOC_PLAN_V4_R23_OPT",
+  "target_date": "2026-07-23",
+  "target_dmy": "23/07/2026",
+  "data_lock_date": "2026-07-22",
+  "config_id": "MB_SONG_LOC_100_PROD_V1_20260721",
+  "status": "LOCKED_AND_SETTLED",
+  "rank_1_excluded": "28",
+  "selected": [
+    {"rank": 2, "code": "09", "points": 50},
+    {"rank": 3, "code": "90", "points": 50}
+  ],
+  "total_points": 100,
+  "cost_per_point_vnd": 23000,
+  "total_capital_vnd": 2300000,
+  "no_reverse": true,
+  "no_extra_codes": true,
+  "no_martingale": true,
+  "causality": {
+    "history_through": "2026-07-22",
+    "target_outcome_used": false,
+    "hash": "1746e531ae0e9c314ce7fbbd413a2647a8fbf2a3b69e043d9b884314fa0ebe9a"
+  },
+  "locked_at": "2026-07-22T19:20:00+07:00"
+}

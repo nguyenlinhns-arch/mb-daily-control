@@ -1,7 +1,7 @@
 {
   "schema_version": "MB_DAILY_CONTROL_PUBLIC_V2",
-  "layout_version": "MB_DAILY_CONTROL_LAYOUT_V2",
-  "generated_at": "2026-07-24T00:20:00+07:00",
+  "layout_version": "MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2",
+  "generated_at": "2026-07-24T00:21:44+07:00",
   "timezone": "Asia/Bangkok",
   "status": "PLAN_PUBLISHED",
   "reviewed_through": "2026-07-23",
@@ -32,19 +32,6 @@
     "tail_earliest_entry_dmy": "24/07/2026",
     "points": 0,
     "capital_vnd": 0
-  },
-  "xien2": {
-    "status": "PENDING_RESULT",
-    "wins": 0,
-    "losses": 0,
-    "net_profit_vnd": 0,
-    "pairs": [
-      {"pair": "52-32", "stake_vnd": 100000},
-      {"pair": "52-91", "stake_vnd": 100000},
-      {"pair": "32-91", "stake_vnd": 100000}
-    ],
-    "total_capital_vnd": 300000,
-    "payout_per_winning_pair_vnd": 1600000
   },
   "actual_performance": {
     "owner": "Linh",
@@ -77,9 +64,10 @@
     "status": "MATCHED_EXACTLY"
   },
   "audit": {
-    "build_id": "WEB_SYNC_20260724_ROOT_LAYOUT_V2",
+    "build_id": "WEB_SYNC_20260724_ROOT_NO_XIEN2",
     "champion_ledger_separated": true,
     "actual_ledger_separated": true,
-    "backtest_published": false
+    "backtest_published": false,
+    "xien2_visible": false
   }
 }

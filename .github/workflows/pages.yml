@@ -53,7 +53,9 @@ jobs:
           grep -q 'MB CHAMPION' _site/index.html
           grep -q '<b>55</b>' _site/index.html
           grep -q '<b>28</b>' _site/index.html
-          test -s _site/live-20260723-0851.html
+          grep -q 'ĐÃ QUYẾT TOÁN · TRƯỢT' _site/index.html
+          grep -q -- '-2.300.000đ' _site/index.html
+          test -s _site/live-20260723-1858.html
           if grep -q 'Đang tải kế hoạch kỳ sắp tới' _site/index.html; then
             echo 'Dynamic loading placeholder must not be deployed.' >&2
             exit 1

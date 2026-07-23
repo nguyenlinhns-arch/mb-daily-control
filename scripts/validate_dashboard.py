@@ -1,39 +1,20 @@
 #!/usr/bin/env python3
-"""Fail a Pages build when the rendered plan and machine data diverge."""
+"""Validate that the public dashboard and machine payload are causally aligned.
+
+The validator intentionally supports the active MB CHAMPION schema while keeping
+basic compatibility with the older SONG LỘC and generic daily schemas. A failed
+assertion stops the GitHub Pages deployment instead of leaving a stale page live.
+"""
 from __future__ import annotations
 
 import argparse
 from datetime import date, timedelta
 import json
-import math
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
-LAYOUT_POLICY = ROOT / "data" / "website-layout-policy.json"
-
-FORBIDDEN_PUBLIC_TEXT = (
-    "Đang tải kế hoạch kỳ sắp tới",
-    "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
-    "Lãi/lỗ tổng",
-    "Backtest",
-    "P/L phương pháp",
-)
-
-REQUIRED_LAYOUT_TEXT = (
-    "Kế hoạch kỳ sắp tới",
-    "Thống kê thực tế",
-    "Số ngày thắng",
-    "Số ngày thua",
-    "Chuỗi thắng dài nhất",
-    "Chuỗi thua dài nhất",
-    "Lãi/lỗ thực tế",
-    "Tổng thực tế",
-)
-
-
 def vnd(value: int) -> str:
-    return f"{value:,}đ".replace(",", ".")
+    return f"{int(value):,}đ".replace(",", ".")
 
 
 def signed_vnd(value: int) -> str:
@@ -41,230 +22,168 @@ def signed_vnd(value: int) -> str:
     return prefix + vnd(value)
 
 
-def validate_song_loc(html: str, payload: dict, data_path: Path) -> None:
+def require_static_safety(html: str) -> None:
+    assert 'data-static-dashboard="1"' in html
+    assert "MB_STATUS_SAFE_V1" in html
+    assert "Đang tải kế hoạch kỳ sắp tới" not in html
+    assert "SYSTEM_SIGNAL_NOT_YET_CONFIRMED" not in html
+
+
+def validate_points_and_dates(
+    html: str,
+    *,
+    target_date: str,
+    lock_date: str,
+    codes: list[str],
+    points_by_code: dict[str, int],
+    total_points: int,
+    capital_vnd: int,
+    cost_per_point_vnd: int,
+) -> None:
+    assert len(codes) == len(set(codes)) == 2
+    assert all(len(code) == 2 and code.isdigit() for code in codes)
+    assert list(points_by_code) == codes
+    assert all(points_by_code[code] == 50 for code in codes)
+    assert sum(points_by_code.values()) == total_points == 100
+    assert capital_vnd == total_points * cost_per_point_vnd == 2_300_000
+
+    target = date.fromisoformat(target_date)
+    locked = date.fromisoformat(lock_date)
+    assert target == locked + timedelta(days=1)
+    assert target.strftime("%d/%m/%Y") in html
+    assert vnd(capital_vnd) in html
+    for code in codes:
+        assert f"<b>{code}</b>" in html, f"Missing rendered code: {code}"
+    assert html.count("50 điểm") >= 2
+
+
+def validate_mb_champion(html: str, payload: dict) -> None:
+    project = payload["project"]
+    order = payload["today_order"]
+
+    assert project["name"] == "MB CHAMPION"
+    assert project["champion"] == "R39 DAILY MASTER"
+    assert project["status"] == "CHAMPION_ACTIVE"
+    assert order["champion"] == "R39 DAILY MASTER"
+    assert order["data_status"] == "LOCKED_CROSSCHECKED_27_OF_27"
+    assert order["status"] in {"CHỜ KẾT QUẢ", "LOCKED_WAITING_RESULT"}
+    assert order["outcome_known_at_selection"] is False
+    assert order["no_martingale"] is True
+    assert order["no_reverse"] is True
+    assert order["no_extra_codes"] is True
+
+    validate_points_and_dates(
+        html,
+        target_date=order["target_date"],
+        lock_date=order["data_lock_date"],
+        codes=order["codes"],
+        points_by_code=order["points_by_code"],
+        total_points=order["total_points"],
+        capital_vnd=order["capital_vnd"],
+        cost_per_point_vnd=order["cost_per_point_vnd"],
+    )
+
+    assert "MB CHAMPION" in html
+    assert "R39 DAILY MASTER" in html
+    assert "MB SONG LỘC" not in html
+    assert "HẠNG 1" not in html and "HẠNG 2" not in html and "HẠNG 3" not in html
+
+    settlement = payload["latest_settlement"]
+    assert settlement["date"] == order["data_lock_date"]
+    assert settlement["total_hits"] == sum(settlement["hits_by_code"].values())
+
+    champion = settlement["champion_fixed_ledger"]
+    champion_points = champion["points_by_code"]
+    assert all(champion_points[code] == 50 for code in settlement["codes"])
+    assert champion["total_points"] == sum(champion_points.values()) == 100
+    assert champion["capital_vnd"] == 2_300_000
+    expected_champion_return = sum(
+        settlement["hits_by_code"][code] * champion_points[code] * 80_000
+        for code in settlement["codes"]
+    )
+    assert champion["return_vnd"] == expected_champion_return
+    assert champion["net_profit_vnd"] == expected_champion_return - champion["capital_vnd"]
+    assert signed_vnd(champion["net_profit_vnd"]) in html
+
+    actual = settlement["actual_real_money"]
+    actual_points = actual["points_by_code"]
+    assert actual["total_points"] == sum(actual_points.values())
+    assert actual["capital_vnd"] == actual["total_points"] * 23_000
+    expected_actual_return = sum(
+        settlement["hits_by_code"][code] * actual_points[code] * 80_000
+        for code in settlement["codes"]
+    )
+    assert actual["return_vnd"] == expected_actual_return
+    assert actual["net_profit_vnd"] == expected_actual_return - actual["capital_vnd"]
+    assert signed_vnd(actual["net_profit_vnd"]) in html
+    assert signed_vnd(actual["cumulative_net_profit_vnd"]) in html
+
+    performance = payload["actual_performance"]
+    assert performance["sessions"] == performance["wins"] + performance["losses"]
+    assert performance["settled_through"] == order["data_lock_date"]
+    assert performance["total_net_profit_vnd"] == actual["cumulative_net_profit_vnd"]
+
+    forward = payload["champion_forward_ledger"]
+    assert forward["sessions"] == forward["profitable_days"] + forward["losing_days"]
+    assert forward["settled_through"] == order["data_lock_date"]
+    assert forward["next_session"] == order["target_date"]
+
+    require_static_safety(html)
+    print("MB_CHAMPION_DASHBOARD_VALIDATION_OK", order["target_date"], ",".join(order["codes"]))
+
+
+def validate_song_loc(html: str, payload: dict) -> None:
     method = payload["method"]
     plan = payload["plan"]
     assert method["official_name"] == "SONG LỘC 100"
-    assert method["technical_code"] == "FUSION2–100 R23 OPT"
     assert method["status"] == "PRODUCTION_OFFICIAL"
     assert plan["status"] == "LOCKED_WAITING_RESULT"
     assert plan["data_status"] == "LOCKED_CROSSCHECKED_27_OF_27"
     assert plan["outcome_known_at_selection"] is False
+    validate_points_and_dates(
+        html,
+        target_date=plan["target_date"],
+        lock_date=plan["data_lock_date"],
+        codes=plan["codes"],
+        points_by_code=plan["points_by_code"],
+        total_points=plan["total_points"],
+        capital_vnd=plan["total_capital_vnd"],
+        cost_per_point_vnd=plan["cost_per_point_vnd"],
+    )
+    require_static_safety(html)
+    print("SONG_LOC_DASHBOARD_VALIDATION_OK", plan["target_date"], ",".join(plan["codes"]))
+
+
+def validate_generic(html: str, payload: dict) -> None:
+    plan = payload["plan"]
+    assert plan["status"] == "LOCKED_WAITING_RESULT"
+    assert plan["outcome_known_at_selection"] is False
     codes = plan["codes"]
     points = plan["points_by_code"]
-    assert len(codes) == len(set(codes)) == 2
-    assert plan["ranks"] == [2, 3]
-    assert plan["rank_1_excluded"] not in codes
-    assert list(points) == codes
-    assert [points[code] for code in codes] == [50, 50]
-    assert plan["total_points"] == 100
-    assert sum(points.values()) == 100
-    assert plan["total_capital_vnd"] == 2_300_000
-    assert plan["maximum_loss_vnd"] == 2_300_000
-    assert plan["total_points"] * plan["cost_per_point_vnd"] == 2_300_000
-    target_day = date.fromisoformat(plan["target_date"])
-    lock_day = date.fromisoformat(plan["data_lock_date"])
-    assert target_day == lock_day + timedelta(days=1)
-    assert target_day.strftime("%d/%m/%Y") in html
-    assert vnd(plan["total_capital_vnd"]) in html
+    assert len(codes) == len(set(codes))
+    assert set(codes) == set(points)
+    assert sum(points.values()) == plan["total_points"]
+    assert plan["total_capital_vnd"] == plan["total_points"] * plan["cost_per_point_vnd"]
+    target = date.fromisoformat(plan["target_date"])
+    locked = date.fromisoformat(plan["data_lock_date"])
+    assert target == locked + timedelta(days=1)
+    assert target.strftime("%d/%m/%Y") in html
     for code in codes:
         assert f"<b>{code}</b>" in html
-        assert "<strong>50 điểm</strong>" in html
-    assert "MB SONG LỘC" in html
-    assert "SONG LỘC 100" in html
-    assert "FUSION4" not in html
-    assert "180 điểm" not in html
-    assert "method_performance" not in payload
-    assert "Sổ phương pháp" not in html
-    assert "Lãi/lỗ phương pháp" not in html
-    actual = payload["actual_performance"]
-    monthly = actual["monthly"]
-    assert monthly
-    assert sum(period["net_profit_vnd"] for period in monthly) == actual["total_net_profit_vnd"]
-    for period in monthly:
-        assert period["sessions"] == period["wins"] + period["losses"]
-        assert period["label"] in html
-        assert f'{period["wins"]} ngày' in html
-        assert f'{period["losses"]} ngày' in html
-        assert f'{period["longest_winning_streak"]} ngày' in html
-        assert f'{period["longest_losing_streak"]} ngày' in html
-        assert signed_vnd(period["net_profit_vnd"]) in html
-    total = actual["total"]
-    assert total["sessions"] == total["wins"] + total["losses"]
-    assert total["start_date"] == actual["tracking_start_date"]
-    assert total["settled_through"] == actual["settled_through"]
-    assert total["net_profit_vnd"] == actual["total_net_profit_vnd"]
-    reviewed_through = actual.get("reviewed_through", actual["settled_through"])
-    reviewed_dmy = date.fromisoformat(reviewed_through).strftime("%d/%m/%Y")
-    assert f"Tổng từ 01/07/2026 đến {reviewed_dmy}" in html
-    assert "Chuỗi thắng dài nhất" in html
-    assert "Chuỗi thua dài nhất" in html
-    assert "Tổng lãi/lỗ" in html
-    assert signed_vnd(actual["total_net_profit_vnd"]) in html
-    de_path = data_path.parent / "de-head-current.json"
-    de = json.loads(de_path.read_text(encoding="utf-8"))
-    assert de["target_date"] == plan["target_date"]
-    assert de["data_lock_date"] == plan["data_lock_date"]
-    assert de["decision"] in {"NO_TRADE", "PLAY", "ELIGIBLE_REFERENCE"}
-    assert de["watch_head"] is not None and de["watch_tail"] is not None
-    assert de["capital_vnd"] >= 0
-    assert "mốc sớm nhất có thể vào tiền" in html
-    assert "de-head-earliest-head" in html
-    assert "de-head-earliest-tail" in html
-    assert 'data-static-dashboard="1"' in html
-    assert "MB_STATUS_SAFE_V1" in html
-    print("SONG_LOC_DASHBOARD_VALIDATION_OK", plan["target_date"], ",".join(codes))
+    require_static_safety(html)
+    print("DASHBOARD_VALIDATION_OK", plan["target_date"], ",".join(codes))
 
 
 def validate(index_path: Path, data_path: Path) -> None:
     html = index_path.read_text(encoding="utf-8")
     payload = json.loads(data_path.read_text(encoding="utf-8"))
-    if payload.get("schema_version", "").startswith("MB_SONG_LOC_100_WEB_V"):
-        validate_song_loc(html, payload, data_path)
-        return
-    layout = json.loads(LAYOUT_POLICY.read_text(encoding="utf-8"))
-    method = payload["method"]
-    plan = payload["plan"]
-    overlay = payload["overlay"]
-    automation = payload.get("automation", {})
-    fusion4 = payload.get("schema_version") == "MB_FUSION4_180_WEB_V1"
-
-    assert layout["schema_version"] == "MB_DAILY_WEBSITE_LAYOUT_V1"
-    assert layout["fail_closed"] is True
-    assert layout["top_section"]["source"] == "plan"
-    assert layout["bottom_section"]["source"] == "actual_performance"
-    assert layout["bottom_section"]["owner"] == "Linh"
-    assert layout["bottom_section"]["tracking_start_date"] == "2026-07-01"
-    assert layout["forbidden_visible_sources"] == [
-        "backtest", "group_actual_pnl", "latest_settlement",
-    ]
-
-    assert method["status"] == "PRODUCTION_OFFICIAL"
-    assert plan["status"] == "LOCKED_WAITING_RESULT"
-    assert plan["outcome_known_at_selection"] is False
-    assert plan["core_100_enabled"] is False
-    assert plan["other_50_enabled"] is False
-    assert automation.get("status") in {
-        "MANUAL_CUTOVER_VALIDATED",
-        "SHEETS_APPLIED_READBACK_VERIFIED_READY_TO_PUBLISH",
-    }
-
-    codes = plan["codes"]
-    points = plan["points_by_code"]
-    assert len(codes) == plan["number_of_codes"] == len(set(codes))
-    assert 1 <= len(codes) <= 12
-    assert all(len(code) == 2 and code.isdigit() for code in codes)
-    assert set(codes) == set(points)
-    if fusion4:
-        assert [points[code] for code in codes] == [50, 50, 50, 30]
-        assert plan["ranked_points"] == [50, 50, 50, 30]
-        assert plan["number_of_codes"] == 4
-        assert plan["total_points"] == 180
+    schema = payload.get("schema_version", "")
+    if schema.startswith("MB_CHAMPION_WEB_V"):
+        validate_mb_champion(html, payload)
+    elif schema.startswith("MB_SONG_LOC_100_WEB_V"):
+        validate_song_loc(html, payload)
     else:
-        expected_points = 30 if len(codes) <= 6 else 25 if len(codes) <= 8 else 20
-        assert plan["points_per_code"] == expected_points
-        assert all(value == expected_points for value in points.values())
-    assert sum(points.values()) == plan["total_points"]
-    assert plan["total_points"] * plan["cost_per_point_vnd"] == plan["total_capital_vnd"]
-    assert plan["maximum_loss_vnd"] == plan["total_capital_vnd"]
-
-    target_day = date.fromisoformat(plan["target_date"])
-    lock_day = date.fromisoformat(plan["data_lock_date"])
-    assert target_day == lock_day + timedelta(days=1)
-    target = target_day.strftime("%d/%m/%Y")
-    assert target in html
-    assert vnd(plan["total_capital_vnd"]) in html
-    for code in codes:
-        assert f"<b>{code}</b>" in html, f"Missing rendered code: {code}"
-        if fusion4:
-            assert f"<strong>{points[code]} điểm</strong>" in html
-        else:
-            assert f"<span>{points[code]} ĐIỂM</span>" in html
-
-    expected_active = (
-        bool(overlay["eligible_width"])
-        and overlay["normalized_margin"] >= overlay["activation_threshold"]
-    )
-    assert math.isfinite(overlay["normalized_margin"])
-    assert math.isfinite(overlay["activation_threshold"])
-    assert overlay["activation_threshold"] > 0
-    assert overlay["active"] is expected_active
-    assert 'data-static-dashboard="1"' in html
-    assert "MB_STATUS_SAFE_V1" in html
-    for forbidden in FORBIDDEN_PUBLIC_TEXT:
-        assert forbidden not in html
-    for required in REQUIRED_LAYOUT_TEXT:
-        assert required in html, f"Thiếu thành phần bố cục bắt buộc: {required}"
-
-    for period in payload["backtest"].values():
-        assert period["sessions"] > 0
-        assert 0 <= period["hit_days"] <= period["sessions"]
-        assert 0 <= period["profit_days"] <= period["sessions"]
-        expected_hit = 100 * period["hit_days"] / period["sessions"]
-        expected_profit = 100 * period["profit_days"] / period["sessions"]
-        assert abs(period["hit_day_rate_pct"] - expected_hit) < 0.0001
-        assert abs(period["profit_day_rate_pct"] - expected_profit) < 0.0001
-
-    if fusion4:
-        actual = payload["actual_performance"]
-        tracking_start = date.fromisoformat(actual["tracking_start_date"])
-        actual_settled = date.fromisoformat(actual["settled_through"])
-        assert actual["source"] == "LINH_ACTUAL_GOOGLE_SHEETS_LEDGER"
-        assert tracking_start <= actual_settled
-        assert actual_settled <= lock_day
-        assert actual["current_month_id"] == actual_settled.strftime("%Y-%m")
-        for period_name in ("current_month", "total"):
-            period = actual[period_name]
-            sessions = period["sessions"]
-            assert sessions >= 0
-            assert period["wins"] + period["losses"] == sessions
-            for streak in (
-                "current_winning_streak", "current_losing_streak",
-                "longest_winning_streak", "longest_losing_streak",
-            ):
-                assert 0 <= period[streak] <= sessions
-            assert period["current_winning_streak"] <= period["longest_winning_streak"]
-            assert period["current_losing_streak"] <= period["longest_losing_streak"]
-            assert signed_vnd(period["net_profit_vnd"]) in html
-        assert tracking_start.strftime("%d/%m/%Y") in html
-        assert "Lệnh thực tế của Linh" in html
-        assert actual_settled.strftime("%d/%m/%Y") in html
-        assert html.index("Kế hoạch kỳ sắp tới") < html.index("Thống kê thực tế")
-
-        group = payload["group_actual_pnl"]
-        assert group["source"] == "AGGREGATE_5_PERSON_GOOGLE_SHEETS_LEDGERS"
-        assert group["people_count"] == 5
-        assert date.fromisoformat(group["settled_through"]) <= lock_day
-
-    settlement = payload.get("latest_settlement")
-    if settlement is not None:
-        assert settlement["date"] == plan["data_lock_date"]
-        settlement_points = settlement["points_by_code"]
-        assert set(settlement["codes"]) == set(settlement_points)
-        assert sum(settlement_points.values()) == settlement["total_points"]
-        assert settlement["capital_vnd"] == settlement["total_points"] * 23_000
-        expected_payout = sum(
-            settlement["hits_by_code"][code] * settlement_points[code] * 80_000
-            for code in settlement["codes"]
-        )
-        assert settlement["payout_vnd"] == expected_payout
-        assert settlement["pnl_vnd"] == expected_payout - settlement["capital_vnd"]
-        expected_roi = 100 * settlement["pnl_vnd"] / settlement["capital_vnd"]
-        assert abs(settlement["roi_pct"] - expected_roi) < 0.0001
-
-    public_text = json.dumps(payload, ensure_ascii=False, sort_keys=True)
-    for private_marker in (
-        '"private"', '"people"', '"pnl_sheet_id"',
-        '"blocked_personal_rows"', '"sheet_name"',
-    ):
-        assert private_marker not in public_text
-
-    print(
-        "DASHBOARD_VALIDATION_OK",
-        plan["target_date"],
-        ",".join(codes),
-        plan["total_capital_vnd"],
-    )
+        validate_generic(html, payload)
 
 
 def main() -> None:

@@ -1,0 +1,21 @@
+{
+  "schema_version": "MB_CHAMPION_DAILY_PLAN_V1",
+  "target_date": "2026-07-23",
+  "data_lock_date": "2026-07-22",
+  "data_status": "27/27_VERIFIED",
+  "champion": "R39 DAILY MASTER",
+  "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
+  "selected": [
+    {"code": "55", "points": 50},
+    {"code": "28", "points": 50}
+  ],
+  "total_points": 100,
+  "cost_per_point_vnd": 23000,
+  "total_capital_vnd": 2300000,
+  "status": "LOCKED_WAITING_RESULT",
+  "outcome_known_at_selection": false,
+  "no_martingale": true,
+  "no_reverse": true,
+  "no_extra_codes": true,
+  "locked_at": "2026-07-23T08:51:00+07:00"
+}

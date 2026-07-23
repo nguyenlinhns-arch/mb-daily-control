@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate agreed MB Daily Control layout
+      - name: Validate agreed MB Daily Control layout without Xiên 2
         run: |
           set -euo pipefail
           python3 -m json.tool data/current.json >/dev/null
@@ -52,14 +52,19 @@ jobs:
           python3 scripts/validate_dashboard.py _site/index.html _site/data/current.json
           grep -q 'data-static-dashboard="1"' _site/index.html
           grep -q 'MB_STATUS_SAFE_V1' _site/index.html
-          grep -q 'MB_DAILY_CONTROL_LAYOUT_V2' _site/index.html
+          grep -q 'MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2' _site/index.html
           grep -q 'KẾ HOẠCH KỲ SẮP TỚI' _site/index.html
-          grep -q 'Khối thực chiến Xiên 2' _site/index.html
+          grep -q 'Bảng chấm điểm công khai' _site/index.html
+          grep -q 'Đề đầu/đuôi hôm nay' _site/index.html
           grep -q 'Lãi/lỗ thực tế của Linh' _site/index.html
           grep -q '<b>13</b>' _site/index.html
           grep -q '<b>55</b>' _site/index.html
           grep -q '<b>83</b>' _site/index.html
           grep -q '<b>28</b>' _site/index.html
+          if grep -q 'Xiên 2' _site/index.html; then
+            echo 'Xiên 2 must not be visible on the public dashboard.' >&2
+            exit 1
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

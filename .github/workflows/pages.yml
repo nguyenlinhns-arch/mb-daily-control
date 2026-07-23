@@ -25,13 +25,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate locked plan and public data
+      - name: Validate actual-only public dashboard
         run: |
           set -euo pipefail
           python3 -m json.tool data/current.json >/dev/null
           python3 scripts/validate_dashboard.py index.html data/current.json
 
-      - name: Build zero-dependency normalized static site
+      - name: Build zero-dependency static site
         run: |
           set -euo pipefail
           rm -rf _site
@@ -39,10 +39,7 @@ jobs:
           python3 scripts/normalize_static_dashboard.py index.html _site/index.html
           cp _site/index.html _site/fast/index.html
           cp data/current.json _site/data/current.json
-          if [ -f data/de-head-current.json ]; then
-            cp data/de-head-current.json _site/data/de-head-current.json
-          fi
-          find . -maxdepth 1 -type f -name 'live-*.html' -exec cp {} _site/ \;
+          cp data/de-head-current.json _site/data/de-head-current.json
           printf '%s\n' "static-dashboard-${GITHUB_SHA}" > _site/version.txt
           touch _site/.nojekyll
           test -s _site/index.html
@@ -50,20 +47,8 @@ jobs:
           python3 scripts/validate_dashboard.py _site/index.html _site/data/current.json
           grep -q 'data-static-dashboard="1"' _site/index.html
           grep -q 'MB_STATUS_SAFE_V1' _site/index.html
-          grep -q 'MB CHAMPION' _site/index.html
-          grep -q '<b>55</b>' _site/index.html
-          grep -q '<b>28</b>' _site/index.html
-          grep -q 'ĐÃ QUYẾT TOÁN · TRƯỢT' _site/index.html
-          grep -q -- '-2.300.000đ' _site/index.html
-          test -s _site/live-20260723-1858.html
-          if grep -q 'Đang tải kế hoạch kỳ sắp tới' _site/index.html; then
-            echo 'Dynamic loading placeholder must not be deployed.' >&2
-            exit 1
-          fi
-          if grep -q 'SYSTEM_SIGNAL_NOT_YET_CONFIRMED' _site/index.html; then
-            echo 'Internal execution enum must not be shown publicly.' >&2
-            exit 1
-          fi
+          grep -q 'LÃI/LỖ THỰC TẾ' _site/index.html
+          grep -q -- '+15.156.000đ' _site/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

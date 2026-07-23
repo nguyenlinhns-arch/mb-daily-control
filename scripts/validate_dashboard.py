@@ -11,8 +11,10 @@ def validate(index_path: Path, data_path: Path) -> None:
     payload = json.loads(data_path.read_text(encoding="utf-8"))
 
     assert payload["schema_version"] == "MB_DAILY_CONTROL_PUBLIC_V2"
-    assert payload["layout_version"] == "MB_DAILY_CONTROL_LAYOUT_V2"
+    assert payload["layout_version"] == "MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2"
     assert payload["status"] == "PLAN_PUBLISHED"
+    assert "xien2" not in payload
+    assert payload["audit"]["xien2_visible"] is False
 
     plan = payload["plan"]
     assert plan["target_date"] == "2026-07-24"
@@ -35,12 +37,6 @@ def validate(index_path: Path, data_path: Path) -> None:
     assert de["watch_tail"] == "6"
     assert de["tail_metrics"]["gate_met"] is True
 
-    xien = payload["xien2"]
-    assert xien["wins"] == 0 and xien["losses"] == 0
-    assert xien["net_profit_vnd"] == 0
-    assert [item["pair"] for item in xien["pairs"]] == ["52-32", "52-91", "32-91"]
-    assert xien["total_capital_vnd"] == 300_000
-
     actual = payload["actual_performance"]
     assert actual["owner"] == "Linh"
     assert actual["settled_through"] == "2026-07-23"
@@ -53,7 +49,7 @@ def validate(index_path: Path, data_path: Path) -> None:
     required_html = [
         'data-static-dashboard="1"',
         "MB_STATUS_SAFE_V1",
-        "MB_DAILY_CONTROL_LAYOUT_V2",
+        "MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2",
         "KẾ HOẠCH KỲ SẮP TỚI",
         "24/07/2026",
         "<b>13</b>",
@@ -62,28 +58,41 @@ def validate(index_path: Path, data_path: Path) -> None:
         "<b>28</b>",
         "150 điểm",
         "3.450.000đ",
+        "Bảng chấm điểm công khai",
         "Đề đầu/đuôi hôm nay",
-        "Khối thực chiến Xiên 2",
-        "52–32",
-        "52–91",
-        "32–91",
         "Lãi/lỗ thực tế của Linh",
         "+15.156.000đ",
+        "Dấu vết kiểm toán",
         "2 nguồn · đủ 27/27",
     ]
     for marker in required_html:
         assert marker in html, marker
+
+    section_order = [
+        "KẾ HOẠCH KỲ SẮP TỚI",
+        "Bảng chấm điểm công khai",
+        "Đề đầu/đuôi hôm nay",
+        "Lãi/lỗ thực tế của Linh",
+        "Dấu vết kiểm toán",
+    ]
+    positions = [html.index(marker) for marker in section_order]
+    assert positions == sorted(positions), positions
 
     forbidden = [
         "Dữ liệu tài chính riêng tư đã được ẩn",
         "Mở kế hoạch 24/07",
         "Đang tải kế hoạch kỳ sắp tới",
         "SYSTEM_SIGNAL_NOT_YET_CONFIRMED",
+        "Khối thực chiến Xiên 2",
+        "Xiên 2",
+        "52–32",
+        "52–91",
+        "32–91",
     ]
     for marker in forbidden:
         assert marker not in html, marker
 
-    print("MB_DAILY_CONTROL_LAYOUT_V2_VALIDATION_OK", payload["reviewed_through"])
+    print("MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2_VALIDATION_OK", payload["reviewed_through"])
 
 
 def main() -> None:

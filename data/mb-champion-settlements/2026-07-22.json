@@ -1,0 +1,26 @@
+{
+  "schema_version": "MB_CHAMPION_SETTLEMENT_V1",
+  "date": "2026-07-22",
+  "codes": ["55", "10"],
+  "hits_by_code": {"55": 0, "10": 1},
+  "total_hits": 1,
+  "champion_fixed_ledger": {
+    "points_by_code": {"55": 50, "10": 50},
+    "total_points": 100,
+    "capital_vnd": 2300000,
+    "return_vnd": 4000000,
+    "net_profit_vnd": 1700000,
+    "result": "CÓ LÃI"
+  },
+  "actual_real_money": {
+    "points_by_code": {"55": 55, "10": 55},
+    "total_points": 110,
+    "capital_vnd": 2530000,
+    "return_vnd": 4400000,
+    "net_profit_vnd": 1870000,
+    "cumulative_net_profit_vnd": 17456000,
+    "result": "THẮNG"
+  },
+  "status": "SETTLED_VERIFIED_27_OF_27",
+  "settled_at": "2026-07-23T08:51:00+07:00"
+}

@@ -1,42 +1,50 @@
 {
   "schema_version": "MB_CHAMPION_WEB_V1",
-  "audit_id": "MB-20260723-R39-DAILY-MASTER",
-  "generated_at": "2026-07-23T08:51:00+07:00",
+  "audit_id": "MB-20260723-R39-DAILY-MASTER-SETTLED",
+  "generated_at": "2026-07-23T18:58:00+07:00",
   "timezone": "Asia/Bangkok",
   "project": {
     "name": "MB CHAMPION",
     "champion": "R39 DAILY MASTER",
     "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
     "status": "CHAMPION_ACTIVE",
-    "display_rule": "Chỉ hiển thị đúng hai số hôm nay và số điểm; không hiển thị hạng."
+    "display_rule": "Chỉ hiển thị đúng hai số hôm nay, số điểm và kết quả quyết toán; không hiển thị hạng."
   },
   "latest_settlement": {
-    "date": "2026-07-22",
-    "date_dmy": "22/07/2026",
-    "codes": ["55", "10"],
-    "hits_by_code": {"55": 0, "10": 1},
-    "total_hits": 1,
+    "date": "2026-07-23",
+    "date_dmy": "23/07/2026",
+    "codes": ["55", "28"],
+    "points_by_code": {"55": 50, "28": 50},
+    "hits_by_code": {"55": 0, "28": 0},
+    "total_hits": 0,
+    "result_units": 27,
+    "result_sequence": ["54", "17", "60", "52", "82", "06", "48", "82", "39", "34", "35", "93", "65", "23", "90", "81", "61", "95", "54", "67", "08", "17", "66", "63", "75", "67", "99"],
     "champion_fixed_ledger": {
-      "points_by_code": {"55": 50, "10": 50},
+      "points_by_code": {"55": 50, "28": 50},
       "total_points": 100,
       "capital_vnd": 2300000,
-      "return_vnd": 4000000,
-      "net_profit_vnd": 1700000,
-      "result": "CÓ LÃI",
-      "sheet_row": "MB CHAMPION!A5:S5"
+      "return_vnd": 0,
+      "net_profit_vnd": -2300000,
+      "cumulative_net_profit_vnd": -600000,
+      "result": "TRƯỢT",
+      "sheet_row": "MB CHAMPION!A6:S6"
     },
     "actual_real_money": {
-      "points_by_code": {"55": 55, "10": 55},
-      "total_points": 110,
-      "capital_vnd": 2530000,
-      "return_vnd": 4400000,
-      "net_profit_vnd": 1870000,
-      "cumulative_net_profit_vnd": 17456000,
-      "result": "THẮNG",
-      "sheet_row": "Linh!A14:H14"
+      "points_by_code": {"55": 50, "28": 50},
+      "total_points": 100,
+      "capital_vnd": 2300000,
+      "return_vnd": 0,
+      "net_profit_vnd": -2300000,
+      "cumulative_net_profit_vnd": 15156000,
+      "result": "THUA",
+      "sheet_row": "Linh!A15:H15"
     },
-    "status": "SETTLED_VERIFIED_27_OF_27",
-    "notes": "55 không về; 10 về 1 nháy. Sổ Champion tính cố định 50–50; sổ tiền thật tính đúng 55–55 điểm đã xác nhận."
+    "status": "SETTLED_VERIFIED_2_SOURCES_27_OF_27",
+    "sources": [
+      "https://xoso.com.vn/xsmb-23-07-2026.html",
+      "https://xosodaiphat.com/xsmb-23-07-2026.html"
+    ],
+    "notes": "55 và 28 đều không xuất hiện trong 27 kết quả ngày 23/07/2026. Sổ Champion và sổ tiền thật cùng mức 50–50 điểm trong phiên này."
   },
   "today_order": {
     "target_date": "2026-07-23",
@@ -53,8 +61,13 @@
     "total_points": 100,
     "cost_per_point_vnd": 23000,
     "capital_vnd": 2300000,
-    "status": "CHỜ KẾT QUẢ",
-    "profit_loss_label": "Chưa quyết toán",
+    "hits_by_code": {"55": 0, "28": 0},
+    "total_hits": 0,
+    "return_vnd": 0,
+    "net_profit_vnd": -2300000,
+    "status": "ĐÃ QUYẾT TOÁN",
+    "result_label": "TRƯỢT",
+    "profit_loss_label": "-2.300.000đ",
     "outcome_known_at_selection": false,
     "no_martingale": true,
     "no_reverse": true,
@@ -64,33 +77,34 @@
   },
   "actual_performance": {
     "scope": "LINH_ACTUAL_GOOGLE_SHEETS_LEDGER",
-    "settled_through": "2026-07-22",
+    "settled_through": "2026-07-23",
     "reviewed_through": "2026-07-23",
-    "sessions": 18,
+    "sessions": 19,
     "wins": 9,
-    "losses": 9,
+    "losses": 10,
     "longest_winning_streak": 3,
     "longest_losing_streak": 4,
-    "total_net_profit_vnd": 17456000
+    "total_net_profit_vnd": 15156000
   },
   "champion_forward_ledger": {
     "tracking_start_date": "2026-07-22",
-    "settled_through": "2026-07-22",
-    "sessions": 1,
+    "settled_through": "2026-07-23",
+    "sessions": 2,
     "profitable_days": 1,
-    "losing_days": 0,
+    "losing_days": 1,
     "total_hits": 1,
-    "net_profit_vnd": 1700000,
-    "next_session": "2026-07-23"
+    "net_profit_vnd": -600000,
+    "next_session": null
   },
   "audit": {
     "source_spreadsheet": "XSMB_Source_2024_2026_MB_v1.3",
-    "source_history_date": "2026-07-22",
+    "source_history_date": "2026-07-23",
     "source_result_units": 27,
-    "target_outcome_used": false,
+    "source_crosscheck_count": 2,
+    "target_outcome_used_at_selection": false,
     "profit_loss_spreadsheet": "Sổ theo dõi lãi lỗ hàng ngày",
     "champion_ledger_separated": true,
     "actual_ledger_separated": true,
-    "updated_at": "2026-07-23T08:51:00+07:00"
+    "updated_at": "2026-07-23T18:58:00+07:00"
   }
 }

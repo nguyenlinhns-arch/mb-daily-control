@@ -15,11 +15,10 @@
   "latest_capital_vnd": 2300000,
   "latest_net_profit_vnd": 1700000,
   "method_cumulative_profit_vnd": 1100000,
-  "actual_order_status_for_2026_07_23": "SETTLED_SEPARATE_MB_CHAMPION",
-  "actual_total_net_profit_vnd": 15156000,
+  "private_actual_ledger_status": "SETTLED_SEPARATELY_NOT_PUBLISHED",
   "next_target_date": "2026-07-24",
   "next_plan_status": "BLOCKED_FAIL_CLOSED",
   "next_plan_blocker": "Missing official FUSION2–100 R23 OPT artifact or exact R4/R10 definitions; no plan or codes were fabricated.",
-  "display_mode": "LINH_ACTUAL_ONLY",
+  "display_mode": "PUBLIC_PRIVACY_REDACTED_PRIVATE_LEDGER_COMPLETE",
   "updated_at": "2026-07-23T19:20:00+07:00"
 }

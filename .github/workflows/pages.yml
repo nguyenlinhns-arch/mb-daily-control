@@ -35,21 +35,31 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf _site
-          mkdir -p _site/fast _site/data
+          mkdir -p _site/fast _site/data _site/plan
           python3 scripts/normalize_static_dashboard.py index.html _site/index.html
           cp _site/index.html _site/fast/index.html
           cp data/current.json _site/data/current.json
           cp data/de-head-current.json _site/data/de-head-current.json
+          cp docs/index.html _site/plan/index.html
+          for file in docs/live-*.html; do
+            [ -e "$file" ] || continue
+            cp "$file" "_site/plan/$(basename "$file")"
+          done
           printf '%s\n' "static-dashboard-${GITHUB_SHA}" > _site/version.txt
           touch _site/.nojekyll
           test -s _site/index.html
           test -s _site/data/current.json
+          test -s _site/plan/index.html
           python3 scripts/validate_dashboard.py _site/index.html _site/data/current.json
           grep -q 'data-static-dashboard="1"' _site/index.html
           grep -q 'MB_STATUS_SAFE_V1' _site/index.html
           grep -q 'Dữ liệu tài chính riêng tư đã được ẩn' _site/index.html
+          grep -q 'MB_CHAMPION_PLAN_V1' _site/plan/index.html
+          grep -q '24/07/2026' _site/plan/index.html
+          grep -q '<b>13</b>' _site/plan/index.html
+          grep -q '<b>55</b>' _site/plan/index.html
           if grep -q '₫' _site/index.html; then
-            echo 'Private financial values must not be public.' >&2
+            echo 'Private financial values must not be public on the status page.' >&2
             exit 1
           fi
 

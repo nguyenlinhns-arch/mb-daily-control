@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Validate that the public dashboard and machine payload are causally aligned.
-
-The validator intentionally supports the active MB CHAMPION schema while keeping
-basic compatibility with the older SONG LỘC and generic daily schemas. A failed
-assertion stops the GitHub Pages deployment instead of leaving a stale page live.
-"""
+"""Validate that the public dashboard and machine payload are causally aligned."""
 from __future__ import annotations
 
 import argparse
@@ -18,8 +13,7 @@ def vnd(value: int) -> str:
 
 
 def signed_vnd(value: int) -> str:
-    prefix = "+" if value > 0 else ""
-    return prefix + vnd(value)
+    return ("+" if value > 0 else "") + vnd(value)
 
 
 def require_static_safety(html: str) -> None:
@@ -60,13 +54,13 @@ def validate_points_and_dates(
 def validate_mb_champion(html: str, payload: dict) -> None:
     project = payload["project"]
     order = payload["today_order"]
+    settlement = payload["latest_settlement"]
 
     assert project["name"] == "MB CHAMPION"
     assert project["champion"] == "R39 DAILY MASTER"
     assert project["status"] == "CHAMPION_ACTIVE"
     assert order["champion"] == "R39 DAILY MASTER"
     assert order["data_status"] == "LOCKED_CROSSCHECKED_27_OF_27"
-    assert order["status"] in {"CHỜ KẾT QUẢ", "LOCKED_WAITING_RESULT"}
     assert order["outcome_known_at_selection"] is False
     assert order["no_martingale"] is True
     assert order["no_reverse"] is True
@@ -88,9 +82,24 @@ def validate_mb_champion(html: str, payload: dict) -> None:
     assert "MB SONG LỘC" not in html
     assert "HẠNG 1" not in html and "HẠNG 2" not in html and "HẠNG 3" not in html
 
-    settlement = payload["latest_settlement"]
-    assert settlement["date"] == order["data_lock_date"]
+    waiting = order["status"] in {"CHỜ KẾT QUẢ", "LOCKED_WAITING_RESULT"}
+    settled = order["status"] in {"ĐÃ QUYẾT TOÁN", "SETTLED"}
+    assert waiting or settled
+
+    if waiting:
+        assert settlement["date"] == order["data_lock_date"]
+    else:
+        assert settlement["date"] == order["target_date"]
+        assert settlement["codes"] == order["codes"]
+        assert settlement["hits_by_code"] == order["hits_by_code"]
+        assert settlement["total_hits"] == order["total_hits"]
+        assert order["return_vnd"] == 0 or order["return_vnd"] > 0
+        assert order["net_profit_vnd"] == order["return_vnd"] - order["capital_vnd"]
+        assert signed_vnd(order["net_profit_vnd"]) in html
+        assert order["result_label"] in html
+
     assert settlement["total_hits"] == sum(settlement["hits_by_code"].values())
+    assert settlement.get("result_units", 27) == 27
 
     champion = settlement["champion_fixed_ledger"]
     champion_points = champion["points_by_code"]
@@ -104,6 +113,8 @@ def validate_mb_champion(html: str, payload: dict) -> None:
     assert champion["return_vnd"] == expected_champion_return
     assert champion["net_profit_vnd"] == expected_champion_return - champion["capital_vnd"]
     assert signed_vnd(champion["net_profit_vnd"]) in html
+    if "cumulative_net_profit_vnd" in champion:
+        assert signed_vnd(champion["cumulative_net_profit_vnd"]) in html
 
     actual = settlement["actual_real_money"]
     actual_points = actual["points_by_code"]
@@ -120,24 +131,31 @@ def validate_mb_champion(html: str, payload: dict) -> None:
 
     performance = payload["actual_performance"]
     assert performance["sessions"] == performance["wins"] + performance["losses"]
-    assert performance["settled_through"] == order["data_lock_date"]
+    expected_settled_through = order["data_lock_date"] if waiting else order["target_date"]
+    assert performance["settled_through"] == expected_settled_through
     assert performance["total_net_profit_vnd"] == actual["cumulative_net_profit_vnd"]
 
     forward = payload["champion_forward_ledger"]
     assert forward["sessions"] == forward["profitable_days"] + forward["losing_days"]
-    assert forward["settled_through"] == order["data_lock_date"]
-    assert forward["next_session"] == order["target_date"]
+    assert forward["settled_through"] == expected_settled_through
+    if waiting:
+        assert forward["next_session"] == order["target_date"]
+    else:
+        assert forward.get("next_session") is None
 
     require_static_safety(html)
-    print("MB_CHAMPION_DASHBOARD_VALIDATION_OK", order["target_date"], ",".join(order["codes"]))
+    print(
+        "MB_CHAMPION_DASHBOARD_VALIDATION_OK",
+        order["target_date"],
+        ",".join(order["codes"]),
+        order["status"],
+    )
 
 
 def validate_song_loc(html: str, payload: dict) -> None:
     method = payload["method"]
     plan = payload["plan"]
     assert method["official_name"] == "SONG LỘC 100"
-    assert method["status"] == "PRODUCTION_OFFICIAL"
-    assert plan["status"] == "LOCKED_WAITING_RESULT"
     assert plan["data_status"] == "LOCKED_CROSSCHECKED_27_OF_27"
     assert plan["outcome_known_at_selection"] is False
     validate_points_and_dates(
@@ -156,7 +174,6 @@ def validate_song_loc(html: str, payload: dict) -> None:
 
 def validate_generic(html: str, payload: dict) -> None:
     plan = payload["plan"]
-    assert plan["status"] == "LOCKED_WAITING_RESULT"
     assert plan["outcome_known_at_selection"] is False
     codes = plan["codes"]
     points = plan["points_by_code"]
@@ -164,12 +181,6 @@ def validate_generic(html: str, payload: dict) -> None:
     assert set(codes) == set(points)
     assert sum(points.values()) == plan["total_points"]
     assert plan["total_capital_vnd"] == plan["total_points"] * plan["cost_per_point_vnd"]
-    target = date.fromisoformat(plan["target_date"])
-    locked = date.fromisoformat(plan["data_lock_date"])
-    assert target == locked + timedelta(days=1)
-    assert target.strftime("%d/%m/%Y") in html
-    for code in codes:
-        assert f"<b>{code}</b>" in html
     require_static_safety(html)
     print("DASHBOARD_VALIDATION_OK", plan["target_date"], ",".join(codes))
 

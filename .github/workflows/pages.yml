@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate actual-only public dashboard
+      - name: Validate privacy-safe public dashboard
         run: |
           set -euo pipefail
           python3 -m json.tool data/current.json >/dev/null
@@ -47,8 +47,11 @@ jobs:
           python3 scripts/validate_dashboard.py _site/index.html _site/data/current.json
           grep -q 'data-static-dashboard="1"' _site/index.html
           grep -q 'MB_STATUS_SAFE_V1' _site/index.html
-          grep -q 'LÃI/LỖ THỰC TẾ' _site/index.html
-          grep -q -- '+15.156.000đ' _site/index.html
+          grep -q 'Dữ liệu tài chính riêng tư đã được ẩn' _site/index.html
+          if grep -q '₫' _site/index.html; then
+            echo 'Private financial values must not be public.' >&2
+            exit 1
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

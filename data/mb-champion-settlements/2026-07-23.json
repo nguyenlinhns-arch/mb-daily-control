@@ -1,0 +1,35 @@
+{
+  "schema_version": "MB_CHAMPION_SETTLEMENT_V1",
+  "settlement_id": "MB-20260723-R39-DAILY-MASTER-SETTLED",
+  "date": "2026-07-23",
+  "champion": "R39 DAILY MASTER",
+  "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
+  "selected_codes": ["55", "28"],
+  "points_by_code": {"55": 50, "28": 50},
+  "hits_by_code": {"55": 0, "28": 0},
+  "total_hits": 0,
+  "total_points": 100,
+  "cost_per_point_vnd": 23000,
+  "capital_vnd": 2300000,
+  "return_vnd": 0,
+  "net_profit_vnd": -2300000,
+  "result": "TRƯỢT",
+  "cumulative_champion_net_profit_vnd": -600000,
+  "cumulative_actual_net_profit_vnd": 15156000,
+  "result_units": 27,
+  "result_sequence": ["54", "17", "60", "52", "82", "06", "48", "82", "39", "34", "35", "93", "65", "23", "90", "81", "61", "95", "54", "67", "08", "17", "66", "63", "75", "67", "99"],
+  "crosscheck": {
+    "status": "PASS_2WAY_MATCH_27_OF_27",
+    "source_1": "https://xoso.com.vn/xsmb-23-07-2026.html",
+    "source_2": "https://xosodaiphat.com/xsmb-23-07-2026.html",
+    "source_1_match": true,
+    "source_2_match": true
+  },
+  "sheet_rows": {
+    "champion": "MB CHAMPION!A6:S6",
+    "actual": "Linh!A15:H15",
+    "history_primary": "MB_History_27!A2347:AB2347",
+    "history_import": "MB_History_27_IMPORT!A2347:AB2347"
+  },
+  "settled_at": "2026-07-23T18:58:00+07:00"
+}

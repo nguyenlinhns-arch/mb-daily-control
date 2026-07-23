@@ -1,0 +1,29 @@
+{
+  "schema_version": "MB_SONG_LOC_SETTLEMENT_V2_FIXED_100",
+  "date": "2026-07-23",
+  "plan_lock_date": "2026-07-22",
+  "codes": ["09", "90"],
+  "points_by_code": {"09": 50, "90": 50},
+  "hits_by_code": {"09": 0, "90": 1},
+  "total_hits": 1,
+  "result_units": 27,
+  "total_points": 100,
+  "capital_vnd": 2300000,
+  "return_vnd": 4000000,
+  "net_profit_vnd": 1700000,
+  "roi_percent": 73.91,
+  "result_label": "CÓ LÃI",
+  "method_cumulative_profit_vnd": 1100000,
+  "method_sheet_row": "SONG LỘC 100!A15:S15",
+  "actual_sheet_row": "Linh!A15:H15",
+  "actual_order_separate": true,
+  "actual_order_method": "MB CHAMPION",
+  "actual_net_profit_vnd": -2300000,
+  "actual_cumulative_profit_vnd": 15156000,
+  "sources": [
+    "https://xoso.com.vn/xsmb-23-07-2026.html",
+    "https://xosodaiphat.com/xsmb-23-07-2026.html"
+  ],
+  "notes": "09 không về; 90 về 1 nháy. Phương pháp SONG LỘC 100 và lệnh tiền thật của Linh được quyết toán tách biệt.",
+  "settled_at": "2026-07-23T19:20:00+07:00"
+}

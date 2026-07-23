@@ -1,7 +1,14 @@
 {
-  "schema_version": "MB_DAILY_CONTROL_LAYOUT_V2",
+  "schema_version": "MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2",
   "effective_from": "2026-07-24",
   "canonical_public_path": "/mb-daily-control/",
+  "section_order": [
+    "plan",
+    "public_score",
+    "de_head_tail",
+    "actual_performance",
+    "audit"
+  ],
   "top_section": {
     "title": "Kế hoạch kỳ sắp tới",
     "source": "plan",
@@ -23,22 +30,9 @@
   "middle_section": {
     "title": "Đề đầu/đuôi hôm nay",
     "source": "data/de-head-current.json",
-    "position": "below_score_above_xien2",
+    "position": "below_score_above_actual_performance",
     "always_visible": true,
     "stale_policy": "WAIT_A0_NO_INFERENCE"
-  },
-  "xien2_section": {
-    "title": "Khối thực chiến Xiên 2",
-    "source": "xien2",
-    "position": "below_de_above_actual_performance",
-    "required_metrics": [
-      "wins",
-      "losses",
-      "net_profit_vnd",
-      "pairs",
-      "total_capital_vnd",
-      "payout_per_winning_pair_vnd"
-    ]
   },
   "bottom_section": {
     "title": "Lãi/lỗ thực tế của Linh",
@@ -59,7 +53,11 @@
       "total.net_profit_vnd"
     ]
   },
+  "removed_public_sections": [
+    "xien2"
+  ],
   "forbidden_visible_sources": [
+    "xien2",
     "method_performance",
     "group_actual_pnl",
     "latest_settlement",

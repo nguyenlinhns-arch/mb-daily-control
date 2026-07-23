@@ -1,15 +1,20 @@
 {
-  "schema_version": "MB_CHAMPION_STATE_V1",
+  "schema_version": "MB_CHAMPION_STATE_V2",
   "project": "MB CHAMPION",
   "champion": "R39 DAILY MASTER",
   "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
-  "settled_through": "2026-07-22",
+  "settled_through": "2026-07-23",
   "planned_through": "2026-07-23",
-  "latest_settlement": "data/mb-champion-settlements/2026-07-22.json",
+  "latest_settlement": "data/mb-champion-settlements/2026-07-23.json",
   "latest_plan": "data/mb-champion-plans/2026-07-23.json",
   "latest_transaction": "data/mb-champion-transactions/2026-07-23.json",
   "latest_codes": ["55", "28"],
   "points_by_code": {"55": 50, "28": 50},
-  "status": "LOCKED_WAITING_RESULT",
-  "updated_at": "2026-07-23T08:51:00+07:00"
+  "hits_by_code": {"55": 0, "28": 0},
+  "daily_net_profit_vnd": -2300000,
+  "champion_cumulative_net_profit_vnd": -600000,
+  "actual_cumulative_net_profit_vnd": 15156000,
+  "status": "SETTLED_VERIFIED_2_SOURCES_27_OF_27",
+  "next_session_status": "NOT_YET_LOCKED",
+  "updated_at": "2026-07-23T18:58:00+07:00"
 }

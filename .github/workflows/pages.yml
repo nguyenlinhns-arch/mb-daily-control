@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate agreed MB Daily Control layout without Xiên 2
+      - name: Validate settled MB Daily Control result
         run: |
           set -euo pipefail
           python3 -m json.tool data/current.json >/dev/null
@@ -39,7 +39,9 @@ jobs:
           python3 scripts/normalize_static_dashboard.py index.html _site/index.html
           cp _site/index.html _site/fast/index.html
           cp data/current.json _site/data/current.json
-          cp data/de-head-current.json _site/data/de-head-current.json
+          if [ -f data/de-head-current.json ]; then
+            cp data/de-head-current.json _site/data/de-head-current.json
+          fi
           cp docs/index.html _site/plan/index.html
           for file in docs/live-*.html; do
             [ -e "$file" ] || continue
@@ -52,15 +54,16 @@ jobs:
           python3 scripts/validate_dashboard.py _site/index.html _site/data/current.json
           grep -q 'data-static-dashboard="1"' _site/index.html
           grep -q 'MB_STATUS_SAFE_V1' _site/index.html
-          grep -q 'MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2' _site/index.html
-          grep -q 'KẾ HOẠCH KỲ SẮP TỚI' _site/index.html
-          grep -q 'Bảng chấm điểm công khai' _site/index.html
-          grep -q 'Đề đầu/đuôi hôm nay' _site/index.html
-          grep -q 'Lãi/lỗ thực tế của Linh' _site/index.html
+          grep -q 'MB_DAILY_CONTROL_LAYOUT_V4_SETTLED_NO_XIEN2' _site/index.html
+          grep -q 'KẾT QUẢ HÔM NAY' _site/index.html
+          grep -q 'Rà soát lãi/lỗ thực tế' _site/index.html
           grep -q '<b>13</b>' _site/index.html
           grep -q '<b>55</b>' _site/index.html
           grep -q '<b>83</b>' _site/index.html
           grep -q '<b>28</b>' _site/index.html
+          grep -q '+550.000đ' _site/index.html
+          grep -q '+15.706.000đ' _site/index.html
+          test -s _site/plan/live-20260724-1834.html
           if grep -q 'Xiên 2' _site/index.html; then
             echo 'Xiên 2 must not be visible on the public dashboard.' >&2
             exit 1

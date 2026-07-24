@@ -1,45 +1,64 @@
 {
-  "schema_version": "MB_DAILY_CONTROL_PUBLIC_V3",
-  "layout_version": "MB_DAILY_CONTROL_LAYOUT_V5_WAITING_DATA_NO_XIEN2",
-  "generated_at": "2026-07-25T06:00:00+07:00",
+  "schema_version": "MB_DAILY_CONTROL_PUBLIC_V4",
+  "layout_version": "MB_DAILY_CONTROL_LAYOUT_V6_CONFIRMED_ORDER_NO_XIEN2",
+  "generated_at": "2026-07-25T06:18:00+07:00",
   "timezone": "Asia/Bangkok",
-  "status": "WAITING_DATA_NO_LIVE_OUTPUT",
+  "status": "REAL_ORDER_RECORDED_WAITING_RESULT",
   "reviewed_through": "2026-07-25",
   "project": {
     "name": "MB CHAMPION",
     "champion": "R39 DAILY MASTER",
     "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
-    "production_status": "NO_ORDER_FAIL_CLOSED"
+    "production_status": "CHAMPION_PAIR_LOCKED_ACTUAL_ORDER_CONFIRMED"
   },
   "plan": {
     "target_date": "2026-07-25",
     "target_dmy": "25/07/2026",
     "data_lock_date": "2026-07-24",
     "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
-    "status": "CHỜ DỮ LIỆU",
-    "codes": [],
-    "points_by_code": {},
-    "scores_by_code": {},
-    "support_by_code": {},
-    "total_points": 0,
+    "status": "CHỜ KẾT QUẢ",
+    "codes": ["52", "83", "54", "90"],
+    "points_by_code": {"52": 50, "83": 50, "54": 25, "90": 25},
+    "total_points": 150,
     "cost_per_point_vnd": 23000,
-    "total_capital_vnd": 0,
-    "production_order": false,
+    "total_capital_vnd": 3450000,
+    "champion_pair": ["52", "83"],
+    "champion_points_by_code": {"52": 50, "83": 50},
+    "champion_total_points": 100,
+    "champion_capital_vnd": 2300000,
+    "capital_overlay_codes": ["54", "90"],
+    "capital_overlay_points_by_code": {"54": 25, "90": 25},
+    "capital_overlay_total_points": 50,
+    "capital_overlay_capital_vnd": 1150000,
+    "actual_order": true,
+    "source": "USER_CONFIRMED_LOCKED_ORDER_SCREENSHOT_20260725",
     "outcome_known_at_selection": false,
     "no_martingale": true,
     "no_reverse": true,
     "no_extra_codes": true,
-    "reason_code": "NO_VALID_TARGET_25_LIVE_OUTPUT",
-    "reason": "Dữ liệu khóa 24/07/2026 đã đủ 27/27, nhưng chưa có output serialize hoặc daily path tái lập hợp lệ cho target 25/07/2026 của R39 DAILY MASTER. R54, R64 và các challenger cũng không có output hiện tại. Theo quy tắc fail-closed, toàn bộ phương pháp thiếu output nhận trọng số live bằng 0; không khóa cặp và không phát lệnh.",
-    "missing_live_outputs": [
-      "R39 DAILY MASTER",
-      "R54 ROBUST RESIDUALGUARD",
-      "R64 MULTIPATH SELECTOR-60",
-      "R11103 TEN-THOUSAND-ROUND ENSEMBLE",
-      "R11110 ROBUST MONTHLY CODEBASKET-10",
-      "R11125 ROBUST BRANCH QUALITY SELECTOR"
+    "locked_rules": [
+      "Không thêm số thứ năm",
+      "Không tự đánh đảo",
+      "Không tăng điểm để gỡ",
+      "Không gấp thếp",
+      "Không thay 50-50-25-25 giữa phiên"
     ],
-    "method_sheet_row": "MB CHAMPION!A8:S8"
+    "method_sheet_row": "MB CHAMPION!A8:S8",
+    "actual_sheet_row": "Linh!A17:H17"
+  },
+  "actual_order_pending": {
+    "date": "2026-07-25",
+    "date_dmy": "25/07/2026",
+    "codes": ["52", "83", "54", "90"],
+    "codes_display": "52 – 83 – 54 – 90",
+    "points_by_code": {"52": 50, "83": 50, "54": 25, "90": 25},
+    "points_display": "52×50 · 83×50 · 54×25 · 90×25",
+    "total_points": 150,
+    "capital_vnd": 3450000,
+    "status": "CHỜ KẾT QUẢ",
+    "profit_loss_label": "Chưa quyết toán",
+    "current_cumulative_vnd": 15706000,
+    "sheet_row": "Linh!A17:H17"
   },
   "latest_actual_settlement": {
     "date": "2026-07-24",
@@ -95,18 +114,19 @@
     "status": "MATCHED_EXACTLY"
   },
   "audit": {
-    "build_id": "WEB_SYNC_20260725_0600_WAITING_DATA",
-    "report_run_id": "RPT_MB_20260725_WAITING_DATA_NO_OUTPUT",
+    "build_id": "WEB_SYNC_20260725_0618_CONFIRMED_52_83_54_90",
+    "report_run_id": "RPT_MB_20260725_CONFIRMED_52_83_54_90_150PTS",
     "source_spreadsheet": "XSMB_Source_2024_2026_MB_v1.3",
     "profit_loss_spreadsheet": "Sổ theo dõi lãi lỗ hàng ngày",
     "data_locked_through": "2026-07-24",
     "source_result_units": 27,
-    "live_output_available": false,
-    "fail_closed": true,
+    "live_output_available": true,
+    "user_order_confirmed": true,
+    "evidence": "USER_SCREENSHOT_PHUONG_AN_VAO_LENH_52_83_54_90",
     "outcome_known_at_selection": false,
     "champion_ledger_separated": true,
     "actual_ledger_separated": true,
     "xien2_visible": false,
-    "updated_at": "2026-07-25T06:00:00+07:00"
+    "updated_at": "2026-07-25T06:18:00+07:00"
   }
 }

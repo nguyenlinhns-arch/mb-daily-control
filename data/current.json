@@ -1,104 +1,194 @@
 {
   "schema_version": "MB_DAILY_CONTROL_PUBLIC_V2",
-  "layout_version": "MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2",
-  "generated_at": "2026-07-24T16:52:00+07:00",
+  "layout_version": "MB_DAILY_CONTROL_LAYOUT_V4_SETTLED_NO_XIEN2",
+  "generated_at": "2026-07-24T18:34:00+07:00",
   "timezone": "Asia/Bangkok",
-  "status": "REAL_ORDER_RECORDED_WAITING_RESULT",
+  "status": "REAL_ORDER_SETTLED_WIN",
   "reviewed_through": "2026-07-24",
   "plan": {
     "target_date": "2026-07-24",
     "target_dmy": "24/07/2026",
     "data_lock_date": "2026-07-23",
-    "codes": ["13", "55", "83", "28"],
-    "points_by_code": {"13": 50, "55": 50, "83": 25, "28": 25},
-    "scores_by_code": {"13": 44.276738, "55": 33.527979, "83": 12.940127, "28": 9.255156},
-    "support_by_code": {"13": "13/15", "55": "12/15", "83": "3/15", "28": "2/15"},
+    "codes": [
+      "13",
+      "55",
+      "83",
+      "28"
+    ],
+    "points_by_code": {
+      "13": 50,
+      "55": 50,
+      "83": 25,
+      "28": 25
+    },
+    "scores_by_code": {
+      "13": 44.276738,
+      "55": 33.527979,
+      "83": 12.940127,
+      "28": 9.255156
+    },
+    "support_by_code": {
+      "13": "13/15",
+      "55": "12/15",
+      "83": "3/15",
+      "28": "2/15"
+    },
     "total_points": 150,
     "cost_per_point_vnd": 23000,
     "total_capital_vnd": 3450000,
-    "method_status": "SHADOW_CHALLENGER_MAX4",
+    "method_status": "SHADOW_CHALLENGER_MAX4_SETTLED",
     "outcome_known_at_selection": false,
     "rbk_used": false,
     "actual_sheet_row": "Linh!A16:H16",
     "source": "USER_CONFIRMED_REAL_ORDER_20260724"
   },
-  "actual_order_pending": {
+  "actual_order_settlement": {
     "date": "2026-07-24",
     "date_dmy": "24/07/2026",
-    "codes": ["13", "55", "83", "28"],
+    "codes": [
+      "13",
+      "55",
+      "83",
+      "28"
+    ],
     "codes_display": "13 – 55 – 83 – 28",
-    "points_by_code": {"13": 50, "55": 50, "83": 25, "28": 25},
+    "points_by_code": {
+      "13": 50,
+      "55": 50,
+      "83": 25,
+      "28": 25
+    },
     "points_display": "13×50 · 55×50 · 83×25 · 28×25",
+    "hits_by_code": {
+      "13": 1,
+      "55": 0,
+      "83": 0,
+      "28": 0
+    },
+    "total_hits": 1,
     "total_points": 150,
+    "cost_per_point_vnd": 23000,
     "capital_vnd": 3450000,
-    "status": "CHỜ KẾT QUẢ",
-    "profit_loss_label": "Chưa quyết toán",
-    "current_cumulative_vnd": 15156000,
-    "sheet_row": "Linh!A16:H16"
+    "return_vnd": 4000000,
+    "net_profit_vnd": 550000,
+    "roi_percent": 15.94,
+    "status": "ĐÃ QUYẾT TOÁN",
+    "result_label": "CÓ LÃI",
+    "profit_loss_label": "+550.000đ",
+    "cumulative_net_profit_vnd": 15706000,
+    "sheet_row": "Linh!A16:H16",
+    "source": "USER_SCREENSHOT_PLUS_XOSODAIPHAT_27_OF_27"
   },
   "latest_settlement": {
-    "date": "2026-07-23",
-    "date_dmy": "23/07/2026",
-    "codes": ["55", "28"],
-    "points_by_code": {"55": 50, "28": 50},
-    "hits_by_code": {"55": 0, "28": 0},
-    "total_hits": 0,
-    "capital_vnd": 2300000,
-    "return_vnd": 0,
-    "net_profit_vnd": -2300000,
-    "result_label": "TRƯỢT",
-    "status": "SETTLED_VERIFIED_2_SOURCES_27_OF_27"
+    "date": "2026-07-24",
+    "date_dmy": "24/07/2026",
+    "codes": [
+      "13",
+      "55",
+      "83",
+      "28"
+    ],
+    "points_by_code": {
+      "13": 50,
+      "55": 50,
+      "83": 25,
+      "28": 25
+    },
+    "hits_by_code": {
+      "13": 1,
+      "55": 0,
+      "83": 0,
+      "28": 0
+    },
+    "total_hits": 1,
+    "result_units": 27,
+    "result_sequence": [
+      "38",
+      "17",
+      "80",
+      "25",
+      "37",
+      "70",
+      "57",
+      "65",
+      "08",
+      "53",
+      "95",
+      "40",
+      "24",
+      "45",
+      "62",
+      "43",
+      "82",
+      "64",
+      "13",
+      "65",
+      "74",
+      "76",
+      "78",
+      "24",
+      "68",
+      "85",
+      "50"
+    ],
+    "capital_vnd": 3450000,
+    "return_vnd": 4000000,
+    "net_profit_vnd": 550000,
+    "roi_percent": 15.94,
+    "result_label": "CÓ LÃI",
+    "status": "SETTLED_VERIFIED_SCREENSHOT_PLUS_WEB_27_OF_27",
+    "notes": "13 về 1 nháy; 55, 83 và 28 không về. Lệnh tiền thật 150 điểm được quyết toán riêng, không sửa ngược sổ Champion."
   },
   "de_head_tail": {
     "target_date": "2026-07-24",
     "method": "Đề Đầu–Đuôi Absolute v3.0 — Gold77",
-    "status": "ĐUÔI 6 ĐẠT GATE THAM CHIẾU · CHỜ XÁC NHẬN ĐIỂM",
+    "status": "THAM CHIẾU RIÊNG · KHÔNG CỘNG VÀO LỆNH LÔ",
     "watch_head": "8",
     "watch_tail": "6",
-    "head_metrics": {"gan": 14, "gmax": 55, "score": 0.254545, "gate_met": false},
-    "tail_metrics": {"gan": 28, "gmax": 43, "score": 0.651163, "gate_met": true},
-    "head_earliest_entry_dmy": null,
-    "tail_earliest_entry_dmy": "24/07/2026",
     "points": 0,
     "capital_vnd": 0
   },
   "actual_performance": {
     "owner": "Linh",
     "tracking_start_date": "2026-07-01",
-    "settled_through": "2026-07-23",
+    "settled_through": "2026-07-24",
     "reviewed_through": "2026-07-24",
     "monthly": [
       {
         "month_id": "2026-07",
-        "wins": 9,
+        "wins": 10,
         "losses": 10,
         "longest_winning_streak": 3,
         "longest_losing_streak": 4,
-        "net_profit_vnd": 15156000
+        "net_profit_vnd": 15706000
       }
     ],
     "total": {
-      "sessions": 19,
-      "wins": 9,
+      "sessions": 20,
+      "wins": 10,
       "losses": 10,
       "longest_winning_streak": 3,
       "longest_losing_streak": 4,
-      "net_profit_vnd": 15156000
+      "net_profit_vnd": 15706000
     },
-    "total_net_profit_vnd": 15156000
+    "total_net_profit_vnd": 15706000
   },
   "source_verification": {
-    "date": "2026-07-23",
+    "date": "2026-07-24",
     "independent_sources": 2,
     "result_units": 27,
-    "status": "MATCHED_EXACTLY"
+    "status": "MATCHED_EXACTLY",
+    "sources": [
+      "USER_SCREENSHOT_XSMB_24_07_2026",
+      "https://xosodaiphat.com/xsmb-24-07-2026.html"
+    ]
   },
   "audit": {
-    "build_id": "WEB_SYNC_20260724_1652_REAL_ORDER_150PTS",
+    "build_id": "WEB_SYNC_20260724_1834_SETTLED_150PTS",
     "champion_ledger_separated": true,
     "actual_ledger_separated": true,
     "backtest_published": false,
     "xien2_visible": false,
-    "updated_at": "2026-07-24T16:52:00+07:00"
+    "updated_at": "2026-07-24T18:34:00+07:00"
   }
 }

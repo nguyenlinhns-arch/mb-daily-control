@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate MB CHAMPION fail-closed status
+      - name: Validate confirmed MB CHAMPION order
         run: |
           set -euo pipefail
           python3 -m json.tool data/current.json >/dev/null
@@ -58,21 +58,25 @@ jobs:
           python3 scripts/validate_dashboard.py _site/index.html _site/data/current.json
           grep -q 'data-static-dashboard="1"' _site/index.html
           grep -q 'MB_STATUS_SAFE_V1' _site/index.html
-          grep -q 'MB_DAILY_CONTROL_LAYOUT_V5_WAITING_DATA_NO_XIEN2' _site/index.html
+          grep -q 'MB_DAILY_CONTROL_LAYOUT_V6_CONFIRMED_ORDER_NO_XIEN2' _site/index.html
           grep -q 'SỐ HÔM NAY' _site/index.html
-          grep -q 'CHỜ DỮ LIỆU' _site/index.html
-          grep -q 'CHƯA CÓ SỐ ĐƯỢC KHÓA' _site/index.html
-          grep -q '0 điểm' _site/index.html
-          grep -q 'KHÔNG PHÁT LỆNH' _site/index.html
+          grep -q 'CHỜ KẾT QUẢ' _site/index.html
+          grep -q 'LỆNH ĐÃ KHÓA' _site/index.html
+          grep -q '<b>52</b>' _site/index.html
+          grep -q '<b>83</b>' _site/index.html
+          grep -q '<b>54</b>' _site/index.html
+          grep -q '<b>90</b>' _site/index.html
+          grep -q '150 điểm' _site/index.html
+          grep -q '3.450.000đ' _site/index.html
           grep -q '+15.706.000đ' _site/index.html
-          test -s _site/live-20260725-0600.html
-          test -s _site/plan/live-20260725-0600.html
+          test -s _site/live-20260725-0618.html
+          test -s _site/plan/live-20260725-0618.html
           if grep -q 'Xiên 2' _site/index.html; then
             echo 'Xiên 2 must not be visible on the public dashboard.' >&2
             exit 1
           fi
-          if grep -q 'CHỜ KẾT QUẢ' _site/index.html; then
-            echo 'Waiting-result state must not replace the current waiting-data state.' >&2
+          if grep -q 'CHỜ DỮ LIỆU' _site/index.html; then
+            echo 'The stale waiting-data state must not be deployed.' >&2
             exit 1
           fi
 

@@ -1,0 +1,31 @@
+{
+  "schema_version": "MB_SONG_LOC_SESSION_CLOSURE_V1",
+  "date": "2026-07-24",
+  "data_lock_date": "2026-07-23",
+  "config_id": "MB_SONG_LOC_100_PROD_V1_20260721",
+  "status": "NO_LOCKED_PLAN_FAIL_CLOSED",
+  "result_units": 27,
+  "result_sequence": [
+    "38", "17", "80", "25", "37", "70", "57", "65", "08",
+    "53", "95", "40", "24", "45", "62", "43", "82", "64",
+    "13", "65", "74", "76", "78", "24", "68", "85", "50"
+  ],
+  "codes": [],
+  "points_by_code": {},
+  "hits_by_code": {},
+  "total_hits": 0,
+  "total_points": 0,
+  "capital_vnd": 0,
+  "return_vnd": 0,
+  "net_profit_vnd": 0,
+  "roi_percent": null,
+  "method_cumulative_profit_vnd": 1100000,
+  "method_sheet_row": "SONG LỘC 100!A16:S16",
+  "private_actual_ledger_status": "SETTLED_SEPARATELY_NOT_PUBLISHED",
+  "sources": [
+    "https://xoso.com.vn/xsmb-24-07-2026.html",
+    "https://xosodaiphat.com/xsmb-24-07-2026.html"
+  ],
+  "notes": "Không tồn tại kế hoạch SONG LỘC 100 khóa hợp lệ cho 24/07. Phiên được đóng tuần tự với 0 vốn và không phát sinh lãi/lỗ phương pháp; không dùng lệnh thật hoặc MB CHAMPION thay thế.",
+  "closed_at": "2026-07-24T19:21:00+07:00"
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "MB_SONG_LOC_PLAN_V5_BLOCKED",
+  "target_date": "2026-07-25",
+  "target_dmy": "25/07/2026",
+  "data_lock_date": "2026-07-24",
+  "config_id": "MB_SONG_LOC_100_PROD_V1_20260721",
+  "status": "BLOCKED_FAIL_CLOSED",
+  "rank_1_excluded": null,
+  "selected": [],
+  "total_points": 0,
+  "cost_per_point_vnd": 23000,
+  "total_capital_vnd": 0,
+  "no_reverse": true,
+  "no_extra_codes": true,
+  "no_martingale": true,
+  "causality": {
+    "history_through": "2026-07-24",
+    "target_outcome_used": false,
+    "input": "MB_SONG_LOC_100_PROD_V1_20260721|history_through=2026-07-24|results=38,17,80,25,37,70,57,65,08,53,95,40,24,45,62,43,82,64,13,65,74,76,78,24,68,85,50|target=2026-07-25|status=BLOCKED_FAIL_CLOSED|reason=MISSING_OFFICIAL_R4_R10_DEFINITION",
+    "hash": "17319b663168364033888abeb1fb5d62c5386d432af0c04d9013f64932c26342"
+  },
+  "blocker": "Không có artifact chính thức hoặc định nghĩa chính xác R4/R10 để tái lập FUSION2–100 R23 OPT. Không thể xếp hạng 00–99, loại hạng 1 và khóa hạng 2–3 mà không bịa dữ liệu.",
+  "recorded_at": "2026-07-24T19:21:00+07:00"
+}

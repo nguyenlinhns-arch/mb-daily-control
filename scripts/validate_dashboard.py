@@ -10,40 +10,51 @@ def validate(index_path: Path, data_path: Path) -> None:
     html = index_path.read_text(encoding="utf-8")
     payload = json.loads(data_path.read_text(encoding="utf-8"))
 
-    assert payload["schema_version"] == "MB_DAILY_CONTROL_PUBLIC_V3"
-    assert payload["layout_version"] == "MB_DAILY_CONTROL_LAYOUT_V5_WAITING_DATA_NO_XIEN2"
-    assert payload["status"] == "WAITING_DATA_NO_LIVE_OUTPUT"
+    assert payload["schema_version"] == "MB_DAILY_CONTROL_PUBLIC_V4"
+    assert payload["layout_version"] == "MB_DAILY_CONTROL_LAYOUT_V6_CONFIRMED_ORDER_NO_XIEN2"
+    assert payload["status"] == "REAL_ORDER_RECORDED_WAITING_RESULT"
     assert payload["audit"]["xien2_visible"] is False
-    assert payload["audit"]["fail_closed"] is True
-    assert payload["audit"]["live_output_available"] is False
+    assert payload["audit"]["live_output_available"] is True
+    assert payload["audit"]["user_order_confirmed"] is True
 
     project = payload["project"]
     assert project["name"] == "MB CHAMPION"
     assert project["champion"] == "R39 DAILY MASTER"
-    assert project["production_status"] == "NO_ORDER_FAIL_CLOSED"
+    assert project["production_status"] == "CHAMPION_PAIR_LOCKED_ACTUAL_ORDER_CONFIRMED"
 
     plan = payload["plan"]
     assert plan["target_date"] == "2026-07-25"
     assert plan["data_lock_date"] == "2026-07-24"
     assert plan["data_status"] == "LOCKED_CROSSCHECKED_27_OF_27"
-    assert plan["status"] == "CHỜ DỮ LIỆU"
-    assert plan["codes"] == []
-    assert plan["points_by_code"] == {}
-    assert plan["total_points"] == 0
-    assert plan["total_capital_vnd"] == 0
-    assert plan["production_order"] is False
+    assert plan["status"] == "CHỜ KẾT QUẢ"
+    assert plan["codes"] == ["52", "83", "54", "90"]
+    assert plan["points_by_code"] == {"52": 50, "83": 50, "54": 25, "90": 25}
+    assert plan["total_points"] == 150
+    assert plan["total_capital_vnd"] == 3_450_000
+    assert plan["champion_pair"] == ["52", "83"]
+    assert plan["champion_points_by_code"] == {"52": 50, "83": 50}
+    assert plan["champion_total_points"] == 100
+    assert plan["champion_capital_vnd"] == 2_300_000
+    assert plan["capital_overlay_codes"] == ["54", "90"]
+    assert plan["capital_overlay_points_by_code"] == {"54": 25, "90": 25}
+    assert plan["actual_order"] is True
     assert plan["outcome_known_at_selection"] is False
     assert plan["no_martingale"] is True
     assert plan["no_reverse"] is True
     assert plan["no_extra_codes"] is True
-    assert plan["reason_code"] == "NO_VALID_TARGET_25_LIVE_OUTPUT"
-    assert "R39 DAILY MASTER" in plan["missing_live_outputs"]
+
+    pending = payload["actual_order_pending"]
+    assert pending["codes"] == plan["codes"]
+    assert pending["points_by_code"] == plan["points_by_code"]
+    assert pending["total_points"] == 150
+    assert pending["capital_vnd"] == 3_450_000
+    assert pending["status"] == "CHỜ KẾT QUẢ"
+    assert pending["current_cumulative_vnd"] == 15_706_000
 
     actual = payload["latest_actual_settlement"]
     assert actual["date"] == "2026-07-24"
     assert actual["net_profit_vnd"] == 550_000
     assert actual["cumulative_net_profit_vnd"] == 15_706_000
-    assert actual["result_label"] == "CÓ LÃI"
 
     champion = payload["latest_champion_settlement"]
     assert champion["date"] == "2026-07-24"
@@ -61,32 +72,34 @@ def validate(index_path: Path, data_path: Path) -> None:
     required = [
         'data-static-dashboard="1"',
         "MB_STATUS_SAFE_V1",
-        "MB_DAILY_CONTROL_LAYOUT_V5_WAITING_DATA_NO_XIEN2",
+        "MB_DAILY_CONTROL_LAYOUT_V6_CONFIRMED_ORDER_NO_XIEN2",
         "SỐ HÔM NAY",
         "25/07/2026",
-        "CHỜ DỮ LIỆU",
-        "CHƯA CÓ SỐ ĐƯỢC KHÓA",
-        "0 số",
-        "0 điểm",
-        "Vốn hôm nay",
-        "0đ",
-        "KHÔNG PHÁT LỆNH",
-        "R39 DAILY MASTER",
-        "24/07/2026 · 27/27",
-        "Kết quả và lãi/lỗ gần nhất",
+        "<b>52</b>",
+        "<b>83</b>",
+        "<b>54</b>",
+        "<b>90</b>",
+        "50 điểm",
+        "25 điểm",
+        "150 điểm",
+        "3.450.000đ",
+        "CHỜ KẾT QUẢ",
+        "LỆNH ĐÃ KHÓA",
+        "Cặp Champion chuẩn",
+        "52 – 83 × 50",
         "+550.000đ",
         "+15.706.000đ",
         "+1.700.000đ",
         "+1.100.000đ",
-        "10 thắng / 10 thua",
-        "RPT_MB_20260725_WAITING_DATA_NO_OUTPUT",
+        "RPT_MB_20260725_CONFIRMED_52_83_54_90_150PTS",
     ]
     for marker in required:
         assert marker in html, marker
 
     forbidden = [
-        "CHỜ KẾT QUẢ",
-        "KẾT QUẢ HÔM NAY",
+        "CHỜ DỮ LIỆU",
+        "CHƯA CÓ SỐ ĐƯỢC KHÓA",
+        "KHÔNG PHÁT LỆNH",
         "HẠNG 1",
         "HẠNG 2",
         "HẠNG 3",
@@ -96,7 +109,7 @@ def validate(index_path: Path, data_path: Path) -> None:
     for marker in forbidden:
         assert marker not in html, marker
 
-    print("MB_DAILY_CONTROL_WAITING_DATA_20260725_VALIDATION_OK")
+    print("MB_DAILY_CONTROL_CONFIRMED_ORDER_20260725_VALIDATION_OK")
 
 
 def main() -> None:

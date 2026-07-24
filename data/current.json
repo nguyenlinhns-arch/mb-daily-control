@@ -1,10 +1,10 @@
 {
   "schema_version": "MB_DAILY_CONTROL_PUBLIC_V2",
   "layout_version": "MB_DAILY_CONTROL_LAYOUT_V3_NO_XIEN2",
-  "generated_at": "2026-07-24T00:21:44+07:00",
+  "generated_at": "2026-07-24T16:52:00+07:00",
   "timezone": "Asia/Bangkok",
-  "status": "PLAN_PUBLISHED",
-  "reviewed_through": "2026-07-23",
+  "status": "REAL_ORDER_RECORDED_WAITING_RESULT",
+  "reviewed_through": "2026-07-24",
   "plan": {
     "target_date": "2026-07-24",
     "target_dmy": "24/07/2026",
@@ -18,7 +18,36 @@
     "total_capital_vnd": 3450000,
     "method_status": "SHADOW_CHALLENGER_MAX4",
     "outcome_known_at_selection": false,
-    "rbk_used": false
+    "rbk_used": false,
+    "actual_sheet_row": "Linh!A16:H16",
+    "source": "USER_CONFIRMED_REAL_ORDER_20260724"
+  },
+  "actual_order_pending": {
+    "date": "2026-07-24",
+    "date_dmy": "24/07/2026",
+    "codes": ["13", "55", "83", "28"],
+    "codes_display": "13 – 55 – 83 – 28",
+    "points_by_code": {"13": 50, "55": 50, "83": 25, "28": 25},
+    "points_display": "13×50 · 55×50 · 83×25 · 28×25",
+    "total_points": 150,
+    "capital_vnd": 3450000,
+    "status": "CHỜ KẾT QUẢ",
+    "profit_loss_label": "Chưa quyết toán",
+    "current_cumulative_vnd": 15156000,
+    "sheet_row": "Linh!A16:H16"
+  },
+  "latest_settlement": {
+    "date": "2026-07-23",
+    "date_dmy": "23/07/2026",
+    "codes": ["55", "28"],
+    "points_by_code": {"55": 50, "28": 50},
+    "hits_by_code": {"55": 0, "28": 0},
+    "total_hits": 0,
+    "capital_vnd": 2300000,
+    "return_vnd": 0,
+    "net_profit_vnd": -2300000,
+    "result_label": "TRƯỢT",
+    "status": "SETTLED_VERIFIED_2_SOURCES_27_OF_27"
   },
   "de_head_tail": {
     "target_date": "2026-07-24",
@@ -37,6 +66,7 @@
     "owner": "Linh",
     "tracking_start_date": "2026-07-01",
     "settled_through": "2026-07-23",
+    "reviewed_through": "2026-07-24",
     "monthly": [
       {
         "month_id": "2026-07",
@@ -64,10 +94,11 @@
     "status": "MATCHED_EXACTLY"
   },
   "audit": {
-    "build_id": "WEB_SYNC_20260724_ROOT_NO_XIEN2",
+    "build_id": "WEB_SYNC_20260724_1652_REAL_ORDER_150PTS",
     "champion_ledger_separated": true,
     "actual_ledger_separated": true,
     "backtest_published": false,
-    "xien2_visible": false
+    "xien2_visible": false,
+    "updated_at": "2026-07-24T16:52:00+07:00"
   }
 }

@@ -1,0 +1,88 @@
+{
+  "schema_version": "MB_CHAMPION_ACTUAL_SETTLEMENT_V1",
+  "settlement_id": "MB-20260724-ACTUAL-13-55-83-28-SETTLED",
+  "date": "2026-07-24",
+  "date_dmy": "24/07/2026",
+  "method_context": "MB CHAMPION / SHADOW_CHALLENGER_MAX4",
+  "selected_codes": [
+    "13",
+    "55",
+    "83",
+    "28"
+  ],
+  "points_by_code": {
+    "13": 50,
+    "55": 50,
+    "83": 25,
+    "28": 25
+  },
+  "hits_by_code": {
+    "13": 1,
+    "55": 0,
+    "83": 0,
+    "28": 0
+  },
+  "total_hits": 1,
+  "total_points": 150,
+  "cost_per_point_vnd": 23000,
+  "capital_vnd": 3450000,
+  "return_vnd": 4000000,
+  "net_profit_vnd": 550000,
+  "roi_percent": 15.94,
+  "result": "CÓ LÃI",
+  "cumulative_actual_net_profit_vnd": 15706000,
+  "result_units": 27,
+  "result_sequence": [
+    "38",
+    "17",
+    "80",
+    "25",
+    "37",
+    "70",
+    "57",
+    "65",
+    "08",
+    "53",
+    "95",
+    "40",
+    "24",
+    "45",
+    "62",
+    "43",
+    "82",
+    "64",
+    "13",
+    "65",
+    "74",
+    "76",
+    "78",
+    "24",
+    "68",
+    "85",
+    "50"
+  ],
+  "full_prize_results": {
+    "DB": "94738",
+    "G1": ["64617"],
+    "G2": ["66080", "86525"],
+    "G3": ["88137", "24070", "45357", "96965", "79008", "81453"],
+    "G4": ["4495", "3440", "1324", "1545"],
+    "G5": ["4662", "3343", "9982", "0464", "0713", "0765"],
+    "G6": ["074", "976", "278"],
+    "G7": ["24", "68", "85", "50"]
+  },
+  "verification": {
+    "status": "PASS_SCREENSHOT_PLUS_WEB_27_OF_27",
+    "source_1": "USER_SCREENSHOT_XSMB_24_07_2026",
+    "source_2": "https://xosodaiphat.com/xsmb-24-07-2026.html",
+    "source_1_match": true,
+    "source_2_match": true
+  },
+  "sheet_rows": {
+    "actual": "Linh!A16:H16",
+    "history_primary": "MB_History_27!A2348:AB2348",
+    "history_import": "MB_History_27_IMPORT!A2348:AB2348",
+    "daily_update_log": "Daily_Update_Log!A106:H106"
+  },
+  "settled_at": "2026-07-24T18:34:00+07:00"
+}

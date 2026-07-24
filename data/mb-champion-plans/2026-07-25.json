@@ -1,19 +1,34 @@
 {
-  "schema_version": "MB_CHAMPION_PLAN_WAITING_DATA_V1",
+  "schema_version": "MB_CHAMPION_PLAN_CONFIRMED_V2",
+  "plan_id": "MB-20260725-CONFIRMED-52-83-54-90",
   "target_date": "2026-07-25",
   "data_lock_date": "2026-07-24",
   "champion": "R39 DAILY MASTER",
   "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
   "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
-  "status": "WAITING_DATA_NO_LIVE_OUTPUT",
-  "codes": [],
-  "points_by_code": {},
-  "total_points": 0,
-  "capital_vnd": 0,
+  "status": "LOCKED_WAITING_RESULT",
+  "champion_pair": ["52", "83"],
+  "champion_points_by_code": {"52": 50, "83": 50},
+  "champion_total_points": 100,
+  "champion_capital_vnd": 2300000,
+  "actual_codes": ["52", "83", "54", "90"],
+  "actual_points_by_code": {"52": 50, "83": 50, "54": 25, "90": 25},
+  "actual_total_points": 150,
+  "actual_capital_vnd": 3450000,
+  "capital_overlay_codes": ["54", "90"],
+  "capital_overlay_points_by_code": {"54": 25, "90": 25},
+  "source": "USER_CONFIRMED_LOCKED_ORDER_SCREENSHOT_20260725",
   "outcome_known_at_selection": false,
-  "fail_closed": true,
-  "reason_code": "NO_VALID_TARGET_25_LIVE_OUTPUT",
-  "reason": "Dữ liệu khóa 24/07/2026 đã đủ 27/27, nhưng chưa có output serialize hoặc daily path tái lập hợp lệ cho target 25/07/2026 của R39 DAILY MASTER. R54, R64 và các challenger cũng không có output hiện tại. Theo quy tắc fail-closed, toàn bộ phương pháp thiếu output nhận trọng số live bằng 0; không khóa cặp và không phát lệnh.",
-  "method_sheet_row": "MB CHAMPION!A8:S8",
-  "created_at": "2026-07-25T06:00:00+07:00"
+  "rules": {
+    "no_fifth_code": true,
+    "no_reverse": true,
+    "no_recovery_increase": true,
+    "no_martingale": true,
+    "stake_structure_locked": "50-50-25-25"
+  },
+  "sheet_rows": {
+    "champion": "MB CHAMPION!A8:S8",
+    "actual": "Linh!A17:H17"
+  },
+  "created_at": "2026-07-25T06:18:00+07:00"
 }

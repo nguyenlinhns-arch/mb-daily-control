@@ -1,0 +1,35 @@
+{
+  "schema_version": "MB_SONG_LOC_TRANSACTION_V6_NO_LOCKED_PLAN",
+  "transaction_id": "MB-20260724-SONG-LOC-100-NO-LOCKED-PLAN",
+  "session_date": "2026-07-24",
+  "checks": {
+    "state_sequence": "PASS_2026_07_23_TO_2026_07_24",
+    "source_crosscheck": "PASS_2_WEB_SOURCES_EXACT_27_OF_27",
+    "source_history_readback": "PASS",
+    "source_import_readback": "PASS",
+    "daily_update_log_readback": "PASS",
+    "locked_method_plan_for_session": "ABSENT",
+    "method_session_closure_write_readback": "PASS_NO_LOCKED_PLAN_ZERO_EXPOSURE",
+    "actual_ledger_conflict_check": "PASS_PRESERVED_PRIVATE_CONFIRMED_ORDER",
+    "other_users_order_review": "PASS_NO_ORDER",
+    "next_plan": "BLOCKED_FAIL_CLOSED_MISSING_OFFICIAL_R4_R10_DEFINITION",
+    "target_outcome_used_for_next_plan": false
+  },
+  "source_sheet_id": "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w",
+  "ledger_id": "14UwClVbGkeiG0GdPKMy6K48biWps69TBw8ZP7cURfnY",
+  "session_closure_file": "data/song-loc-settlements/2026-07-24.json",
+  "next_plan_record": "data/song-loc-plans/2026-07-25.json",
+  "method_sheet_row": "SONG LỘC 100!A16:S16",
+  "method_session": {
+    "status": "NO_LOCKED_PLAN_FAIL_CLOSED",
+    "codes": [],
+    "total_points": 0,
+    "capital_vnd": 0,
+    "return_vnd": 0,
+    "net_profit_vnd": 0,
+    "roi_percent": null,
+    "method_cumulative_profit_vnd": 1100000
+  },
+  "private_actual_ledger_status": "SETTLED_SEPARATELY_NOT_PUBLISHED",
+  "updated_at": "2026-07-24T19:21:00+07:00"
+}

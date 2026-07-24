@@ -1,20 +1,28 @@
 {
-  "schema_version": "MB_CHAMPION_TRANSACTION_V2",
-  "transaction_id": "MB-20260724-REAL-ORDER-150PTS",
+  "schema_version": "MB_CHAMPION_TRANSACTION_V3",
+  "transaction_id": "MB-20260724-REAL-ORDER-150PTS-SETTLED",
   "date": "2026-07-24",
   "checks": {
     "actual_order_write_readback": "PASS",
-    "google_sheet_row": "Linh!A16:H16",
-    "website_source_update": "PASS",
-    "causality_outcome_hidden": "PASS_PENDING_RESULT"
+    "source_results_27_of_27": "PASS_SCREENSHOT_PLUS_WEB",
+    "history_primary_write_readback": "PASS",
+    "history_import_write_readback": "PASS",
+    "actual_ledger_write_readback": "PASS",
+    "current_payload_update": "PASS",
+    "causality_outcome_hidden_at_selection": "PASS"
   },
   "actual_ledger_id": "14UwClVbGkeiG0GdPKMy6K48biWps69TBw8ZP7cURfnY",
   "actual_order_file": "data/mb-champion-actual-orders/2026-07-24.json",
+  "actual_settlement_file": "data/mb-champion-actual-settlements/2026-07-24.json",
   "current_payload": "data/current.json",
   "selected_codes": ["13", "55", "83", "28"],
   "points_by_code": {"13": 50, "55": 50, "83": 25, "28": 25},
+  "hits_by_code": {"13": 1, "55": 0, "83": 0, "28": 0},
   "total_points": 150,
   "capital_vnd": 3450000,
-  "status": "LOCKED_WAITING_RESULT",
-  "updated_at": "2026-07-24T16:52:00+07:00"
+  "return_vnd": 4000000,
+  "net_profit_vnd": 550000,
+  "cumulative_net_profit_vnd": 15706000,
+  "status": "SETTLED_WIN",
+  "updated_at": "2026-07-24T18:34:00+07:00"
 }

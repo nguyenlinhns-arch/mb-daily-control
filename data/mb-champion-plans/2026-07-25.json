@@ -1,0 +1,19 @@
+{
+  "schema_version": "MB_CHAMPION_PLAN_WAITING_DATA_V1",
+  "target_date": "2026-07-25",
+  "data_lock_date": "2026-07-24",
+  "champion": "R39 DAILY MASTER",
+  "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
+  "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
+  "status": "WAITING_DATA_NO_LIVE_OUTPUT",
+  "codes": [],
+  "points_by_code": {},
+  "total_points": 0,
+  "capital_vnd": 0,
+  "outcome_known_at_selection": false,
+  "fail_closed": true,
+  "reason_code": "NO_VALID_TARGET_25_LIVE_OUTPUT",
+  "reason": "Dữ liệu khóa 24/07/2026 đã đủ 27/27, nhưng chưa có output serialize hoặc daily path tái lập hợp lệ cho target 25/07/2026 của R39 DAILY MASTER. R54, R64 và các challenger cũng không có output hiện tại. Theo quy tắc fail-closed, toàn bộ phương pháp thiếu output nhận trọng số live bằng 0; không khóa cặp và không phát lệnh.",
+  "method_sheet_row": "MB CHAMPION!A8:S8",
+  "created_at": "2026-07-25T06:00:00+07:00"
+}

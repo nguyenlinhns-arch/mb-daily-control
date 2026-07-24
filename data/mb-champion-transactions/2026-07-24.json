@@ -1,0 +1,20 @@
+{
+  "schema_version": "MB_CHAMPION_TRANSACTION_V2",
+  "transaction_id": "MB-20260724-REAL-ORDER-150PTS",
+  "date": "2026-07-24",
+  "checks": {
+    "actual_order_write_readback": "PASS",
+    "google_sheet_row": "Linh!A16:H16",
+    "website_source_update": "PASS",
+    "causality_outcome_hidden": "PASS_PENDING_RESULT"
+  },
+  "actual_ledger_id": "14UwClVbGkeiG0GdPKMy6K48biWps69TBw8ZP7cURfnY",
+  "actual_order_file": "data/mb-champion-actual-orders/2026-07-24.json",
+  "current_payload": "data/current.json",
+  "selected_codes": ["13", "55", "83", "28"],
+  "points_by_code": {"13": 50, "55": 50, "83": 25, "28": 25},
+  "total_points": 150,
+  "capital_vnd": 3450000,
+  "status": "LOCKED_WAITING_RESULT",
+  "updated_at": "2026-07-24T16:52:00+07:00"
+}

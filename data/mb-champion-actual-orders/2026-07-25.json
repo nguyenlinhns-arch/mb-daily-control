@@ -1,0 +1,26 @@
+{
+  "schema_version": "MB_CHAMPION_ACTUAL_ORDER_V2",
+  "order_id": "MB-20260725-ACTUAL-52-83-54-90",
+  "date": "2026-07-25",
+  "date_dmy": "25/07/2026",
+  "method_context": "MB CHAMPION / CONFIRMED CAPITAL OVERLAY",
+  "champion_pair": ["52", "83"],
+  "codes": ["52", "83", "54", "90"],
+  "points_by_code": {"52": 50, "83": 50, "54": 25, "90": 25},
+  "total_points": 150,
+  "cost_per_point_vnd": 23000,
+  "capital_vnd": 3450000,
+  "status": "LOCKED_WAITING_RESULT",
+  "profit_loss_label": "Chưa quyết toán",
+  "sheet_row": "Linh!A17:H17",
+  "evidence": "USER_SCREENSHOT_PHUONG_AN_VAO_LENH_52_83_54_90",
+  "rules": {
+    "no_fifth_code": true,
+    "no_reverse": true,
+    "no_recovery_increase": true,
+    "no_martingale": true,
+    "stake_structure_locked": "50-50-25-25",
+    "outcome_known_at_selection": false
+  },
+  "recorded_at": "2026-07-25T06:18:00+07:00"
+}

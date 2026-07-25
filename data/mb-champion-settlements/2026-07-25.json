@@ -1,0 +1,35 @@
+{
+  "schema_version": "MB_CHAMPION_SETTLEMENT_V2",
+  "settlement_id": "MB-20260725-R39-DAILY-MASTER-SETTLED",
+  "date": "2026-07-25",
+  "champion": "R39 DAILY MASTER",
+  "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
+  "selected_codes": ["52", "83"],
+  "points_by_code": {"52": 50, "83": 50},
+  "hits_by_code": {"52": 0, "83": 0},
+  "total_hits": 0,
+  "total_points": 100,
+  "cost_per_point_vnd": 23000,
+  "capital_vnd": 2300000,
+  "return_vnd": 0,
+  "net_profit_vnd": -2300000,
+  "result": "TRƯỢT",
+  "cumulative_champion_net_profit_vnd": -1200000,
+  "result_units": 27,
+  "result_sequence": ["28", "78", "86", "67", "84", "94", "69", "85", "92", "78", "61", "29", "96", "10", "71", "98", "29", "19", "81", "05", "37", "05", "75", "35", "66", "69", "02"],
+  "crosscheck": {
+    "status": "PASS_3_WEB_SOURCES_27_OF_27",
+    "source_1": "https://ketqua.vn/xsmb/25-07-2026",
+    "source_2": "https://xoso.com.vn/xsmb-thu-7.html",
+    "source_3": "https://xosodaiphat.com/xsmb-thu-7.html",
+    "source_1_match": true,
+    "source_2_match": true,
+    "source_3_match": true
+  },
+  "sheet_rows": {
+    "champion": "MB CHAMPION!A8:S8",
+    "history_primary": "MB_History_27!A2349:AB2349",
+    "history_import": "MB_History_27_IMPORT!A2349:AB2349"
+  },
+  "settled_at": "2026-07-25T20:27:00+07:00"
+}

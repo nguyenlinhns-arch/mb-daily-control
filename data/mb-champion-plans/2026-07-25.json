@@ -1,12 +1,12 @@
 {
-  "schema_version": "MB_CHAMPION_PLAN_CONFIRMED_V2",
+  "schema_version": "MB_CHAMPION_PLAN_CONFIRMED_V3",
   "plan_id": "MB-20260725-CONFIRMED-52-83-54-90",
   "target_date": "2026-07-25",
   "data_lock_date": "2026-07-24",
   "champion": "R39 DAILY MASTER",
   "config_id": "MB_CHAMPION_R39_DAILY_MASTER_V01_20260722",
   "data_status": "LOCKED_CROSSCHECKED_27_OF_27",
-  "status": "LOCKED_WAITING_RESULT",
+  "status": "SETTLED",
   "champion_pair": ["52", "83"],
   "champion_points_by_code": {"52": 50, "83": 50},
   "champion_total_points": 100,
@@ -17,6 +17,11 @@
   "actual_capital_vnd": 3450000,
   "capital_overlay_codes": ["54", "90"],
   "capital_overlay_points_by_code": {"54": 25, "90": 25},
+  "hits_by_code": {"52": 0, "83": 0, "54": 0, "90": 0},
+  "actual_return_vnd": 0,
+  "actual_net_profit_vnd": -3450000,
+  "champion_return_vnd": 0,
+  "champion_net_profit_vnd": -2300000,
   "source": "USER_CONFIRMED_LOCKED_ORDER_SCREENSHOT_20260725",
   "outcome_known_at_selection": false,
   "rules": {
@@ -30,5 +35,10 @@
     "champion": "MB CHAMPION!A8:S8",
     "actual": "Linh!A17:H17"
   },
-  "created_at": "2026-07-25T06:18:00+07:00"
+  "settlement_files": {
+    "champion": "data/mb-champion-settlements/2026-07-25.json",
+    "actual": "data/mb-champion-actual-settlements/2026-07-25.json"
+  },
+  "created_at": "2026-07-25T06:18:00+07:00",
+  "settled_at": "2026-07-25T20:27:00+07:00"
 }

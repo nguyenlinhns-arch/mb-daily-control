@@ -83,7 +83,7 @@ def validate(index_path: Path, data_path: Path) -> None:
         "3.450.000đ",
         "13×50 · 97×50 · 89×25 · 83×25",
         "RPT_MB_20260726_R11167_NATIVE_RUN_V01",
-        "outcome known at selection",
+        "Outcome known at selection",
         "false",
     ]
     for marker in required:

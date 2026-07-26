@@ -1,15 +1,17 @@
 {
   "schema_version": "MB_DAILY_CONTROL_PUBLIC_V6",
   "layout_version": "MB_DAILY_CONTROL_LAYOUT_V8_PLAN_26_NO_XIEN2",
-  "generated_at": "2026-07-25T21:08:36+07:00",
-  "timezone": "Asia/Bangkok",
+  "generated_at": "2026-07-26T08:15:00+07:00",
+  "timezone": "Asia/Ho_Chi_Minh",
   "status": "PLAN_LOCKED_WAIT_RESULT",
   "reviewed_through": "2026-07-25",
   "project": {
     "name": "MB CHAMPION",
     "runtime": "R11167",
+    "score_source": "R11168",
     "scoring_policy": "R11157",
-    "registry_version": "MB_CHAMPION_METHOD_REGISTRY_V13_20260726",
+    "carryover_policy": "NO_AUTO_CARRYOVER_V1",
+    "registry_version": "MB_CHAMPION_METHOD_REGISTRY_V14_20260726",
     "legacy_production_benchmark": "R39 → R54 → R64",
     "production_status": "DEFAULT_SHADOW_NATIVE_R11167"
   },
@@ -18,7 +20,7 @@
     "target_dmy": "26/07/2026",
     "data_lock_date": "2026-07-25",
     "data_status": "LOCKED_27_OF_27",
-    "status": "ĐÃ KHÓA",
+    "status": "ĐÃ KHÓA · CHỜ KẾT QUẢ",
     "codes": ["13", "97", "89", "83"],
     "scores_by_code": {
       "13": 23.049921996879874,
@@ -43,6 +45,7 @@
     "outcome_known_at_selection": false,
     "tie_review": false,
     "exact_ties_outside_decision_zone": ["15", "20"],
+    "reselected_fresh_codes": ["83"],
     "no_martingale": true,
     "no_reverse": true,
     "no_extra_codes": true
@@ -63,22 +66,22 @@
     "cumulative_net_profit_vnd": 12256000,
     "status": "SETTLED_27_OF_27"
   },
-  "capital_prospective": {
-    "sessions_completed": 1,
+  "prospective_v2": {
+    "start_date": "2026-07-26",
+    "sessions_completed": 0,
     "required_sessions": 30,
-    "r11118_last_pl_vnd": -3450000,
-    "r11156_last_pl_vnd": -3450000,
-    "delta_vnd": 0
+    "status": "WAIT_RESULT_SESSION_1",
+    "frozen_bundle": "R11167 + R11168 + R11157 + R11118",
+    "r11156_mode": "PAIRED_SHADOW"
   },
   "audit": {
-    "build_id": "WEB_SYNC_20260725_2115_PLAN_26_R11168",
-    "report_run_id": "RPT_MB_20260726_R11167_NATIVE_RUN_V01",
+    "build_id": "WEB_SYNC_20260726_0815_PLAN_26_R11168_V03",
+    "report_run_id": "RPT_MB_20260726_R11167_R11168_FROZEN_RERUN_V03",
     "data_snapshot_id": "XSMB_20260725_27_85F9FDD90356",
     "data_sha256": "85f9fdd903569d755e6b56533562e998f5985c58785c668d7cd84948c2e4b7f1",
-    "artifact_sha256": "ac9e1c9c02427df8d484920a872cdc33c727ec0f27a97e365b715565f5f8be80",
-    "content_hash": "3de5a3a81a5cec91aa0fce3ee9e8ecf7e6b9a86fe4aeeb11d9feffe8d78db6c5",
+    "artifact_sha256": "30955ad13e2429d319eaf5bf9778917616b1967b3bc4d445432ec80ee07a4bac",
     "outcome_known_at_selection": false,
     "xien2_visible": false,
-    "updated_at": "2026-07-25T21:08:36+07:00"
+    "updated_at": "2026-07-26T08:15:00+07:00"
   }
 }

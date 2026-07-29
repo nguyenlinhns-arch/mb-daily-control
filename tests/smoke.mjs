@@ -6,11 +6,11 @@ const content = Object.fromEntries(
 );
 
 const requiredHtml = [
-  "MB MAX V03 Command Center",
-  "Command console",
-  "Capital Protection",
+  "Bảng điều khiển đơn giản",
+  "Lệnh hôm nay",
+  "Phanh vốn",
   "Ledger",
-  "Publication Contract",
+  "Trước khi xuống tiền",
   "app.js",
 ];
 

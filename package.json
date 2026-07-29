@@ -1,0 +1,9 @@
+{
+  "name": "mb-max-v03-github-pages",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --check app.js && node tests/smoke.mjs"
+  }
+}

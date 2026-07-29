@@ -51,6 +51,14 @@ footer {
   padding: 28px 0 18px;
 }
 
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: var(--green);
@@ -127,6 +135,10 @@ h2 {
   color: var(--green-dark);
 }
 
+.review-trigger {
+  min-height: 42px;
+}
+
 label {
   display: grid;
   gap: 7px;
@@ -170,7 +182,7 @@ select:focus {
 
 .control-panel {
   display: grid;
-  grid-template-columns: 180px minmax(240px, 1fr) repeat(3, minmax(120px, 0.45fr));
+  grid-template-columns: 180px minmax(240px, 1fr) 140px repeat(3, minmax(120px, 0.45fr));
   gap: 12px;
   align-items: end;
   margin-bottom: 14px;
@@ -212,6 +224,64 @@ select:focus {
   grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.75fr);
   gap: 14px;
   margin-bottom: 14px;
+}
+
+.review-panel {
+  margin-bottom: 14px;
+}
+
+.review-flow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.review-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e2e8e2;
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 11px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.review-step strong {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #eaf4ec;
+  color: var(--green);
+  font-size: 13px;
+}
+
+.review-step.is-ready {
+  border-color: #bad8c2;
+  color: var(--green-dark);
+}
+
+.review-copy {
+  border-left: 4px solid var(--green);
+  background: #fbfcfa;
+  padding: 12px 14px;
+}
+
+.review-copy strong {
+  color: var(--green-dark);
+  font-size: 15px;
+}
+
+.review-copy p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .tabs {
@@ -484,7 +554,8 @@ footer strong {
   .control-panel,
   .workspace-grid,
   .ledger-layout,
-  .details-grid {
+  .details-grid,
+  .review-flow {
     grid-template-columns: 1fr;
   }
 }
@@ -497,6 +568,7 @@ footer strong {
   }
 
   .app-header,
+  .header-actions,
   .section-head,
   .table-head,
   footer {

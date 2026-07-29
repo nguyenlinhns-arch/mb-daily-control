@@ -5,182 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Dashboard vận hành MB MAX V03: tạo lệnh ChatGPT, ledger lãi lỗ, chuỗi thắng thua, lệnh phanh vốn và danh sách số mạnh."
+      content="Dashboard MB MAX V03 đơn giản: tạo lệnh ChatGPT, kiểm tra phanh vốn và ghi ledger lãi lỗ."
     />
     <title>MB MAX V03 Dashboard</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="hero">
-      <div class="hero__content">
-        <p class="eyebrow">MB MAX V03 Command Center</p>
-        <h1>Dashboard chọn số, lãi lỗ và phanh vốn</h1>
-        <p class="lead">
-          Một màn hình vận hành để tạo lệnh gửi ChatGPT, khóa dữ liệu t-1,
-          theo dõi ledger, chuỗi thắng thua, trạng thái bảo toàn vốn, số mạnh
-          và số được chọn sau artifact PASS/HASH_MATCH.
-        </p>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">MB MAX V03</p>
+        <h1>Bảng điều khiển đơn giản</h1>
+        <p class="lead">Chọn ngày, tạo lệnh gửi ChatGPT, kiểm tra phanh vốn và ghi lãi/lỗ.</p>
       </div>
-      <form class="setup panel" id="setupForm">
-        <div class="panel__head">
-          <div>
-            <p class="eyebrow">Thiết lập phiên</p>
-            <h2>Khóa ngày chạy</h2>
-          </div>
-          <span class="pill">27/27 required</span>
-        </div>
-        <label for="targetDate">Ngày cần chọn số</label>
-        <input id="targetDate" type="date" />
-        <label for="selectedCodes">Số được chọn sau khi ChatGPT trả artifact</label>
-        <textarea
-          id="selectedCodes"
-          rows="4"
-          placeholder="Ví dụ: 13 x 50, 83 x 50. Chỉ nhập khi artifact PUBLISHED+PASS+HASH_MATCH."
-        ></textarea>
-        <p class="notice">
-          Nguồn kết luận duy nhất là artifact canonical. Thiếu Champion, thiếu
-          27/27, hash lệch, trùng final published hoặc lỗi look-ahead thì coi là
-          NO_BET/CAPITAL_BLOCKED.
-        </p>
-      </form>
+      <div class="top-actions">
+        <button class="button button--ghost" type="button" id="openChatGPT">Mở ChatGPT</button>
+      </div>
     </header>
 
-    <main>
-      <section class="metrics" aria-label="Chỉ số vận hành">
-        <article class="metric">
-          <span>Target Date</span>
-          <strong id="displayTargetDate">--/--/----</strong>
-        </article>
-        <article class="metric">
-          <span>Data Lock</span>
-          <strong id="displayDataLock">--/--/----</strong>
-        </article>
-        <article class="metric">
-          <span>Risk State</span>
-          <strong id="displayRiskState">ALLOW</strong>
-        </article>
-        <article class="metric">
-          <span>Publication</span>
-          <strong>PASS mới xuống tiền</strong>
-        </article>
+    <main class="layout">
+      <section class="card setup-card" aria-label="Thiết lập phiên chạy">
+        <div class="form-row">
+          <label for="targetDate">
+            Ngày chạy
+            <input id="targetDate" type="date" />
+          </label>
+          <label for="selectedCodes">
+            Số chốt sau artifact PASS
+            <input
+              id="selectedCodes"
+              type="text"
+              placeholder="Ví dụ: 13 x 50, 83 x 50"
+            />
+          </label>
+        </div>
+
+        <div class="status-strip" aria-label="Trạng thái phiên">
+          <article>
+            <span>Target</span>
+            <strong id="displayTargetDate">--/--/----</strong>
+          </article>
+          <article>
+            <span>Data Lock</span>
+            <strong id="displayDataLock">--/--/----</strong>
+          </article>
+          <article>
+            <span>Risk</span>
+            <strong id="displayRiskState">ALLOW</strong>
+          </article>
+          <article>
+            <span>Điều kiện</span>
+            <strong>PASS + HASH</strong>
+          </article>
+        </div>
       </section>
 
-      <section class="grid-two">
-        <article class="panel">
-          <div class="panel__head">
+      <section class="main-grid">
+        <article class="card command-panel">
+          <div class="section-head">
             <div>
-              <p class="eyebrow">Nút gửi lệnh</p>
-              <h2>Command console</h2>
+              <p class="eyebrow">Command</p>
+              <h2>Lệnh hôm nay</h2>
             </div>
-            <button class="button button--ghost" type="button" id="openChatGPT">
-              Mở ChatGPT
-            </button>
+            <button class="button button--dark" type="button" id="copyCommand">Sao chép</button>
           </div>
 
-          <div class="command-grid" id="commandGrid" aria-label="Loại lệnh">
-            <button class="command-card is-active" type="button" data-command="dailyRun">
-              <span>Chốt số</span>
-              <strong>Chạy MB MAX V03</strong>
-              <small>Khóa dữ liệu t-1, chạy Champion, MB16HO, CUM3, MB 2SO và Gate.</small>
-            </button>
-            <button class="command-card" type="button" data-command="settle">
-              <span>Lãi/lỗ</span>
-              <strong>Cập nhật kết quả</strong>
-              <small>Đối soát kết quả, cập nhật ledger, chuỗi thắng thua và P/L tháng.</small>
-            </button>
-            <button class="command-card" type="button" data-command="capitalBrake">
-              <span>Bảo toàn vốn</span>
-              <strong>Kiểm tra lệnh phanh</strong>
-              <small>Rà soát CORE_ONLY, PAUSE_SHADOW, HARD_PAUSE và Profit Lock.</small>
-            </button>
-            <button class="command-card" type="button" data-command="strongList">
-              <span>Danh sách</span>
-              <strong>Quét số mạnh</strong>
-              <small>Liệt kê số mạnh theo cluster, dedupe, điểm và giao thoa phương pháp.</small>
-            </button>
-            <button class="command-card" type="button" data-command="report">
-              <span>Artifact</span>
-              <strong>Xuất báo cáo ngày</strong>
-              <small>Tạo báo cáo đủ Data Lock, SHA-256, audit, hash và kết luận cuối.</small>
-            </button>
+          <div class="tabs" id="commandGrid" aria-label="Chọn loại lệnh">
+            <button class="tab is-active" type="button" data-command="dailyRun">Chốt số</button>
+            <button class="tab" type="button" data-command="settle">Kết quả</button>
+            <button class="tab" type="button" data-command="capitalBrake">Phanh vốn</button>
+            <button class="tab" type="button" data-command="strongList">Số mạnh</button>
+            <button class="tab" type="button" data-command="report">Báo cáo</button>
           </div>
 
-          <div class="command-output">
-            <div class="command-output__bar">
-              <label for="commandText">Lệnh sẵn sàng gửi</label>
-              <button class="button button--dark" type="button" id="copyCommand">
-                Sao chép lệnh
-              </button>
-            </div>
-            <textarea id="commandText" readonly rows="14"></textarea>
-          </div>
+          <textarea id="commandText" readonly rows="15"></textarea>
         </article>
 
-        <article class="panel">
-          <div class="panel__head">
-            <div>
-              <p class="eyebrow">Capital Protection</p>
-              <h2>Lệnh phanh theo tiêu chuẩn</h2>
+        <aside class="side-stack">
+          <article class="card">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Capital Gate</p>
+                <h2>Phanh vốn</h2>
+              </div>
+              <span class="risk-badge" id="riskBadge">ALLOW</span>
             </div>
-            <span class="risk-badge" id="riskBadge">ALLOW</span>
-          </div>
 
-          <div class="signal-grid">
-            <article class="signal">
-              <span>Chuỗi thua Live</span>
-              <strong id="liveLossStreak">0</strong>
-              <small>Sau 2 thua: CORE_ONLY</small>
-            </article>
-            <article class="signal">
-              <span>Chuỗi thắng Live</span>
-              <strong id="liveWinStreak">0</strong>
-              <small>Probation chỉ xét khi audit PASS</small>
-            </article>
-            <article class="signal">
-              <span>Hành động kế tiếp</span>
-              <strong id="nextAction">ALLOW</strong>
-              <small>Không manual override</small>
-            </article>
-          </div>
+            <div class="simple-metrics">
+              <article>
+                <span>Thua Live</span>
+                <strong id="liveLossStreak">0</strong>
+              </article>
+              <article>
+                <span>Thắng Live</span>
+                <strong id="liveWinStreak">0</strong>
+              </article>
+              <article>
+                <span>Lệnh tiếp</span>
+                <strong id="nextAction">ALLOW</strong>
+              </article>
+            </div>
 
-          <div class="money-grid">
-            <article>
-              <span>Lũy kế tháng</span>
-              <strong id="cumulativeNet">0đ</strong>
-            </article>
-            <article>
-              <span>Đỉnh tháng</span>
-              <strong id="monthlyPeak">0đ</strong>
-            </article>
-            <article>
-              <span>Drawdown</span>
-              <strong id="maxDrawdown">0đ</strong>
-            </article>
-          </div>
+            <ul class="short-rules">
+              <li>2 thua: chỉ CORE.</li>
+              <li>3 thua: dừng tiền thật.</li>
+              <li>Không gấp thếp, không gỡ.</li>
+            </ul>
+          </article>
 
-          <ul class="rules">
-            <li>Sau 1 thua: không tăng điểm, không thêm số.</li>
-            <li>Sau 2 thua Live: phiên kế tiếp CORE_ONLY.</li>
-            <li>Sau 3 thua Live: PAUSE_SHADOW, dừng tiền thật.</li>
-            <li>Sau 5 thua mô hình: HARD_PAUSE.</li>
-            <li>Profit Lock nếu giảm 6.900.000đ từ đỉnh sau khi lãi tháng đạt 25.000.000đ.</li>
-          </ul>
-        </article>
+          <article class="card">
+            <p class="eyebrow">P/L tháng</p>
+            <div class="money-list">
+              <div>
+                <span>Lũy kế</span>
+                <strong id="cumulativeNet">0đ</strong>
+              </div>
+              <div>
+                <span>Đỉnh</span>
+                <strong id="monthlyPeak">0đ</strong>
+              </div>
+              <div>
+                <span>Drawdown</span>
+                <strong id="maxDrawdown">0đ</strong>
+              </div>
+            </div>
+          </article>
+        </aside>
       </section>
 
-      <section class="grid-two grid-two--ledger">
-        <article class="panel">
-          <div class="panel__head">
+      <section class="main-grid ledger-grid">
+        <article class="card">
+          <div class="section-head">
             <div>
               <p class="eyebrow">Settlement</p>
-              <h2>Ghi kết quả phiên</h2>
+              <h2>Ghi ledger</h2>
             </div>
             <span class="pill">23.000đ/điểm</span>
           </div>
 
           <form class="settlement" id="settlementForm">
             <label>
-              Chế độ
+              Mode
               <select id="settlementMode">
                 <option value="CORE">CORE</option>
                 <option value="PROFIT">PROFIT</option>
@@ -189,39 +153,37 @@
               </select>
             </label>
             <label>
-              Số đã đánh
+              Số
               <input id="settlementCodes" type="text" placeholder="13,83" />
             </label>
             <label>
-              Tổng điểm
+              Điểm
               <input id="settlementPoints" type="number" min="0" max="150" step="5" value="100" />
             </label>
             <label>
-              Nháy thắng quy đổi điểm
+              Nháy
               <input id="settlementHits" type="number" min="0" step="1" value="0" />
             </label>
             <label class="span-two">
               Ghi chú
-              <input id="settlementNote" type="text" placeholder="Ví dụ: Artifact PASS, CORE_ONLY theo Gate" />
+              <input id="settlementNote" type="text" placeholder="Artifact PASS, CORE_ONLY..." />
             </label>
             <div class="settlement-preview">
-              <span>Dự tính P/L</span>
+              <span>P/L dự tính</span>
               <strong id="settlementPreview">-2.300.000đ</strong>
               <small id="settlementStatus">Thua</small>
             </div>
-            <button class="button button--dark" type="submit">Lưu ledger</button>
+            <button class="button button--dark" type="submit">Lưu</button>
           </form>
         </article>
 
-        <article class="panel">
-          <div class="panel__head">
+        <article class="card">
+          <div class="section-head">
             <div>
               <p class="eyebrow">Ledger</p>
-              <h2>Lãi lỗ và ngày thắng thua</h2>
+              <h2>Lãi/lỗ</h2>
             </div>
-            <button class="button button--ghost" type="button" id="clearLedger">
-              Xóa dữ liệu mẫu
-            </button>
+            <button class="button button--ghost" type="button" id="clearLedger">Xóa ledger</button>
           </div>
           <div class="table-wrap">
             <table>
@@ -233,7 +195,7 @@
                   <th>Điểm</th>
                   <th>Nháy</th>
                   <th>P/L</th>
-                  <th>Trạng thái</th>
+                  <th>TT</th>
                 </tr>
               </thead>
               <tbody id="ledgerBody"></tbody>
@@ -242,25 +204,25 @@
         </article>
       </section>
 
-      <section class="grid-two">
-        <article class="panel">
-          <div class="panel__head">
+      <section class="extras">
+        <article class="card">
+          <div class="section-head">
             <div>
               <p class="eyebrow">Watchlist</p>
-              <h2>List số mạnh</h2>
+              <h2>Số mạnh</h2>
             </div>
             <span class="pill">Chờ artifact</span>
           </div>
           <div class="number-list" id="strongNumberList"></div>
         </article>
 
-        <article class="panel">
-          <div class="panel__head">
+        <article class="card">
+          <div class="section-head">
             <div>
-              <p class="eyebrow">Publication Contract</p>
-              <h2>Checklist trước khi xuống tiền</h2>
+              <p class="eyebrow">Checklist</p>
+              <h2>Trước khi xuống tiền</h2>
             </div>
-            <span class="pill">Không gỡ thếp</span>
+            <span class="pill">Không override</span>
           </div>
           <div class="checklist" id="publicationChecklist"></div>
         </article>
@@ -269,7 +231,7 @@
 
     <footer>
       <strong>MB MAX V03</strong>
-      <span>Champion giữ quyền Core. MB16HO, CUM3 và MB 2SO chỉ là tham chiếu sau dedupe. Capital Gate bắt buộc.</span>
+      <span>Champion giữ Core. Capital Gate quyết định xuống tiền.</span>
     </footer>
 
     <script src="app.js" defer></script>

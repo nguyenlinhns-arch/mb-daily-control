@@ -251,6 +251,10 @@ function commandHeader() {
   return `Dự án MB MAX V03. Target Date: ${displayDate(state.targetDate)}. Data Lock: hết ngày ${displayDate(previousDate(state.targetDate))}. Nguồn chuẩn duy nhất: ${SOURCE_NAME}. Config ID: ${CONFIG_ID}. CUM3 ID: ${CUM3_ID}. MB 2SO ID: ${MB2SO_ID}. Capital Rule ID: ${CAPITAL_RULE_ID}.`;
 }
 
+function buildLaunchCommand() {
+  return `Chạy rà soát số MB MAX V03 ngày ${displayDate(state.targetDate)}. Khóa dữ liệu đến hết ${displayDate(previousDate(state.targetDate))}. Trả list số theo Champion/MB16HO/CUM3/MB 2SO, phương án A/B/C và kết luận ALLOW/CORE_ONLY/NO_BET.`;
+}
+
 function buildCommand() {
   const header = commandHeader();
   const dateLabel = displayDate(state.targetDate);
@@ -388,10 +392,10 @@ function markReviewSent() {
     month: "2-digit",
     year: "numeric",
   }).format(new Date());
-  $("reviewState").textContent = "Đã gửi lệnh";
+  $("reviewState").textContent = "Đã mở ChatGPT";
   $("reviewTitle").textContent = `Đã mở phiên rà soát cho ngày ${displayDate(state.targetDate)}.`;
   $("reviewMessage").textContent =
-    `Lúc ${timestamp}. Dashboard đã mở ChatGPT và sao chép lệnh rà soát. Hãy lấy bảng list số và kết luận ALLOW/CORE_ONLY/NO_BET; chỉ nhập vào “Số chốt” khi artifact PASS và Capital Gate cho phép.`;
+    `Lúc ${timestamp}. Dashboard đã mở ChatGPT bằng lệnh ngắn và sao chép lệnh rà soát đầy đủ. Chỉ nhập “Số chốt” khi artifact PASS và Capital Gate cho phép.`;
   document.querySelectorAll(".review-step").forEach((step) => {
     step.classList.add("is-ready");
   });
@@ -401,8 +405,9 @@ function runReviewCommand() {
   state.activeCommand = "reviewRun";
   renderCommand();
   const command = buildCommand();
+  const launchCommand = buildLaunchCommand();
   void copyText(command);
-  window.open(buildChatGptCommandUrl(command), "_blank", "noopener,noreferrer");
+  window.open(buildChatGptCommandUrl(launchCommand), "_blank", "noopener,noreferrer");
   markReviewSent();
 }
 
@@ -526,12 +531,6 @@ function bindEvents() {
     window.setTimeout(() => {
       button.textContent = "Sao chép lệnh";
     }, 1800);
-  });
-
-  $("openChatGPT").addEventListener("click", async () => {
-    const command = buildCommand();
-    await copyText(command);
-    window.open(buildChatGptCommandUrl(command), "_blank", "noopener,noreferrer");
   });
 
   $("runReview").addEventListener("click", runReviewCommand);

@@ -8,9 +8,8 @@ const content = Object.fromEntries(
 const requiredHtml = [
   "Control Center",
   "Rà soát số",
-  "Project ChatGPT MB MAX V03",
-  "saveProjectUrl",
-  "projectStatus",
+  "Mở ChatGPT",
+  "Sẵn sàng",
   "Lệnh gửi Project",
   "Quyết định vốn",
   "Ghi kết quả",
@@ -25,12 +24,14 @@ const requiredJs = [
   "buildCommand",
   "PROJECT_URL_STORAGE_KEY",
   "buildChatGptCommandUrl",
-  "requireProjectUrl",
   "runReviewCommand",
   "calculateMetrics",
   "localStorage",
   "chatgpt.com",
 ];
+
+const removedHtml = ["saveProjectUrl", "projectStatus", "Dán link Project trong ChatGPT"];
+const removedJs = ["requireProjectUrl"];
 
 for (const token of requiredHtml) {
   if (!content["index.html"].includes(token)) {
@@ -41,6 +42,18 @@ for (const token of requiredHtml) {
 for (const token of requiredJs) {
   if (!content["app.js"].includes(token)) {
     throw new Error(`Missing JS token: ${token}`);
+  }
+}
+
+for (const token of removedHtml) {
+  if (content["index.html"].includes(token)) {
+    throw new Error(`Removed HTML token is still present: ${token}`);
+  }
+}
+
+for (const token of removedJs) {
+  if (content["app.js"].includes(token)) {
+    throw new Error(`Removed JS token is still present: ${token}`);
   }
 }
 

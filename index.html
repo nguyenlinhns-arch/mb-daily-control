@@ -19,7 +19,7 @@
       </div>
       <div class="header-actions">
         <button class="button button--dark" type="button" id="runReviewHeader">Rà soát số</button>
-        <button class="button button--ghost" type="button" id="openChatGPT">Mở ChatGPT</button>
+        <button class="button button--ghost" type="button" id="openChatGPT">Mở Project</button>
       </div>
     </header>
 
@@ -78,6 +78,20 @@
             Dashboard sẽ tự tạo lệnh chuẩn, mở ChatGPT và yêu cầu Project trả bảng số theo Champion,
             MB16HO, CUM3, MB 2SO, sau đó kết luận ALLOW/CORE_ONLY/NO_BET.
           </p>
+        </div>
+
+        <div class="project-connect" aria-label="Kết nối Project ChatGPT">
+          <label for="projectUrl">
+            Project ChatGPT MB MAX V03
+            <input
+              id="projectUrl"
+              type="url"
+              placeholder="Dán link Project trong ChatGPT, ví dụ https://chatgpt.com/project/..."
+              autocomplete="off"
+            />
+          </label>
+          <button class="button button--ghost" type="button" id="saveProjectUrl">Lưu Project</button>
+          <span class="project-status" id="projectStatus">Chưa kết nối Project</span>
         </div>
       </section>
 

@@ -273,10 +273,12 @@ select:focus {
 
 .primary-actions {
   grid-column: 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
+  display: grid;
+  align-items: stretch;
+}
+
+.primary-actions .button {
+  width: 100%;
 }
 
 .meta-strip {
@@ -521,6 +523,12 @@ summary small {
   flex-wrap: wrap;
   gap: 8px;
   margin: 14px 0 12px;
+}
+
+.drawer-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
 }
 
 .tab {

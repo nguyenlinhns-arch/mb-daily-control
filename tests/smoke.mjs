@@ -6,16 +6,16 @@ const content = Object.fromEntries(
 );
 
 const requiredHtml = [
-  "Dashboard vận hành",
+  "Control Center",
   "Rà soát số",
   "Project ChatGPT MB MAX V03",
   "saveProjectUrl",
   "projectStatus",
-  "Lệnh hôm nay",
-  "Trạng thái vốn",
-  "Ghi ledger",
+  "Lệnh gửi Project",
+  "Quyết định vốn",
+  "Ghi kết quả",
   "Số mạnh đang theo dõi",
-  "Checklist trước khi xuống tiền",
+  "Checklist xuống tiền",
   "app.js",
 ];
 

@@ -284,6 +284,37 @@ select:focus {
   line-height: 1.5;
 }
 
+.project-connect {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+  gap: 10px;
+  align-items: end;
+  border: 1px solid #e2e8e2;
+  border-radius: 8px;
+  background: #ffffff;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.project-status {
+  align-self: center;
+  border-radius: 999px;
+  padding: 8px 11px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.project-status.is-connected {
+  background: #eaf4ec;
+  color: var(--green);
+}
+
+.project-status.is-missing {
+  background: var(--yellow-bg);
+  color: var(--yellow);
+}
+
 .tabs {
   display: flex;
   flex-wrap: wrap;
@@ -555,7 +586,8 @@ footer strong {
   .workspace-grid,
   .ledger-layout,
   .details-grid,
-  .review-flow {
+  .review-flow,
+  .project-connect {
     grid-template-columns: 1fr;
   }
 }

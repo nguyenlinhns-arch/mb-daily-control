@@ -317,7 +317,7 @@ function renderMetrics() {
 
 function renderCommand() {
   $("commandText").value = buildCommand();
-  document.querySelectorAll(".command-card").forEach((button) => {
+  document.querySelectorAll("[data-command]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.command === state.activeCommand);
     button.setAttribute(
       "aria-pressed",
@@ -444,7 +444,7 @@ function bindEvents() {
     const ok = await copyText(buildCommand());
     button.textContent = ok ? "Đã sao chép" : "Không sao chép được";
     window.setTimeout(() => {
-      button.textContent = "Sao chép lệnh";
+      button.textContent = "Sao chép";
     }, 1800);
   });
 

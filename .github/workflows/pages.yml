@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Deploy static site to GitHub Pages
 
 on:
   push:
@@ -11,8 +11,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -20,81 +20,27 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate MB CHAMPION public dashboard
-        run: |
-          set -euo pipefail
-          python3 -m json.tool data/current.json >/dev/null
-          python3 scripts/validate_dashboard.py index.html data/current.json
-
-      - name: Build zero-dependency static site
-        run: |
-          set -euo pipefail
-          rm -rf _site
-          mkdir -p _site/fast _site/data _site/plan
-          python3 scripts/normalize_static_dashboard.py index.html _site/index.html
-          cp _site/index.html _site/fast/index.html
-          cp data/current.json _site/data/current.json
-          if [ -f data/de-head-current.json ]; then
-            cp data/de-head-current.json _site/data/de-head-current.json
-          fi
-          cp docs/index.html _site/plan/index.html
-          for file in live-*.html; do
-            [ -e "$file" ] || continue
-            cp "$file" "_site/$(basename "$file")"
-          done
-          for file in docs/live-*.html; do
-            [ -e "$file" ] || continue
-            cp "$file" "_site/plan/$(basename "$file")"
-          done
-          printf '%s\n' "static-dashboard-${GITHUB_SHA}" > _site/version.txt
-          touch _site/.nojekyll
-          test -s _site/index.html
-          test -s _site/data/current.json
-          python3 scripts/validate_dashboard.py _site/index.html _site/data/current.json
-          grep -q 'data-static-dashboard="1"' _site/index.html
-          grep -q 'MB_STATUS_SAFE_V1' _site/index.html
-          grep -q 'MB_DAILY_CONTROL_LAYOUT_V8_PLAN_26_NO_XIEN2' _site/index.html
-          grep -q 'KẾ HOẠCH KỲ SẮP TỚI' _site/index.html
-          grep -q 'Chủ Nhật, 26/07/2026' _site/index.html
-          grep -q '<b>13</b>' _site/index.html
-          grep -q '<b>97</b>' _site/index.html
-          grep -q '<b>89</b>' _site/index.html
-          grep -q '<b>83</b>' _site/index.html
-          grep -q '150 điểm' _site/index.html
-          grep -q '3.450.000đ' _site/index.html
-          grep -q '13×50 · 97×50 · 89×25 · 83×25' _site/index.html
-          if grep -q 'KẾT QUẢ HÔM NAY' _site/index.html; then
-            echo 'The stale 25/07 result hero must not be deployed.' >&2
-            exit 1
-          fi
-          if grep -q 'Thứ Bảy, 25/07/2026' _site/index.html; then
-            echo 'The stale 25/07 public title must not be deployed.' >&2
-            exit 1
-          fi
-          if grep -q '52×50 · 83×50 · 54×25 · 90×25' _site/index.html; then
-            echo 'The stale 25/07 plan order must not be deployed as the public current plan.' >&2
-            exit 1
-          fi
-          if grep -q 'Xiên 2' _site/index.html; then
-            echo 'Xiên 2 must not be visible on the public dashboard.' >&2
-            exit 1
-          fi
-
-      - name: Configure Pages
+      - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
-      - name: Upload static site
+      - name: Build static artifact
+        run: |
+          set -euo pipefail
+          npm test
+          rm -rf _site
+          mkdir -p _site
+          cp index.html styles.css app.js 404.html _site/
+          touch _site/.nojekyll
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: "_site"
 
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

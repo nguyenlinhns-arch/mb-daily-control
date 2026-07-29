@@ -251,26 +251,6 @@ function commandHeader() {
   return `Dự án MB MAX V03. Target Date: ${displayDate(state.targetDate)}. Data Lock: hết ngày ${displayDate(previousDate(state.targetDate))}. Nguồn chuẩn duy nhất: ${SOURCE_NAME}. Config ID: ${CONFIG_ID}. CUM3 ID: ${CUM3_ID}. MB 2SO ID: ${MB2SO_ID}. Capital Rule ID: ${CAPITAL_RULE_ID}.`;
 }
 
-function renderProjectConnection() {
-  const connected = Boolean(state.projectUrl);
-  $("projectUrl").value = state.projectUrl;
-  $("projectStatus").textContent = connected
-    ? "Đã kết nối Project"
-    : "Chưa kết nối Project";
-  $("projectStatus").className = `project-status ${connected ? "is-connected" : "is-missing"}`;
-  $("openChatGPT").textContent = connected ? "Mở Project" : "Kết nối Project";
-}
-
-function requireProjectUrl() {
-  if (state.projectUrl) return true;
-  $("reviewState").textContent = "Cần link Project";
-  $("reviewTitle").textContent = "Chưa có link Project MB MAX V03.";
-  $("reviewMessage").textContent =
-    "Hãy mở Project MB MAX V03 trong ChatGPT, sao chép URL trên trình duyệt, dán vào ô Project ChatGPT rồi bấm Lưu Project. Sau đó nút Rà soát số sẽ mở thẳng đúng dự án.";
-  $("projectUrl").focus();
-  return false;
-}
-
 function buildCommand() {
   const header = commandHeader();
   const dateLabel = displayDate(state.targetDate);
@@ -411,7 +391,7 @@ function markReviewSent() {
   $("reviewState").textContent = "Đã gửi lệnh";
   $("reviewTitle").textContent = `Đã mở phiên rà soát cho ngày ${displayDate(state.targetDate)}.`;
   $("reviewMessage").textContent =
-    `Lúc ${timestamp}. Dashboard đã mở đúng Project đã kết nối và sao chép lệnh rà soát. Hãy lấy bảng list số và kết luận ALLOW/CORE_ONLY/NO_BET trong ChatGPT; chỉ nhập vào “Số chốt” khi artifact PASS và Capital Gate cho phép.`;
+    `Lúc ${timestamp}. Dashboard đã mở ChatGPT và sao chép lệnh rà soát. Hãy lấy bảng list số và kết luận ALLOW/CORE_ONLY/NO_BET; chỉ nhập vào “Số chốt” khi artifact PASS và Capital Gate cho phép.`;
   document.querySelectorAll(".review-step").forEach((step) => {
     step.classList.add("is-ready");
   });
@@ -420,7 +400,6 @@ function markReviewSent() {
 function runReviewCommand() {
   state.activeCommand = "reviewRun";
   renderCommand();
-  if (!requireProjectUrl()) return;
   const command = buildCommand();
   void copyText(command);
   window.open(buildChatGptCommandUrl(command), "_blank", "noopener,noreferrer");
@@ -550,7 +529,6 @@ function bindEvents() {
   });
 
   $("openChatGPT").addEventListener("click", async () => {
-    if (!requireProjectUrl()) return;
     const command = buildCommand();
     await copyText(command);
     window.open(buildChatGptCommandUrl(command), "_blank", "noopener,noreferrer");
@@ -558,26 +536,6 @@ function bindEvents() {
 
   $("runReview").addEventListener("click", runReviewCommand);
   $("runReviewHeader").addEventListener("click", runReviewCommand);
-
-  $("saveProjectUrl").addEventListener("click", () => {
-    const normalized = normalizeProjectUrl($("projectUrl").value);
-    if (!normalized) {
-      $("projectStatus").textContent = "Link chưa hợp lệ. Hãy dùng link bắt đầu bằng https://chatgpt.com/...";
-      $("projectStatus").className = "project-status is-missing";
-      $("projectUrl").focus();
-      return;
-    }
-    state.projectUrl = normalized;
-    writeStorage(PROJECT_URL_STORAGE_KEY, state.projectUrl);
-    renderProjectConnection();
-  });
-
-  $("projectUrl").addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      $("saveProjectUrl").click();
-    }
-  });
 
   ["settlementPoints", "settlementHits"].forEach((id) => {
     $(id).addEventListener("input", renderSettlementPreview);
@@ -625,7 +583,6 @@ function boot() {
   state.projectUrl = normalizeProjectUrl(readStorage(PROJECT_URL_STORAGE_KEY) || "");
   $("targetDate").value = state.targetDate;
   $("selectedCodes").value = state.selectedCodes;
-  renderProjectConnection();
   renderStrongNumbers();
   renderChecklist();
   bindEvents();

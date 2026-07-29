@@ -1,95 +1,40 @@
-# MB Daily Control
+# MB MAX V03 Dashboard
 
-Dashboard và pipeline vận hành hằng ngày cho phương pháp **MB FUSION4–180**.
+Dashboard GitHub Pages cho MB MAX V03.
 
-## Lệnh đã khóa ngày 20/07/2026
+## Chức năng
 
-- Hạng 1–3: **21, 91, 60 × 50 điểm**.
-- Hạng 4: **15 × 30 điểm**.
-- Tổng: **180 điểm**, vốn/lỗ tối đa **4.140.000đ** theo giá vốn
-  23.000đ/điểm.
-- Dữ liệu chỉ khóa đến hết 19/07/2026; kết quả 20/07 không được dùng khi chọn.
+- Tạo lệnh chuẩn để gửi ChatGPT: chạy MB MAX V03, cập nhật kết quả, kiểm tra lệnh phanh, quét số mạnh và xuất báo cáo ngày.
+- Ledger lãi/lỗ lưu trên trình duyệt bằng `localStorage`.
+- Tự tính chuỗi thắng/thua Live, lũy kế tháng, đỉnh tháng, drawdown và trạng thái Capital Protection.
+- Watchlist số mạnh và checklist Publication Contract.
 
-Fusion4 xếp hạng theo công thức đã khóa:
+## Triển khai GitHub Pages
 
-`0,75 × hạng Max4 + 0,25 × ưu tiên Max10 + 0,50 nếu thuộc tập Max10`
+1. Tạo repository mới trên GitHub, ví dụ `mb-max-v03-dashboard`.
+2. Upload toàn bộ nội dung thư mục này lên repository.
+3. Vào `Settings` -> `Pages`.
+4. Chọn `Build and deployment` -> `GitHub Actions`.
+5. Push lên nhánh `main`. Workflow `.github/workflows/pages.yml` sẽ tự deploy.
 
-A1 được giữ ở lớp kiểm toán nghiên cứu; với cấu hình cố định bốn số, A1 không
-thay đổi thứ tự chọn. Không dùng Core100/Other50, overlay hay gấp thếp.
+Với repo `nguyenlinhns-arch/mb-daily-control`, link công khai là:
 
-## Đối soát đến 19/07/2026
+```text
+https://nguyenlinhns-arch.github.io/mb-daily-control/
+```
 
-Lệnh Fusion4 ngày 19/07 là `59, 78, 06, 10` theo mức `50–50–50–30`.
-Mã 78 xuất hiện một nháy: vốn 4.140.000đ, trả 4.000.000đ, P/L phương pháp
-**-140.000đ**. Lệnh cá nhân của Linh cùng ngày trùng với lệnh Fusion4 và đã
-được quyết toán riêng; không cộng trùng hai sổ.
+## Chạy thử local
 
-Lệnh thực tế của từng người luôn tách riêng. Pipeline chỉ quyết toán dòng đã có
-dữ liệu A:D; không tự gán lệnh, không tự ghi 0 và không suy diễn P/L cho người
-không có lệnh.
+```bash
+python3 -m http.server 4173
+```
 
-## Tự động hóa lúc 19:15
+Sau đó mở:
 
-Workflow `.github/workflows/fusion4-daily-1915.yml` chạy lúc 19:15
-Asia/Bangkok, retry idempotent lúc 19:30 và 19:45:
+```text
+http://localhost:4173
+```
 
-1. đọc đủ 27/27 kết quả ngày hiện tại và đối chiếu hai tab lịch sử;
-2. quyết toán lệnh Fusion4 đã khóa và các lệnh cá nhân thực tế đang có;
-3. ghi Google Sheets rồi đọc lại đúng operation ID/hash;
-4. tải runtime riêng tư, sinh và khóa kế hoạch cho ngày sau;
-5. chỉ khi Sheets/readback đạt mới cập nhật JSON, website và đẩy nhánh `main`.
+## Lưu ý vận hành
 
-Thiếu kết quả, sai hash, thay đổi A:D trong lúc chạy, P/L có sẵn mâu thuẫn hoặc
-Google trả lỗi đều làm pipeline dừng fail-closed; website gần nhất được giữ
-nguyên. Lịch V32 cũ đã bị gỡ và chỉ còn rollback thủ công có xác nhận.
-
-Các tab transaction hiện hành:
-
-- nguồn: `FUSION4_Daily_Plan`, `FUSION4_Daily_Settlement`,
-  `FUSION4_Automation_Log`;
-- P/L: `Tự động hóa FUSION4`, `Nhật ký FUSION4`, `MB FUSION4` và năm tab cá
-  nhân được ánh xạ bằng các slot `p1`–`p5`.
-
-Sổ `MB FUSION4` là sổ phương pháp lý thuyết. Năm tab cá nhân là sổ lệnh thật;
-hai phạm vi không được cộng lẫn.
-
-## Thành phần chính
-
-- `index.html`: dashboard tĩnh đã render, không cần API để hiện lệnh.
-- `data/current.json`: payload công khai cùng nội dung với giao diện.
-- `data/fusion4-*`: plan, settlement, state và transaction audit.
-- `scripts/fusion4_engine.py`: wrapper xếp hạng Fusion4 trên runtime riêng tư.
-- `scripts/fusion4_daily.py`: giao dịch fail-closed từ kết quả đến website.
-- `scripts/fusion4_google_sheets_bridge.py`: snapshot, ghi Sheets và readback.
-- `scripts/validate_dashboard.py`: chặn publish nếu HTML/JSON/vốn lệch nhau.
-
-Repository cần secret `GOOGLE_SERVICE_ACCOUNT_JSON`. Service account phải có
-quyền Editor ở file nguồn và file P/L, quyền Reader ở runtime Drive, đồng thời
-được phép ghi các protected range cột E/H của năm tab cá nhân. ID file P/L nằm
-trong tab ẩn `V32_Private_Config` để tương thích runtime và không xuất hiện trên
-website.
-
-Runtime/model không nằm trong repository công khai. Gói Drive được kiểm tra
-SHA-256 `09bb4dbd6890f0d27c4f8519b72deb3b3b18c317c246c4a168182b51ed7a67d1`
-và tree hash `1e06af9c8639099055380e136ee13f5f0c6399c9a437c9cc6150246f16b9fdf3`;
-sai một byte thì pipeline dừng.
-
-Trang công khai: <https://nguyenlinhns-arch.github.io/mb-daily-control/>
-
-## Hợp đồng bố cục website
-
-Bố cục công khai được khóa trong `data/website-layout-policy.json` và được
-kiểm tra fail-closed trước khi xuất bản:
-
-1. Phần trên chỉ hiển thị **kế hoạch kỳ sắp tới**: ngày đánh, từng số, điểm
-   từng số, tổng điểm và tổng vốn.
-2. Phần dưới chỉ hiển thị **lệnh thực tế của Linh** từ 01/07/2026 đến kỳ đã
-   đối chiếu gần nhất, tách `Tháng hiện tại` và `Tổng thực tế`; mỗi khối có số
-   ngày thắng, số ngày thua, chuỗi thắng dài nhất, chuỗi thua dài nhất và
-   lãi/lỗ thực tế.
-3. Không hiển thị backtest, P/L lý thuyết của phương pháp hoặc tổng P/L 5 người
-   trong khu vực thống kê công khai.
-
-Google Sheet nguồn: <https://docs.google.com/spreadsheets/d/1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w/edit>
-
-Backtest là số liệu lịch sử, không bảo đảm kết quả tương lai.
+Website không tự bịa số và không tự xuống tiền. Final codes chỉ hợp lệ khi có artifact canonical `PUBLISHED+PASS+HASH_MATCH` theo đúng mô tả MB MAX V03.

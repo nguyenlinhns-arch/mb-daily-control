@@ -6,11 +6,12 @@ const content = Object.fromEntries(
 );
 
 const requiredHtml = [
-  "Bảng điều khiển đơn giản",
+  "Dashboard vận hành",
   "Lệnh hôm nay",
-  "Phanh vốn",
-  "Ledger",
-  "Trước khi xuống tiền",
+  "Trạng thái vốn",
+  "Ghi ledger",
+  "Số mạnh đang theo dõi",
+  "Checklist trước khi xuống tiền",
   "app.js",
 ];
 

@@ -8,8 +8,8 @@ const POINT_PAYOUT = 80000;
 const DEFAULT_TARGET_DATE = "2026-07-29";
 const LEDGER_STORAGE_KEY = "mb-max-v03-ledger";
 const SELECTED_CODES_STORAGE_KEY = "mb-max-v03-selected-codes";
-const PROJECT_URL_STORAGE_KEY = "mb-max-v03-chatgpt-project-url";
-const CHATGPT_FALLBACK_URL = "https://chatgpt.com/";
+const DEFAULT_PROJECT_URL =
+  "https://chatgpt.com/g/g-p-6a36a4fc59c0819190472acee32d2540-mb-max-v03/project";
 
 const commandMeta = {
   reviewRun: "Rà soát số",
@@ -45,7 +45,7 @@ const state = {
   activeCommand: "reviewRun",
   targetDate: DEFAULT_TARGET_DATE,
   selectedCodes: "",
-  projectUrl: "",
+  projectUrl: DEFAULT_PROJECT_URL,
   ledger: [],
 };
 
@@ -159,7 +159,7 @@ function normalizeProjectUrl(value) {
 }
 
 function buildChatGptCommandUrl(command) {
-  const targetUrl = state.projectUrl || CHATGPT_FALLBACK_URL;
+  const targetUrl = state.projectUrl || DEFAULT_PROJECT_URL;
   const url = new URL(targetUrl);
   url.searchParams.set("q", command);
   return url.toString();
@@ -392,10 +392,10 @@ function markReviewSent() {
     month: "2-digit",
     year: "numeric",
   }).format(new Date());
-  $("reviewState").textContent = "Đã mở ChatGPT";
-  $("reviewTitle").textContent = `Đã mở phiên rà soát cho ngày ${displayDate(state.targetDate)}.`;
+  $("reviewState").textContent = "Đã gửi sang Project";
+  $("reviewTitle").textContent = `Đã gửi lệnh rà soát vào Project cho ngày ${displayDate(state.targetDate)}.`;
   $("reviewMessage").textContent =
-    `Lúc ${timestamp}. Dashboard đã mở ChatGPT bằng lệnh ngắn và sao chép lệnh rà soát đầy đủ. Chỉ nhập “Số chốt” khi artifact PASS và Capital Gate cho phép.`;
+    `Lúc ${timestamp}. Dashboard đã mở đúng Project MB MAX V03 bằng lệnh ngắn và sao chép lệnh rà soát đầy đủ. Chỉ nhập “Số chốt” khi artifact PASS và Capital Gate cho phép.`;
   document.querySelectorAll(".review-step").forEach((step) => {
     step.classList.add("is-ready");
   });
@@ -579,7 +579,7 @@ function bindEvents() {
 function boot() {
   state.ledger = parseLedger(readStorage(LEDGER_STORAGE_KEY));
   state.selectedCodes = readStorage(SELECTED_CODES_STORAGE_KEY) || "";
-  state.projectUrl = normalizeProjectUrl(readStorage(PROJECT_URL_STORAGE_KEY) || "");
+  state.projectUrl = DEFAULT_PROJECT_URL;
   $("targetDate").value = state.targetDate;
   $("selectedCodes").value = state.selectedCodes;
   renderStrongNumbers();

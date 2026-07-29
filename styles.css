@@ -102,8 +102,7 @@ h2 {
 
 .top-status,
 .pill,
-.risk-badge,
-.project-status {
+.risk-badge {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
@@ -270,31 +269,6 @@ textarea:focus,
 select:focus {
   border-color: var(--green);
   box-shadow: 0 0 0 3px rgb(22 115 77 / 0.12);
-}
-
-.project-row {
-  grid-column: 2;
-  display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto auto;
-  gap: 10px;
-  align-items: end;
-}
-
-.project-status {
-  min-height: 36px;
-  padding: 8px 11px;
-  background: var(--yellow-soft);
-  color: var(--yellow);
-}
-
-.project-status.is-connected {
-  background: var(--green-soft);
-  color: var(--green);
-}
-
-.project-status.is-missing {
-  background: var(--yellow-soft);
-  color: var(--yellow);
 }
 
 .primary-actions {
@@ -648,12 +622,10 @@ summary small {
   .main-grid,
   .support-grid,
   .run-form,
-  .project-row,
   .settlement {
     grid-template-columns: 1fr;
   }
 
-  .project-row,
   .primary-actions {
     grid-column: 1;
   }

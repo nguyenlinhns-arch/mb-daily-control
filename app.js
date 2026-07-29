@@ -255,8 +255,8 @@ function renderProjectConnection() {
   const connected = Boolean(state.projectUrl);
   $("projectUrl").value = state.projectUrl;
   $("projectStatus").textContent = connected
-    ? "Đã kết nối Project. Nút rà soát sẽ mở đúng dự án."
-    : "Chưa kết nối: cần dán link Project để tránh mở nhầm chat thường.";
+    ? "Đã kết nối Project"
+    : "Chưa kết nối Project";
   $("projectStatus").className = `project-status ${connected ? "is-connected" : "is-missing"}`;
   $("openChatGPT").textContent = connected ? "Mở Project" : "Kết nối Project";
 }
@@ -545,7 +545,7 @@ function bindEvents() {
     const ok = await copyText(buildCommand());
     button.textContent = ok ? "Đã sao chép" : "Không sao chép được";
     window.setTimeout(() => {
-      button.textContent = "Sao chép";
+      button.textContent = "Sao chép lệnh";
     }, 1800);
   });
 

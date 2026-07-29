@@ -7,10 +7,9 @@ const content = Object.fromEntries(
 
 const requiredHtml = [
   "Control Center",
-  "Rà soát số",
-  "Mở ChatGPT",
-  "Sẵn sàng",
-  "Lệnh gửi Project",
+  "Rà soát trên ChatGPT",
+  "Sẵn sàng rà soát",
+  "Lệnh rà soát đầy đủ",
   "Quyết định vốn",
   "Ghi kết quả",
   "Số mạnh đang theo dõi",
@@ -24,6 +23,7 @@ const requiredJs = [
   "buildCommand",
   "PROJECT_URL_STORAGE_KEY",
   "buildChatGptCommandUrl",
+  "buildLaunchCommand",
   "runReviewCommand",
   "calculateMetrics",
   "localStorage",

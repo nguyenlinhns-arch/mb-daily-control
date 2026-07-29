@@ -7,6 +7,7 @@ const content = Object.fromEntries(
 
 const requiredHtml = [
   "Dashboard vận hành",
+  "Rà soát số",
   "Lệnh hôm nay",
   "Trạng thái vốn",
   "Ghi ledger",
@@ -19,6 +20,7 @@ const requiredJs = [
   "MB_MAX_V03_CUM3_2SO_INT_V3",
   "MB_CAPITAL_PROTECTION_V1",
   "buildCommand",
+  "runReviewCommand",
   "calculateMetrics",
   "localStorage",
   "chatgpt.com",

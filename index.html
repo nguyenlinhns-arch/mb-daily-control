@@ -5,62 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Dashboard MB MAX V03 đơn giản: tạo lệnh ChatGPT, kiểm tra phanh vốn và ghi ledger lãi lỗ."
+      content="Dashboard MB MAX V03 tối giản: tạo lệnh ChatGPT, kiểm tra phanh vốn và ghi ledger lãi lỗ."
     />
     <title>MB MAX V03 Dashboard</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="topbar">
+    <header class="app-header">
       <div>
         <p class="eyebrow">MB MAX V03</p>
-        <h1>Bảng điều khiển đơn giản</h1>
-        <p class="lead">Chọn ngày, tạo lệnh gửi ChatGPT, kiểm tra phanh vốn và ghi lãi/lỗ.</p>
+        <h1>Dashboard vận hành</h1>
+        <p class="lead">Một màn hình để tạo lệnh, kiểm soát vốn và ghi kết quả hằng ngày.</p>
       </div>
-      <div class="top-actions">
-        <button class="button button--ghost" type="button" id="openChatGPT">Mở ChatGPT</button>
-      </div>
+      <button class="button button--dark" type="button" id="openChatGPT">Mở ChatGPT</button>
     </header>
 
-    <main class="layout">
-      <section class="card setup-card" aria-label="Thiết lập phiên chạy">
-        <div class="form-row">
-          <label for="targetDate">
-            Ngày chạy
-            <input id="targetDate" type="date" />
-          </label>
-          <label for="selectedCodes">
-            Số chốt sau artifact PASS
-            <input
-              id="selectedCodes"
-              type="text"
-              placeholder="Ví dụ: 13 x 50, 83 x 50"
-            />
-          </label>
+    <main class="page">
+      <section class="panel control-panel" aria-label="Thiết lập phiên chạy">
+        <label for="targetDate">
+          Ngày chạy
+          <input id="targetDate" type="date" />
+        </label>
+        <label for="selectedCodes">
+          Số chốt
+          <input id="selectedCodes" type="text" placeholder="Ví dụ: 13 x 50, 83 x 50" />
+        </label>
+        <div class="summary-card">
+          <span>Target</span>
+          <strong id="displayTargetDate">--/--/----</strong>
         </div>
-
-        <div class="status-strip" aria-label="Trạng thái phiên">
-          <article>
-            <span>Target</span>
-            <strong id="displayTargetDate">--/--/----</strong>
-          </article>
-          <article>
-            <span>Data Lock</span>
-            <strong id="displayDataLock">--/--/----</strong>
-          </article>
-          <article>
-            <span>Risk</span>
-            <strong id="displayRiskState">ALLOW</strong>
-          </article>
-          <article>
-            <span>Điều kiện</span>
-            <strong>PASS + HASH</strong>
-          </article>
+        <div class="summary-card">
+          <span>Data Lock</span>
+          <strong id="displayDataLock">--/--/----</strong>
+        </div>
+        <div class="summary-card">
+          <span>Risk</span>
+          <strong id="displayRiskState">ALLOW</strong>
         </div>
       </section>
 
-      <section class="main-grid">
-        <article class="card command-panel">
+      <section class="workspace-grid">
+        <article class="panel command-panel">
           <div class="section-head">
             <div>
               <p class="eyebrow">Command</p>
@@ -80,68 +65,63 @@
           <textarea id="commandText" readonly rows="15"></textarea>
         </article>
 
-        <aside class="side-stack">
-          <article class="card">
-            <div class="section-head">
-              <div>
-                <p class="eyebrow">Capital Gate</p>
-                <h2>Phanh vốn</h2>
-              </div>
-              <span class="risk-badge" id="riskBadge">ALLOW</span>
+        <aside class="panel gate-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Capital Gate</p>
+              <h2>Trạng thái vốn</h2>
             </div>
+            <span class="risk-badge" id="riskBadge">ALLOW</span>
+          </div>
 
-            <div class="simple-metrics">
-              <article>
-                <span>Thua Live</span>
-                <strong id="liveLossStreak">0</strong>
-              </article>
-              <article>
-                <span>Thắng Live</span>
-                <strong id="liveWinStreak">0</strong>
-              </article>
-              <article>
-                <span>Lệnh tiếp</span>
-                <strong id="nextAction">ALLOW</strong>
-              </article>
+          <div class="metric-stack">
+            <div class="metric-line">
+              <span>Thua Live</span>
+              <strong id="liveLossStreak">0</strong>
             </div>
-
-            <ul class="short-rules">
-              <li>2 thua: chỉ CORE.</li>
-              <li>3 thua: dừng tiền thật.</li>
-              <li>Không gấp thếp, không gỡ.</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <p class="eyebrow">P/L tháng</p>
-            <div class="money-list">
-              <div>
-                <span>Lũy kế</span>
-                <strong id="cumulativeNet">0đ</strong>
-              </div>
-              <div>
-                <span>Đỉnh</span>
-                <strong id="monthlyPeak">0đ</strong>
-              </div>
-              <div>
-                <span>Drawdown</span>
-                <strong id="maxDrawdown">0đ</strong>
-              </div>
+            <div class="metric-line">
+              <span>Thắng Live</span>
+              <strong id="liveWinStreak">0</strong>
             </div>
-          </article>
+            <div class="metric-line">
+              <span>Lệnh tiếp</span>
+              <strong id="nextAction">ALLOW</strong>
+            </div>
+          </div>
+
+          <div class="money-block">
+            <div>
+              <span>Lũy kế tháng</span>
+              <strong id="cumulativeNet">0đ</strong>
+            </div>
+            <div>
+              <span>Đỉnh tháng</span>
+              <strong id="monthlyPeak">0đ</strong>
+            </div>
+            <div>
+              <span>Drawdown</span>
+              <strong id="maxDrawdown">0đ</strong>
+            </div>
+          </div>
+
+          <ul class="rule-list">
+            <li>2 thua: chỉ CORE.</li>
+            <li>3 thua: dừng tiền thật.</li>
+            <li>Không gấp thếp, không gỡ.</li>
+          </ul>
         </aside>
       </section>
 
-      <section class="main-grid ledger-grid">
-        <article class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Settlement</p>
-              <h2>Ghi ledger</h2>
-            </div>
-            <span class="pill">23.000đ/điểm</span>
+      <section class="panel ledger-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Settlement</p>
+            <h2>Ghi ledger</h2>
           </div>
+          <span class="pill">23.000đ/điểm</span>
+        </div>
 
+        <div class="ledger-layout">
           <form class="settlement" id="settlementForm">
             <label>
               Mode
@@ -164,7 +144,7 @@
               Nháy
               <input id="settlementHits" type="number" min="0" step="1" value="0" />
             </label>
-            <label class="span-two">
+            <label class="wide">
               Ghi chú
               <input id="settlementNote" type="text" placeholder="Artifact PASS, CORE_ONLY..." />
             </label>
@@ -173,59 +153,50 @@
               <strong id="settlementPreview">-2.300.000đ</strong>
               <small id="settlementStatus">Thua</small>
             </div>
-            <button class="button button--dark" type="submit">Lưu</button>
+            <button class="button button--dark wide" type="submit">Lưu ledger</button>
           </form>
-        </article>
 
-        <article class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Ledger</p>
-              <h2>Lãi/lỗ</h2>
+          <div class="ledger-table">
+            <div class="table-head">
+              <strong>Lãi/lỗ gần nhất</strong>
+              <button class="button button--ghost" type="button" id="clearLedger">Xóa ledger</button>
             </div>
-            <button class="button button--ghost" type="button" id="clearLedger">Xóa ledger</button>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ngày</th>
+                    <th>Mode</th>
+                    <th>Số</th>
+                    <th>Điểm</th>
+                    <th>Nháy</th>
+                    <th>P/L</th>
+                    <th>TT</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerBody"></tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ngày</th>
-                  <th>Mode</th>
-                  <th>Số</th>
-                  <th>Điểm</th>
-                  <th>Nháy</th>
-                  <th>P/L</th>
-                  <th>TT</th>
-                </tr>
-              </thead>
-              <tbody id="ledgerBody"></tbody>
-            </table>
-          </div>
-        </article>
+        </div>
       </section>
 
-      <section class="extras">
-        <article class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Watchlist</p>
-              <h2>Số mạnh</h2>
-            </div>
-            <span class="pill">Chờ artifact</span>
-          </div>
+      <section class="details-grid">
+        <details class="panel soft-panel" open>
+          <summary>
+            <span>Số mạnh đang theo dõi</span>
+            <small>Chỉ là watchlist, chờ artifact PASS.</small>
+          </summary>
           <div class="number-list" id="strongNumberList"></div>
-        </article>
+        </details>
 
-        <article class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Checklist</p>
-              <h2>Trước khi xuống tiền</h2>
-            </div>
-            <span class="pill">Không override</span>
-          </div>
+        <details class="panel soft-panel">
+          <summary>
+            <span>Checklist trước khi xuống tiền</span>
+            <small>Publication Contract + Capital Gate.</small>
+          </summary>
           <div class="checklist" id="publicationChecklist"></div>
-        </article>
+        </details>
       </section>
     </main>
 

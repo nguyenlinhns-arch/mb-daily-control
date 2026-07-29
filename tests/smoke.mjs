@@ -7,7 +7,7 @@ const content = Object.fromEntries(
 
 const requiredHtml = [
   "Control Center",
-  "Rà soát trên ChatGPT",
+  "Gửi lệnh vào Project",
   "Sẵn sàng rà soát",
   "Lệnh rà soát đầy đủ",
   "Quyết định vốn",
@@ -20,8 +20,8 @@ const requiredHtml = [
 const requiredJs = [
   "MB_MAX_V03_CUM3_2SO_INT_V3",
   "MB_CAPITAL_PROTECTION_V1",
+  "g-p-6a36a4fc59c0819190472acee32d2540-mb-max-v03",
   "buildCommand",
-  "PROJECT_URL_STORAGE_KEY",
   "buildChatGptCommandUrl",
   "buildLaunchCommand",
   "runReviewCommand",
@@ -31,7 +31,7 @@ const requiredJs = [
 ];
 
 const removedHtml = ["saveProjectUrl", "projectStatus", "Dán link Project trong ChatGPT"];
-const removedJs = ["requireProjectUrl"];
+const removedJs = ["requireProjectUrl", "CHATGPT_FALLBACK_URL", "PROJECT_URL_STORAGE_KEY"];
 
 for (const token of requiredHtml) {
   if (!content["index.html"].includes(token)) {

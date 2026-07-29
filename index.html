@@ -32,10 +32,10 @@
       <section class="hero-panel" aria-label="Phiên vận hành MB MAX V03">
         <div class="hero-copy">
           <p class="eyebrow">Phiên vận hành</p>
-          <h2>Rà soát số trước. Quyết định vốn sau.</h2>
+          <h2>Một nút để rà soát MB MAX V03.</h2>
           <p>
-            Bấm một nút để mở phiên rà soát MB MAX V03, gửi lệnh kiểm tra list số,
-            phương án A/B/C và kết luận ALLOW/CORE_ONLY/NO_BET.
+            Bấm nút xanh để mở ChatGPT, chuẩn bị lệnh rà soát số và nhận kết luận
+            ALLOW/CORE_ONLY/NO_BET trước khi ghi vốn.
           </p>
         </div>
 
@@ -52,10 +52,8 @@
 
         <div class="primary-actions">
           <button class="button button--primary button--large" type="button" id="runReview">
-            Rà soát số
+            Rà soát trên ChatGPT
           </button>
-          <button class="button button--light" type="button" id="openChatGPT">Mở ChatGPT</button>
-          <button class="button button--light" type="button" id="copyCommand">Sao chép lệnh</button>
         </div>
 
         <div class="meta-strip">
@@ -69,7 +67,7 @@
           </div>
           <div>
             <span>Trạng thái</span>
-            <strong id="reviewState">Sẵn sàng</strong>
+            <strong id="reviewState">Sẵn sàng rà soát</strong>
           </div>
         </div>
       </section>
@@ -80,14 +78,13 @@
             <p class="eyebrow">Review</p>
             <h2>Kết quả rà soát</h2>
           </div>
-          <span class="pill">Project chạy</span>
+          <span class="pill">ChatGPT</span>
         </div>
 
         <div class="review-copy">
-          <strong id="reviewTitle">Bấm “Rà soát số” để chạy MB MAX V03.</strong>
+          <strong id="reviewTitle">Bấm “Rà soát trên ChatGPT” để chạy MB MAX V03.</strong>
           <p id="reviewMessage">
-            Sau khi ChatGPT trả bảng số, nhập số được phép vào ô “Số chốt sau rà soát”, rồi ghi ledger
-            khi có kết quả.
+            Sau khi có bảng số, nhập số được phép vào ô “Số chốt sau rà soát”, rồi ghi ledger khi có kết quả.
           </p>
         </div>
 
@@ -219,9 +216,12 @@
 
       <details class="panel command-drawer">
         <summary>
-          <span>Lệnh gửi Project</span>
-          <small>Mở khi cần kiểm tra hoặc sao chép thủ công.</small>
+          <span>Lệnh rà soát đầy đủ</span>
+          <small>Dùng khi cần kiểm tra nội dung lệnh trước khi gửi.</small>
         </summary>
+        <div class="drawer-toolbar">
+          <button class="button button--light" type="button" id="copyCommand">Sao chép lệnh đầy đủ</button>
+        </div>
         <div class="tabs" id="commandGrid" aria-label="Chọn loại lệnh">
           <button class="tab is-active" type="button" data-command="reviewRun">Rà soát</button>
           <button class="tab" type="button" data-command="dailyRun">Chốt số</button>

@@ -10,6 +10,7 @@ const LEDGER_STORAGE_KEY = "mb-max-v03-ledger";
 const SELECTED_CODES_STORAGE_KEY = "mb-max-v03-selected-codes";
 
 const commandMeta = {
+  reviewRun: "Rà soát số",
   dailyRun: "Chạy MB MAX V03",
   settle: "Cập nhật kết quả",
   capitalBrake: "Kiểm tra lệnh phanh",
@@ -39,7 +40,7 @@ const checklist = [
 ];
 
 const state = {
-  activeCommand: "dailyRun",
+  activeCommand: "reviewRun",
   targetDate: DEFAULT_TARGET_DATE,
   selectedCodes: "",
   ledger: [],
@@ -229,6 +230,31 @@ function buildCommand() {
     ? `Số đang nhập trên dashboard: ${state.selectedCodes.trim()}.`
     : "Dashboard chưa có final_codes; chỉ chốt khi artifact canonical PASS.";
 
+  if (state.activeCommand === "reviewRun") {
+    return `${header}
+
+Hãy bấm chạy/rà soát theo đúng Project MB MAX V03 cho ngày ${dateLabel} và tạo list số trước khi quyết định xuống tiền.
+
+Yêu cầu chạy:
+1. Khóa dữ liệu đến hết t-1; xác nhận đủ 27/27; outcome_known_at_selection=false.
+2. Chạy lần lượt Champion, MB16HO, CUM3 và MB 2SO; không dùng kết quả ngày t.
+3. Tạo list số theo từng nguồn: Champion Top2, MB16HO Top2/Top3/Top5, CUM3 Top3, MB 2SO Top Pair.
+4. Cluster/dedupe bắt buộc: mỗi cluster tối đa một phiếu effective weight; CUM3 và MB 2SO chỉ là tham chiếu sau dedupe.
+5. Tính ConsensusScore, ghi nguồn hỗ trợ, cluster, effective_weight, trạng thái Core/Third/Watch/Dedupe.
+6. Sau khi có list, lập phương án:
+   - Phương án A: CORE_ONLY, 2 số Champion x 50 điểm.
+   - Phương án B: PROFIT, 3 số x 50 điểm nếu số thứ ba đủ ít nhất hai cluster độc lập và Capital Gate cho phép.
+   - Phương án C: NO_BET nếu thiếu dữ liệu, lỗi audit, capital blocked hoặc Publication Contract không đạt.
+7. Chạy hai Capital Gate và kiểm tra LIVE_LOSS_STREAK, MODEL_LOSS_STREAK, SHADOW_RECOVERY, LIVE_PROBATION, P/L tháng, đỉnh tháng, drawdown.
+8. Chỉ kết luận từ artifact canonical PUBLISHED+PASS+HASH_MATCH. Nếu chưa đạt, trả final_codes=[], total_points=0, total_capital=0.
+
+Trả về đúng cấu trúc:
+1. Bảng list số: số, nguồn, cluster, effective_weight, ConsensusScore, vai trò, ghi chú dedupe.
+2. Bảng phương án A/B/C: số, điểm, vốn, điều kiện được phép, rủi ro.
+3. Kết luận duy nhất: ALLOW, CORE_ONLY hoặc NO_BET.
+4. final_codes, total_points, total_capital, Risk State, SHA-256 và lý do chốt/không chốt.`;
+  }
+
   if (state.activeCommand === "dailyRun") {
     return `${header}
 
@@ -324,6 +350,32 @@ function renderCommand() {
       button.dataset.command === state.activeCommand ? "true" : "false",
     );
   });
+}
+
+function markReviewSent() {
+  const timestamp = new Intl.DateTimeFormat("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date());
+  $("reviewState").textContent = "Đã gửi lệnh";
+  $("reviewTitle").textContent = `Đã mở phiên rà soát cho ngày ${displayDate(state.targetDate)}.`;
+  $("reviewMessage").textContent =
+    `Lúc ${timestamp}. Hãy lấy bảng list số và kết luận ALLOW/CORE_ONLY/NO_BET trong ChatGPT; chỉ nhập vào “Số chốt” khi artifact PASS và Capital Gate cho phép.`;
+  document.querySelectorAll(".review-step").forEach((step) => {
+    step.classList.add("is-ready");
+  });
+}
+
+function runReviewCommand() {
+  state.activeCommand = "reviewRun";
+  renderCommand();
+  const command = buildCommand();
+  void copyText(command);
+  markReviewSent();
+  window.open(`https://chatgpt.com/?q=${encodeURIComponent(command)}`, "_blank", "noopener,noreferrer");
 }
 
 function renderSettlementPreview() {
@@ -453,6 +505,9 @@ function bindEvents() {
     const url = `https://chatgpt.com/?q=${encodeURIComponent(buildCommand())}`;
     window.open(url, "_blank", "noopener,noreferrer");
   });
+
+  $("runReview").addEventListener("click", runReviewCommand);
+  $("runReviewHeader").addEventListener("click", runReviewCommand);
 
   ["settlementPoints", "settlementHits"].forEach((id) => {
     $(id).addEventListener("input", renderSettlementPreview);

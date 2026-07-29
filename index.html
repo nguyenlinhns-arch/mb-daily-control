@@ -5,143 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Dashboard MB MAX V03 tối giản: tạo lệnh ChatGPT, kiểm tra phanh vốn và ghi ledger lãi lỗ."
+      content="MB MAX V03 Control Center: rà soát số, mở đúng Project ChatGPT, kiểm soát vốn và ghi ledger hằng ngày."
     />
-    <title>MB MAX V03 Dashboard</title>
+    <title>MB MAX V03 Control Center</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="app-header">
-      <div>
-        <p class="eyebrow">MB MAX V03</p>
-        <h1>Dashboard vận hành</h1>
-        <p class="lead">Một màn hình để tạo lệnh, kiểm soát vốn và ghi kết quả hằng ngày.</p>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">MB</div>
+        <div>
+          <p class="eyebrow">MB MAX V03</p>
+          <h1>Control Center</h1>
+        </div>
       </div>
-      <div class="header-actions">
-        <button class="button button--dark" type="button" id="runReviewHeader">Rà soát số</button>
-        <button class="button button--ghost" type="button" id="openChatGPT">Mở Project</button>
+      <div class="topbar-actions">
+        <span class="top-status">
+          Risk
+          <strong id="displayRiskState">ALLOW</strong>
+        </span>
+        <button class="button button--primary" type="button" id="runReviewHeader">Rà soát số</button>
       </div>
     </header>
 
-    <main class="page">
-      <section class="panel control-panel" aria-label="Thiết lập phiên chạy">
-        <label for="targetDate">
-          Ngày chạy
-          <input id="targetDate" type="date" />
-        </label>
-        <label for="selectedCodes">
-          Số chốt
-          <input id="selectedCodes" type="text" placeholder="Ví dụ: 13 x 50, 83 x 50" />
-        </label>
-        <button class="button button--dark review-trigger" type="button" id="runReview">Rà soát số</button>
-        <div class="summary-card">
-          <span>Target</span>
-          <strong id="displayTargetDate">--/--/----</strong>
-        </div>
-        <div class="summary-card">
-          <span>Data Lock</span>
-          <strong id="displayDataLock">--/--/----</strong>
-        </div>
-        <div class="summary-card">
-          <span>Risk</span>
-          <strong id="displayRiskState">ALLOW</strong>
-        </div>
-      </section>
-
-      <section class="panel review-panel" aria-label="Rà soát số theo phương pháp">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Review</p>
-            <h2>Rà soát số</h2>
-          </div>
-          <span class="pill" id="reviewState">Chưa chạy</span>
-        </div>
-
-        <div class="review-flow">
-          <div class="review-step is-ready">
-            <strong>1</strong>
-            <span>Tạo list số</span>
-          </div>
-          <div class="review-step">
-            <strong>2</strong>
-            <span>Lọc phương án</span>
-          </div>
-          <div class="review-step">
-            <strong>3</strong>
-            <span>Quyết định theo Gate</span>
-          </div>
-        </div>
-
-        <div class="review-copy">
-          <strong id="reviewTitle">Bấm “Rà soát số” để chạy MB MAX V03.</strong>
-          <p id="reviewMessage">
-            Dashboard sẽ tự tạo lệnh chuẩn, mở ChatGPT và yêu cầu Project trả bảng số theo Champion,
-            MB16HO, CUM3, MB 2SO, sau đó kết luận ALLOW/CORE_ONLY/NO_BET.
+    <main class="app-shell">
+      <section class="hero-panel" aria-label="Phiên vận hành MB MAX V03">
+        <div class="hero-copy">
+          <p class="eyebrow">Phiên vận hành</p>
+          <h2>Rà soát số trước. Quyết định vốn sau.</h2>
+          <p>
+            Nút chính mở đúng Project ChatGPT MB MAX V03, gửi lệnh rà soát và yêu cầu trả list số,
+            phương án A/B/C, kết luận ALLOW/CORE_ONLY/NO_BET.
           </p>
         </div>
 
-        <div class="project-connect" aria-label="Kết nối Project ChatGPT">
+        <div class="run-form">
+          <label for="targetDate">
+            Ngày chạy
+            <input id="targetDate" type="date" />
+          </label>
+          <label for="selectedCodes">
+            Số chốt sau rà soát
+            <input id="selectedCodes" type="text" placeholder="Ví dụ: 13 x 50, 83 x 50" />
+          </label>
+        </div>
+
+        <div class="project-row" aria-label="Kết nối Project ChatGPT">
           <label for="projectUrl">
             Project ChatGPT MB MAX V03
             <input
               id="projectUrl"
               type="url"
-              placeholder="Dán link Project trong ChatGPT, ví dụ https://chatgpt.com/project/..."
+              placeholder="Dán link Project trong ChatGPT"
               autocomplete="off"
             />
           </label>
-          <button class="button button--ghost" type="button" id="saveProjectUrl">Lưu Project</button>
+          <button class="button button--light" type="button" id="saveProjectUrl">Lưu Project</button>
           <span class="project-status" id="projectStatus">Chưa kết nối Project</span>
+        </div>
+
+        <div class="primary-actions">
+          <button class="button button--primary button--large" type="button" id="runReview">
+            Rà soát số
+          </button>
+          <button class="button button--light" type="button" id="openChatGPT">Mở Project</button>
+          <button class="button button--light" type="button" id="copyCommand">Sao chép lệnh</button>
+        </div>
+
+        <div class="meta-strip">
+          <div>
+            <span>Target</span>
+            <strong id="displayTargetDate">--/--/----</strong>
+          </div>
+          <div>
+            <span>Data Lock</span>
+            <strong id="displayDataLock">--/--/----</strong>
+          </div>
+          <div>
+            <span>Trạng thái</span>
+            <strong id="reviewState">Chưa chạy</strong>
+          </div>
         </div>
       </section>
 
-      <section class="workspace-grid">
-        <article class="panel command-panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Command</p>
-              <h2>Lệnh hôm nay</h2>
-            </div>
-            <button class="button button--dark" type="button" id="copyCommand">Sao chép</button>
+      <section class="status-panel" aria-label="Trạng thái rà soát">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Review</p>
+            <h2>Kết quả rà soát</h2>
           </div>
+          <span class="pill">Project chạy</span>
+        </div>
 
-          <div class="tabs" id="commandGrid" aria-label="Chọn loại lệnh">
-            <button class="tab is-active" type="button" data-command="reviewRun">Rà soát</button>
-            <button class="tab" type="button" data-command="dailyRun">Chốt số</button>
-            <button class="tab" type="button" data-command="settle">Kết quả</button>
-            <button class="tab" type="button" data-command="capitalBrake">Phanh vốn</button>
-            <button class="tab" type="button" data-command="strongList">Số mạnh</button>
-            <button class="tab" type="button" data-command="report">Báo cáo</button>
+        <div class="review-copy">
+          <strong id="reviewTitle">Bấm “Rà soát số” để chạy MB MAX V03.</strong>
+          <p id="reviewMessage">
+            Sau khi Project trả bảng số, nhập số được phép vào ô “Số chốt sau rà soát”, rồi ghi ledger
+            khi có kết quả.
+          </p>
+        </div>
+
+        <div class="review-flow" aria-label="Quy trình">
+          <div class="review-step is-ready">
+            <strong>1</strong>
+            <span>List số</span>
           </div>
+          <div class="review-step">
+            <strong>2</strong>
+            <span>Phương án</span>
+          </div>
+          <div class="review-step">
+            <strong>3</strong>
+            <span>Capital Gate</span>
+          </div>
+        </div>
+      </section>
 
-          <textarea id="commandText" readonly rows="15"></textarea>
-        </article>
-
-        <aside class="panel gate-panel">
-          <div class="section-head">
+      <section class="main-grid">
+        <aside class="panel decision-panel" aria-label="Quyết định vốn">
+          <div class="section-title">
             <div>
-              <p class="eyebrow">Capital Gate</p>
-              <h2>Trạng thái vốn</h2>
+              <p class="eyebrow">Capital</p>
+              <h2>Quyết định vốn</h2>
             </div>
             <span class="risk-badge" id="riskBadge">ALLOW</span>
           </div>
 
-          <div class="metric-stack">
-            <div class="metric-line">
-              <span>Thua Live</span>
-              <strong id="liveLossStreak">0</strong>
-            </div>
-            <div class="metric-line">
-              <span>Thắng Live</span>
-              <strong id="liveWinStreak">0</strong>
-            </div>
-            <div class="metric-line">
+          <div class="decision-list">
+            <div>
               <span>Lệnh tiếp</span>
               <strong id="nextAction">ALLOW</strong>
             </div>
-          </div>
-
-          <div class="money-block">
+            <div>
+              <span>Thua Live</span>
+              <strong id="liveLossStreak">0</strong>
+            </div>
+            <div>
+              <span>Thắng Live</span>
+              <strong id="liveWinStreak">0</strong>
+            </div>
             <div>
               <span>Lũy kế tháng</span>
               <strong id="cumulativeNet">0đ</strong>
@@ -156,24 +158,20 @@
             </div>
           </div>
 
-          <ul class="rule-list">
-            <li>2 thua: chỉ CORE.</li>
-            <li>3 thua: dừng tiền thật.</li>
-            <li>Không gấp thếp, không gỡ.</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section class="panel ledger-panel">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Settlement</p>
-            <h2>Ghi ledger</h2>
+          <div class="rule-note">
+            2 thua: CORE_ONLY. 3 thua: PAUSE_SHADOW. Không gấp thếp, không gỡ.
           </div>
-          <span class="pill">23.000đ/điểm</span>
-        </div>
+        </aside>
 
-        <div class="ledger-layout">
+        <section class="panel ledger-panel" aria-label="Ghi ledger">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Ledger</p>
+              <h2>Ghi kết quả</h2>
+            </div>
+            <span class="pill">23.000đ/điểm</span>
+          </div>
+
           <form class="settlement" id="settlementForm">
             <label>
               Mode
@@ -205,13 +203,13 @@
               <strong id="settlementPreview">-2.300.000đ</strong>
               <small id="settlementStatus">Thua</small>
             </div>
-            <button class="button button--dark wide" type="submit">Lưu ledger</button>
+            <button class="button button--primary wide" type="submit">Lưu ledger</button>
           </form>
 
           <div class="ledger-table">
             <div class="table-head">
               <strong>Lãi/lỗ gần nhất</strong>
-              <button class="button button--ghost" type="button" id="clearLedger">Xóa ledger</button>
+              <button class="button button--light button--small" type="button" id="clearLedger">Xóa ledger</button>
             </div>
             <div class="table-wrap">
               <table>
@@ -230,21 +228,37 @@
               </table>
             </div>
           </div>
-        </div>
+        </section>
       </section>
 
-      <section class="details-grid">
-        <details class="panel soft-panel" open>
+      <details class="panel command-drawer">
+        <summary>
+          <span>Lệnh gửi Project</span>
+          <small>Mở khi cần kiểm tra hoặc sao chép thủ công.</small>
+        </summary>
+        <div class="tabs" id="commandGrid" aria-label="Chọn loại lệnh">
+          <button class="tab is-active" type="button" data-command="reviewRun">Rà soát</button>
+          <button class="tab" type="button" data-command="dailyRun">Chốt số</button>
+          <button class="tab" type="button" data-command="settle">Kết quả</button>
+          <button class="tab" type="button" data-command="capitalBrake">Phanh vốn</button>
+          <button class="tab" type="button" data-command="strongList">Số mạnh</button>
+          <button class="tab" type="button" data-command="report">Báo cáo</button>
+        </div>
+        <textarea id="commandText" readonly rows="12"></textarea>
+      </details>
+
+      <section class="support-grid">
+        <details class="panel soft-panel">
           <summary>
             <span>Số mạnh đang theo dõi</span>
-            <small>Chỉ là watchlist, chờ artifact PASS.</small>
+            <small>Watchlist, không tự chốt khi chưa có artifact PASS.</small>
           </summary>
           <div class="number-list" id="strongNumberList"></div>
         </details>
 
         <details class="panel soft-panel">
           <summary>
-            <span>Checklist trước khi xuống tiền</span>
+            <span>Checklist xuống tiền</span>
             <small>Publication Contract + Capital Gate.</small>
           </summary>
           <div class="checklist" id="publicationChecklist"></div>
@@ -252,9 +266,9 @@
       </section>
     </main>
 
-    <footer>
+    <footer class="footer">
       <strong>MB MAX V03</strong>
-      <span>Champion giữ Core. Capital Gate quyết định xuống tiền.</span>
+      <span>Rà soát bằng Project. Xuống tiền theo Capital Gate.</span>
     </footer>
 
     <script src="app.js" defer></script>

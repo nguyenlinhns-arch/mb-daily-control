@@ -17,7 +17,10 @@
         <h1>Dashboard vận hành</h1>
         <p class="lead">Một màn hình để tạo lệnh, kiểm soát vốn và ghi kết quả hằng ngày.</p>
       </div>
-      <button class="button button--dark" type="button" id="openChatGPT">Mở ChatGPT</button>
+      <div class="header-actions">
+        <button class="button button--dark" type="button" id="runReviewHeader">Rà soát số</button>
+        <button class="button button--ghost" type="button" id="openChatGPT">Mở ChatGPT</button>
+      </div>
     </header>
 
     <main class="page">
@@ -30,6 +33,7 @@
           Số chốt
           <input id="selectedCodes" type="text" placeholder="Ví dụ: 13 x 50, 83 x 50" />
         </label>
+        <button class="button button--dark review-trigger" type="button" id="runReview">Rà soát số</button>
         <div class="summary-card">
           <span>Target</span>
           <strong id="displayTargetDate">--/--/----</strong>
@@ -44,6 +48,39 @@
         </div>
       </section>
 
+      <section class="panel review-panel" aria-label="Rà soát số theo phương pháp">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Review</p>
+            <h2>Rà soát số</h2>
+          </div>
+          <span class="pill" id="reviewState">Chưa chạy</span>
+        </div>
+
+        <div class="review-flow">
+          <div class="review-step is-ready">
+            <strong>1</strong>
+            <span>Tạo list số</span>
+          </div>
+          <div class="review-step">
+            <strong>2</strong>
+            <span>Lọc phương án</span>
+          </div>
+          <div class="review-step">
+            <strong>3</strong>
+            <span>Quyết định theo Gate</span>
+          </div>
+        </div>
+
+        <div class="review-copy">
+          <strong id="reviewTitle">Bấm “Rà soát số” để chạy MB MAX V03.</strong>
+          <p id="reviewMessage">
+            Dashboard sẽ tự tạo lệnh chuẩn, mở ChatGPT và yêu cầu Project trả bảng số theo Champion,
+            MB16HO, CUM3, MB 2SO, sau đó kết luận ALLOW/CORE_ONLY/NO_BET.
+          </p>
+        </div>
+      </section>
+
       <section class="workspace-grid">
         <article class="panel command-panel">
           <div class="section-head">
@@ -55,7 +92,8 @@
           </div>
 
           <div class="tabs" id="commandGrid" aria-label="Chọn loại lệnh">
-            <button class="tab is-active" type="button" data-command="dailyRun">Chốt số</button>
+            <button class="tab is-active" type="button" data-command="reviewRun">Rà soát</button>
+            <button class="tab" type="button" data-command="dailyRun">Chốt số</button>
             <button class="tab" type="button" data-command="settle">Kết quả</button>
             <button class="tab" type="button" data-command="capitalBrake">Phanh vốn</button>
             <button class="tab" type="button" data-command="strongList">Số mạnh</button>

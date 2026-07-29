@@ -34,8 +34,8 @@
           <p class="eyebrow">Phiên vận hành</p>
           <h2>Rà soát số trước. Quyết định vốn sau.</h2>
           <p>
-            Nút chính mở đúng Project ChatGPT MB MAX V03, gửi lệnh rà soát và yêu cầu trả list số,
-            phương án A/B/C, kết luận ALLOW/CORE_ONLY/NO_BET.
+            Bấm một nút để mở phiên rà soát MB MAX V03, gửi lệnh kiểm tra list số,
+            phương án A/B/C và kết luận ALLOW/CORE_ONLY/NO_BET.
           </p>
         </div>
 
@@ -50,25 +50,11 @@
           </label>
         </div>
 
-        <div class="project-row" aria-label="Kết nối Project ChatGPT">
-          <label for="projectUrl">
-            Project ChatGPT MB MAX V03
-            <input
-              id="projectUrl"
-              type="url"
-              placeholder="Dán link Project trong ChatGPT"
-              autocomplete="off"
-            />
-          </label>
-          <button class="button button--light" type="button" id="saveProjectUrl">Lưu Project</button>
-          <span class="project-status" id="projectStatus">Chưa kết nối Project</span>
-        </div>
-
         <div class="primary-actions">
           <button class="button button--primary button--large" type="button" id="runReview">
             Rà soát số
           </button>
-          <button class="button button--light" type="button" id="openChatGPT">Mở Project</button>
+          <button class="button button--light" type="button" id="openChatGPT">Mở ChatGPT</button>
           <button class="button button--light" type="button" id="copyCommand">Sao chép lệnh</button>
         </div>
 
@@ -83,7 +69,7 @@
           </div>
           <div>
             <span>Trạng thái</span>
-            <strong id="reviewState">Chưa chạy</strong>
+            <strong id="reviewState">Sẵn sàng</strong>
           </div>
         </div>
       </section>
@@ -100,7 +86,7 @@
         <div class="review-copy">
           <strong id="reviewTitle">Bấm “Rà soát số” để chạy MB MAX V03.</strong>
           <p id="reviewMessage">
-            Sau khi Project trả bảng số, nhập số được phép vào ô “Số chốt sau rà soát”, rồi ghi ledger
+            Sau khi ChatGPT trả bảng số, nhập số được phép vào ô “Số chốt sau rà soát”, rồi ghi ledger
             khi có kết quả.
           </p>
         </div>

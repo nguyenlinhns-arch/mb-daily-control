@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - tmp-ai4so-master-ad-tts-0807
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read

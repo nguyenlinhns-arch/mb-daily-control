@@ -1,0 +1,30 @@
+name: Temp AI Intro NamMinh TTS 0807
+
+on:
+  push:
+    branches:
+      - tmp-ai-intro-tts-0807
+
+permissions:
+  contents: read
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Edge TTS
+        run: pip install edge-tts
+      - name: Generate NamMinh speech
+        run: python tmp_ai_intro_tts_0807.py
+      - name: Inspect output
+        run: ls -lh tts_ai_intro
+      - name: Upload TTS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-intro-namminh-0807
+          path: tts_ai_intro/
+          retention-days: 1

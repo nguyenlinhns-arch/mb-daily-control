@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - tmp-ai-intro-tts-0807
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read

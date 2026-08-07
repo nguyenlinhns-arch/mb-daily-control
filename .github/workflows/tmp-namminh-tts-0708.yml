@@ -1,0 +1,35 @@
+name: Temp NamMinh TTS 0708
+
+on:
+  push:
+    branches:
+      - tmp-namminh-tts-0708
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Edge TTS
+        run: pip install edge-tts
+      - name: Generate NamMinh speech
+        run: python tmp_namminh_tts_0708.py
+      - name: Inspect output
+        run: |
+          ls -lh tts_out
+          for f in tts_out/*.mp3; do ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$f"; done > tts_out/durations.txt
+      - name: Upload TTS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: namminh-tts-0708
+          path: tts_out/
+          retention-days: 1

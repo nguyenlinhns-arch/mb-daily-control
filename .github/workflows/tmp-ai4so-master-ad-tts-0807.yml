@@ -1,0 +1,30 @@
+name: Temp AI4SO Master Ad NamMinh TTS
+
+on:
+  push:
+    branches:
+      - tmp-ai4so-master-ad-tts-0807
+
+permissions:
+  contents: read
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Edge TTS
+        run: pip install edge-tts
+      - name: Generate NamMinh speech
+        run: python tmp_ai4so_master_ad_tts.py
+      - name: Inspect output
+        run: ls -lh tts_ai4so_master_ad
+      - name: Upload TTS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai4so-master-ad-namminh-0807
+          path: tts_ai4so_master_ad/
+          retention-days: 1

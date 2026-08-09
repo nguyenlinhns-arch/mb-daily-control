@@ -3,533 +3,138 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
-  <meta name="description" content="4SO AI thống kê kết quả Lô tô Miền Bắc đã công bố, phân tích dữ liệu lịch sử, backtest, xếp hạng tín hiệu và đầu ra mô hình bằng trí tuệ nhân tạo.">
+  <meta name="description" content="4SO AI là báo cáo phân tích dữ liệu kết quả Xổ số Miền Bắc đã công bố, gồm thống kê, backtest, xếp hạng mô hình và hồ sơ đối chiếu. Không nhận cược, không trả thưởng, không đại diện đặt cược.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="theme-color" content="#071b2b">
-  <link rel="canonical" href="https://lemienbac.com/">
+  <link rel="canonical" href="https://nguyenlinhns-arch.github.io/mb-daily-control/ai-methods/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://lemienbac.com/">
-  <meta property="og:title" content="4SO AI – Thống kê Lô tô Miền Bắc">
-  <meta property="og:description" content="Báo cáo AI 4SO với hơn 15.000 lượt tính toán thống kê, 7 lớp phương pháp và hồ sơ đối chiếu công khai.">
-  <meta property="og:image" content="https://lemienbac.com/ai-methods/og-4so-ai.jpg">
+  <meta property="og:url" content="https://nguyenlinhns-arch.github.io/mb-daily-control/ai-methods/">
+  <meta property="og:title" content="4SO AI – Báo cáo phân tích dữ liệu Xổ số Miền Bắc">
+  <meta property="og:description" content="Báo cáo dữ liệu AI 4SO: thống kê lịch sử, backtest, xếp hạng mô hình và hồ sơ đối chiếu công khai. Không nhận cược, không trả thưởng.">
+  <meta property="og:image" content="https://nguyenlinhns-arch.github.io/mb-daily-control/ai-methods/og-4so-ai.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="4SO AI – hơn 15.000 lượt tính toán, 7 lớp phương pháp, báo cáo AI 50.000 đồng mỗi ngày">
+  <meta property="og:image:alt" content="4SO AI – báo cáo phân tích dữ liệu và hồ sơ đối chiếu">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="4SO AI – Thống kê Lô tô Miền Bắc">
-  <meta name="twitter:description" content="Báo cáo AI 4SO với hơn 15.000 lượt tính toán thống kê và 7 lớp phương pháp.">
-  <meta name="twitter:image" content="https://lemienbac.com/ai-methods/og-4so-ai.jpg">
-  <title>4SO AI – Thống kê Lô tô Miền Bắc</title>
+  <meta name="twitter:title" content="4SO AI – Báo cáo phân tích dữ liệu Xổ số Miền Bắc">
+  <meta name="twitter:description" content="Thống kê lịch sử, backtest, xếp hạng mô hình và hồ sơ đối chiếu công khai.">
+  <meta name="twitter:image" content="https://nguyenlinhns-arch.github.io/mb-daily-control/ai-methods/og-4so-ai.jpg">
+  <title>4SO AI – Báo cáo phân tích dữ liệu Xổ số Miền Bắc</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --navy:#071b2b;
-      --navy-2:#0d2a3f;
-      --navy-3:#153b55;
-      --ink:#102333;
-      --muted:#5d6d78;
-      --soft:#edf2f4;
-      --paper:#f7f9fa;
-      --card:#ffffff;
-      --line:#dbe4e8;
-      --lime:#d7ff55;
-      --lime-deep:#a9d719;
-      --blue:#0878f9;
-      --green:#26704a;
-      --green-soft:#e4f4e9;
-      --red:#9b4439;
-      --red-soft:#f8e8e5;
-      --orange:#ff6b3d;
-      --shadow:0 18px 48px rgba(7,27,43,.10);
-      --font:"Be Vietnam Pro","Segoe UI Variable","Segoe UI",Arial,sans-serif;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-    body{margin:0;min-width:320px;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-    body.lock{overflow:hidden;touch-action:none}
-    [hidden]{display:none!important}
-    button,input{font:inherit}
-    button,a{-webkit-tap-highlight-color:transparent}
-    button{cursor:pointer}
-    a{color:inherit;text-decoration:none}
-    button:focus-visible,input:focus-visible,a:focus-visible{outline:4px solid rgba(8,120,249,.28);outline-offset:3px}
-    .wrap{width:min(calc(100% - 32px),1080px);margin-inline:auto}
-    .num{font-variant-numeric:tabular-nums lining-nums}
-
-    .site-header{position:sticky;top:0;z-index:60;border-bottom:1px solid rgba(219,228,232,.88);background:rgba(247,249,250,.92);backdrop-filter:blur(18px)}
-    .header-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{min-width:0;display:flex;align-items:center;gap:11px}
-    .brand-mark{flex:0 0 46px;width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:var(--navy);color:var(--lime);font-size:14px;font-weight:900;letter-spacing:-.04em;box-shadow:0 8px 20px rgba(7,27,43,.16)}
-    .brand-copy{min-width:0;display:grid;gap:1px}
-    .brand-copy strong{font-size:18px;line-height:1.2;letter-spacing:-.02em}
-    .brand-copy span{overflow:hidden;color:var(--muted);font-size:14px;line-height:1.3;white-space:nowrap;text-overflow:ellipsis}
-    .header-cta{min-height:50px;padding:0 17px;border:0;border-radius:14px;background:var(--navy);color:#fff;font-size:15px;font-weight:800;white-space:nowrap}
-
-    .hero{padding:30px 0 54px}
-    .hero-copy{max-width:620px}
-    .eyebrow{width:max-content;max-width:100%;margin:0 0 16px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;gap:9px;background:#fff;color:#3c5667;font-size:14px;font-weight:800;line-height:1.35}
-    .eyebrow-dot{flex:0 0 9px;width:9px;height:9px;border-radius:50%;background:#24a96a;box-shadow:0 0 0 5px rgba(36,169,106,.12)}
-    h1{margin:0;font-size:clamp(42px,11vw,68px);line-height:1.02;letter-spacing:-.055em;text-wrap:balance}
-    .hero-lead{margin:18px 0 0;color:#50636f;font-size:18px;line-height:1.6}
-    .hero-lead strong{color:var(--ink);font-weight:800}
-
-    .hero-panel{margin-top:26px;padding:18px;border-radius:30px;background:var(--navy);color:#fff;box-shadow:0 24px 60px rgba(7,27,43,.20)}
-    .proof-primary{padding:22px;border-radius:22px;background:linear-gradient(135deg,var(--lime),#ebff9c);color:var(--navy)}
-    .proof-label{margin:0;font-size:14px;font-weight:800;letter-spacing:.045em;text-transform:uppercase}
-    .proof-value{display:block;margin-top:7px;font-size:clamp(64px,19vw,92px);font-weight:900;line-height:.92;letter-spacing:-.075em;font-variant-numeric:tabular-nums}
-    .proof-title{display:block;margin-top:12px;font-size:20px;font-weight:850;line-height:1.32;letter-spacing:-.025em}
-    .proof-note{display:block;margin-top:6px;color:#3e5010;font-size:15px;font-weight:600;line-height:1.45}
-    .proof-secondary{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .proof-mini{min-width:0;padding:17px;border:1px solid rgba(255,255,255,.13);border-radius:18px;background:rgba(255,255,255,.06)}
-    .proof-mini strong{display:block;color:var(--lime);font-size:31px;font-weight:900;line-height:1;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
-    .proof-mini span{display:block;margin-top:8px;color:#d2dce1;font-size:14px;font-weight:600;line-height:1.4}
-
-    .access-box{margin-top:18px;padding:20px;border:1px solid rgba(255,255,255,.14);border-radius:22px;background:var(--navy-2)}
-    .access-kicker{margin:0;color:var(--lime);font-size:14px;font-weight:850;letter-spacing:.055em;text-transform:uppercase}
-    .access-box h2{margin:7px 0 0;font-size:30px;line-height:1.18;letter-spacing:-.04em}
-    .access-desc{margin:9px 0 0;color:#c5d1d7;font-size:16px;line-height:1.55}
-    .date-label{margin-top:17px;display:grid;gap:8px;color:#d4dee3;font-size:15px;font-weight:750}
-    .date-label input{width:100%;min-height:58px;padding:0 15px;border:1px solid rgba(255,255,255,.2);border-radius:14px;background:var(--navy-3);color:#fff;color-scheme:dark;font-size:18px;font-weight:700}
-    .price-line{margin-top:15px;padding:16px 0;border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.13);display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
-    .price-line span{color:#c0cdd3;font-size:15px;font-weight:650;line-height:1.4}
-    .price-line strong{flex:0 0 auto;color:var(--lime);font-size:34px;font-weight:900;line-height:1;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
-    .primary-cta{width:100%;min-height:62px;margin-top:16px;padding:0 18px;border:0;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--lime);color:var(--navy);font-size:18px;font-weight:900;box-shadow:0 10px 26px rgba(215,255,85,.16)}
-    .primary-cta .arrow{font-size:25px;line-height:1}
-    .payment-caption{margin:12px 0 0;color:#b8c7ce;font-size:14px;line-height:1.55;text-align:center}
-
-    .trust-strip{padding:0 0 56px}
-    .trust-grid{display:grid;gap:10px}
-    .trust-item{padding:17px;border:1px solid var(--line);border-radius:18px;display:grid;grid-template-columns:44px 1fr;gap:13px;align-items:center;background:#fff}
-    .trust-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:var(--soft);color:var(--navy);font-size:18px;font-weight:900}
-    .trust-item strong{display:block;font-size:17px;line-height:1.3}
-    .trust-item span{display:block;margin-top:4px;color:var(--muted);font-size:15px;line-height:1.45}
-
-    .conversion{padding:0 0 64px}
-    .conversion-card{position:relative;overflow:hidden;padding:24px;border:1px solid #cbd9df;border-radius:28px;background:#fff;box-shadow:var(--shadow)}
-    .conversion-card::after{content:"";position:absolute;right:-78px;top:-92px;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(215,255,85,.68),rgba(215,255,85,0) 70%);pointer-events:none}
-    .conversion-top{position:relative;z-index:1}
-    .conversion-badge{width:max-content;max-width:100%;margin:0 0 11px;padding:8px 12px;border-radius:999px;background:var(--navy);color:var(--lime);font-size:14px;font-weight:850;line-height:1.35}
-    .conversion-card h2{margin:0;font-size:clamp(32px,8.8vw,48px);line-height:1.12;letter-spacing:-.048em;text-wrap:balance}
-    .conversion-card h2 strong{color:#e84d2c;font-weight:900;font-variant-numeric:tabular-nums}
-    .conversion-lead{margin:14px 0 0;color:#50646f;font-size:17px;line-height:1.65}
-    .conversion-lead strong{color:var(--ink)}
-    .conversion-metrics{position:relative;z-index:1;margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .conversion-metric{padding:17px;border:1px solid var(--line);border-radius:18px;background:var(--soft)}
-    .conversion-metric strong{display:block;color:var(--navy);font-size:34px;font-weight:900;line-height:1;letter-spacing:-.06em;font-variant-numeric:tabular-nums}
-    .conversion-metric span{display:block;margin-top:8px;color:#536873;font-size:14px;font-weight:700;line-height:1.42}
-    .layer-title{margin:20px 0 9px;color:#3d5562;font-size:15px;font-weight:800}
-    .layers{display:flex;flex-wrap:wrap;gap:8px}
-    .layers span{padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-size:14px;font-weight:800;line-height:1.25}
-    .conversion-benefits{margin:20px 0 0;padding:0;list-style:none;display:grid;gap:10px}
-    .conversion-benefits li{display:grid;grid-template-columns:27px 1fr;gap:10px;align-items:start;color:#4e626d;font-size:15px;line-height:1.52}
-    .conversion-benefits li::before{content:"✓";width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:var(--green-soft);color:var(--green);font-size:14px;font-weight:900}
-    .conversion-action{margin-top:21px;padding-top:20px;border-top:1px solid var(--line)}
-    .conversion-price{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
-    .conversion-price span{color:#516671;font-size:15px;font-weight:700;line-height:1.42}
-    .conversion-price strong{flex:0 0 auto;color:var(--navy);font-size:36px;font-weight:900;line-height:1;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
-    .conversion-button{width:100%;min-height:62px;margin-top:15px;padding:0 17px;border:0;border-radius:16px;background:var(--navy);color:#fff;font-size:18px;font-weight:900;box-shadow:0 12px 28px rgba(7,27,43,.16)}
-    .conversion-note{margin:11px 0 0;color:#687a83;font-size:14px;line-height:1.52;text-align:center}
-
-    .section{padding:64px 0}
-    .section-dark{background:var(--navy);color:#fff}
-    .section-soft{background:#eaf0f2}
-    .section-kicker{margin:0 0 9px;color:#e8542d;font-size:14px;font-weight:850;letter-spacing:.07em;text-transform:uppercase}
-    .section-dark .section-kicker{color:var(--lime)}
-    .section-title{margin:0;font-size:clamp(32px,8.6vw,48px);line-height:1.1;letter-spacing:-.045em;text-wrap:balance}
-    .section-intro{max-width:740px;margin:13px 0 0;color:var(--muted);font-size:17px;line-height:1.65}
-    .section-dark .section-intro{color:#c1cdd3}
-
-    .summary-grid{margin-top:24px;display:grid;gap:14px}
-    .summary-card{padding:22px;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 8px 25px rgba(7,27,43,.05)}
-    .summary-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .summary-top span{color:#4d6370;font-size:16px;font-weight:750}
-    .summary-top b{color:var(--green);font-size:25px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
-    .summary-main{margin-top:12px;display:flex;align-items:flex-end;gap:9px}
-    .summary-main strong{font-size:44px;font-weight:900;line-height:1;letter-spacing:-.06em;font-variant-numeric:tabular-nums}
-    .summary-main span{padding-bottom:4px;color:var(--muted);font-size:16px;font-weight:650}
-    .track{height:12px;margin-top:18px;overflow:hidden;border-radius:999px;background:#e4eaed}
-    .track span{height:100%;display:block;border-radius:inherit;background:linear-gradient(90deg,var(--lime-deep),#5fa842)}
-    .w-774{width:77.4%}.w-667{width:66.7%}.w-750{width:75%}
-    .summary-card p{margin:13px 0 0;color:var(--muted);font-size:15px;line-height:1.55}
-    .definition{margin:18px 0 0;padding:15px 16px;border-left:5px solid var(--orange);border-radius:0 14px 14px 0;background:#fff;color:#52656f;font-size:15px;line-height:1.62}
-
-    .report-grid{margin-top:24px;display:grid;gap:13px}
-    .report-item{padding:20px;border:1px solid rgba(255,255,255,.13);border-radius:20px;background:rgba(255,255,255,.055)}
-    .report-index{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:var(--lime);color:var(--navy);font-size:15px;font-weight:900}
-    .report-item h3{margin:15px 0 0;font-size:21px;line-height:1.3;letter-spacing:-.025em}
-    .report-item p{margin:7px 0 0;color:#bdcad0;font-size:15px;line-height:1.58}
-
-    .usage-grid{margin-top:24px;display:grid;gap:15px}
-    .usage-card{padding:22px;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 8px 28px rgba(7,27,43,.06)}
-    .usage-card.featured{border:2px solid var(--navy)}
-    .usage-badge{width:max-content;margin:0 0 12px;padding:7px 11px;border-radius:999px;background:var(--lime);color:var(--navy);font-size:14px;font-weight:850}
-    .usage-card h3{margin:0;font-size:25px;line-height:1.25;letter-spacing:-.035em}
-    .usage-card>p{margin:9px 0 0;color:var(--muted);font-size:16px;line-height:1.58}
-    .weight-grid{margin-top:17px;display:grid;gap:9px}
-    .weight-grid.two{grid-template-columns:1fr 1fr}
-    .weight-grid.four{grid-template-columns:1fr 1fr}
-    .weight{padding:14px 8px;border-radius:15px;background:var(--navy);color:#fff;text-align:center}
-    .weight strong{display:block;color:var(--lime);font-size:27px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
-    .weight span{display:block;margin-top:7px;color:#c5d1d7;font-size:14px;font-weight:650;line-height:1.25}
-    .usage-note{margin:17px 0 0;color:#52636d;font-size:15px;line-height:1.62}
-
-    .history-head{display:grid;gap:18px}
-    .tabs{padding:5px;border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#e6edef}
-    .tab{min-height:53px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:#4e626e;font-size:16px;font-weight:800}
-    .tab.active{background:var(--navy);color:#fff}
-    .history-meta{margin:17px 0 0;color:var(--muted);font-size:15px;font-weight:600}
-    .history-list{margin-top:16px;display:grid;gap:11px}
-    .history-row{padding:18px;border:1px solid var(--line);border-radius:20px;background:#fff}
-    .row-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .row-date{font-size:16px;font-weight:850;font-variant-numeric:tabular-nums}
-    .status{padding:7px 10px;border-radius:999px;font-size:14px;font-weight:800;line-height:1.25}
-    .status.hit{background:var(--green-soft);color:var(--green)}
-    .status.miss{background:var(--red-soft);color:var(--red)}
-    .codes{margin-top:14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-    .code{height:52px;display:grid;place-items:center;border-radius:14px;background:var(--navy);color:var(--lime);font-size:21px;font-weight:900;font-variant-numeric:tabular-nums}
-    .row-result{margin:13px 0 0;color:#586b76;font-size:15px;line-height:1.55}
-    .row-result b{color:var(--ink)}
-    .show-all{width:100%;min-height:56px;margin-top:13px;border:1px solid var(--line);border-radius:15px;background:#fff;color:var(--navy);font-size:16px;font-weight:800}
-
-    .steps{margin-top:24px;display:grid;gap:13px}
-    .step{padding:20px;border:1px solid var(--line);border-radius:20px;display:grid;grid-template-columns:48px 1fr;gap:14px;background:#fff}
-    .step-num{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:var(--navy);color:var(--lime);font-size:17px;font-weight:900}
-    .step h3{margin:1px 0 0;font-size:20px;line-height:1.35}
-    .step p{margin:6px 0 0;color:var(--muted);font-size:15px;line-height:1.55}
-
-    .terms{padding:24px;border:1px solid var(--line);border-radius:24px;background:#fff}
-    .term-list{margin:21px 0 0;padding:0;list-style:none;display:grid;gap:17px}
-    .term-list li{padding-top:17px;border-top:1px solid var(--line);color:#52646e;font-size:15px;line-height:1.62}
-    .term-list li:first-child{padding-top:0;border-top:0}
-    .term-list strong{display:block;margin-bottom:4px;color:var(--ink);font-size:17px}
-
-    .closing{margin:0 auto;padding:27px 22px;border-radius:26px;background:linear-gradient(135deg,var(--orange),#e8442b);color:#fff;box-shadow:0 20px 48px rgba(232,68,43,.19)}
-    .closing .section-kicker{color:#fff2e8}
-    .closing h2{margin:0;font-size:34px;line-height:1.13;letter-spacing:-.045em}
-    .closing p{margin:11px 0 0;color:#fff0eb;font-size:16px;line-height:1.58}
-    .closing button{width:100%;min-height:60px;margin-top:19px;padding:0 17px;border:0;border-radius:15px;background:#fff;color:var(--navy);font-size:17px;font-weight:900}
-    .legal-note{padding:26px 0 118px;color:#596b75;font-size:15px;line-height:1.68}
-    .legal-note strong{color:var(--ink)}
-    .footer{padding:25px 0 110px;border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-    .footer p{margin:3px 0 0;color:var(--muted);font-size:14px;line-height:1.55;text-align:right}
-
-    .mobile-bar{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:80;min-height:76px;padding:10px 10px 10px 15px;border:1px solid rgba(255,255,255,.14);border-radius:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(7,27,43,.97);color:#fff;box-shadow:0 18px 48px rgba(0,0,0,.30);backdrop-filter:blur(18px)}
-    .mobile-bar div{min-width:0}
-    .mobile-bar span{display:block;overflow:hidden;color:#c0ccd2;font-size:14px;line-height:1.25;white-space:nowrap;text-overflow:ellipsis}
-    .mobile-bar strong{display:block;margin-top:3px;color:var(--lime);font-size:18px;line-height:1.2;font-variant-numeric:tabular-nums}
-    .mobile-bar button{flex:0 0 auto;min-height:54px;padding:0 16px;border:0;border-radius:14px;background:var(--lime);color:var(--navy);font-size:16px;font-weight:900}
-
-    .backdrop{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;background:rgba(2,11,18,.82);backdrop-filter:blur(8px)}
-    .dialog{position:relative;width:100%;max-height:calc(100dvh - 12px);overflow:auto;overscroll-behavior:contain;padding:34px 18px calc(22px + env(safe-area-inset-bottom));border-radius:28px 28px 0 0;background:var(--paper)}
-    .dialog::before{content:"";position:absolute;top:10px;left:50%;width:46px;height:5px;border-radius:999px;background:#bdc8cd;transform:translateX(-50%)}
-    .dialog-close{position:absolute;top:18px;right:16px;width:48px;height:48px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--navy);font-size:27px;line-height:1}
-    .dialog .section-kicker{padding-right:58px}
-    .dialog h2{max-width:calc(100% - 55px);margin:0;font-size:30px;line-height:1.18;letter-spacing:-.04em}
-    .dialog-intro{margin:10px 0 0;color:var(--muted);font-size:16px;line-height:1.58}
-    .dialog-date{margin-top:17px;display:grid;gap:8px;color:#405763;font-size:15px;font-weight:750}
-    .dialog-date input{width:100%;min-height:58px;padding:0 14px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);font-size:18px;font-weight:700}
-    .paycard{margin-top:14px;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:#fff}
-    .payrow{min-height:72px;padding:12px 14px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
-    .payrow:last-child{border-bottom:0}
-    .payrow span{color:var(--muted);font-size:14px;font-weight:650}
-    .payrow strong{grid-row:2;color:var(--ink);font-size:17px;font-weight:850;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
-    .copy{grid-column:2;grid-row:1/span 2;min-width:84px;min-height:48px;padding:0 11px;border:0;border-radius:12px;background:#eef6d6;color:#355d00;font-size:14px;font-weight:850}
-    .paysteps{margin:17px 0;padding:0;list-style:none;display:grid;gap:12px}
-    .paysteps li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;color:#4c616c;font-size:15px;line-height:1.5}
-    .paysteps span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--navy);color:var(--lime);font-size:14px;font-weight:900}
-    .zalo{width:100%;min-height:60px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-size:17px;font-weight:900}
-    .dialog-note{margin:13px 3px 0;color:#667983;font-size:14px;line-height:1.58;text-align:center}
-
-    @media(max-width:359px){
-      .wrap{width:calc(100% - 24px)}
-      .brand-copy span{display:none}
-      .header-cta{padding:0 12px;font-size:14px}
-      h1{font-size:39px}
-      .hero-panel{padding:14px}
-      .proof-primary{padding:18px}
-      .proof-value{font-size:62px}
-      .proof-mini{padding:14px 12px}
-      .proof-mini strong{font-size:27px}
-      .price-line{display:grid;gap:8px}
-      .price-line strong{font-size:32px}
-      .conversion-card{padding:19px}
-      .conversion-metrics{grid-template-columns:1fr}
-      .conversion-price{display:grid;gap:8px}
-      .mobile-bar{left:6px;right:6px}
-      .mobile-bar button{padding:0 12px;font-size:15px}
-    }
-    @media(min-width:640px){
-      .trust-grid,.summary-grid,.report-grid,.steps{grid-template-columns:repeat(2,1fr)}
-      .summary-card:last-child{grid-column:1/-1}
-      .usage-grid{grid-template-columns:1fr 1fr}
-      .weight-grid.four{grid-template-columns:repeat(4,1fr)}
-    }
-    @media(min-width:820px){
-      body{font-size:18px}
-      .wrap{width:min(calc(100% - 56px),1080px)}
-      .header-inner{min-height:80px}
-      .hero{padding:64px 0 78px;display:grid;grid-template-columns:minmax(0,1fr) minmax(410px,.92fr);gap:58px;align-items:start}
-      .hero-panel{margin-top:0;padding:22px}
-      .proof-secondary{grid-template-columns:1fr 1fr}
-      .trust-grid{grid-template-columns:repeat(3,1fr)}
-      .conversion-card{padding:38px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);gap:0 46px;align-items:start}
-      .conversion-top,.conversion-metrics,.layer-title,.layers{grid-column:1}
-      .conversion-action{grid-column:2;grid-row:1/span 4;margin:0;padding:25px;border:1px solid var(--line);border-radius:22px;background:var(--soft)}
-      .conversion-benefits{margin-top:0}
-      .section{padding:86px 0}
-      .summary-grid{grid-template-columns:repeat(3,1fr)}
-      .summary-card:last-child{grid-column:auto}
-      .report-grid{grid-template-columns:repeat(4,1fr)}
-      .history-head{grid-template-columns:1fr auto;align-items:end}
-      .tabs{width:360px}
-      .history-row{display:grid;grid-template-columns:125px 285px minmax(0,1fr) 150px;gap:17px;align-items:center}
-      .row-top{display:contents}
-      .row-date{grid-column:1;grid-row:1}
-      .status{grid-column:4;grid-row:1;justify-self:end}
-      .codes{grid-column:2;grid-row:1;margin:0}
-      .row-result{grid-column:3;grid-row:1;margin:0}
-      .steps{grid-template-columns:repeat(3,1fr)}
-      .terms{padding:34px}
-      .term-list{grid-template-columns:1fr 1fr;gap:22px 34px}
-      .term-list li:nth-child(2){padding-top:0;border-top:0}
-      .closing{padding:38px;display:grid;grid-template-columns:minmax(0,1fr) 310px;column-gap:48px;align-items:end}
-      .closing .section-kicker,.closing h2,.closing p{grid-column:1}
-      .closing button{grid-column:2;grid-row:1/span 3;margin:0}
-      .legal-note{padding-bottom:38px}
-      .footer{padding-bottom:28px;align-items:center}
-      .mobile-bar{display:none}
-      .backdrop{align-items:center;justify-content:center;padding:24px}
-      .dialog{width:min(590px,100%);padding:36px;border-radius:28px}
-      .dialog::before{display:none}
-    }
-    @media(hover:hover) and (pointer:fine){
-      button,.zalo{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
-      button:hover,.zalo:hover{filter:brightness(.98);transform:translateY(-1px)}
-    }
+    :root{--navy:#071b2b;--navy2:#0d2a3f;--ink:#102333;--muted:#5d6d78;--paper:#f7f9fa;--card:#fff;--line:#dbe4e8;--soft:#edf2f4;--lime:#d7ff55;--lime2:#a9d719;--green:#26704a;--greenSoft:#e4f4e9;--red:#9b4439;--redSoft:#f8e8e5;--orange:#ed5b34;--blue:#0878f9;--shadow:0 18px 48px rgba(7,27,43,.10);--font:"Be Vietnam Pro","Segoe UI",Arial,sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;min-width:320px;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}body.lock{overflow:hidden}[hidden]{display:none!important}button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}button,a{-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,a:focus-visible{outline:4px solid rgba(8,120,249,.26);outline-offset:3px}.wrap{width:min(calc(100% - 32px),1080px);margin-inline:auto}
+    .site-header{position:sticky;top:0;z-index:60;border-bottom:1px solid rgba(219,228,232,.9);background:rgba(247,249,250,.94);backdrop-filter:blur(18px)}.header-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:11px;min-width:0}.brand-mark{flex:0 0 46px;width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:var(--navy);color:var(--lime);font-size:14px;font-weight:900;box-shadow:0 8px 20px rgba(7,27,43,.16)}.brand-copy{min-width:0;display:grid;gap:1px}.brand-copy strong{font-size:18px;line-height:1.2}.brand-copy span{overflow:hidden;color:var(--muted);font-size:14px;line-height:1.3;white-space:nowrap;text-overflow:ellipsis}.header-cta{min-height:50px;padding:0 17px;border:0;border-radius:14px;background:var(--navy);color:#fff;font-size:15px;font-weight:800;white-space:nowrap}
+    .hero{padding:34px 0 54px}.hero-copy{max-width:650px}.eyebrow{width:max-content;max-width:100%;margin:0 0 16px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;display:flex;align-items:center;gap:9px;background:#fff;color:#3c5667;font-size:14px;font-weight:800}.dot{width:9px;height:9px;border-radius:50%;background:#24a96a;box-shadow:0 0 0 5px rgba(36,169,106,.12)}h1{margin:0;font-size:clamp(42px,11vw,68px);line-height:1.02;letter-spacing:-.055em;text-wrap:balance}.hero-lead{margin:18px 0 0;color:#50636f;font-size:18px}.hero-lead strong{color:var(--ink)}.hero-safety{margin-top:17px;display:flex;flex-wrap:wrap;gap:8px}.hero-safety span{padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#526671;font-size:13px;font-weight:800}
+    .hero-panel{margin-top:26px;padding:18px;border-radius:30px;background:var(--navy);color:#fff;box-shadow:0 24px 60px rgba(7,27,43,.20)}.proof-primary{padding:22px;border-radius:22px;background:linear-gradient(135deg,var(--lime),#ebff9c);color:var(--navy)}.proof-label{margin:0;font-size:13px;font-weight:850;letter-spacing:.045em;text-transform:uppercase}.proof-value{display:block;margin-top:7px;font-size:clamp(64px,19vw,92px);font-weight:900;line-height:.92;letter-spacing:-.075em}.proof-title{display:block;margin-top:12px;font-size:20px;font-weight:850;line-height:1.32}.proof-note{display:block;margin-top:6px;color:#3e5010;font-size:14px;font-weight:650;line-height:1.5}.proof-secondary{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.proof-mini{padding:17px;border:1px solid rgba(255,255,255,.13);border-radius:18px;background:rgba(255,255,255,.06)}.proof-mini strong{display:block;color:var(--lime);font-size:31px;font-weight:900;line-height:1}.proof-mini span{display:block;margin-top:8px;color:#d2dce1;font-size:14px;font-weight:600;line-height:1.4}
+    .access-box{margin-top:18px;padding:20px;border:1px solid rgba(255,255,255,.14);border-radius:22px;background:var(--navy2)}.access-kicker{margin:0;color:var(--lime);font-size:13px;font-weight:850;letter-spacing:.055em;text-transform:uppercase}.access-box h2{margin:7px 0 0;font-size:30px;line-height:1.18;letter-spacing:-.04em}.access-desc{margin:9px 0 0;color:#c5d1d7;font-size:15px}.date-label{margin-top:17px;display:grid;gap:8px;color:#d4dee3;font-size:15px;font-weight:750}.date-label input{width:100%;min-height:58px;padding:0 15px;border:1px solid rgba(255,255,255,.2);border-radius:14px;background:#153b55;color:#fff;color-scheme:dark;font-size:18px;font-weight:700}.price-line{margin-top:15px;padding:16px 0;border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.13);display:flex;align-items:flex-end;justify-content:space-between;gap:16px}.price-line span{color:#c0cdd3;font-size:15px;font-weight:650}.price-line strong{color:var(--lime);font-size:34px;font-weight:900;line-height:1}.primary-cta{width:100%;min-height:62px;margin-top:16px;padding:0 18px;border:0;border-radius:16px;background:var(--lime);color:var(--navy);font-size:18px;font-weight:900}.payment-caption{margin:12px 0 0;color:#b8c7ce;font-size:13px;line-height:1.55;text-align:center}
+    .trust-strip{padding:0 0 56px}.trust-grid{display:grid;gap:10px}.trust-item{padding:17px;border:1px solid var(--line);border-radius:18px;display:grid;grid-template-columns:44px 1fr;gap:13px;align-items:center;background:#fff}.trust-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:var(--soft);color:var(--navy);font-size:15px;font-weight:900}.trust-item strong{display:block;font-size:16px}.trust-item span{display:block;margin-top:4px;color:var(--muted);font-size:14px;line-height:1.45}
+    .section{padding:64px 0}.section-soft{background:#eaf0f2}.section-dark{background:var(--navy);color:#fff}.section-kicker{margin:0 0 9px;color:var(--orange);font-size:13px;font-weight:850;letter-spacing:.07em;text-transform:uppercase}.section-dark .section-kicker{color:var(--lime)}.section-title{margin:0;font-size:clamp(32px,8.6vw,48px);line-height:1.1;letter-spacing:-.045em;text-wrap:balance}.section-intro{max-width:760px;margin:13px 0 0;color:var(--muted);font-size:16px}.section-dark .section-intro{color:#c1cdd3}
+    .offer{padding:0 0 64px}.offer-card{padding:24px;border:1px solid #cbd9df;border-radius:28px;background:#fff;box-shadow:var(--shadow)}.offer-badge{width:max-content;max-width:100%;margin:0 0 11px;padding:8px 12px;border-radius:999px;background:var(--navy);color:var(--lime);font-size:13px;font-weight:850}.offer-card h2{margin:0;font-size:clamp(32px,8.8vw,48px);line-height:1.12;letter-spacing:-.048em}.offer-card h2 strong{color:var(--orange)}.offer-lead{margin:14px 0 0;color:#50646f;font-size:16px}.metrics{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{padding:17px;border:1px solid var(--line);border-radius:18px;background:var(--soft)}.metric strong{display:block;color:var(--navy);font-size:33px;font-weight:900;line-height:1}.metric span{display:block;margin-top:8px;color:#536873;font-size:13px;font-weight:700}.layers{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}.layers span{padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-size:13px;font-weight:800}.benefits{margin:20px 0 0;padding:0;list-style:none;display:grid;gap:10px}.benefits li{display:grid;grid-template-columns:27px 1fr;gap:10px;align-items:start;color:#4e626d;font-size:14px}.benefits li::before{content:"✓";width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:var(--greenSoft);color:var(--green);font-size:14px;font-weight:900}.offer-action{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}.offer-price{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}.offer-price span{color:#516671;font-size:14px;font-weight:700}.offer-price strong{color:var(--navy);font-size:36px;font-weight:900;line-height:1}.offer-button{width:100%;min-height:62px;margin-top:15px;border:0;border-radius:16px;background:var(--navy);color:#fff;font-size:17px;font-weight:900}.offer-note{margin:11px 0 0;color:#687a83;font-size:13px;text-align:center}
+    .summary-grid,.report-grid,.rank-grid,.steps,.safety-grid{margin-top:24px;display:grid;gap:14px}.summary-card,.rank-card,.safety-card{padding:22px;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 8px 25px rgba(7,27,43,.05)}.summary-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.summary-top span{color:#4d6370;font-size:15px;font-weight:750}.summary-top b{color:var(--green);font-size:24px;font-weight:900}.summary-main{margin-top:12px;display:flex;align-items:flex-end;gap:9px}.summary-main strong{font-size:44px;font-weight:900;line-height:1}.summary-main span{padding-bottom:4px;color:var(--muted);font-size:15px}.track{height:12px;margin-top:18px;overflow:hidden;border-radius:999px;background:#e4eaed}.track span{height:100%;display:block;border-radius:inherit;background:linear-gradient(90deg,var(--lime2),#5fa842)}.w774{width:77.4%}.w667{width:66.7%}.w750{width:75%}.summary-card p{margin:13px 0 0;color:var(--muted);font-size:14px}.definition{margin:18px 0 0;padding:15px 16px;border-left:5px solid var(--orange);border-radius:0 14px 14px 0;background:#fff;color:#52656f;font-size:14px}
+    .report-item{padding:20px;border:1px solid rgba(255,255,255,.13);border-radius:20px;background:rgba(255,255,255,.055)}.report-index{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:var(--lime);color:var(--navy);font-size:14px;font-weight:900}.report-item h3{margin:15px 0 0;font-size:20px}.report-item p{margin:7px 0 0;color:#bdcad0;font-size:14px}
+    .rank-card{box-shadow:none}.rank-label{display:inline-block;padding:7px 10px;border-radius:999px;background:var(--navy);color:var(--lime);font-size:13px;font-weight:900}.rank-card h3{margin:14px 0 0;font-size:23px}.rank-card p{margin:8px 0 0;color:var(--muted);font-size:15px}.rank-note{margin-top:16px;padding:15px;border-radius:16px;background:var(--soft);color:#536873;font-size:14px}.rank-note strong{color:var(--ink)}
+    .history-head{display:grid;gap:18px}.tabs{padding:5px;border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#e6edef}.tab{min-height:53px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:#4e626e;font-size:15px;font-weight:800}.tab.active{background:var(--navy);color:#fff}.history-meta{margin:17px 0 0;color:var(--muted);font-size:14px;font-weight:600}.history-list{margin-top:16px;display:grid;gap:11px}.history-row{padding:18px;border:1px solid var(--line);border-radius:20px;background:#fff}.row-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.row-date{font-size:15px;font-weight:850}.status{padding:7px 10px;border-radius:999px;font-size:13px;font-weight:800}.status.hit{background:var(--greenSoft);color:var(--green)}.status.miss{background:var(--redSoft);color:var(--red)}.codes{margin-top:14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.code{height:52px;display:grid;place-items:center;border-radius:14px;background:var(--navy);color:var(--lime);font-size:20px;font-weight:900}.row-result{margin:13px 0 0;color:#586b76;font-size:14px}.row-result b{color:var(--ink)}.show-all{width:100%;min-height:56px;margin-top:13px;border:1px solid var(--line);border-radius:15px;background:#fff;color:var(--navy);font-size:15px;font-weight:800}
+    .step{padding:20px;border:1px solid var(--line);border-radius:20px;display:grid;grid-template-columns:48px 1fr;gap:14px;background:#fff}.step-num{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:var(--navy);color:var(--lime);font-size:16px;font-weight:900}.step h3{margin:1px 0 0;font-size:19px}.step p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    .safety-card h3{margin:0;font-size:19px}.safety-card p{margin:8px 0 0;color:var(--muted);font-size:14px}.legal-box{margin-top:24px;padding:22px;border:1px solid var(--line);border-radius:22px;background:#fff}.legal-box h3{margin:0;font-size:21px}.legal-box p{margin:9px 0 0;color:var(--muted);font-size:14px}.legal-links{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}.legal-links a{padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--navy);font-size:13px;font-weight:850}
+    .closing{margin:0 auto;padding:27px 22px;border-radius:26px;background:linear-gradient(135deg,var(--orange),#e8442b);color:#fff;box-shadow:0 20px 48px rgba(232,68,43,.19)}.closing .section-kicker{color:#fff2e8}.closing h2{margin:0;font-size:34px;line-height:1.13}.closing p{margin:11px 0 0;color:#fff0eb;font-size:15px}.closing button{width:100%;min-height:60px;margin-top:19px;border:0;border-radius:15px;background:#fff;color:var(--navy);font-size:16px;font-weight:900}.legal-note{padding:26px 0 118px;color:#596b75;font-size:14px}.footer{padding:25px 0 110px;border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.footer-right{text-align:right}.footer-right p{margin:3px 0 0;color:var(--muted);font-size:13px}.footer-links{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px}.footer-links a{color:#3f5663;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+    .mobile-bar{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:80;min-height:76px;padding:10px 10px 10px 15px;border:1px solid rgba(255,255,255,.14);border-radius:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(7,27,43,.97);color:#fff;box-shadow:0 18px 48px rgba(0,0,0,.30);backdrop-filter:blur(18px)}.mobile-bar span{display:block;color:#c0ccd2;font-size:13px}.mobile-bar strong{display:block;margin-top:3px;color:var(--lime);font-size:17px}.mobile-bar button{min-height:54px;padding:0 16px;border:0;border-radius:14px;background:var(--lime);color:var(--navy);font-size:15px;font-weight:900}
+    .backdrop{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;background:rgba(2,11,18,.82);backdrop-filter:blur(8px)}.dialog{position:relative;width:100%;max-height:calc(100dvh - 12px);overflow:auto;padding:34px 18px calc(22px + env(safe-area-inset-bottom));border-radius:28px 28px 0 0;background:var(--paper)}.dialog::before{content:"";position:absolute;top:10px;left:50%;width:46px;height:5px;border-radius:999px;background:#bdc8cd;transform:translateX(-50%)}.dialog-close{position:absolute;top:18px;right:16px;width:48px;height:48px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--navy);font-size:27px}.dialog h2{max-width:calc(100% - 55px);margin:0;font-size:30px;line-height:1.18}.dialog-intro{margin:10px 0 0;color:var(--muted);font-size:15px}.dialog-date{margin-top:17px;display:grid;gap:8px;color:#405763;font-size:14px;font-weight:750}.dialog-date input{width:100%;min-height:58px;padding:0 14px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);font-size:18px;font-weight:700}.consent{margin-top:15px;padding:14px;border:1px solid var(--line);border-radius:15px;display:grid;grid-template-columns:24px 1fr;gap:10px;background:#fff;color:#50636f;font-size:13px}.consent input{width:20px;height:20px;margin:2px 0 0}.consent a{color:#075fd0;font-weight:800;text-decoration:underline}.pay-area{margin-top:14px}.paycard{overflow:hidden;border:1px solid var(--line);border-radius:18px;background:#fff}.payrow{min-height:72px;padding:12px 14px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}.payrow:last-child{border-bottom:0}.payrow span{color:var(--muted);font-size:13px;font-weight:650}.payrow strong{grid-row:2;color:var(--ink);font-size:16px;font-weight:850;overflow-wrap:anywhere}.copy{grid-column:2;grid-row:1/span 2;min-width:84px;min-height:48px;padding:0 11px;border:0;border-radius:12px;background:#eef6d6;color:#355d00;font-size:13px;font-weight:850}.paysteps{margin:17px 0;padding:0;list-style:none;display:grid;gap:12px}.paysteps li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;color:#4c616c;font-size:14px}.paysteps span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--navy);color:var(--lime);font-size:13px;font-weight:900}.zalo{width:100%;min-height:60px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-size:16px;font-weight:900}.dialog-note{margin:13px 3px 0;color:#667983;font-size:13px;text-align:center}.consent-hint{margin:10px 0 0;color:#8a5b23;font-size:12px;text-align:center}
+    @media(max-width:359px){.wrap{width:calc(100% - 24px)}.brand-copy span{display:none}.header-cta{padding:0 12px;font-size:13px}h1{font-size:39px}.hero-panel{padding:14px}.proof-primary{padding:18px}.proof-value{font-size:62px}.metrics{grid-template-columns:1fr}.price-line,.offer-price{display:grid;gap:8px}.mobile-bar{left:6px;right:6px}}
+    @media(min-width:640px){.trust-grid,.summary-grid,.report-grid,.rank-grid,.steps,.safety-grid{grid-template-columns:repeat(2,1fr)}.summary-card:last-child{grid-column:1/-1}}
+    @media(min-width:820px){.wrap{width:min(calc(100% - 56px),1080px)}.header-inner{min-height:80px}.hero{padding:64px 0 78px;display:grid;grid-template-columns:minmax(0,1fr) minmax(410px,.92fr);gap:58px;align-items:start}.hero-panel{margin-top:0;padding:22px}.trust-grid{grid-template-columns:repeat(3,1fr)}.offer-card{padding:38px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);gap:0 46px;align-items:start}.offer-main{grid-column:1}.offer-action{grid-column:2;grid-row:1;margin:0;padding:25px;border:1px solid var(--line);border-radius:22px;background:var(--soft)}.section{padding:86px 0}.summary-grid{grid-template-columns:repeat(3,1fr)}.summary-card:last-child{grid-column:auto}.report-grid{grid-template-columns:repeat(4,1fr)}.history-head{grid-template-columns:1fr auto;align-items:end}.tabs{width:360px}.history-row{display:grid;grid-template-columns:125px 285px minmax(0,1fr) 150px;gap:17px;align-items:center}.row-top{display:contents}.row-date{grid-column:1}.status{grid-column:4;justify-self:end}.codes{grid-column:2;margin:0}.row-result{grid-column:3;margin:0}.steps{grid-template-columns:repeat(3,1fr)}.safety-grid{grid-template-columns:repeat(4,1fr)}.closing{padding:38px;display:grid;grid-template-columns:minmax(0,1fr) 310px;column-gap:48px;align-items:end}.closing .section-kicker,.closing h2,.closing p{grid-column:1}.closing button{grid-column:2;grid-row:1/span 3;margin:0}.legal-note{padding-bottom:38px}.footer{padding-bottom:28px;align-items:center}.mobile-bar{display:none}.backdrop{align-items:center;justify-content:center;padding:24px}.dialog{width:min(590px,100%);padding:36px;border-radius:28px}.dialog::before{display:none}}
+    @media(hover:hover) and (pointer:fine){button,.zalo{transition:transform .16s ease,filter .16s ease}button:hover,.zalo:hover{filter:brightness(.98);transform:translateY(-1px)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button,.zalo{transition:none!important}}
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"4SO AI","description":"Báo cáo phân tích dữ liệu kết quả Xổ số Miền Bắc đã công bố, gồm thống kê, backtest, xếp hạng mô hình và hồ sơ đối chiếu.","areaServed":"VN","offers":{"@type":"Offer","price":"50000","priceCurrency":"VND","description":"Quyền truy cập một báo cáo dữ liệu cho một ngày"}}</script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="header-inner wrap">
-      <a class="brand" href="#top" aria-label="4SO AI - Trang chủ">
-        <b class="brand-mark">4SO</b>
-        <span class="brand-copy"><strong>4SO AI</strong><span>Dữ liệu đến ngày hôm qua</span></span>
-      </a>
-      <button class="header-cta" type="button" data-open>Xem gói 01 ngày</button>
-    </div>
-  </header>
-
+  <header class="site-header"><div class="header-inner wrap"><a class="brand" href="#top" aria-label="4SO AI - Trang chủ"><b class="brand-mark">4SO</b><span class="brand-copy"><strong>4SO AI</strong><span>Báo cáo phân tích dữ liệu</span></span></a><button class="header-cta" type="button" data-open>Xem gói 01 ngày</button></div></header>
   <main>
     <section class="hero wrap" id="top">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-dot"></span> Báo cáo thống kê AI theo ngày</p>
-        <h1>AI thống kê Lô tô Miền Bắc.</h1>
-        <p class="hero-lead"><strong>4SO AI thống kê kết quả Lô tô Miền Bắc đã công bố</strong>, phân tích dữ liệu lịch sử đến hết ngày hôm qua <strong>(<span data-lock-date>--/--/----</span>)</strong>, chấm đủ 45 cặp đảo và xếp hạng hai cặp đầu ra cho ngày người dùng lựa chọn.</p>
+        <p class="eyebrow"><span class="dot"></span> Báo cáo dữ liệu AI theo ngày</p>
+        <h1>Phân tích dữ liệu Xổ số Miền Bắc bằng AI.</h1>
+        <p class="hero-lead"><strong>4SO AI sử dụng kết quả đã công bố đến hết ngày hôm qua</strong> để thực hiện thống kê, backtest, chấm đủ 45 cặp đảo và xếp hạng hai cặp đầu ra của mô hình cho báo cáo ngày kế tiếp.</p>
+        <div class="hero-safety"><span>18+</span><span>Không nhận cược</span><span>Không trả thưởng</span><span>Không cam kết kết quả</span></div>
       </div>
-
       <section class="hero-panel" aria-labelledby="access-title">
-        <div class="proof-primary">
-          <p class="proof-label">Một đợt kiểm định lịch sử</p>
-          <strong class="proof-value">80%</strong>
-          <span class="proof-title">24/30 ngày có đầu ra xuất hiện</span>
-          <span class="proof-note">Số liệu lịch sử, không phải cam kết cho kỳ tiếp theo</span>
-        </div>
-        <div class="proof-secondary" role="group" aria-label="Quy mô nghiên cứu">
-          <div class="proof-mini"><strong>1.000+</strong><span>vòng nghiên cứu và kiểm định</span></div>
-          <div class="proof-mini"><strong>45/45</strong><span>cặp được chấm trong mỗi báo cáo</span></div>
-        </div>
-
+        <div class="proof-primary"><p class="proof-label">Kết quả đối chiếu 01/07–09/08/2026</p><strong class="proof-value">75%</strong><span class="proof-title">30/40 ngày có ít nhất một đầu ra xuất hiện</span><span class="proof-note">Số liệu lịch sử đã đối chiếu, không phải xác suất bảo đảm và không cam kết cho kỳ tiếp theo.</span></div>
+        <div class="proof-secondary"><div class="proof-mini"><strong>1.000+</strong><span>vòng nghiên cứu và kiểm định</span></div><div class="proof-mini"><strong>45/45</strong><span>cặp được chấm trong mỗi báo cáo</span></div></div>
         <div class="access-box">
-          <p class="access-kicker">Quyền truy cập 01 ngày</p>
-          <h2 id="access-title">Báo cáo ngày <span data-date>--/--/----</span></h2>
-          <p class="access-desc">Chọn ngày cần xem. Báo cáo gồm dữ liệu, thống kê, backtest, xếp hạng Top 1–Top 2 và đầu ra mô hình.</p>
-          <label class="date-label">Ngày báo cáo<input class="report-date" type="date"></label>
-          <div class="price-line"><span>Phí truy cập một báo cáo</span><strong>50.000đ</strong></div>
-          <button class="primary-cta" type="button" data-open>Mở quyền truy cập <span class="arrow">→</span></button>
-          <p class="payment-caption">Xác nhận thanh toán qua Zalo · Không thu tiền đặt cược</p>
+          <p class="access-kicker">Quyền truy cập 01 báo cáo</p><h2 id="access-title">Báo cáo ngày <span data-date>--/--/----</span></h2>
+          <p class="access-desc">Báo cáo gồm dữ liệu nguồn, thống kê, backtest, xếp hạng Top 1–Top 2 và hồ sơ đối chiếu. Ngày báo cáo kế tiếp được khóa theo dữ liệu t−1.</p>
+          <label class="date-label">Ngày báo cáo<input class="report-date" type="date" aria-label="Ngày báo cáo"></label>
+          <div class="price-line"><span>Phí quyền truy cập một báo cáo</span><strong>50.000đ</strong></div>
+          <button class="primary-cta" type="button" data-open>Xem hướng dẫn truy cập →</button>
+          <p class="payment-caption">Phí dịch vụ dữ liệu · Không phải tiền đặt cược · Chỉ dành cho người từ 18 tuổi</p>
         </div>
       </section>
     </section>
 
-    <section class="trust-strip wrap" aria-label="Cam kết dịch vụ">
-      <div class="trust-grid">
-        <article class="trust-item"><span class="trust-icon">Lịch</span><div><strong>Dữ liệu đến ngày hôm qua</strong><span>Khóa đến <span data-lock-date>--/--/----</span>, không dùng kết quả tương lai.</span></div></article>
-        <article class="trust-item"><span class="trust-icon">✓</span><div><strong>Có lịch sử đối chiếu</strong><span>Đầu ra và kết quả được công khai theo từng ngày.</span></div></article>
-        <article class="trust-item"><span class="trust-icon">AI</span><div><strong>Phí dịch vụ dữ liệu</strong><span>50.000đ cho quyền xem một báo cáo đã chọn.</span></div></article>
-      </div>
-    </section>
+    <section class="trust-strip wrap" aria-label="Nguyên tắc dịch vụ"><div class="trust-grid">
+      <article class="trust-item"><span class="trust-icon">D-1</span><div><strong>Không dùng kết quả tương lai</strong><span>Dữ liệu báo cáo ngày <span data-date>--/--/----</span> được khóa đến <span data-lock-date>--/--/----</span>.</span></div></article>
+      <article class="trust-item"><span class="trust-icon">✓</span><div><strong>Đối chiếu công khai</strong><span>Đầu ra mô hình và kết quả thực tế được lưu theo từng ngày.</span></div></article>
+      <article class="trust-item"><span class="trust-icon">18+</span><div><strong>Dịch vụ dữ liệu</strong><span>Không nhận cược, không giữ tiền cược, không trả thưởng hoặc đặt cược thay.</span></div></article>
+    </div></section>
 
-    <section class="conversion wrap" id="gia-tri-bao-cao">
-      <div class="conversion-card">
-        <div class="conversion-top">
-          <p class="conversion-badge">Gói báo cáo nghiên cứu AI 4SO</p>
-          <h2><strong>50.000đ</strong> — bạn sở hữu báo cáo phân tích AI cho ngày đã chọn</h2>
-          <p class="conversion-lead">Không chỉ là bốn đầu ra. Bạn nhận một báo cáo được tổng hợp từ <strong>hơn 15.000 lượt tính toán thống kê</strong> và <strong>7 lớp phương pháp chọn lọc</strong>.</p>
-        </div>
-        <div class="conversion-metrics" role="group" aria-label="Quy mô phân tích">
-          <div class="conversion-metric"><strong>15.000+</strong><span>lượt tính toán thống kê</span></div>
-          <div class="conversion-metric"><strong>7 lớp</strong><span>phương pháp nghiên cứu chọn lọc</span></div>
-        </div>
-        <p class="layer-title">Các lớp phương pháp được nghiên cứu và đối chiếu</p>
+    <section class="offer wrap" id="goi-bao-cao"><div class="offer-card">
+      <div class="offer-main"><p class="offer-badge">Gói báo cáo nghiên cứu AI 4SO</p><h2><strong>50.000đ</strong> cho quyền xem một báo cáo dữ liệu</h2><p class="offer-lead">Mỗi báo cáo tổng hợp từ hơn <strong>15.000 lượt tính toán thống kê</strong>, các lớp phương pháp nghiên cứu và hồ sơ kiểm định trước khi công bố đầu ra.</p>
+        <div class="metrics"><div class="metric"><strong>15.000+</strong><span>lượt tính toán thống kê</span></div><div class="metric"><strong>7 lớp</strong><span>phương pháp nghiên cứu</span></div></div>
         <div class="layers"><span>4SO</span><span>A1</span><span>MAX</span><span>2SO</span><span>CUM3</span><span>Fusion</span><span>Champion</span></div>
-        <div class="conversion-action">
-          <ul class="conversion-benefits">
-            <li>Dữ liệu cập nhật đến ngày hôm qua <strong>(<span data-lock-date>--/--/----</span>)</strong></li>
-            <li>Thống kê, backtest và hồ sơ kiểm định</li>
-            <li>Xếp hạng Top 1–Top 2 và đầu ra mô hình</li>
-            <li>Lịch sử đối chiếu minh bạch theo từng ngày</li>
-          </ul>
-          <div class="conversion-price"><span>Phí trọn gói<br>một báo cáo / một ngày</span><strong>50.000đ</strong></div>
-          <button class="conversion-button" type="button" data-open>Nhận báo cáo AI 4SO →</button>
-          <p class="conversion-note">Phí quyền truy cập báo cáo dữ liệu · Không phải tiền đặt cược</p>
-        </div>
       </div>
-    </section>
+      <div class="offer-action"><ul class="benefits"><li>Dữ liệu khóa đến ngày hôm qua <strong>(<span data-lock-date>--/--/----</span>)</strong></li><li>Thống kê, backtest và hồ sơ kiểm định</li><li>Xếp hạng thống kê Top 1–Top 2</li><li>Lịch sử đối chiếu theo từng ngày</li></ul><div class="offer-price"><span>Phí truy cập<br>01 báo cáo / 01 ngày</span><strong>50.000đ</strong></div><button class="offer-button" type="button" data-open>Xem thông tin truy cập →</button><p class="offer-note">Không tư vấn mức tiền đặt cược và không cung cấp dịch vụ cá cược.</p></div>
+    </div></section>
 
-    <section class="section section-soft" id="thong-ke">
-      <div class="wrap">
-        <p class="section-kicker">Dữ kiện đã đối chiếu</p>
-        <h2 class="section-title">Hiệu suất tháng 7–8/2026</h2>
-        <p class="section-intro">Đầu ra mô hình được lưu trước kỳ và đối chiếu với đủ 27 mã kết quả. Số liệu cập nhật đến hết 09/08/2026.</p>
-        <div class="summary-grid">
-          <article class="summary-card">
-            <div class="summary-top"><span>Tháng 7/2026</span><b>77,4%</b></div>
-            <div class="summary-main"><strong>24/31</strong><span>ngày</span></div>
-            <div class="track"><span class="w-774"></span></div>
-            <p>48 lần xuất hiện · 7 ngày không xuất hiện</p>
-          </article>
-          <article class="summary-card">
-            <div class="summary-top"><span>Tháng 8 đến ngày hôm qua</span><b>66,7%</b></div>
-            <div class="summary-main"><strong>6/9</strong><span>ngày</span></div>
-            <div class="track"><span class="w-667"></span></div>
-            <p>01/08–09/08 · 10 lần xuất hiện</p>
-          </article>
-          <article class="summary-card">
-            <div class="summary-top"><span>Tổng hai tháng</span><b>75%</b></div>
-            <div class="summary-main"><strong>30/40</strong><span>ngày</span></div>
-            <div class="track"><span class="w-750"></span></div>
-            <p>58 lần xuất hiện · 1.800 lượt chấm cặp</p>
-          </article>
-        </div>
-        <p class="definition"><strong>“Ngày có đầu ra xuất hiện”</strong> là ngày có ít nhất 1 trong 4 đầu ra của MB_4SO_V1 xuất hiện trong 27 mã kết quả. Đây là thống kê lịch sử, không phải tỷ lệ bảo đảm.</p>
+    <section class="section section-soft" id="thong-ke"><div class="wrap"><p class="section-kicker">Dữ kiện đã đối chiếu</p><h2 class="section-title">Hiệu suất lịch sử tháng 7–8/2026</h2><p class="section-intro">Đầu ra mô hình được lưu trước kỳ và đối chiếu với đủ 27 mã kết quả. Dữ liệu bên dưới cập nhật đến hết 09/08/2026.</p>
+      <div class="summary-grid">
+        <article class="summary-card"><div class="summary-top"><span>Tháng 7/2026</span><b>77,4%</b></div><div class="summary-main"><strong>24/31</strong><span>ngày</span></div><div class="track"><span class="w774"></span></div><p>48 lần xuất hiện · 7 ngày không xuất hiện</p></article>
+        <article class="summary-card"><div class="summary-top"><span>01/08–09/08/2026</span><b>66,7%</b></div><div class="summary-main"><strong>6/9</strong><span>ngày</span></div><div class="track"><span class="w667"></span></div><p>10 lần xuất hiện trong 9 ngày đã đối chiếu</p></article>
+        <article class="summary-card"><div class="summary-top"><span>Tổng giai đoạn</span><b>75%</b></div><div class="summary-main"><strong>30/40</strong><span>ngày</span></div><div class="track"><span class="w750"></span></div><p>58 lần xuất hiện · 1.800 lượt chấm cặp</p></article>
       </div>
-    </section>
+      <p class="definition"><strong>Định nghĩa:</strong> “Ngày có đầu ra xuất hiện” là ngày có ít nhất 1 trong 4 đầu ra của MB_4SO_V1 xuất hiện trong 27 mã kết quả. Đây là thống kê lịch sử, không phải tỷ lệ bảo đảm cho kỳ tiếp theo.</p>
+    </div></section>
 
-    <section class="section section-dark" id="bao-cao-gom-gi">
-      <div class="wrap">
-        <p class="section-kicker">Giá trị trong mỗi báo cáo</p>
-        <h2 class="section-title">50.000đ bao gồm những gì?</h2>
-        <p class="section-intro">Quyền truy cập áp dụng cho một báo cáo và đúng ngày người dùng đã chọn.</p>
-        <div class="report-grid">
-          <article class="report-item"><span class="report-index">01</span><h3>Dữ liệu đến ngày hôm qua</h3><p>Kiểm tra phạm vi dữ liệu trước khi mô hình tính toán.</p></article>
-          <article class="report-item"><span class="report-index">02</span><h3>Thống kê &amp; backtest</h3><p>Các chỉ số và hồ sơ kiểm định liên quan đến đầu ra.</p></article>
-          <article class="report-item"><span class="report-index">03</span><h3>Xếp hạng tín hiệu</h3><p>Chấm đủ 45 cặp và xác định thứ hạng Top 1–Top 2.</p></article>
-          <article class="report-item"><span class="report-index">04</span><h3>Đầu ra mô hình</h3><p>Hai cặp đảo, tương ứng bốn mã được công bố trong báo cáo.</p></article>
-        </div>
-      </div>
-    </section>
+    <section class="section section-dark" id="bao-cao-gom-gi"><div class="wrap"><p class="section-kicker">Nội dung báo cáo</p><h2 class="section-title">Bạn nhận được những gì?</h2><p class="section-intro">Quyền truy cập áp dụng cho đúng báo cáo/ngày đã chọn và tập trung vào dữ liệu, phương pháp và hồ sơ đối chiếu.</p><div class="report-grid">
+      <article class="report-item"><span class="report-index">01</span><h3>Phạm vi dữ liệu</h3><p>Ngày khóa dữ liệu và kiểm tra nguồn trước khi mô hình tính toán.</p></article>
+      <article class="report-item"><span class="report-index">02</span><h3>Thống kê &amp; backtest</h3><p>Các chỉ số lịch sử và kết quả kiểm định liên quan đến mô hình.</p></article>
+      <article class="report-item"><span class="report-index">03</span><h3>Bảng xếp hạng</h3><p>Chấm đủ 45 cặp và xác định Top 1–Top 2 theo công thức đã khóa.</p></article>
+      <article class="report-item"><span class="report-index">04</span><h3>Đầu ra mô hình</h3><p>Hai cặp đảo, tương ứng bốn mã được công bố để theo dõi và đối chiếu.</p></article>
+    </div></div></section>
 
-    <section class="section wrap" id="cach-doc">
-      <p class="section-kicker">Cách đọc đầu ra</p>
-      <h2 class="section-title">Theo dõi 1 cặp hoặc đủ 2 cặp</h2>
-      <p class="section-intro">Mỗi báo cáo luôn công bố đúng hai cặp đảo. Người đọc có thể xem cặp xếp hạng Top 1 hoặc toàn bộ Top 1 + Top 2; các mã trong cùng phương án được trình bày với trọng số bằng nhau.</p>
-      <div class="usage-grid">
-        <article class="usage-card featured">
-          <p class="usage-badge">Phương án rút gọn</p>
-          <h3>1 cặp ưu tiên · Top 1</h3>
-          <p>Hai mã đảo thuộc cặp đứng đầu bảng xếp hạng.</p>
-          <div class="weight-grid two"><div class="weight"><strong>50%</strong><span>Mã A</span></div><div class="weight"><strong>50%</strong><span>Mã đảo A</span></div></div>
-        </article>
-        <article class="usage-card">
-          <p class="usage-badge">Phương án đầy đủ</p>
-          <h3>2 cặp · Top 1 + Top 2</h3>
-          <p>Đủ bốn mã canonical trong báo cáo của mô hình.</p>
-          <div class="weight-grid four"><div class="weight"><strong>25%</strong><span>Mã A</span></div><div class="weight"><strong>25%</strong><span>Đảo A</span></div><div class="weight"><strong>25%</strong><span>Mã B</span></div><div class="weight"><strong>25%</strong><span>Đảo B</span></div></div>
-        </article>
-      </div>
-      <p class="usage-note"><strong>Lưu ý:</strong> Tỷ trọng chỉ mô tả cách theo dõi và đánh giá đầu ra. Website không tư vấn mức tiền, không nhận tiền đặt cược và không đại diện đặt cược.</p>
-    </section>
+    <section class="section wrap" id="cach-doc"><p class="section-kicker">Cách đọc bảng xếp hạng</p><h2 class="section-title">Top 1 và Top 2 là thứ hạng thống kê</h2><p class="section-intro">Hai vị trí thể hiện thứ tự xếp hạng của mô hình. Website không dùng các vị trí này để hướng dẫn số tiền, tỷ lệ vốn hoặc cách đặt cược.</p><div class="rank-grid">
+      <article class="rank-card"><span class="rank-label">TOP 1</span><h3>Cặp đứng đầu mô hình</h3><p>Cặp có điểm xếp hạng cao nhất theo công thức đã khóa tại thời điểm tính toán.</p><div class="rank-note"><strong>Ý nghĩa:</strong> ưu tiên về thứ hạng thống kê, không phải cam kết chắc chắn xuất hiện.</div></article>
+      <article class="rank-card"><span class="rank-label">TOP 2</span><h3>Cặp đứng thứ hai</h3><p>Cặp có điểm xếp hạng cao thứ hai và được công bố cùng Top 1 trong báo cáo đầy đủ.</p><div class="rank-note"><strong>Không phải phân bổ vốn:</strong> website không đưa tỷ lệ 50/50, 25/25/25/25 hoặc mức tiền để đặt cược.</div></article>
+    </div></section>
 
-    <section class="section section-soft" id="lich-su">
-      <div class="wrap">
-        <div class="history-head">
-          <div><p class="section-kicker">Hồ sơ công khai</p><h2 class="section-title">Đầu ra và kết quả từng ngày</h2><p class="section-intro">Xem bốn đầu ra đã lưu, mã thực tế xuất hiện và số lần xuất hiện.</p></div>
-          <div class="tabs" role="tablist" aria-label="Chọn tháng"><button class="tab active" type="button" data-month="08" role="tab" aria-selected="true">Tháng 8 · 9 ngày</button><button class="tab" type="button" data-month="07" role="tab" aria-selected="false">Tháng 7 · 31 ngày</button></div>
-        </div>
-        <p class="history-meta" id="history-meta">Tháng 8/2026 · Đã đối chiếu đến 09/08/2026</p>
-        <div class="history-list" id="history-list" aria-live="polite"></div>
-        <button class="show-all" id="show-all" type="button" hidden>Xem đủ 31 ngày tháng 7</button>
-      </div>
-    </section>
+    <section class="section section-soft" id="lich-su"><div class="wrap"><div class="history-head"><div><p class="section-kicker">Hồ sơ công khai</p><h2 class="section-title">Đầu ra và kết quả từng ngày</h2><p class="section-intro">Xem bốn đầu ra đã lưu, mã thực tế xuất hiện và số lần xuất hiện. Kết quả được đối chiếu sau kỳ.</p></div><div class="tabs" role="tablist" aria-label="Chọn tháng"><button class="tab active" type="button" data-month="08" role="tab" aria-selected="true">Tháng 8 · 9 ngày</button><button class="tab" type="button" data-month="07" role="tab" aria-selected="false">Tháng 7 · 31 ngày</button></div></div><p class="history-meta" id="history-meta">Tháng 8/2026 · Đã đối chiếu đến 09/08/2026</p><div class="history-list" id="history-list" aria-live="polite"></div><button class="show-all" id="show-all" type="button" hidden>Xem đủ 31 ngày tháng 7</button></div></section>
 
-    <section class="section wrap" id="quy-trinh">
-      <p class="section-kicker">Quy trình truy cập</p>
-      <h2 class="section-title">Ba bước để nhận báo cáo</h2>
-      <div class="steps">
-        <article class="step"><span class="step-num">1</span><div><h3>Chọn ngày báo cáo</h3><p>Chọn đúng ngày cần xem trong biểu mẫu.</p></div></article>
-        <article class="step"><span class="step-num">2</span><div><h3>Thanh toán 50.000đ</h3><p>Chuyển phí quyền truy cập và ghi rõ ngày báo cáo.</p></div></article>
-        <article class="step"><span class="step-num">3</span><div><h3>Gửi xác nhận Zalo</h3><p>Gửi ảnh giao dịch để được xác nhận quyền truy cập.</p></div></article>
-      </div>
-    </section>
+    <section class="section wrap" id="quy-trinh"><p class="section-kicker">Quy trình truy cập</p><h2 class="section-title">Ba bước rõ ràng</h2><div class="steps"><article class="step"><span class="step-num">1</span><div><h3>Chọn ngày báo cáo</h3><p>Hiện tại chỉ mở báo cáo cho ngày kế tiếp theo múi giờ Việt Nam.</p></div></article><article class="step"><span class="step-num">2</span><div><h3>Đọc và đồng ý điều khoản</h3><p>Xác nhận từ 18 tuổi, hiểu đây là dịch vụ dữ liệu và không phải dịch vụ cá cược.</p></div></article><article class="step"><span class="step-num">3</span><div><h3>Thanh toán và xác nhận</h3><p>Chuyển phí truy cập 50.000đ và gửi ảnh giao dịch qua Zalo để đối soát.</p></div></article></div></section>
 
-    <section class="section wrap">
-      <div class="terms">
-        <p class="section-kicker">Phạm vi dịch vụ</p>
-        <h2 class="section-title">Minh bạch trước khi thanh toán</h2>
-        <ul class="term-list">
-          <li><strong>Phí quyền truy cập báo cáo.</strong> 50.000đ là phí xem một báo cáo AI cho ngày đã chọn, gồm dữ liệu, thống kê, backtest, xếp hạng và đầu ra mô hình.</li>
-          <li><strong>Không tổ chức cá cược.</strong> Dịch vụ không nhận cược, giữ tiền cược, trả thưởng, đặt cược thay hoặc liên kết người dùng với điểm đánh bạc.</li>
-          <li><strong>Không cam kết kết quả tương lai.</strong> Kết quả mô hình là tính toán thống kê; dữ liệu lịch sử không bảo đảm kết quả kỳ tiếp theo.</li>
-          <li><strong>Hoạt động thực tế phải đúng mô tả.</strong> Mọi yêu cầu nhận cược, đặt cược hộ hoặc trả thưởng đều bị từ chối.</li>
-        </ul>
-      </div>
-    </section>
+    <section class="section section-soft" id="an-toan"><div class="wrap"><p class="section-kicker">Bảo vệ người dùng</p><h2 class="section-title">Phạm vi dịch vụ được giới hạn rõ</h2><div class="safety-grid">
+      <article class="safety-card"><h3>Không tổ chức cá cược</h3><p>Không nhận cược, giữ tiền cược, trả thưởng, đặt cược thay hoặc giới thiệu điểm đánh bạc.</p></article>
+      <article class="safety-card"><h3>Không cam kết kết quả</h3><p>Backtest và tỷ lệ lịch sử chỉ mô tả dữ liệu quá khứ, không bảo đảm kỳ tiếp theo.</p></article>
+      <article class="safety-card"><h3>Chỉ dành cho 18+</h3><p>Người dùng phải đủ 18 tuổi và tự chịu trách nhiệm tuân thủ pháp luật khi sử dụng thông tin.</p></article>
+      <article class="safety-card"><h3>Không tư vấn tiền cược</h3><p>Báo cáo không chỉ dẫn mức tiền, gấp thếp, phân bổ vốn hoặc hành vi đặt cược.</p></article>
+    </div><div class="legal-box"><h3>Thanh toán, hoàn phí và dữ liệu cá nhân</h3><p>50.000đ là phí quyền truy cập một báo cáo. Nếu dịch vụ không thể cung cấp báo cáo do lỗi từ phía bên cung cấp, người dùng được hoàn lại toàn bộ phí của báo cáo đó. Ảnh giao dịch gửi qua Zalo chỉ được sử dụng để đối soát thanh toán, hỗ trợ truy cập và xử lý khiếu nại; không được dùng để bán dữ liệu hoặc quảng cáo ngoài mục đích đã thông báo.</p><div class="legal-links"><a href="legal.html#terms">Điều khoản dịch vụ</a><a href="legal.html#privacy">Chính sách bảo mật</a><a href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Hỗ trợ qua Zalo</a></div></div></div></section>
 
-    <section class="closing wrap">
-      <p class="section-kicker">Quyền truy cập 01 ngày</p>
-      <h2>Báo cáo ngày <span data-date>--/--/----</span></h2>
-      <p>Chọn ngày, thanh toán phí truy cập 50.000đ và gửi ảnh giao dịch qua Zalo để xác nhận.</p>
-      <button type="button" data-open>Mở hướng dẫn thanh toán →</button>
-    </section>
-
-    <section class="legal-note wrap"><strong>Tuyên bố sử dụng:</strong> Kết quả của mô hình là kết quả tính toán thống kê, không phải cam kết kết quả tương lai; dịch vụ không cung cấp hoặc tổ chức hoạt động cá cược. Người dùng từ 18 tuổi trở lên tự chịu trách nhiệm về cách sử dụng thông tin và phải tuân thủ pháp luật.</section>
+    <section class="closing wrap"><p class="section-kicker">Quyền truy cập 01 ngày</p><h2>Báo cáo ngày <span data-date>--/--/----</span></h2><p>Đọc điều khoản, xác nhận từ 18 tuổi và xem hướng dẫn thanh toán phí truy cập 50.000đ.</p><button type="button" data-open>Xem hướng dẫn truy cập →</button></section>
+    <section class="legal-note wrap"><strong>Tuyên bố sử dụng:</strong> 4SO AI cung cấp báo cáo nghiên cứu và phân tích dữ liệu. Kết quả mô hình không phải cam kết kết quả tương lai. Dịch vụ không nhận cược, không trả thưởng, không đại diện đặt cược và không hướng dẫn mức tiền đặt cược.</section>
   </main>
 
-  <footer class="footer wrap">
-    <a class="brand" href="#top"><b class="brand-mark">4SO</b><span class="brand-copy"><strong>4SO AI</strong><span>Thống kê Lô tô Miền Bắc</span></span></a>
-    <p>© 2026</p>
-  </footer>
+  <footer class="footer wrap"><a class="brand" href="#top"><b class="brand-mark">4SO</b><span class="brand-copy"><strong>4SO AI</strong><span>Phân tích dữ liệu Xổ số Miền Bắc</span></span></a><div class="footer-right"><div class="footer-links"><a href="legal.html#terms">Điều khoản</a><a href="legal.html#privacy">Bảo mật</a><a href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Liên hệ</a></div><p>© 2026 · Dịch vụ dữ liệu 18+</p></div></footer>
 
-  <div class="mobile-bar">
-    <div><span>Báo cáo <span data-date>--/--/----</span></span><strong>50.000đ / ngày</strong></div>
-    <button type="button" data-open>Truy cập</button>
-  </div>
+  <div class="mobile-bar"><div><span>Báo cáo <span data-date>--/--/----</span></span><strong>50.000đ / báo cáo</strong></div><button type="button" data-open>Chi tiết</button></div>
 
-  <div class="backdrop" id="backdrop" hidden>
-    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
-      <button class="dialog-close" id="close" type="button" aria-label="Đóng">×</button>
-      <p class="section-kicker">Phí quyền truy cập</p>
-      <h2 id="dialog-title">Mở báo cáo AI trong 01 ngày</h2>
-      <p class="dialog-intro">Chọn đúng ngày báo cáo. 50.000đ là phí dịch vụ dữ liệu và phân tích AI, không phải tiền đặt cược.</p>
-      <label class="dialog-date">Ngày báo cáo<input id="dialog-date" type="date"></label>
-      <div class="paycard">
-        <div class="payrow"><span>Ngân hàng</span><strong>VPBank</strong></div>
-        <div class="payrow"><span>Số tài khoản</span><strong>1128091987</strong><button class="copy" type="button" data-copy="1128091987">Sao chép</button></div>
-        <div class="payrow"><span>Phí truy cập 01 ngày</span><strong>50.000đ</strong></div>
-        <div class="payrow"><span>Nội dung chuyển khoản</span><strong id="memo">4SO AI --</strong><button class="copy" id="copy-memo" type="button">Sao chép</button></div>
-      </div>
-      <ol class="paysteps">
-        <li><span>1</span>Chuyển phí quyền truy cập 50.000đ.</li>
-        <li><span>2</span>Ghi đúng ngày báo cáo <strong id="step-date">--/--/----</strong>.</li>
-        <li><span>3</span>Gửi ảnh giao dịch qua Zalo để xác nhận.</li>
-      </ol>
-      <a class="zalo" href="https://zalo.me/0398696879" target="_blank" rel="noreferrer">Mở Zalo gửi xác nhận →</a>
-      <p class="dialog-note">Website chỉ cung cấp báo cáo nghiên cứu dữ liệu. Không nhận tiền đặt cược, không trả thưởng và không đại diện đặt cược.</p>
-    </section>
-  </div>
+  <div class="backdrop" id="backdrop" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><button class="dialog-close" id="close" type="button" aria-label="Đóng">×</button><p class="section-kicker">Quyền truy cập báo cáo</p><h2 id="dialog-title">Báo cáo AI ngày <span data-date>--/--/----</span></h2><p class="dialog-intro">50.000đ là phí dịch vụ dữ liệu và phân tích AI, không phải tiền đặt cược. Vui lòng đọc và xác nhận điều khoản trước khi xem thông tin thanh toán.</p><label class="dialog-date">Ngày báo cáo<input id="dialog-date" type="date" aria-label="Ngày báo cáo trong cửa sổ thanh toán"></label>
+    <label class="consent"><input id="consent-check" type="checkbox"><span>Tôi xác nhận <strong>đủ 18 tuổi</strong>, đã đọc <a href="legal.html#terms" target="_blank">Điều khoản dịch vụ</a> và <a href="legal.html#privacy" target="_blank">Chính sách bảo mật</a>; tôi hiểu đây là dịch vụ báo cáo dữ liệu, không phải dịch vụ cá cược và không có cam kết kết quả.</span></label>
+    <p class="consent-hint" id="consent-hint">Đánh dấu xác nhận để hiển thị thông tin thanh toán.</p>
+    <div class="pay-area" id="pay-area" hidden><div class="paycard"><div class="payrow"><span>Ngân hàng</span><strong>VPBank</strong></div><div class="payrow"><span>Số tài khoản</span><strong>1128091987</strong><button class="copy" type="button" data-copy="1128091987">Sao chép</button></div><div class="payrow"><span>Phí truy cập 01 báo cáo</span><strong>50.000đ</strong></div><div class="payrow"><span>Nội dung chuyển khoản</span><strong id="memo">4SO AI --</strong><button class="copy" id="copy-memo" type="button">Sao chép</button></div></div><ol class="paysteps"><li><span>1</span>Chuyển phí quyền truy cập 50.000đ.</li><li><span>2</span>Ghi đúng ngày báo cáo <strong id="step-date">--/--/----</strong>.</li><li><span>3</span>Gửi ảnh giao dịch qua Zalo để đối soát và xác nhận quyền truy cập.</li></ol><a class="zalo" id="zalo-link" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Mở Zalo gửi xác nhận →</a><p class="dialog-note">Ảnh giao dịch chỉ dùng cho đối soát, hỗ trợ truy cập và xử lý khiếu nại theo chính sách bảo mật.</p></div>
+  </section></div>
 
   <script>
     (()=>{
@@ -538,100 +143,22 @@
         {d:"01/08",m:"08",s:"06 60 48 84",h:"60×2, 48",n:3},{d:"02/08",m:"08",s:"38 83 05 50",h:"38, 83",n:2},{d:"03/08",m:"08",s:"05 50 06 60",h:"—",n:0},{d:"04/08",m:"08",s:"05 50 06 60",h:"—",n:0},{d:"05/08",m:"08",s:"05 50 06 60",h:"60, 05",n:2},{d:"06/08",m:"08",s:"48 84 36 63",h:"84",n:1},{d:"07/08",m:"08",s:"36 63 05 50",h:"50",n:1},{d:"08/08",m:"08",s:"19 91 06 60",h:"19",n:1},{d:"09/08",m:"08",s:"38 83 06 60",h:"—",n:0}
       ];
       const pad=n=>String(n).padStart(2,"0");
-      const tomorrow=()=>{
-        const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Ho_Chi_Minh",day:"2-digit",month:"2-digit",year:"numeric"}).formatToParts(new Date());
-        const value=Object.fromEntries(parts.map(part=>[part.type,part.value]));
-        const date=new Date(Date.UTC(+value.year,+value.month-1,+value.day+1));
-        return `${date.getUTCFullYear()}-${pad(date.getUTCMonth()+1)}-${pad(date.getUTCDate())}`;
-      };
+      const tomorrow=()=>{const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Ho_Chi_Minh",day:"2-digit",month:"2-digit",year:"numeric"}).formatToParts(new Date());const v=Object.fromEntries(parts.map(p=>[p.type,p.value]));const d=new Date(Date.UTC(+v.year,+v.month-1,+v.day+1));return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`};
       const format=iso=>{const[y,m,d]=iso.split("-");return{display:`${d}/${m}/${y}`,memo:`4SO AI ${d}-${m}-${y}`}};
-      const previousDay=iso=>{
-        const [year,month,day]=iso.split("-").map(Number);
-        const date=new Date(Date.UTC(year,month-1,day-1));
-        return `${pad(date.getUTCDate())}/${pad(date.getUTCMonth()+1)}/${date.getUTCFullYear()}`;
-      };
-      const heroDate=document.querySelector(".report-date");
-      const dialogDate=document.querySelector("#dialog-date");
-      const backdrop=document.querySelector("#backdrop");
-      const memo=document.querySelector("#memo");
-      const stepDate=document.querySelector("#step-date");
-      const closeButton=document.querySelector("#close");
-      const openButtons=[...document.querySelectorAll("[data-open]")];
-      const initial=tomorrow();
-      heroDate.value=dialogDate.value=initial;
-      heroDate.min=dialogDate.min=initial;
-      const validDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(value)?value:initial;
-      const syncDate=value=>{
-        const safe=validDate(value);
-        heroDate.value=dialogDate.value=safe;
-        const formatted=format(safe);
-        document.querySelectorAll("[data-date]").forEach(element=>element.textContent=formatted.display);
-        document.querySelectorAll("[data-lock-date]").forEach(element=>element.textContent=previousDay(safe));
-        memo.textContent=formatted.memo;
-        stepDate.textContent=formatted.display;
-      };
-      syncDate(initial);
-      heroDate.addEventListener("input",event=>syncDate(event.target.value));
-      dialogDate.addEventListener("input",event=>syncDate(event.target.value));
-
-      let lastFocus=null;
-      const open=()=>{
-        lastFocus=document.activeElement;
-        syncDate(heroDate.value||initial);
-        backdrop.hidden=false;
-        openButtons.forEach(button=>button.setAttribute("aria-expanded","true"));
-        document.body.classList.add("lock");
-        setTimeout(()=>closeButton.focus({preventScroll:true}),30);
-      };
-      const close=()=>{
-        if(backdrop.hidden)return;
-        backdrop.hidden=true;
-        openButtons.forEach(button=>button.setAttribute("aria-expanded","false"));
-        document.body.classList.remove("lock");
-        if(lastFocus&&typeof lastFocus.focus==="function")lastFocus.focus({preventScroll:true});
-      };
-      openButtons.forEach(button=>{
-        button.setAttribute("aria-expanded","false");
-        button.setAttribute("aria-controls","backdrop");
-        button.addEventListener("click",open);
-      });
-      closeButton.addEventListener("click",close);
-      backdrop.addEventListener("click",event=>{if(event.target===backdrop)close()});
-      document.addEventListener("keydown",event=>{if(event.key==="Escape")close()});
-
-      const copy=async(value,button)=>{
-        let ok=false;
-        try{await navigator.clipboard.writeText(value);ok=true}catch{}
-        if(!ok){
-          const area=document.createElement("textarea");
-          area.value=value;area.style.position="fixed";area.style.opacity="0";
-          document.body.appendChild(area);area.select();ok=document.execCommand("copy");area.remove();
-        }
-        button.textContent=ok?"Đã chép":"Chép lại";
-        setTimeout(()=>button.textContent="Sao chép",1500);
-      };
-      document.querySelectorAll("[data-copy]").forEach(button=>button.addEventListener("click",()=>copy(button.dataset.copy,button)));
-      document.querySelector("#copy-memo").addEventListener("click",event=>copy(memo.textContent,event.currentTarget));
-
-      let month="08";
-      let expanded=false;
-      const list=document.querySelector("#history-list");
-      const showAll=document.querySelector("#show-all");
-      const meta=document.querySelector("#history-meta");
-      const render=()=>{
-        const rows=history.filter(row=>row.m===month).slice().reverse();
-        const shown=month==="07"&&!expanded?rows.slice(0,10):rows;
-        list.innerHTML=shown.map(row=>`<article class="history-row"><div class="row-top"><span class="row-date">${row.d}/2026</span><span class="status ${row.n?"hit":"miss"}">${row.n?"Có xuất hiện":"Không xuất hiện"}</span></div><div class="codes">${row.s.split(" ").map(code=>`<span class="code">${code}</span>`).join("")}</div><p class="row-result">Kết quả đối chiếu: <b>${row.h}</b>${row.n?` · ${row.n} lần xuất hiện`:""}</p></article>`).join("");
-        showAll.hidden=month!=="07"||expanded;
-        meta.textContent=month==="08"?"Tháng 8/2026 · Đã đối chiếu đến 09/08/2026":"Tháng 7/2026 · 31 ngày · Mới nhất hiển thị trước";
-      };
-      document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{
-        month=tab.dataset.month;expanded=false;
-        document.querySelectorAll(".tab").forEach(item=>{const active=item===tab;item.classList.toggle("active",active);item.setAttribute("aria-selected",String(active))});
-        render();
-      }));
-      showAll.addEventListener("click",()=>{expanded=true;render()});
-      render();
+      const previousDay=iso=>{const[y,m,d]=iso.split("-").map(Number);const date=new Date(Date.UTC(y,m-1,d-1));return `${pad(date.getUTCDate())}/${pad(date.getUTCMonth()+1)}/${date.getUTCFullYear()}`};
+      const heroDate=document.querySelector(".report-date"),dialogDate=document.querySelector("#dialog-date"),backdrop=document.querySelector("#backdrop"),memo=document.querySelector("#memo"),stepDate=document.querySelector("#step-date"),closeButton=document.querySelector("#close"),consent=document.querySelector("#consent-check"),payArea=document.querySelector("#pay-area"),consentHint=document.querySelector("#consent-hint"),openButtons=[...document.querySelectorAll("[data-open]")];
+      const initial=tomorrow();heroDate.value=dialogDate.value=initial;heroDate.min=heroDate.max=dialogDate.min=dialogDate.max=initial;
+      const syncDate=value=>{const safe=value===initial?value:initial;heroDate.value=dialogDate.value=safe;const f=format(safe);document.querySelectorAll("[data-date]").forEach(el=>el.textContent=f.display);document.querySelectorAll("[data-lock-date]").forEach(el=>el.textContent=previousDay(safe));memo.textContent=f.memo;stepDate.textContent=f.display};syncDate(initial);
+      heroDate.addEventListener("input",()=>syncDate(heroDate.value));dialogDate.addEventListener("input",()=>syncDate(dialogDate.value));
+      const track=(name,params={})=>{try{if(typeof window.fbq==="function")window.fbq("trackCustom",name,params)}catch{}};
+      let lastFocus=null;const open=()=>{lastFocus=document.activeElement;syncDate(initial);consent.checked=false;payArea.hidden=true;consentHint.hidden=false;backdrop.hidden=false;document.body.classList.add("lock");openButtons.forEach(b=>b.setAttribute("aria-expanded","true"));track("OpenAccessGuide",{report_date:initial});setTimeout(()=>closeButton.focus({preventScroll:true}),30)};const close=()=>{if(backdrop.hidden)return;backdrop.hidden=true;document.body.classList.remove("lock");openButtons.forEach(b=>b.setAttribute("aria-expanded","false"));if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true})};
+      openButtons.forEach(b=>{b.setAttribute("aria-expanded","false");b.setAttribute("aria-controls","backdrop");b.addEventListener("click",open)});closeButton.addEventListener("click",close);backdrop.addEventListener("click",e=>{if(e.target===backdrop)close()});document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
+      consent.addEventListener("change",()=>{payArea.hidden=!consent.checked;consentHint.hidden=consent.checked;if(consent.checked)track("AcceptTerms",{report_date:initial})});
+      const copy=async(value,button)=>{let ok=false;try{await navigator.clipboard.writeText(value);ok=true}catch{}if(!ok){const area=document.createElement("textarea");area.value=value;area.style.position="fixed";area.style.opacity="0";document.body.appendChild(area);area.select();ok=document.execCommand("copy");area.remove()}button.textContent=ok?"Đã chép":"Chép lại";setTimeout(()=>button.textContent="Sao chép",1500)};
+      document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>copy(b.dataset.copy,b)));document.querySelector("#copy-memo").addEventListener("click",e=>copy(memo.textContent,e.currentTarget));document.querySelector("#zalo-link").addEventListener("click",()=>track("ContactZalo",{report_date:initial}));
+      let month="08",expanded=false;const list=document.querySelector("#history-list"),showAll=document.querySelector("#show-all"),meta=document.querySelector("#history-meta");
+      const render=()=>{const rows=history.filter(r=>r.m===month).slice().reverse(),shown=month==="07"&&!expanded?rows.slice(0,10):rows;list.innerHTML=shown.map(r=>`<article class="history-row"><div class="row-top"><span class="row-date">${r.d}/2026</span><span class="status ${r.n?"hit":"miss"}">${r.n?"Có xuất hiện":"Không xuất hiện"}</span></div><div class="codes">${r.s.split(" ").map(c=>`<span class="code">${c}</span>`).join("")}</div><p class="row-result">Kết quả đối chiếu: <b>${r.h}</b>${r.n?` · ${r.n} lần xuất hiện`:""}</p></article>`).join("");showAll.hidden=month!=="07"||expanded;meta.textContent=month==="08"?"Tháng 8/2026 · Đã đối chiếu đến 09/08/2026":"Tháng 7/2026 · 31 ngày · Mới nhất hiển thị trước"};
+      document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{month=tab.dataset.month;expanded=false;document.querySelectorAll(".tab").forEach(item=>{const active=item===tab;item.classList.toggle("active",active);item.setAttribute("aria-selected",String(active))});render()}));showAll.addEventListener("click",()=>{expanded=true;render()});render();
     })();
   </script>
 </body>

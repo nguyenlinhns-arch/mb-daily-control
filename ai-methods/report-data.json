@@ -1,0 +1,41 @@
+{
+  "report_stage": "TEMPLATE",
+  "target_date": "--/--/----",
+  "data_lock": "--/--/----",
+  "method_id": "MB_4SO_V1",
+  "active_config": "MB_4SO_PRIMARY_V1_20260731",
+  "canonical_algorithm": "MB_4SO_TOP2_2SO_T1_V1",
+  "source_name": "XSMB_Source_2024_2026_MB_v1.3",
+  "source_tab": "MB_History_27",
+  "source_status": "27/27",
+  "source_hash": "--",
+  "config_hash": "--",
+  "executor_hash": "--",
+  "final_pairs": [],
+  "final_codes": [],
+  "top3": [
+    {"rank": 1, "pair": "--", "score": null, "hit_rate_60": null, "gap": null},
+    {"rank": 2, "pair": "--", "score": null, "hit_rate_60": null, "gap": null},
+    {"rank": 3, "pair": "--", "score": null, "hit_rate_60": null, "gap": null}
+  ],
+  "audit": {
+    "data_lock": "PENDING",
+    "source_hash": "PENDING",
+    "config_hash": "PENDING",
+    "executor_hash": "PENDING",
+    "no_look_ahead": "PENDING",
+    "score_45_pairs": "PENDING",
+    "tie_audit": "PENDING",
+    "unique_top2": "PENDING",
+    "readback": "PENDING"
+  },
+  "challenger_status": "SHADOW · weight=0 · vốn=0",
+  "risk_state": "--",
+  "capital_gate": "--",
+  "points_per_code": 50,
+  "total_points": 200,
+  "total_capital_vnd": 4600000,
+  "conclusion": "--",
+  "published_at": "--",
+  "note": "Mẫu báo cáo. Chỉ chuyển sang PUBLISHED khi toàn bộ audit PASS và hash MATCH."
+}

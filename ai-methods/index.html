@@ -44,48 +44,144 @@
     @media(min-width:768px){.wrap{width:min(100% - 56px,1060px)}header{height:76px}.mark{width:44px;height:44px}.brand strong{font-size:16px}.brand small{font-size:12px}.header-cta{min-height:46px;padding:0 19px;font-size:13px}.hero{padding:50px 0 66px;display:grid;grid-template-columns:1fr .92fr;gap:0 58px;align-items:start}.eyebrow,.hero h1,.hero-lead{grid-column:1}.access-card{grid-column:2;grid-row:1/span 4;margin:0;padding:24px}.access-card h2{font-size:32px}.access-form{grid-template-columns:1fr 1.15fr}.section{padding:76px 0}.section h2{font-size:44px}.section-intro{max-width:700px;font-size:15px}.summary-grid{grid-template-columns:repeat(3,1fr)}.summary-card:last-child{grid-column:auto}.summary-card{padding:20px}.history-head{grid-template-columns:1fr auto;align-items:end}.tabs{width:330px}.history-list{gap:7px}.history-row{padding:13px 15px;display:grid;grid-template-columns:98px 250px minmax(0,1fr) 125px;gap:15px;align-items:center}.row-top{display:contents}.row-date{grid-column:1}.status{grid-column:4;grid-row:1;justify-self:end}.codes{grid-column:2;grid-row:1;margin:0}.row-result{grid-column:3;grid-row:1;margin:0}.method-grid{grid-template-columns:repeat(3,1fr)}.method{min-height:82px}.terms{padding:34px}.term-list{grid-template-columns:1fr 1fr;gap:17px 30px}.closing{padding:36px;display:grid;grid-template-columns:1fr auto;column-gap:45px;align-items:end}.closing .section-label,.closing h2,.closing p{grid-column:1}.closing button{grid-column:2;grid-row:1/span 3;width:300px;margin:0}.notice{padding-bottom:45px}.mobilebar{display:none}footer{padding-bottom:26px;align-items:center}.backdrop{align-items:center;justify-content:center;padding:20px}.dialog{width:min(550px,100%);padding:32px;border-radius:24px}.dialog::before{display:none}}
     @media(hover:hover) and (pointer:fine){button,.zalo{transition:transform .16s ease,filter .16s ease}button:hover,.zalo:hover{filter:brightness(.96);transform:translateY(-1px)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button,.zalo{transition:none!important}}
+
+    /* Mobile conversion pass: số liệu lớn, CTA rõ, thao tác một tay */
+    .price-box{margin:18px 0 0;padding:16px;border:1px solid rgba(201,251,67,.3);border-radius:17px;background:rgba(201,251,67,.08)}
+    .price-box>span{display:block;color:#bfcbd0;font-size:12px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+    .price-box strong{display:block;margin-top:5px;color:var(--lime);font:950 36px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:-.055em}
+    .price-box small{display:block;margin-top:7px;color:#c6d0d4;font-size:13px;line-height:1.45}
+    .benefit-grid{margin:12px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .benefit-grid span{min-height:49px;padding:9px 10px;border:1px solid rgba(255,255,255,.12);border-radius:12px;display:flex;align-items:center;color:#e2e8ea;font-size:13px;font-weight:750;line-height:1.25}
+    .usage-grid{margin-top:20px;display:grid;gap:14px}
+    .usage-card{padding:20px;border:1px solid var(--line);border-radius:21px;background:var(--card);box-shadow:0 8px 24px rgba(11,24,34,.06)}
+    .usage-card.featured{border:2px solid var(--ink)}
+    .usage-badge{width:max-content;margin:0 0 10px;padding:6px 10px;border-radius:999px;background:var(--lime);color:var(--ink);font-size:12px;font-weight:950;letter-spacing:.04em;text-transform:uppercase}
+    .usage-card h3{margin:0;font-size:26px;line-height:1.08;letter-spacing:-.035em}
+    .usage-card>p{margin:9px 0 0;color:#5c6c74;font-size:15px;line-height:1.5}
+    .weight-row{margin-top:16px;display:grid;gap:8px}
+    .weight-row.two{grid-template-columns:repeat(2,1fr)}
+    .weight-row.four{grid-template-columns:repeat(4,1fr)}
+    .weight{min-width:0;padding:12px 5px;border-radius:13px;background:var(--ink);color:#fff;text-align:center}
+    .weight strong{display:block;color:var(--lime);font:950 22px/1 ui-monospace,SFMono-Regular,Consolas,monospace}
+    .weight span{display:block;margin-top:6px;color:#b8c3c8;font-size:11px;font-weight:800;line-height:1.15}
+    .usage-note{margin:15px 2px 0;padding:13px 14px;border-left:4px solid var(--orange);background:#efeae0;color:#5b6a72;font-size:13px;line-height:1.55}
+    .usage-note strong{color:var(--ink)}
+    .track .w-667{width:66.7%}
+
+    @media(max-width:767px){
+      body{font-size:17px;line-height:1.6}
+      .wrap{width:calc(100% - 24px)}
+      header{height:72px}
+      .mark{flex-basis:44px;width:44px;height:44px;font-size:13px}
+      .brand{gap:11px}.brand strong{font-size:18px}.brand small{font-size:13px}
+      .header-cta{min-height:50px;padding:0 15px;font-size:14px}
+      .hero{padding:20px 0 46px}
+      .eyebrow{font-size:13px;line-height:1.35;letter-spacing:.055em}
+      h1{margin-top:17px;font-size:clamp(40px,12vw,54px);line-height:.99;letter-spacing:-.055em}
+      .hero-lead{margin-top:17px;font-size:17px;line-height:1.58}
+      .access-card{margin-top:23px;padding:20px;border-radius:28px}
+      .proofbar{grid-template-columns:1fr;margin:0 0 22px;border:0;border-radius:0;background:transparent;overflow:visible;gap:10px}
+      .proofbar div{min-height:0;padding:17px;border:1px solid rgba(255,255,255,.15);border-radius:17px;background:rgba(255,255,255,.055)}
+      .proofbar div+div{border-left:1px solid rgba(255,255,255,.15)}
+      .proofbar .primary-proof{padding:19px;background:var(--lime);color:var(--ink)}
+      .proofbar .proof-kicker{margin:0 0 7px;color:#415215;font-size:12px;font-weight:950;letter-spacing:.065em;text-transform:uppercase}
+      .proofbar strong{font-size:54px;line-height:.92}
+      .proofbar .primary-proof strong{color:var(--ink)}
+      .proofbar b{display:block;margin-top:9px;color:#fff;font-size:18px;line-height:1.2}
+      .proofbar .primary-proof b{color:var(--ink)}
+      .proofbar span{margin-top:8px;color:#c6d0d4;font-size:14px;line-height:1.4}
+      .proofbar .primary-proof span{color:#34430f}
+      .access-label{font-size:13px}.access-card h2{margin-top:8px;font-size:32px;line-height:1.08}
+      .access-intro{font-size:16px;line-height:1.52}
+      .access-form{gap:12px}.date-box{font-size:13px}.date-box input{min-height:60px;font-size:18px}
+      .access-button{min-height:62px;font-size:17px;border-radius:15px}
+      .price-box>span{font-size:13px}.price-box strong{font-size:40px}.price-box small{font-size:14px}
+      .benefit-grid span{min-height:55px;font-size:14px}
+      .service-boundary{font-size:14px;line-height:1.55}
+      .section{padding:54px 0}.section-label{font-size:13px}.section h2{font-size:34px;line-height:1.05}.section-intro{font-size:16px;line-height:1.55}
+      .summary-grid{grid-template-columns:1fr;gap:14px}.summary-card:last-child{grid-column:auto}.summary-card{padding:20px;border-radius:20px}
+      .summary-top{font-size:16px}.summary-top b{font-size:25px}.summary-card h3{margin:12px 0 14px;font-size:38px}
+      .track{height:11px}.summary-card p{font-size:14px}.definition{font-size:14px}
+      .history{padding-top:54px}.history-meta{font-size:14px}.history-list{gap:12px}.history-row{padding:17px;border-radius:19px}
+      .row-date{font-size:15px}.status{padding:7px 10px;font-size:12px}.codes{gap:8px}.code{height:49px;font-size:20px}.row-result{font-size:15px}.show-all{min-height:55px;font-size:15px}
+      .tabs{margin-top:2px}.tab{min-height:52px;font-size:14px}
+      .method-grid{grid-template-columns:1fr;gap:10px}.method{min-height:84px;padding:13px}.method>span{width:44px;height:44px;font-size:12px}.method strong{font-size:16px}.method small{font-size:13px}
+      .terms{padding:23px 19px}.terms h2{font-size:32px}.term-list li{grid-template-columns:34px 1fr;font-size:15px}.term-list span{width:34px;height:34px;font-size:10px}
+      .closing{padding:25px 20px}.closing h2{font-size:32px}.closing p{font-size:15px}.closing button{min-height:58px;font-size:16px}
+      .notice{font-size:14px;line-height:1.65}
+      .mobilebar{left:7px;right:7px;min-height:78px;padding:9px 9px 9px 14px}.mobilebar small{font-size:12px}.mobilebar strong{font-size:16px}.mobilebar button{min-height:54px;font-size:14px}
+      .dialog{padding:30px 18px calc(20px + env(safe-area-inset-bottom))}.dialog h2{font-size:30px}.dialog-intro{font-size:15px}
+      .dialog-date{font-size:13px}.dialog-date input{min-height:57px;font-size:18px}.payrow{min-height:68px}.payrow span{font-size:12px}.payrow strong{font-size:16px}
+      .paysteps li{font-size:15px}.zalo{min-height:60px;font-size:17px}.dialog-note{font-size:13px}
+      footer p{font-size:12px}
+    }
+    @media(min-width:768px){
+      .price-box{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 16px}.price-box strong{grid-column:2;grid-row:1/span 2}.price-box small{grid-column:1}
+      .usage-grid{grid-template-columns:1fr 1fr}.usage-card{padding:25px}.weight strong{font-size:25px}
+    }
   </style>
 </head>
 <body>
   <header class="wrap">
     <a class="brand" href="#top" aria-label="4SO AI - Trang chủ"><b class="mark">4SO</b><span class="brand-copy"><strong>4SO AI</strong><small>Nghiên cứu dữ liệu · t−1</small></span></a>
-    <button class="header-cta" type="button" data-open>Mở báo cáo</button>
+    <button class="header-cta" type="button" data-open>Xem gói 01 ngày</button>
   </header>
 
   <main>
     <section class="hero wrap" id="top">
       <p class="eyebrow"><span class="dot"></span> Báo cáo dữ liệu khóa đến t−1</p>
-      <h1>Chọn ngày xem báo cáo 4SO AI.</h1>
-      <p class="hero-lead"><strong>4SO AI – nền tảng nghiên cứu và phân tích dữ liệu xổ số bằng trí tuệ nhân tạo.</strong> Mỗi báo cáo chấm đủ 45 cặp đảo và lưu đầu ra trước khi có kết quả.</p>
+      <h1>Nghiên cứu AI 4SO cho ngày bạn chọn.</h1>
+      <p class="hero-lead"><strong>4SO AI – nền tảng nghiên cứu và phân tích dữ liệu bằng trí tuệ nhân tạo.</strong> Mỗi báo cáo khóa dữ liệu đến t−1, chấm đủ 45 cặp đảo, xếp hạng Top 1–Top 2 và lưu đầu ra trước khi có kết quả.</p>
 
       <section class="access-card" aria-labelledby="access-title">
-        <div class="proofbar" role="group" aria-label="Dữ kiện nghiên cứu nổi bật"><div><strong>80%</strong><span>24/30 ngày · 25/06–24/07/2026</span></div><div><strong>1.000+</strong><span>vòng nghiên cứu và kiểm định</span></div></div>
+        <div class="proofbar" role="group" aria-label="Dữ kiện nghiên cứu nổi bật"><div class="primary-proof"><span class="proof-kicker">Kết quả kiểm định lịch sử</span><strong>80%</strong><b>24/30 ngày có đầu ra xuất hiện</b><span>Cửa sổ 25/06–24/07/2026</span></div><div><strong>1.000+</strong><b>vòng nghiên cứu và kiểm định</b><span>Mỗi báo cáo chấm đủ 45/45 cặp đảo</span></div></div>
         <p class="access-label">Thao tác chính</p>
         <h2 id="access-title">Báo cáo ngày <span data-date>--/--/----</span></h2>
         <p class="access-intro">Chọn ngày cần xem, sau đó mở hướng dẫn xác nhận quyền truy cập.</p>
         <div class="access-form">
           <label class="date-box">Ngày báo cáo<input class="report-date" type="date"></label>
-          <button class="access-button" type="button" data-open>Mở báo cáo 01 ngày <span>→</span></button>
+          <button class="access-button" type="button" data-open>Mở quyền truy cập <span>→</span></button>
         </div>
-        <p class="fee-line"><strong>50.000đ</strong> / quyền truy cập báo cáo AI trong 01 ngày</p>
-        <ul class="includes"><li>Dữ liệu</li><li>Thống kê</li><li>Backtest</li><li>Xếp hạng tín hiệu</li><li>Đầu ra mô hình</li></ul>
+        <div class="price-box"><span>Phí quyền truy cập 01 ngày</span><strong>50.000đ</strong><small>Một báo cáo cho đúng ngày đã chọn</small></div>
+        <div class="benefit-grid" aria-label="Nội dung báo cáo"><span>Dữ liệu khóa đến t−1</span><span>Thống kê & backtest</span><span>Xếp hạng Top 1–Top 2</span><span>Lịch sử đối chiếu</span></div>
         <p class="service-boundary"><strong>Phí dịch vụ dữ liệu, không phải tiền đặt cược.</strong> Website không nhận tiền đặt cược, không trả thưởng, không đại diện đặt cược và không liên kết đến điểm đánh bạc.</p>
       </section>
     </section>
 
     <section class="results section" id="ket-qua"><div class="wrap">
-      <p class="section-label">Dữ kiện đã đối chiếu</p><h2>Kết quả tháng 7 và tháng 8/2026</h2><p class="section-intro">Bản ghi đầu ra mô hình được khóa trước kỳ và đối chiếu với đủ 27 mã kết quả. Cập nhật đến hết 08/08/2026 — t−1 tại lần cập nhật.</p>
+      <p class="section-label">Dữ kiện đã đối chiếu</p><h2>Kết quả tháng 7 và tháng 8/2026</h2><p class="section-intro">Bản ghi đầu ra mô hình được khóa trước kỳ và đối chiếu với đủ 27 mã kết quả. Cập nhật đến hết 09/08/2026 — dữ liệu t−1 của báo cáo 10/08.</p>
       <div class="summary-grid">
         <article class="summary-card"><div class="summary-top"><span>Tháng 7/2026</span><b>77,4%</b></div><h3>24/31 ngày</h3><div class="track"><span class="w-774"></span></div><p>48 lần xuất hiện · 7 ngày không xuất hiện</p></article>
-        <article class="summary-card"><div class="summary-top"><span>Tháng 8 đến t−1</span><b>75%</b></div><h3>6/8 ngày</h3><div class="track"><span class="w-750"></span></div><p>01/08–08/08 · 10 lần xuất hiện</p></article>
-        <article class="summary-card"><div class="summary-top"><span>Tổng hai giai đoạn</span><b>76,9%</b></div><h3>30/39 ngày</h3><div class="track"><span class="w-769"></span></div><p>58 lần xuất hiện · 1.755 lượt chấm cặp</p></article>
+        <article class="summary-card"><div class="summary-top"><span>Tháng 8 đến t−1</span><b>66,7%</b></div><h3>6/9 ngày</h3><div class="track"><span class="w-667"></span></div><p>01/08–09/08 · 10 lần xuất hiện · 3 ngày không xuất hiện</p></article>
+        <article class="summary-card"><div class="summary-top"><span>Tổng hai giai đoạn</span><b>75%</b></div><h3>30/40 ngày</h3><div class="track"><span class="w-750"></span></div><p>58 lần xuất hiện · 1.800 lượt chấm cặp</p></article>
       </div>
       <p class="definition">“Ngày có xuất hiện” = ít nhất 1 trong 4 đầu ra của MB_4SO_V1 xuất hiện trong 27 mã kết quả của ngày đó. Các tỷ lệ trên mô tả dữ liệu lịch sử, không phải “tỷ lệ chắc thắng”.</p>
     </div></section>
 
+    <section class="section wrap" id="cach-doc">
+      <p class="section-label">Cách đọc đầu ra</p>
+      <h2>Lựa chọn 1 cặp hoặc đủ 2 cặp.</h2>
+      <p class="section-intro">Báo cáo luôn công bố đúng hai cặp đảo được xếp hạng. Người đọc có thể theo dõi cặp Top 1 hoặc toàn bộ Top 1 + Top 2; các đầu ra trong cùng phương án được trình bày với tỷ trọng bằng nhau.</p>
+      <div class="usage-grid">
+        <article class="usage-card featured">
+          <p class="usage-badge">Phương án rút gọn</p>
+          <h3>1 cặp ưu tiên · Top 1</h3>
+          <p>Gồm hai mã đảo của cặp đứng đầu bảng xếp hạng. Hai đầu ra có trọng số theo dõi bằng nhau.</p>
+          <div class="weight-row two" aria-label="Hai đầu ra cùng trọng số"><div class="weight"><strong>50%</strong><span>Mã A</span></div><div class="weight"><strong>50%</strong><span>Mã đảo A</span></div></div>
+        </article>
+        <article class="usage-card">
+          <p class="usage-badge">Phương án đầy đủ</p>
+          <h3>2 cặp · Top 1 + Top 2</h3>
+          <p>Gồm đủ bốn đầu ra canonical của mô hình. Bốn đầu ra có trọng số theo dõi bằng nhau.</p>
+          <div class="weight-row four" aria-label="Bốn đầu ra cùng trọng số"><div class="weight"><strong>25%</strong><span>Mã A</span></div><div class="weight"><strong>25%</strong><span>Đảo A</span></div><div class="weight"><strong>25%</strong><span>Mã B</span></div><div class="weight"><strong>25%</strong><span>Đảo B</span></div></div>
+        </article>
+      </div>
+      <p class="usage-note"><strong>Lưu ý:</strong> Tỷ trọng trên chỉ mô tả cách theo dõi và đánh giá đầu ra mô hình. Website không tư vấn mức tiền, không nhận tiền đặt cược và không đại diện đặt cược.</p>
+    </section>
+
     <section class="history section wrap" id="lich-su">
-      <div class="history-head"><div><p class="section-label">Hồ sơ công khai</p><h2>4 đầu ra và kết quả từng ngày</h2><p class="section-intro">Hiển thị đầu ra mô hình đã công bố trước kỳ, số thực tế xuất hiện và tổng số lần xuất hiện.</p></div><div class="tabs" role="tablist" aria-label="Chọn tháng"><button class="tab active" type="button" data-month="08" role="tab" aria-selected="true">Tháng 8 · 8 ngày</button><button class="tab" type="button" data-month="07" role="tab" aria-selected="false">Tháng 7 · 31 ngày</button></div></div>
-      <p class="history-meta" id="history-meta">Tháng 8/2026 · Đã đối chiếu đến 08/08/2026</p>
+      <div class="history-head"><div><p class="section-label">Hồ sơ công khai</p><h2>4 đầu ra và kết quả từng ngày</h2><p class="section-intro">Hiển thị đầu ra mô hình đã công bố trước kỳ, số thực tế xuất hiện và tổng số lần xuất hiện.</p></div><div class="tabs" role="tablist" aria-label="Chọn tháng"><button class="tab active" type="button" data-month="08" role="tab" aria-selected="true">Tháng 8 · 9 ngày</button><button class="tab" type="button" data-month="07" role="tab" aria-selected="false">Tháng 7 · 31 ngày</button></div></div>
+      <p class="history-meta" id="history-meta">Tháng 8/2026 · Đã đối chiếu đến 09/08/2026</p>
       <div class="history-list" id="history-list" aria-live="polite"></div>
       <button class="show-all" id="show-all" type="button" hidden>Xem đủ 31 ngày tháng 7</button>
     </section>
@@ -99,7 +195,7 @@
   </main>
 
   <footer class="wrap"><a class="brand" href="#top"><b class="mark">4SO</b><span class="brand-copy"><strong>4SO AI</strong><small>Nghiên cứu dữ liệu · t−1</small></span></a><p>© 2026<br>Zalo 0398 696 879</p></footer>
-  <div class="mobilebar"><div><small>Báo cáo AI <span data-date>--/--/----</span></small><strong>50.000đ / 01 ngày</strong></div><button type="button" data-open>Mở báo cáo</button></div>
+  <div class="mobilebar"><div><small>Báo cáo AI <span data-date>--/--/----</span></small><strong>50.000đ / 01 ngày</strong></div><button type="button" data-open>Truy cập</button></div>
 
   <div class="backdrop" id="backdrop" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><button class="close" id="close" type="button" aria-label="Đóng">×</button><p class="section-label">Phí quyền truy cập</p><h2 id="dialog-title">Mở báo cáo AI trong 01 ngày</h2><p class="dialog-intro">Chọn đúng ngày báo cáo. 50.000đ là phí dịch vụ dữ liệu và phân tích AI, không phải tiền đặt cược.</p>
     <label class="dialog-date">Ngày báo cáo<input id="dialog-date" type="date"></label>
@@ -112,7 +208,7 @@
     (()=>{
       const history=[
         {d:"01/07",m:"07",s:"38 83 45 54",h:"54×2",n:2},{d:"02/07",m:"07",s:"25 52 12 21",h:"25, 52",n:2},{d:"03/07",m:"07",s:"12 21 13 31",h:"13, 21",n:2},{d:"04/07",m:"07",s:"38 83 13 31",h:"83",n:1},{d:"05/07",m:"07",s:"13 31 25 52",h:"13, 31",n:2},{d:"06/07",m:"07",s:"25 52 38 83",h:"83×2",n:2},{d:"07/07",m:"07",s:"25 52 45 54",h:"54×2",n:2},{d:"08/07",m:"07",s:"25 52 38 83",h:"—",n:0},{d:"09/07",m:"07",s:"38 83 13 31",h:"13×2",n:2},{d:"10/07",m:"07",s:"38 83 45 54",h:"45, 54, 83",n:3},{d:"11/07",m:"07",s:"13 31 12 21",h:"31×2",n:2},{d:"12/07",m:"07",s:"12 21 45 54",h:"—",n:0},{d:"13/07",m:"07",s:"13 31 45 54",h:"13, 31",n:2},{d:"14/07",m:"07",s:"38 83 45 54",h:"—",n:0},{d:"15/07",m:"07",s:"38 83 13 31",h:"38, 83",n:2},{d:"16/07",m:"07",s:"13 31 37 73",h:"37×2",n:2},{d:"17/07",m:"07",s:"13 31 45 54",h:"13×2",n:2},{d:"18/07",m:"07",s:"45 54 06 60",h:"54",n:1},{d:"19/07",m:"07",s:"06 60 38 83",h:"38×2",n:2},{d:"20/07",m:"07",s:"06 60 13 31",h:"60",n:1},{d:"21/07",m:"07",s:"13 31 19 91",h:"—",n:0},{d:"22/07",m:"07",s:"13 31 19 91",h:"13×2, 19, 91",n:4},{d:"23/07",m:"07",s:"36 63 06 60",h:"60, 63, 06",n:3},{d:"24/07",m:"07",s:"38 83 06 60",h:"38",n:1},{d:"25/07",m:"07",s:"06 60 36 63",h:"—",n:0},{d:"26/07",m:"07",s:"06 60 38 83",h:"38, 60",n:2},{d:"27/07",m:"07",s:"36 63 13 31",h:"—",n:0},{d:"28/07",m:"07",s:"38 83 06 60",h:"—",n:0},{d:"29/07",m:"07",s:"06 60 38 83",h:"83",n:1},{d:"30/07",m:"07",s:"06 60 25 52",h:"06",n:1},{d:"31/07",m:"07",s:"38 83 25 52",h:"52×2, 38, 83",n:4},
-        {d:"01/08",m:"08",s:"06 60 48 84",h:"60×2, 48",n:3},{d:"02/08",m:"08",s:"38 83 05 50",h:"38, 83",n:2},{d:"03/08",m:"08",s:"05 50 06 60",h:"—",n:0},{d:"04/08",m:"08",s:"05 50 06 60",h:"—",n:0},{d:"05/08",m:"08",s:"05 50 06 60",h:"60, 05",n:2},{d:"06/08",m:"08",s:"48 84 36 63",h:"84",n:1},{d:"07/08",m:"08",s:"36 63 05 50",h:"50",n:1},{d:"08/08",m:"08",s:"19 91 06 60",h:"19",n:1}
+        {d:"01/08",m:"08",s:"06 60 48 84",h:"60×2, 48",n:3},{d:"02/08",m:"08",s:"38 83 05 50",h:"38, 83",n:2},{d:"03/08",m:"08",s:"05 50 06 60",h:"—",n:0},{d:"04/08",m:"08",s:"05 50 06 60",h:"—",n:0},{d:"05/08",m:"08",s:"05 50 06 60",h:"60, 05",n:2},{d:"06/08",m:"08",s:"48 84 36 63",h:"84",n:1},{d:"07/08",m:"08",s:"36 63 05 50",h:"50",n:1},{d:"08/08",m:"08",s:"19 91 06 60",h:"19",n:1},{d:"09/08",m:"08",s:"38 83 06 60",h:"—",n:0}
       ];
       const pad=n=>String(n).padStart(2,"0");
       const tomorrow=()=>{const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Ho_Chi_Minh",day:"2-digit",month:"2-digit",year:"numeric"}).formatToParts(new Date());const v=Object.fromEntries(parts.map(p=>[p.type,p.value]));const d=new Date(Date.UTC(+v.year,+v.month-1,+v.day+1));return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`};
@@ -127,7 +223,7 @@
       openButtons.forEach(el=>{el.setAttribute("aria-expanded","false");el.setAttribute("aria-controls","backdrop");el.addEventListener("click",open)});closeButton.addEventListener("click",close);backdrop.addEventListener("click",e=>{if(e.target===backdrop)close()});document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
       const copy=async(value,button)=>{let ok=false;try{await navigator.clipboard.writeText(value);ok=true}catch{}if(!ok){const t=document.createElement("textarea");t.value=value;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();ok=document.execCommand("copy");t.remove()}button.textContent=ok?"Đã chép":"Chép lại";setTimeout(()=>button.textContent="Sao chép",1500)};document.querySelectorAll("[data-copy]").forEach(btn=>btn.addEventListener("click",()=>copy(btn.dataset.copy,btn)));document.querySelector("#copy-memo").addEventListener("click",e=>copy(memo.textContent,e.currentTarget));
       let month="08",expanded=false;const list=document.querySelector("#history-list"),showAll=document.querySelector("#show-all"),meta=document.querySelector("#history-meta");
-      const render=()=>{const rows=history.filter(r=>r.m===month).slice().reverse();const shown=month==="07"&&!expanded?rows.slice(0,10):rows;list.innerHTML=shown.map(r=>`<article class="history-row"><div class="row-top"><span class="row-date">${r.d}/2026</span><span class="status ${r.n?"hit":"miss"}">${r.n?"Có xuất hiện":"Không xuất hiện"}</span></div><div class="codes">${r.s.split(" ").map(n=>`<span class="code">${n}</span>`).join("")}</div><p class="row-result">Kết quả đối chiếu: <b>${r.h}</b>${r.n?` · ${r.n} lần xuất hiện`:""}</p></article>`).join("");showAll.hidden=month!=="07"||expanded;showAll.textContent="Xem đủ 31 ngày tháng 7";meta.textContent=month==="08"?"Tháng 8/2026 · Đã đối chiếu đến 08/08/2026":"Tháng 7/2026 · 31 ngày · Mới nhất hiển thị trước"};
+      const render=()=>{const rows=history.filter(r=>r.m===month).slice().reverse();const shown=month==="07"&&!expanded?rows.slice(0,10):rows;list.innerHTML=shown.map(r=>`<article class="history-row"><div class="row-top"><span class="row-date">${r.d}/2026</span><span class="status ${r.n?"hit":"miss"}">${r.n?"Có xuất hiện":"Không xuất hiện"}</span></div><div class="codes">${r.s.split(" ").map(n=>`<span class="code">${n}</span>`).join("")}</div><p class="row-result">Kết quả đối chiếu: <b>${r.h}</b>${r.n?` · ${r.n} lần xuất hiện`:""}</p></article>`).join("");showAll.hidden=month!=="07"||expanded;showAll.textContent="Xem đủ 31 ngày tháng 7";meta.textContent=month==="08"?"Tháng 8/2026 · Đã đối chiếu đến 09/08/2026":"Tháng 7/2026 · 31 ngày · Mới nhất hiển thị trước"};
       document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{month=tab.dataset.month;expanded=false;document.querySelectorAll(".tab").forEach(t=>{const active=t===tab;t.classList.toggle("active",active);t.setAttribute("aria-selected",String(active))});render()}));showAll.addEventListener("click",()=>{expanded=true;render()});render();
     })();
   </script>

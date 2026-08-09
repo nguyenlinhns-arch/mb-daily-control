@@ -1,0 +1,21 @@
+{
+  "report_stage": "TEMPLATE",
+  "target_date": "--/--/----",
+  "data_lock": "--/--/----",
+  "method_id": "MB_4SO_V1",
+  "active_config": "MB_4SO_PRIMARY_V1_20260731",
+  "source_status": "27/27",
+  "final_pairs": [],
+  "final_codes": [],
+  "top3": [
+    {"rank": 1, "pair": "--", "hit_rate_60": null, "gap": null},
+    {"rank": 2, "pair": "--", "hit_rate_60": null, "gap": null},
+    {"rank": 3, "pair": "--", "hit_rate_60": null, "gap": null}
+  ],
+  "audit": {
+    "no_look_ahead": "PENDING",
+    "tie_audit": "PENDING",
+    "readback": "PENDING"
+  },
+  "conclusion": "--"
+}

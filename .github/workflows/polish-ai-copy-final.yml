@@ -1,0 +1,47 @@
+name: Polish final 4SO copy blocks
+
+on:
+  push:
+    paths:
+      - '.github/workflows/polish-ai-copy-final.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Polish final blocks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace(
+            '<div class="legal-box"><h3>Thanh toán, hoàn phí và dữ liệu cá nhân</h3><p>30.000đ là phí quyền truy cập một báo cáo. Nếu dịch vụ không thể cung cấp báo cáo do lỗi từ phía bên cung cấp, người dùng được hoàn lại toàn bộ phí của báo cáo đó. Ảnh giao dịch gửi qua Zalo chỉ được sử dụng để đối soát thanh toán, hỗ trợ truy cập và xử lý khiếu nại; không được dùng để bán dữ liệu hoặc quảng cáo ngoài mục đích đã thông báo.</p>',
+            '<div class="legal-box"><h3>Thanh toán &amp; bảo mật</h3><p>Phí sử dụng là 30.000đ/ngày. Nếu không thể cung cấp báo cáo do lỗi từ phía dịch vụ, khoản phí được hoàn lại. Ảnh giao dịch qua Zalo chỉ dùng để đối soát, hỗ trợ truy cập và xử lý khiếu nại.</p>'
+          )
+          s=s.replace(
+            '<section class="closing wrap"><p class="section-kicker">Quyền truy cập 01 ngày</p><h2>Báo cáo ngày <span data-date>--/--/----</span></h2><p>Đọc điều khoản, xác nhận từ 18 tuổi và xem hướng dẫn thanh toán phí truy cập 30.000đ.</p><button type="button" data-open>Xem cách nhận báo cáo →</button></section>',
+            '<section class="closing wrap"><p class="section-kicker">Báo cáo 4SO AI</p><h2>Ngày <span data-date>--/--/----</span></h2><p>Phí sử dụng 30.000đ/ngày.<br>Xác nhận đủ 18 tuổi trước khi thanh toán.</p><button type="button" data-open>Xem cách nhận báo cáo →</button></section>'
+          )
+          s=s.replace('<span>Phân tích dữ liệu Xổ số Miền Bắc</span>','<span>Báo cáo dữ liệu theo ngày</span>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify
+        run: |
+          grep -q 'Báo cáo 4SO AI' ai-methods/index.html
+          grep -q 'Phí sử dụng 30.000đ/ngày' ai-methods/index.html
+          if grep -q '50.000đ' ai-methods/index.html; then exit 1; fi
+      - name: Commit
+        run: |
+          if git diff --quiet -- ai-methods/index.html; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/index.html
+          git commit -m 'Polish final 4SO website copy'
+          git push origin HEAD:main

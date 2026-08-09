@@ -1,0 +1,58 @@
+name: Normalize AI 4SO public page
+
+on:
+  push:
+    paths:
+      - '.github/workflows/normalize-ai-methods.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Normalize price and top proof
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          files = [Path('ai-methods/index.html'), Path('ai-methods/legal.html')]
+          for p in files:
+              s = p.read_text(encoding='utf-8')
+              s = s.replace('50.000đ', '30.000đ')
+              s = s.replace('50.000 đồng', '30.000 đồng')
+              s = s.replace('"price":"50000"', '"price":"30000"')
+              p.write_text(s, encoding='utf-8')
+
+          p = Path('ai-methods/index.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              '<div class="proof-primary"><p class="proof-label">Kết quả đối chiếu 01/07–09/08/2026</p><strong class="proof-value">75%</strong><span class="proof-title">30/40 ngày có ít nhất một đầu ra xuất hiện</span>',
+              '<div class="proof-primary"><p class="proof-label">Một đợt kiểm định lịch sử</p><strong class="proof-value">80%</strong><span class="proof-title">24/30 ngày có đầu ra xuất hiện</span>'
+          )
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Verify no old price remains
+        run: |
+          if grep -RInE '50\.000(đ| đồng)|"price":"50000"' ai-methods/index.html ai-methods/legal.html; then
+            echo 'Old price still exists' >&2
+            exit 1
+          fi
+          grep -n 'proof-value">80%' ai-methods/index.html
+          grep -n '30.000đ' ai-methods/index.html | head
+      - name: Commit normalized public page
+        run: |
+          if git diff --quiet -- ai-methods/index.html ai-methods/legal.html; then
+            echo 'Already normalized'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/index.html ai-methods/legal.html
+          git commit -m 'Normalize 4SO price to 30k and top proof to 80%'
+          git push origin HEAD:main

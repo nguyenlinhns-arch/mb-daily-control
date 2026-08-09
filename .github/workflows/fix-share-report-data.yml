@@ -1,0 +1,41 @@
+name: Wire public-safe MB 4SO share data
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-share-report-data.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Use public-safe data source
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/report-share.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("Bản chia sẻ chỉ hiển thị thứ hạng, tỷ lệ xuất hiện 60 ngày và khoảng cách hiện tại; không hiển thị điểm, vốn hoặc số tiền.", "Bản chia sẻ trình bày thứ hạng, tỷ lệ xuất hiện 60 ngày và khoảng cách hiện tại của từng cặp.")
+          s=s.replace("fetch('report-data.json',{cache:'no-store'})", "fetch('report-share-data.json',{cache:'no-store'})")
+          s=s.replace("<span class=\"stage\">${fmt(r.report_stage)}</span>", "<span class=\"stage\">${String(r.report_stage).toUpperCase()==='PUBLISHED'?'ĐÃ XUẤT BẢN':fmt(r.report_stage)}</span>")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify public report contains no stake fields
+        run: |
+          ! grep -qiE 'points_per_code|total_points|total_capital|capital_gate|risk_state' ai-methods/report-share-data.json
+          grep -q "report-share-data.json" ai-methods/report-share.html
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/report-share.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Use public-safe data for MB 4SO share report'
+          git push origin HEAD:main

@@ -1,0 +1,49 @@
+name: V6 premium polish
+on:
+  push:
+    paths: ['.github/workflows/v6-premium-polish.yml']
+permissions:
+  contents: write
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Apply final premium polish
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v6.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('>NHẬN BÁO CÁO 30.000đ</button>','>Nhận báo cáo 30.000đ</button>')
+          css='''
+/* final-premium-polish */
+:root{--navy:#0b2735;--navy2:#123746;--ink:#10232d;--muted:#697980;--paper:#f3f0e8;--white:#fbf9f4;--line:#d6d9d3;--lime:#dafe61;--rust:#c05a43;--soft:#e9ebe5}
+.wrap{width:min(calc(100% - 32px),1180px)}
+.header-in{min-height:68px}.header-cta{min-height:48px;padding:0 16px;font-size:11px}.mark{background:var(--navy);color:var(--lime)}
+.proof-in{padding-top:22px;padding-bottom:22px}.proof-number{font-size:76px}.proof-copy strong{font-size:19px}.proof-copy span{font-size:11px}.proof-note{font-size:10px}.proof-action{min-height:48px;padding:0 15px;font-size:11px}
+.hero{padding:58px 0 64px}.hero h1{font-size:clamp(48px,10.5vw,96px);line-height:.95;letter-spacing:-.064em}.lead{max-width:760px;font-size:17px;line-height:1.62}.hero-meta{font-size:11px}.btn-primary,.btn-secondary{min-height:52px;font-size:11px}
+.stat strong,.proof-number,.pair strong,.plan-price,.history-item strong,.payrow strong{font-variant-numeric:tabular-nums}
+.stat strong{font-size:24px}.stat span{font-size:11px}.section{padding:78px 0}.section h2{font-size:clamp(34px,7vw,58px);line-height:1.05}.intro{font-size:14px;line-height:1.65}
+.report{box-shadow:0 26px 70px rgba(13,36,47,.11)}.report-head{padding:23px}.report-head h3{font-size:25px}.report-top span,.report-top b{font-size:9px}.report-meta span{font-size:8px}.report-body{padding:20px}.pair{padding:18px 8px}.pair strong{font-size:25px}.result{font-size:10px}.report-actions a,.report-actions button{min-height:49px;font-size:11px}
+.plan{padding-top:24px;padding-bottom:24px}.plan.featured{background:#fff}.plan-tag{font-size:9px}.plan-price{font-size:35px}.plan-desc{font-size:11px}.plan button{min-height:49px;font-size:10px}.trust-line strong{font-size:11px}.trust-line span{font-size:10px}.method-row strong{font-size:16px}.method-row span{font-size:11px}.history-item span{font-size:10px}.history-item small{font-size:9px}.history-note{font-size:10px}.faq summary{font-size:12px}.faq p{font-size:11px}.legal-links a{font-size:9px}
+.mobile-bar{min-height:65px}.mobile-bar span{font-size:9px}.mobile-bar strong{font-size:14px}.mobile-bar button{min-height:48px;font-size:11px}.dialog h2{font-size:26px}.dialog-intro{font-size:10px}.modal-plan b{font-size:9px}.modal-plan strong{font-size:12px}.payrow span{font-size:9px}.payrow strong{font-size:13px}.copy{min-height:42px;font-size:9px}.copy-all{min-height:46px;font-size:10px}.zalo{min-height:54px;font-size:11px}.checkout-note{font-size:9px}
+.header-cta,.proof-action,.btn-primary,.btn-secondary,.report-actions a,.report-actions button,.plan button,.mobile-bar button,.zalo,.copy,.copy-all{transition:transform .16s ease,background-color .16s ease,border-color .16s ease,box-shadow .16s ease}.header-cta:hover,.proof-action:hover,.btn-primary:hover,.report-actions button:hover,.plan button:hover,.mobile-bar button:hover{transform:translateY(-1px)}.btn-secondary:hover,.report-actions a:hover,.legal-links a:hover{background:#fff}.nav a:hover{color:var(--ink)}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid rgba(192,90,67,.25);outline-offset:3px}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media(max-width:719px){.hero{padding:40px 0 52px}.section{padding:64px 0}.proof-in{padding-top:20px;padding-bottom:20px}.proof-number{font-size:74px}.lead{font-size:16px}.plan-desc{font-size:11px}.terms{font-size:9px}}
+@media(min-width:720px){.section{padding:92px 0}.proof-in{min-height:116px}.fact strong{font-size:31px}}
+'''
+          if '/* final-premium-polish */' not in s:
+              s=s.replace('</style>',css+'\n</style>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify and commit
+        run: |
+          grep -n 'final-premium-polish' ai-methods/landing-v6.html
+          grep -n 'Nhận báo cáo 30.000đ' ai-methods/landing-v6.html | head
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v6.html
+          git commit -m 'Polish v6 premium visual system' || exit 0
+          git push origin HEAD:main

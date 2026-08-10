@@ -1,0 +1,46 @@
+name: Final 4SO conversion cleanup
+on:
+  push:
+    paths: ['.github/workflows/final-conversion-cleanup.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Final cleanup
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v3.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('Bản tin ngày <span data-date>--/--/----</span> chỉ dùng dữ liệu đến','Báo cáo ngày <span data-date>--/--/----</span> chỉ dùng dữ liệu đến')
+          s=s.replace('Bản tin gồm xếp hạng, kiểm định và hồ sơ đối chiếu','Báo cáo gồm xếp hạng, kiểm định và hồ sơ đối chiếu')
+          s=s.replace('cấu trúc bản tin và dữ liệu lịch sử','cấu trúc báo cáo và dữ liệu lịch sử')
+          s=s.replace('<button class="buy-cta" type="button" data-open>CHỌN GÓI & ĐĂNG KÝ<small>Xem thông tin chuyển khoản</small></button>','<button class="buy-cta" id="main-cta" type="button" data-open>ĐĂNG KÝ GÓI 1 NGÀY – 30.000đ<small>Xem thông tin chuyển khoản</small></button>')
+          old="const start=nextDay(),display=fmt(start),memo=document.querySelector('#memo'),selectedLabel=document.querySelector('#selected-label'),selectedPrice=document.querySelector('#selected-price'),payLabel=document.querySelector('#pay-label'),payPrice=document.querySelector('#pay-price'),backdrop=document.querySelector('#backdrop'),close=document.querySelector('#close'),zalo=document.querySelector('#zalo'),openers=[...document.querySelectorAll('[data-open]')],packageButtons=[...document.querySelectorAll('[data-package]')];"
+          new="const start=nextDay(),display=fmt(start),memo=document.querySelector('#memo'),selectedLabel=document.querySelector('#selected-label'),selectedPrice=document.querySelector('#selected-price'),payLabel=document.querySelector('#pay-label'),payPrice=document.querySelector('#pay-price'),mainCTA=document.querySelector('#main-cta'),backdrop=document.querySelector('#backdrop'),close=document.querySelector('#close'),zalo=document.querySelector('#zalo'),openers=[...document.querySelectorAll('[data-open]')],packageButtons=[...document.querySelectorAll('[data-package]')];"
+          s=s.replace(old,new)
+          oldsync="const sync=()=>{const p=packs[selected];selectedLabel.textContent=p.label;selectedPrice.textContent=p.text;payLabel.textContent=p.label;payPrice.textContent=p.text;memo.textContent=`4SO AI ${p.memo} ${display.replaceAll('/','-')}`;packageButtons.forEach(b=>b.classList.toggle('active',b.dataset.package===selected))};"
+          newsync="const sync=()=>{const p=packs[selected];selectedLabel.textContent=p.label;selectedPrice.textContent=p.text;payLabel.textContent=p.label;payPrice.textContent=p.text;if(mainCTA)mainCTA.childNodes[0].nodeValue=`ĐĂNG KÝ ${p.label.toUpperCase()} – ${p.text}`;memo.textContent=`4SO AI ${p.memo} ${display.replaceAll('/','-')}`;packageButtons.forEach(b=>b.classList.toggle('active',b.dataset.package===selected))};"
+          s=s.replace(oldsync,newsync)
+          # Track report sample interest separately when Meta Pixel is later installed.
+          hook="document.querySelector('a[href=\"#mau-bao-cao\"]')?.addEventListener('click',()=>track('ViewReportSample',{report_date:start}));"
+          if 'ViewReportSample' not in s:
+              s=s.replace("zalo.addEventListener('click',()=>track('ContactZaloAfterPayment',{report_date:start,package:selected,price:packs[selected].price}));", "zalo.addEventListener('click',()=>track('ContactZaloAfterPayment',{report_date:start,package:selected,price:packs[selected].price}));"+hook)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify and commit
+        run: |
+          grep -n 'id="main-cta"' ai-methods/landing-v3.html
+          grep -n 'ViewReportSample' ai-methods/landing-v3.html
+          grep -n 'Báo cáo ngày' ai-methods/landing-v3.html | head
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v3.html
+          git commit -m 'Make 4SO registration CTA package-specific' || exit 0
+          git push origin HEAD:main

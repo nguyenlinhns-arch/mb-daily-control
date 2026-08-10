@@ -28,7 +28,6 @@ jobs:
           oldsync="const sync=()=>{const p=packs[selected];selectedLabel.textContent=p.label;selectedPrice.textContent=p.text;payLabel.textContent=p.label;payPrice.textContent=p.text;memo.textContent=`4SO AI ${p.memo} ${display.replaceAll('/','-')}`;packageButtons.forEach(b=>b.classList.toggle('active',b.dataset.package===selected))};"
           newsync="const sync=()=>{const p=packs[selected];selectedLabel.textContent=p.label;selectedPrice.textContent=p.text;payLabel.textContent=p.label;payPrice.textContent=p.text;if(mainCTA)mainCTA.childNodes[0].nodeValue=`ĐĂNG KÝ ${p.label.toUpperCase()} – ${p.text}`;memo.textContent=`4SO AI ${p.memo} ${display.replaceAll('/','-')}`;packageButtons.forEach(b=>b.classList.toggle('active',b.dataset.package===selected))};"
           s=s.replace(oldsync,newsync)
-          # Track report sample interest separately when Meta Pixel is later installed.
           hook="document.querySelector('a[href=\"#mau-bao-cao\"]')?.addEventListener('click',()=>track('ViewReportSample',{report_date:start}));"
           if 'ViewReportSample' not in s:
               s=s.replace("zalo.addEventListener('click',()=>track('ContactZaloAfterPayment',{report_date:start,package:selected,price:packs[selected].price}));", "zalo.addEventListener('click',()=>track('ContactZaloAfterPayment',{report_date:start,package:selected,price:packs[selected].price}));"+hook)
@@ -44,3 +43,4 @@ jobs:
           git add ai-methods/landing-v3.html
           git commit -m 'Make 4SO registration CTA package-specific' || exit 0
           git push origin HEAD:main
+# retrigger

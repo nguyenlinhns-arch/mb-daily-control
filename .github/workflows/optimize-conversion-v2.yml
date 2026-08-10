@@ -1,0 +1,81 @@
+name: Optimize 4SO conversion v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/optimize-conversion-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Optimize landing conversion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/index.html')
+          s=p.read_text(encoding='utf-8')
+
+          # Hide redundant date pickers: only one valid next-day report exists.
+          s=s.replace('.date-label{margin-top:17px;display:grid;', '.date-label{display:none;margin-top:17px;')
+          s=s.replace('.dialog-date{margin-top:17px;display:grid;', '.dialog-date{display:none;margin-top:17px;')
+
+          # Add conversion-focused styles.
+          marker='.payment-caption{margin:12px 0 0;color:#b8c7ce;font-size:13px;line-height:1.55;text-align:center}'
+          extra='''\n    .fixed-report-date{margin-top:14px;padding:12px 14px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:12px}.fixed-report-date span{color:#bfcdd3;font-size:13px}.fixed-report-date strong{color:#fff;font-size:16px}.sample-proof{margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--soft)}.sample-proof-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.sample-proof-top span{color:var(--muted);font-size:12px;font-weight:750}.sample-proof-top b{padding:6px 9px;border-radius:999px;background:var(--greenSoft);color:var(--green);font-size:11px}.sample-proof-pairs{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.sample-proof-pairs strong{padding:11px;border-radius:12px;background:var(--navy);color:var(--lime);text-align:center;font-size:18px}.sample-proof-note{margin:10px 0 0;color:var(--muted);font-size:12px;line-height:1.5}.copy-all{width:100%;min-height:52px;margin-top:12px;border:1px solid #c9d6da;border-radius:13px;background:#f1f5f6;color:var(--navy);font-size:14px;font-weight:900}.chosen-date{margin-top:14px;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;display:flex;justify-content:space-between;gap:12px}.chosen-date span{color:var(--muted);font-size:13px}.chosen-date strong{color:var(--ink);font-size:15px}'''
+          if extra.strip() not in s:
+              s=s.replace(marker, marker+extra)
+
+          # Add explicit fixed report date in hero and remove visible date control.
+          old='<p class="buy-desc">Một lần thanh toán cho đúng bản tin/ngày đã chọn. Không cần tạo tài khoản.</p>\n          <label class="date-label">Ngày bản tin<input class="report-date" type="date" aria-label="Ngày bản tin"></label>'
+          new='<p class="buy-desc">Một lần thanh toán cho đúng bản tin/ngày đã chọn. Không cần tạo tài khoản.</p>\n          <div class="fixed-report-date"><span>Bản tin được mở cho</span><strong><span data-date>--/--/----</span></strong></div>\n          <label class="date-label">Ngày bản tin<input class="report-date" type="date" aria-label="Ngày bản tin"></label>'
+          s=s.replace(old,new)
+
+          # Upgrade sample section with a concrete, already-published past example from existing history.
+          old='<div class="sample-action"><button type="button" data-open>Nhận bản tin ngày <span data-date>--/--/----</span> – 30.000đ →</button></div>'
+          new='''<div class="sample-proof"><div class="sample-proof-top"><span>Mẫu bản tin đã xuất bản · 08/08/2026</span><b>Đã đối chiếu</b></div><div class="sample-proof-pairs"><strong>19 - 91</strong><strong>06 - 60</strong></div><p class="sample-proof-note">Kết quả đối chiếu trong lịch sử công khai: mã 19 xuất hiện. Đây chỉ là ví dụ về cách bản tin được trình bày, không phải bảo đảm cho ngày khác.</p></div><div class="sample-action"><button type="button" data-open>Nhận bản tin ngày <span data-date>--/--/----</span> – 30.000đ →</button></div>'''
+          s=s.replace(old,new)
+
+          # Make sticky CTA self-explanatory.
+          s=s.replace('<button type="button" data-open>Đăng ký</button></div>', '<button type="button" data-open>Đăng ký 30K</button></div>')
+
+          # Modal: keep selected date visible without a redundant input.
+          old='<p class="dialog-intro">Phí sử dụng 30.000đ. Chuyển khoản theo thông tin bên dưới, sau đó gửi ảnh giao dịch qua Zalo để nhận bản tin.</p><label class="dialog-date">Ngày bản tin<input id="dialog-date" type="date" aria-label="Ngày bản tin trong cửa sổ thanh toán"></label>'
+          new='<p class="dialog-intro">Phí sử dụng 30.000đ. Chuyển khoản theo thông tin bên dưới, sau đó gửi ảnh giao dịch qua Zalo để nhận bản tin.</p><div class="chosen-date"><span>Bản tin</span><strong><span data-date>--/--/----</span></strong></div><label class="dialog-date">Ngày bản tin<input id="dialog-date" type="date" aria-label="Ngày bản tin trong cửa sổ thanh toán"></label>'
+          s=s.replace(old,new)
+
+          # One-tap copy of all bank transfer details.
+          old='<div class="payrow"><span>Nội dung chuyển khoản</span><strong id="memo">4SO AI --</strong><button class="copy" id="copy-memo" type="button">Sao chép</button></div></div><ol class="paysteps">'
+          new='<div class="payrow"><span>Nội dung chuyển khoản</span><strong id="memo">4SO AI --</strong><button class="copy" id="copy-memo" type="button">Sao chép</button></div><button class="copy-all" id="copy-all" type="button">SAO CHÉP TOÀN BỘ THÔNG TIN CHUYỂN KHOẢN</button></div><ol class="paysteps">'
+          s=s.replace(old,new)
+
+          # Hook copy-all into existing copy helper.
+          old='document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>copy(b.dataset.copy,b)));document.querySelector("#copy-memo").addEventListener("click",e=>copy(memo.textContent,e.currentTarget));document.querySelector("#zalo-link").addEventListener("click",()=>track("ContactZaloAfterPayment",{report_date:initial}));'
+          new='document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>copy(b.dataset.copy,b)));document.querySelector("#copy-memo").addEventListener("click",e=>copy(memo.textContent,e.currentTarget));document.querySelector("#copy-all").addEventListener("click",e=>copy(`VPBank | 1128091987 | 30.000đ | ${memo.textContent}`,e.currentTarget));document.querySelector("#zalo-link").addEventListener("click",()=>track("ContactZaloAfterPayment",{report_date:initial}));'
+          s=s.replace(old,new)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify conversion changes
+        run: |
+          grep -n 'sample-proof' ai-methods/index.html
+          grep -n 'SAO CHÉP TOÀN BỘ' ai-methods/index.html
+          grep -n 'Đăng ký 30K' ai-methods/index.html
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/index.html
+          if git diff --cached --quiet; then
+            echo 'No changes'
+            exit 0
+          fi
+          git commit -m 'Improve 4SO checkout conversion and trust'
+          git push origin HEAD:main

@@ -36,8 +36,8 @@ jobs:
           cp index.html styles.css app.js _site/control/
           cp 404.html favicon.svg robots.txt sitemap.xml _site/
           cp -R ai-methods _site/
-          cp ai-methods/landing-v5.html _site/index.html
-          cp ai-methods/landing-v5.html _site/ai-methods/index.html
+          cp ai-methods/landing-v6.html _site/index.html
+          cp ai-methods/landing-v6.html _site/ai-methods/index.html
           cp ai-methods/legal-v3.html _site/legal.html
           cp ai-methods/legal-v3.html _site/ai-methods/legal.html
           touch _site/.nojekyll

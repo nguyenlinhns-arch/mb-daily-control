@@ -1,0 +1,55 @@
+name: Move 80 proof to top
+on:
+  push:
+    paths: ['.github/workflows/move-80-proof-top.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Move proof block above hero
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v3.html')
+          s=p.read_text(encoding='utf-8')
+
+          old='<section class="sell"><div class="proof"><p class="proof-label">Kết quả kiểm định lịch sử 30 ngày</p><strong class="proof-value">80%</strong><span class="proof-title">24/30 ngày có ít nhất một đầu ra xuất hiện</span><span class="proof-note">Số liệu lịch sử đã đối chiếu; không bảo đảm kỳ tiếp theo.</span></div><div class="proof-mini">'
+          new='<section class="sell"><div class="proof-mini">'
+          s=s.replace(old,new,1)
+
+          top='''<section class="top-proof wrap" aria-label="Kết quả kiểm định lịch sử"><div class="top-proof-copy"><span class="top-proof-label">KIỂM ĐỊNH LỊCH SỬ 30 NGÀY</span><strong>80%</strong><div><b>24/30 ngày</b><span>có ít nhất một đầu ra xuất hiện</span></div></div><p>Số liệu lịch sử đã đối chiếu · Không bảo đảm kỳ tiếp theo</p></section>'''
+          marker='</header>\n  <main id="top">'
+          if 'class="top-proof wrap"' not in s:
+              s=s.replace(marker,'</header>\n  '+top+'\n  <main id="top">',1)
+
+          css='''.top-proof{margin-top:12px;padding:16px;border-radius:20px;background:linear-gradient(135deg,var(--lime),#edffab);color:var(--navy);box-shadow:0 12px 30px rgba(7,27,43,.08)}.top-proof-copy{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"label label" "value detail";column-gap:15px;align-items:end}.top-proof-label{grid-area:label;font-size:10px;font-weight:900;letter-spacing:.06em}.top-proof strong{grid-area:value;font-size:58px;line-height:.92;letter-spacing:-.07em}.top-proof-copy div{grid-area:detail;padding-bottom:3px}.top-proof-copy div b{display:block;font-size:18px;line-height:1.1}.top-proof-copy div span{display:block;margin-top:4px;font-size:11px;font-weight:700}.top-proof>p{margin:9px 0 0;color:#46570f;font-size:10px;font-weight:700}.sell .proof-mini{margin-top:0}'''
+          if '.top-proof{' not in s:
+              s=s.replace('    @media(max-width:420px)', '    '+css+'\n    @media(max-width:420px)',1)
+
+          desktop='''@media(min-width:820px){.top-proof{margin-top:18px;padding:15px 20px;display:flex;align-items:center;justify-content:space-between;gap:24px}.top-proof-copy{display:flex;align-items:center;gap:16px}.top-proof-label{font-size:10px}.top-proof strong{font-size:52px}.top-proof-copy div{padding:0}.top-proof-copy div b{font-size:18px}.top-proof>p{margin:0;text-align:right;max-width:240px}}'''
+          if '@media(min-width:820px){.top-proof' not in s:
+              s=s.replace('    @media(min-width:820px){.wrap', '    '+desktop+'\n    @media(min-width:820px){.wrap',1)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify and commit
+        run: |
+          grep -n 'top-proof' ai-methods/landing-v3.html | head
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('ai-methods/landing-v3.html').read_text(encoding='utf-8')
+          assert s.index('class="top-proof wrap"') < s.index('class="hero wrap"')
+          assert '<section class="sell"><div class="proof-mini">' in s
+          print('proof moved above hero')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v3.html
+          git commit -m 'Move 80 percent proof above hero' || exit 0
+          git push origin HEAD:main

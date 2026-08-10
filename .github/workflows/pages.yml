@@ -36,10 +36,28 @@ jobs:
           cp index.html styles.css app.js _site/control/
           cp 404.html favicon.svg robots.txt sitemap.xml _site/
           cp -R ai-methods _site/
-          cp ai-methods/landing-v6.html _site/index.html
-          cp ai-methods/landing-v6.html _site/ai-methods/index.html
           cp ai-methods/legal-v3.html _site/legal.html
           cp ai-methods/legal-v3.html _site/ai-methods/legal.html
+
+          python - <<'PY'
+          import base64, gzip, re
+          from pathlib import Path
+
+          payload = Path('.github/workflows/install-v7.yml').read_text(encoding='utf-8')
+          match = re.search(r'V7_GZ_B64:\s*(\S+)', payload)
+          if not match:
+              raise SystemExit('Missing V7_GZ_B64 payload')
+          html = gzip.decompress(base64.b64decode(match.group(1)))
+          for target in [
+              Path('_site/index.html'),
+              Path('_site/ai-methods/index.html'),
+              Path('_site/ai-methods/landing-v7.html'),
+          ]:
+              target.write_bytes(html)
+          PY
+
+          grep -n 'Thay cảm tính' _site/index.html | head
+          grep -n '80%' _site/index.html | head
           touch _site/.nojekyll
 
       - name: Upload artifact

@@ -1,0 +1,94 @@
+name: Optimize 4SO conversion v4
+
+on:
+  push:
+    paths:
+      - '.github/workflows/optimize-conversion-v4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Improve conversion flow
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v3.html')
+          s=p.read_text(encoding='utf-8')
+
+          # Stronger but factual header CTA.
+          s=s.replace('>Chọn gói</button></div></header>', '>Đăng ký báo cáo</button></div></header>')
+
+          # Add a low-friction secondary action in the hero to inspect the report sample.
+          hero_old='''<div class="safety"><span>18+</span><span>Dịch vụ dữ liệu</span><span>Không nhận cược</span><span>Không cam kết kết quả</span></div></div>'''
+          hero_new='''<div class="hero-actions"><button type="button" data-open>ĐĂNG KÝ TỪ 30.000đ</button><a href="#mau-bao-cao">Xem mẫu báo cáo ↓</a></div><div class="safety"><span>18+</span><span>Dịch vụ dữ liệu</span><span>Không nhận cược</span><span>Không cam kết kết quả</span></div></div>'''
+          s=s.replace(hero_old,hero_new)
+
+          # Give sample section a stable anchor.
+          s=s.replace('<section class="section soft"><div class="wrap"><p class="kicker">Xem trước khi đăng ký</p>', '<section class="section soft" id="mau-bao-cao"><div class="wrap"><p class="kicker">Xem trước khi đăng ký</p>',1)
+
+          # Package copy: keep day default, strengthen factual value framing.
+          s=s.replace('<b>1 tuần</b><strong>200.000đ</strong><small>7 ngày liên tiếp · <span class="save">tiết kiệm 10K</span></small>', '<b>1 tuần</b><strong>200.000đ</strong><small>7 bản tin liên tiếp · <span class="save">tiết kiệm 10K</span></small>')
+          s=s.replace('<span class="best">TIẾT KIỆM 100K</span><b>1 tháng</b><strong>800.000đ</strong><small>30 ngày liên tiếp</small>', '<span class="best">TIẾT KIỆM 100K</span><b>1 tháng</b><strong>800.000đ</strong><small>30 bản tin liên tiếp</small>')
+
+          # Reassurance immediately below main purchase CTA.
+          cap='<p class="caption">Chuyển khoản → gửi ảnh qua Zalo → nhận bản tin</p>'
+          cap2='<p class="caption">Chuyển khoản → gửi ảnh qua Zalo → nhận bản tin</p><div class="purchase-reassure"><span>Không cần tài khoản</span><span>Không tự gia hạn</span><span>Hỗ trợ qua Zalo</span></div>'
+          s=s.replace(cap,cap2,1)
+
+          # Improve sample CTA wording.
+          s=s.replace('CHỌN GÓI NHẬN BẢN TIN →','ĐĂNG KÝ NHẬN BÁO CÁO →')
+
+          # Insert objection-handling FAQ before the closing CTA.
+          marker='<section class="closing wrap"><p class="kicker">Thống kê Xổ số Miền Bắc · 4SO AI</p>'
+          faq='''<section class="section faq-section"><div class="wrap"><p class="kicker">Trước khi đăng ký</p><h2>4 câu hỏi thường gặp</h2><div class="faq-grid"><details open><summary>Tôi nhận được gì?</summary><p>Bản báo cáo thống kê Xổ số Miền Bắc gồm Top 1–Top 2, 4 số đầu ra, Top 3, các chỉ số lịch sử và phần kiểm tra dữ liệu trước kỳ.</p></details><details><summary>Khi nào tôi nhận báo cáo?</summary><p>Sau khi chuyển khoản, gửi ảnh giao dịch qua Zalo để đối soát. Báo cáo được gửi theo ngày và gói đã đăng ký.</p></details><details><summary>Gói tuần và tháng tính thế nào?</summary><p>Gói 1 tuần gồm 7 bản tin liên tiếp; gói 1 tháng gồm 30 bản tin liên tiếp, bắt đầu từ ngày hiển thị khi đăng ký.</p></details><details><summary>Nếu dịch vụ không cung cấp được báo cáo?</summary><p>Nếu không thể cung cấp báo cáo do lỗi phía dịch vụ, phần phí tương ứng được hoàn lại theo điều khoản công bố.</p></details></div></div></section>'''
+          if '4 câu hỏi thường gặp' not in s:
+              s=s.replace(marker,faq+marker)
+
+          # Stronger final conversion copy, still factual.
+          s=s.replace('<h2>Chọn gói phù hợp với nhu cầu theo dõi</h2>', '<h2>Chọn gói và nhận báo cáo thống kê mỗi ngày</h2>')
+          s=s.replace('<button type="button" data-open>CHỌN GÓI & ĐĂNG KÝ →</button>', '<button type="button" data-open>ĐĂNG KÝ NHẬN BÁO CÁO →</button>')
+
+          # Checkout reassurance above payment data.
+          modal_intro='''<p class="dialog-intro">Thanh toán một lần, không tự gia hạn. Chọn gói, chuyển khoản và gửi ảnh qua Zalo để nhận bản tin.</p>'''
+          modal_intro2='''<p class="dialog-intro">Thanh toán một lần, không tự gia hạn. Chọn gói, chuyển khoản và gửi ảnh qua Zalo để nhận báo cáo.</p><div class="checkout-trust"><span>✓ Không cần tạo tài khoản</span><span>✓ Không tự gia hạn</span><span>✓ Lỗi dịch vụ được xử lý theo chính sách hoàn phí</span></div>'''
+          s=s.replace(modal_intro,modal_intro2)
+          s=s.replace('Gửi ảnh giao dịch qua Zalo để nhận bản tin.','Gửi ảnh giao dịch qua Zalo để nhận báo cáo.')
+          s=s.replace('TÔI ĐÃ CHUYỂN KHOẢN – MỞ ZALO →','ĐÃ CHUYỂN KHOẢN – GỬI XÁC NHẬN ZALO →')
+
+          # Mobile CTA clarity.
+          s=s.replace('<button type="button" data-open>Chọn gói</button></div>', '<button type="button" data-open>Đăng ký</button></div>')
+
+          # Styles for added conversion elements.
+          css='''.hero-actions{margin-top:18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:center}.hero-actions button{min-height:52px;padding:0 14px;border:0;border-radius:13px;background:var(--navy);color:#fff;font-size:13px;font-weight:900}.hero-actions a{min-height:52px;padding:0 12px;border:1px solid var(--line);border-radius:13px;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--navy);font-size:12px;font-weight:850}.purchase-reassure{margin-top:10px;display:flex;flex-wrap:wrap;justify-content:center;gap:6px}.purchase-reassure span{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.07);color:#cbd6db;font-size:8px;font-weight:750}.faq-section{background:#fff}.faq-grid{margin-top:18px;display:grid;gap:9px}.faq-grid details{border:1px solid var(--line);border-radius:15px;background:var(--paper);overflow:hidden}.faq-grid summary{padding:15px 16px;cursor:pointer;color:var(--navy);font-size:13px;font-weight:900;list-style:none}.faq-grid summary::-webkit-details-marker{display:none}.faq-grid summary::after{content:"+";float:right;color:var(--orange);font-size:18px;line-height:1}.faq-grid details[open] summary::after{content:"−"}.faq-grid details p{margin:0;padding:0 16px 15px;color:var(--muted);font-size:11px;line-height:1.55}.checkout-trust{margin-top:10px;padding:10px 11px;border:1px solid var(--line);border-radius:11px;display:grid;gap:5px;background:#fff;color:#526671;font-size:9px;font-weight:750}'''
+          if '.hero-actions{' not in s:
+              s=s.replace('    @media(max-width:420px)', '    '+css+'\n    @media(max-width:420px)')
+          # Mobile hero actions stack to preserve tap targets.
+          if '@media(max-width:420px){.hero-actions' not in s:
+              s=s.replace('@media(max-width:420px){', '@media(max-width:420px){.hero-actions{grid-template-columns:1fr}.hero-actions a{min-height:46px}')
+          # FAQ two columns on wider screens.
+          s=s.replace('@media(min-width:640px){', '@media(min-width:640px){.faq-grid{grid-template-columns:1fr 1fr}')
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Sanity checks
+        run: |
+          grep -n 'ĐĂNG KÝ TỪ 30.000đ' ai-methods/landing-v3.html
+          grep -n '4 câu hỏi thường gặp' ai-methods/landing-v3.html
+          grep -n 'checkout-trust' ai-methods/landing-v3.html
+          grep -n 'ĐĂNG KÝ NHẬN BÁO CÁO' ai-methods/landing-v3.html
+      - name: Commit
+        run: |
+          if git diff --quiet -- ai-methods/landing-v3.html; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v3.html
+          git commit -m 'Improve 4SO report conversion funnel'
+          git push origin HEAD:main

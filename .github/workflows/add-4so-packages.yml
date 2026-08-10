@@ -1,0 +1,101 @@
+name: Add 4SO packages
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-4so-packages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Add packages and finish conversion polish
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/index.html')
+          s=p.read_text(encoding='utf-8')
+
+          # Hide redundant date selectors because the first eligible report date is fixed.
+          s=s.replace('.date-label{margin-top:14px;display:grid;', '.date-label{display:none;margin-top:14px;')
+          s=s.replace('.dialog-date{margin-top:15px;display:grid;', '.dialog-date{display:none;margin-top:15px;')
+
+          # Conversion/package styles.
+          css='''\n    .fixed-report-date{margin-top:13px;padding:12px 13px;border:1px solid rgba(255,255,255,.14);border-radius:13px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:10px}.fixed-report-date span{color:#bfcdd3;font-size:12px}.fixed-report-date strong{color:#fff;font-size:15px}.package-label{margin:14px 0 7px;color:#c4d1d7;font-size:12px;font-weight:800}.packages{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.package{position:relative;min-width:0;padding:12px 7px;border:1px solid rgba(255,255,255,.16);border-radius:13px;background:rgba(255,255,255,.055);color:#fff;text-align:left}.package.active{border-color:var(--lime);background:rgba(215,255,85,.12);box-shadow:inset 0 0 0 1px var(--lime)}.package b{display:block;color:#fff;font-size:13px;line-height:1.2}.package strong{display:block;margin-top:5px;color:var(--lime);font-size:17px;line-height:1}.package small{display:block;margin-top:5px;color:#b9c8cf;font-size:9px;line-height:1.3}.package .save{color:#d7ff55;font-weight:800}.package-popular{position:absolute;top:-8px;right:5px;padding:3px 6px;border-radius:999px;background:var(--orange);color:#fff!important;font-size:8px!important;font-weight:900;white-space:nowrap}.sample-proof{margin-top:18px;padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--soft)}.sample-proof-top{display:flex;align-items:center;justify-content:space-between;gap:9px}.sample-proof-top span{color:var(--muted);font-size:11px;font-weight:800}.sample-proof-top b{padding:5px 8px;border-radius:999px;background:var(--greenSoft);color:var(--green);font-size:10px}.sample-proof-pairs{margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.sample-proof-pairs strong{padding:11px;border-radius:11px;background:var(--navy);color:var(--lime);text-align:center;font-size:17px}.sample-proof-note{margin:9px 0 0;color:var(--muted);font-size:11px;line-height:1.5}.chosen-date{margin-top:12px;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}.chosen-date span{color:var(--muted);font-size:12px}.chosen-date strong{color:var(--ink);font-size:14px}.modal-packages{margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.modal-package{padding:10px 6px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);text-align:left}.modal-package.active{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);background:#f0f4f5}.modal-package b{display:block;font-size:11px}.modal-package strong{display:block;margin-top:4px;color:var(--navy);font-size:15px}.modal-package small{display:block;margin-top:4px;color:var(--muted);font-size:8px;line-height:1.25}.copy-all{width:calc(100% - 24px);min-height:50px;margin:11px 12px 12px;border:1px solid #cbd8dc;border-radius:12px;background:#eef3f4;color:var(--navy);font-size:12px;font-weight:900;letter-spacing:.01em}.package-note{margin:9px 0 0;color:#b8c7ce;font-size:10px;line-height:1.4;text-align:center}\n    @media(max-width:420px){.packages,.modal-packages{grid-template-columns:1fr}.package,.modal-package{text-align:center}.package-popular{top:5px;right:7px}}\n'''
+          if '.packages{' not in s:
+              s=s.replace('    @media(max-width:359px)', css+'    @media(max-width:359px)')
+
+          # Add fixed report date + package chooser to hero buy box.
+          old='''<p class="buy-desc">Một lần thanh toán cho đúng bản tin/ngày đã chọn. Không cần tạo tài khoản.</p>\n          <div class="fixed-report-date"><span>Bản tin được mở cho</span><strong><span data-date>--/--/----</span></strong></div>\n          <label class="date-label">Ngày bản tin<input class="report-date" type="date" aria-label="Ngày bản tin"></label>\n          <div class="price-line"><span>Phí sử dụng 01 ngày</span><strong>30.000đ</strong></div>'''
+          if old not in s:
+              old='''<p class="buy-desc">Một lần thanh toán cho đúng bản tin/ngày đã chọn. Không cần tạo tài khoản.</p>\n          <label class="date-label">Ngày bản tin<input class="report-date" type="date" aria-label="Ngày bản tin"></label>\n          <div class="price-line"><span>Phí sử dụng 01 ngày</span><strong>30.000đ</strong></div>'''
+          new='''<p class="buy-desc">Chọn gói phù hợp. Thanh toán một lần, không tự gia hạn.</p>\n          <div class="fixed-report-date"><span>Bắt đầu từ bản tin</span><strong><span data-date>--/--/----</span></strong></div>\n          <label class="date-label">Ngày bản tin<input class="report-date" type="date" aria-label="Ngày bản tin"></label>\n          <p class="package-label">Chọn gói</p><div class="packages" role="group" aria-label="Chọn gói bản tin"><button class="package active" type="button" data-package="day"><b>1 ngày</b><strong>30.000đ</strong><small>01 bản tin</small></button><button class="package" type="button" data-package="week"><b>1 tuần</b><strong>200.000đ</strong><small>7 ngày liên tiếp · <span class="save">tiết kiệm 10K</span></small></button><button class="package" type="button" data-package="month"><span class="package-popular">TIẾT KIỆM NHẤT</span><b>1 tháng</b><strong>800.000đ</strong><small>30 ngày liên tiếp · <span class="save">tiết kiệm 100K</span></small></button></div>\n          <div class="price-line"><span id="selected-package-label">Gói 1 ngày</span><strong id="selected-package-price">30.000đ</strong></div><p class="package-note">Gói tuần/tháng bắt đầu từ ngày hiển thị và dùng cho các bản tin liên tiếp.</p>'''
+          s=s.replace(old,new)
+
+          # Strengthen primary CTA wording but keep factual.
+          s=s.replace('ĐĂNG KÝ NHẬN BẢN TIN<small>Xem thông tin thanh toán</small>', 'CHỌN GÓI & ĐĂNG KÝ<small>Thanh toán một lần · không tự gia hạn</small>')
+
+          # Add package selector inside modal before paycard.
+          needle='<div class="chosen-date"><span>Bản tin</span><strong><span data-date>--/--/----</span></strong></div><label class="dialog-date">Ngày bản tin<input id="dialog-date" type="date" aria-label="Ngày bản tin trong cửa sổ thanh toán"></label><div class="paycard">'
+          repl='<div class="chosen-date"><span>Bắt đầu từ</span><strong><span data-date>--/--/----</span></strong></div><label class="dialog-date">Ngày bản tin<input id="dialog-date" type="date" aria-label="Ngày bản tin trong cửa sổ thanh toán"></label><div class="modal-packages" role="group" aria-label="Chọn gói thanh toán"><button class="modal-package active" type="button" data-package="day"><b>1 ngày</b><strong>30.000đ</strong><small>01 bản tin</small></button><button class="modal-package" type="button" data-package="week"><b>1 tuần</b><strong>200.000đ</strong><small>7 ngày</small></button><button class="modal-package" type="button" data-package="month"><b>1 tháng</b><strong>800.000đ</strong><small>30 ngày</small></button></div><div class="paycard">'
+          s=s.replace(needle,repl)
+
+          # Make payment amount dynamic.
+          s=s.replace('<div class="payrow"><span>Phí sử dụng 01 bản tin</span><strong>30.000đ</strong></div>', '<div class="payrow"><span id="pay-package-label">Gói 1 ngày</span><strong id="pay-package-price">30.000đ</strong></div>')
+          s=s.replace('<li><span>1</span>Chuyển phí sử dụng 30.000đ.</li>', '<li><span>1</span>Chuyển đúng số tiền của gói đã chọn.</li>')
+
+          # Ensure one-tap copy-all button exists.
+          if 'id="copy-all"' not in s:
+              s=s.replace('<div class="payrow"><span>Nội dung chuyển khoản</span><strong id="memo">4SO AI --</strong><button class="copy" id="copy-memo" type="button">Sao chép</button></div></div>', '<div class="payrow"><span>Nội dung chuyển khoản</span><strong id="memo">4SO AI --</strong><button class="copy" id="copy-memo" type="button">Sao chép</button></div><button class="copy-all" id="copy-all" type="button">SAO CHÉP TOÀN BỘ THÔNG TIN CHUYỂN KHOẢN</button></div>')
+
+          # Package JS state. Insert after 'initial' initialization.
+          marker='const initial=tomorrow();heroDate.value=dialogDate.value=initial;heroDate.min=heroDate.max=dialogDate.min=dialogDate.max=initial;'
+          pkgjs='''const packages={day:{label:'Gói 1 ngày',price:30000,priceText:'30.000đ',memo:'1D'},week:{label:'Gói 1 tuần · 7 ngày',price:200000,priceText:'200.000đ',memo:'7D'},month:{label:'Gói 1 tháng · 30 ngày',price:800000,priceText:'800.000đ',memo:'30D'}};let selectedPackage='day';const packageButtons=[...document.querySelectorAll('[data-package]')];const selectedLabel=document.querySelector('#selected-package-label'),selectedPrice=document.querySelector('#selected-package-price'),payLabel=document.querySelector('#pay-package-label'),payPrice=document.querySelector('#pay-package-price');const updatePackage=(key)=>{selectedPackage=packages[key]?key:'day';const p=packages[selectedPackage];packageButtons.forEach(b=>b.classList.toggle('active',b.dataset.package===selectedPackage));if(selectedLabel)selectedLabel.textContent=p.label;if(selectedPrice)selectedPrice.textContent=p.priceText;if(payLabel)payLabel.textContent=p.label;if(payPrice)payPrice.textContent=p.priceText;syncDate(initial);track('SelectPackage',{package:selectedPackage,price:p.price})};packageButtons.forEach(b=>b.addEventListener('click',()=>updatePackage(b.dataset.package)));'''
+          if 'const packages={day:' not in s:
+              s=s.replace(marker,marker+pkgjs)
+
+          # Dynamic memo based on selected package.
+          oldsync='memo.textContent=f.memo;stepDate.textContent=f.display'
+          newsync="memo.textContent=`4SO AI ${packages[selectedPackage].memo} ${f.display.replaceAll('/','-')}`;stepDate.textContent=f.display"
+          s=s.replace(oldsync,newsync)
+
+          # Open modal tracks selected package + price.
+          s=s.replace("track(\"OpenPurchase\",{report_date:initial,price:30000})", "track(\"OpenPurchase\",{report_date:initial,package:selectedPackage,price:packages[selectedPackage].price})")
+          s=s.replace("track(\"ContactZaloAfterPayment\",{report_date:initial,price:30000})", "track(\"ContactZaloAfterPayment\",{report_date:initial,package:selectedPackage,price:packages[selectedPackage].price})")
+
+          # Wire copy-all. Avoid duplicate listener.
+          oldwire='document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>copy(b.dataset.copy,b)));document.querySelector("#copy-memo").addEventListener("click",e=>copy(memo.textContent,e.currentTarget));document.querySelector("#zalo-link").addEventListener("click",()=>track("ContactZaloAfterPayment",{report_date:initial,package:selectedPackage,price:packages[selectedPackage].price}));'
+          newwire='document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>copy(b.dataset.copy,b)));document.querySelector("#copy-memo").addEventListener("click",e=>copy(memo.textContent,e.currentTarget));document.querySelector("#copy-all").addEventListener("click",e=>copy(`VPBank | 1128091987 | ${packages[selectedPackage].priceText} | ${memo.textContent}`,e.currentTarget));document.querySelector("#zalo-link").addEventListener("click",()=>track("ContactZaloAfterPayment",{report_date:initial,package:selectedPackage,price:packages[selectedPackage].price}));'
+          s=s.replace(oldwire,newwire)
+
+          # Initialize package UI after syncDate is available.
+          s=s.replace('syncDate(initial);\n      heroDate.addEventListener', 'syncDate(initial);updatePackage(\'day\');\n      heroDate.addEventListener')
+
+          # Update JSON-LD to expose all three factual offers.
+          oldjson='''<script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"4SO AI","description":"Bản tin phân tích dữ liệu Xổ số Miền Bắc theo ngày.","areaServed":"VN","offers":{"@type":"Offer","price":"30000","priceCurrency":"VND","description":"Một bản tin dữ liệu cho một ngày"}}</script>'''
+          newjson='''<script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"4SO AI","description":"Bản tin phân tích dữ liệu Xổ số Miền Bắc theo ngày.","areaServed":"VN","offers":[{"@type":"Offer","name":"Gói 1 ngày","price":"30000","priceCurrency":"VND"},{"@type":"Offer","name":"Gói 1 tuần - 7 ngày","price":"200000","priceCurrency":"VND"},{"@type":"Offer","name":"Gói 1 tháng - 30 ngày","price":"800000","priceCurrency":"VND"}]}</script>'''
+          s=s.replace(oldjson,newjson)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify packages
+        run: |
+          grep -n '200.000đ' ai-methods/index.html | head
+          grep -n '800.000đ' ai-methods/index.html | head
+          grep -n 'const packages=' ai-methods/index.html
+          grep -n '#copy-all' ai-methods/index.html
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/index.html
+          if git diff --cached --quiet; then echo 'No changes'; exit 0; fi
+          git commit -m 'Add weekly and monthly 4SO report packages'
+          git push origin HEAD:main

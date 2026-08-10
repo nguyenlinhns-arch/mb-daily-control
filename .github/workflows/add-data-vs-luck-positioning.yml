@@ -1,0 +1,59 @@
+name: Add data-vs-luck positioning
+on:
+  push:
+    paths: ['.github/workflows/add-data-vs-luck-positioning.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Add positioning block
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v3.html')
+          s=p.read_text(encoding='utf-8')
+
+          # Strengthen SEO description with verified historical-data coverage.
+          s=s.replace('Báo cáo phân tích 4SO AI thống kê Xổ số Miền Bắc từ dữ liệu đã công bố: 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.', 'Báo cáo phân tích 4SO AI thống kê Xổ số Miền Bắc từ dữ liệu lịch sử 2020 đến nay: 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.')
+          s=s.replace('Báo cáo phân tích Xổ số Miền Bắc bằng AI theo ngày với 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.', 'Báo cáo phân tích Xổ số Miền Bắc bằng AI từ dữ liệu 2020 đến nay, 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.')
+
+          proof='''<section class="top-proof wrap" aria-label="Kết quả kiểm định lịch sử"><div class="top-proof-copy"><span class="top-proof-label">KIỂM ĐỊNH LỊCH SỬ 30 NGÀY</span><strong>80%</strong><div><b>24/30 ngày</b><span>có ít nhất một đầu ra xuất hiện</span></div></div><p>Số liệu lịch sử đã đối chiếu · Không bảo đảm kỳ tiếp theo</p><div class="top-proof-actions"><button type="button" data-open>ĐĂNG KÝ TỪ 30.000đ</button><a href="#mau-bao-cao">Xem mẫu báo cáo</a></div></section>'''
+          compare='''<section class="data-position wrap" aria-label="Phân tích dữ liệu thay cho cảm tính"><p class="data-kicker">KHÔNG CHỈ NHÌN “CẦU” VÀ CHỜ MAY MẮN</p><h2>Đưa dữ liệu vào quyết định</h2><p class="data-intro">Thay vì chỉ dựa vào “cầu”, số nóng/lạnh hoặc cảm tính, 4SO AI phân tích kết quả Xổ số Miền Bắc từ <strong>năm 2020 đến nay</strong> theo quy trình đã khóa trước kỳ.</p><div class="data-points"><div><strong>2020 → nay</strong><span>dữ liệu lịch sử</span></div><div><strong>7 lớp</strong><span>phương pháp phân tích</span></div><div><strong>15.000+</strong><span>lượt tính toán mỗi báo cáo</span></div></div><p class="data-note">AI không biến dữ liệu thành sự chắc chắn; mục tiêu là thay cảm tính bằng quy trình thống kê có thể kiểm tra và đối chiếu.</p></section>'''
+          if 'class="data-position' not in s:
+              s=s.replace(proof,proof+compare)
+
+          # Refresh hero copy so the same positioning is reinforced without repeating a long paragraph.
+          s=s.replace('<p class="lead"><strong>Mỗi ngày AI chỉ dùng kết quả Xổ số Miền Bắc đã công bố đến hết ngày hôm qua</strong>, chạy hơn 15.000 lượt tính toán qua 7 lớp phương pháp rồi xuất bản một báo cáo phân tích ngắn gọn.</p>', '<p class="lead"><strong>Mỗi báo cáo dùng dữ liệu Xổ số Miền Bắc từ 2020 đến hết ngày hôm qua</strong>, xử lý theo 7 lớp phương pháp rồi xuất bản kết quả phân tích ngắn gọn, có lịch sử để đối chiếu.</p>')
+
+          # Make the proof mini cards complement rather than duplicate the new positioning block.
+          s=s.replace('<div class="proof-mini"><div class="mini"><strong>15.000+</strong><span>lượt tính toán</span></div><div class="mini"><strong>7 lớp</strong><span>phương pháp</span></div><div class="mini"><strong>45/45</strong><span>cặp được chấm</span></div></div>', '<div class="proof-mini"><div class="mini"><strong>45/45</strong><span>cặp được chấm</span></div><div class="mini"><strong>t−1</strong><span>khóa dữ liệu</span></div><div class="mini"><strong>Top 2</strong><span>đầu ra cuối</span></div></div>')
+
+          css='''.data-position{margin-top:12px;padding:18px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:0 12px 30px rgba(7,27,43,.06)}.data-kicker{margin:0;color:var(--orange);font-size:10px;font-weight:900;letter-spacing:.06em}.data-position h2{margin:5px 0 0;font-size:25px;line-height:1.1;letter-spacing:-.035em}.data-intro{margin:8px 0 0;color:#536873;font-size:13px;line-height:1.55}.data-points{margin-top:13px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.data-points div{padding:11px 8px;border-radius:12px;background:var(--navy);text-align:center}.data-points strong{display:block;color:var(--lime);font-size:15px;line-height:1.1}.data-points span{display:block;margin-top:5px;color:#c6d2d8;font-size:8px;line-height:1.3}.data-note{margin:10px 0 0;color:#6b7d86;font-size:9px;line-height:1.45}.data-intro strong{color:var(--ink)}'''
+          if '.data-position{' not in s:
+              s=s.replace('    @media(max-width:819px)', '    '+css+'\n    @media(max-width:819px)')
+
+          mobile='''@media(max-width:420px){.data-position{padding:15px}.data-position h2{font-size:23px}.data-points{grid-template-columns:1fr 1fr}.data-points div:last-child{grid-column:1/-1}.data-intro{font-size:12px}}'''
+          if 'data-points div:last-child' not in s:
+              s=s.replace('    @media(max-width:420px)', '    '+mobile+'\n    @media(max-width:420px)')
+
+          # Structured-data description follows public positioning.
+          s=s.replace('"description":"Báo cáo phân tích dữ liệu Xổ số Miền Bắc bằng AI theo ngày."', '"description":"Báo cáo phân tích dữ liệu Xổ số Miền Bắc bằng AI, sử dụng dữ liệu lịch sử từ 2020 đến nay theo quy trình thống kê nhiều lớp."')
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify and commit
+        run: |
+          grep -n 'KHÔNG CHỈ NHÌN' ai-methods/landing-v3.html
+          grep -n '2020 → nay' ai-methods/landing-v3.html
+          grep -n '15.000+' ai-methods/landing-v3.html | head
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v3.html
+          git commit -m 'Explain data-driven 4SO positioning' || exit 0
+          git push origin HEAD:main

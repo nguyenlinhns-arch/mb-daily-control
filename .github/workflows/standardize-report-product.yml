@@ -1,0 +1,93 @@
+name: Standardize 4SO report product wording
+
+on:
+  push:
+    paths:
+      - '.github/workflows/standardize-report-product.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  standardize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Standardize product wording
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v3.html')
+          s=p.read_text(encoding='utf-8')
+          reps={
+            '4SO AI thống kê Xổ số Miền Bắc bằng AI từ dữ liệu đã công bố:':'Báo cáo phân tích 4SO AI thống kê Xổ số Miền Bắc từ dữ liệu đã công bố:',
+            'Thống kê Xổ số Miền Bắc bằng AI theo ngày với':'Báo cáo phân tích Xổ số Miền Bắc bằng AI theo ngày với',
+            'Bản tin ngày <strong><span data-date>--/--/----</span></strong>':'Báo cáo ngày <strong><span data-date>--/--/----</span></strong>',
+            'rồi xuất bản một bản tin ngắn gọn.':'rồi xuất bản một báo cáo phân tích ngắn gọn.',
+            '<li>Hai cặp Top 1 – Top 2, tương ứng 4 số đầu ra</li>':'<li>Báo cáo PDF gọn, gồm Top 1 – Top 2 và 4 số đầu ra</li>',
+            '<p class="buy-kicker">Thống kê Xổ số Miền Bắc · <span data-date>--/--/----</span></p><h2>Chọn gói nhận bản tin</h2>':'<p class="buy-kicker">Báo cáo phân tích Xổ số Miền Bắc · <span data-date>--/--/----</span></p><h2>Chọn gói nhận báo cáo</h2>',
+            '<small>01 bản tin</small>':'<small>01 báo cáo</small>',
+            '7 bản tin liên tiếp':'7 báo cáo liên tiếp',
+            '30 bản tin liên tiếp':'30 báo cáo liên tiếp',
+            'Chuyển khoản → gửi ảnh qua Zalo → nhận bản tin':'Chuyển khoản → gửi ảnh qua Zalo → nhận báo cáo',
+            '<h2>Mẫu bản tin thống kê đã xuất bản</h2>':'<h2>Mẫu báo cáo phân tích đã xuất bản</h2>',
+            'trình bày đúng cấu trúc người đăng ký nhận được.':'trình bày đúng cấu trúc báo cáo người đăng ký nhận được.',
+            'Bản tin được tạo từ quy trình đã khóa':'Báo cáo được tạo từ quy trình đã khóa',
+            '<p class="kicker">Cách nhận bản tin</p>':'<p class="kicker">Cách nhận báo cáo</p>',
+            'Gửi ảnh giao dịch để đối soát và nhận bản tin.':'Gửi ảnh giao dịch để đối soát và nhận báo cáo.',
+            'Nếu không thể cung cấp bản tin do lỗi phía dịch vụ':'Nếu không thể cung cấp báo cáo do lỗi phía dịch vụ',
+            '<span>Thống kê XSMB · từ <span data-date>--/--/----</span></span>':'<span>Báo cáo XSMB · từ <span data-date>--/--/----</span></span>',
+            '<p class="kicker">Thống kê Xổ số Miền Bắc · 4SO AI</p><h2 id="dialog-title">Chọn gói bản tin từ <span data-date>--/--/----</span></h2>':'<p class="kicker">Báo cáo phân tích Xổ số Miền Bắc · 4SO AI</p><h2 id="dialog-title">Chọn gói báo cáo từ <span data-date>--/--/----</span></h2>',
+            'Báo cáo được gửi theo ngày và gói đã đăng ký.':'Báo cáo PDF được gửi theo ngày và gói đã đăng ký.',
+            'Gói 1 tuần gồm 7 bản tin liên tiếp; gói 1 tháng gồm 30 bản tin liên tiếp':'Gói 1 tuần gồm 7 báo cáo liên tiếp; gói 1 tháng gồm 30 báo cáo liên tiếp',
+            'Bản báo cáo thống kê Xổ số Miền Bắc gồm':'Báo cáo phân tích Xổ số Miền Bắc gồm'
+          }
+          for a,b in reps.items(): s=s.replace(a,b)
+
+          # Add a concrete deliverable line in the purchase box.
+          anchor='<div class="purchase-reassure"><span>Không cần tài khoản</span><span>Không tự gia hạn</span><span>Hỗ trợ qua Zalo</span></div>'
+          deliver='''<div class="deliverable"><span class="deliverable-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5"/><path d="M10 13h5"/><path d="M10 17h5"/></svg></span><div><strong>Báo cáo PDF theo ngày</strong><span>Trình bày gọn, tối ưu để xem trên điện thoại và gửi qua Zalo sau đối soát.</span></div></div>'''
+          if 'class="deliverable"' not in s:
+              s=s.replace(anchor,anchor+deliver)
+
+          # Add format badge to report sample.
+          sample='<div class="sample-top"><span>08/08/2026 · đã đối chiếu</span><b>Có xuất hiện</b></div>'
+          sample2=sample+'<div class="format-badges"><span>PDF 1 trang</span><span>Tối ưu điện thoại</span><span>Dữ liệu + kiểm định</span></div>'
+          if 'format-badges' not in s:
+              s=s.replace(sample,sample2)
+
+          css='''.deliverable{margin-top:11px;padding:11px 12px;border:1px solid rgba(255,255,255,.13);border-radius:12px;display:grid;grid-template-columns:35px 1fr;gap:9px;align-items:center;background:rgba(255,255,255,.055)}.deliverable-icon{width:35px;height:35px;display:grid;place-items:center;border-radius:10px;background:rgba(215,255,85,.11);color:var(--lime)}.deliverable-icon svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.deliverable strong{display:block;color:#fff;font-size:11px}.deliverable div span{display:block;margin-top:3px;color:#bdccd2;font-size:9px;line-height:1.35}.format-badges{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}.format-badges span{padding:5px 8px;border-radius:999px;background:var(--soft);color:var(--navy);font-size:9px;font-weight:800}'''
+          if '.deliverable{' not in s:
+              s=s.replace('    @media(max-width:420px)', '    '+css+'\n    @media(max-width:420px)')
+
+          # Update structured-data description.
+          s=s.replace('"description":"Bản tin phân tích dữ liệu Xổ số Miền Bắc theo ngày."','"description":"Báo cáo phân tích dữ liệu Xổ số Miền Bắc bằng AI theo ngày."')
+          p.write_text(s,encoding='utf-8')
+
+          lp=Path('ai-methods/legal-v3.html')
+          l=lp.read_text(encoding='utf-8')
+          l=l.replace('bản tin phân tích dữ liệu Xổ số Miền Bắc theo ngày','báo cáo phân tích dữ liệu Xổ số Miền Bắc theo ngày')
+          l=l.replace('01 bản tin cho ngày bắt đầu.','01 báo cáo cho ngày bắt đầu.')
+          l=l.replace('7 ngày liên tiếp từ ngày bắt đầu.','7 báo cáo liên tiếp từ ngày bắt đầu.')
+          l=l.replace('30 ngày liên tiếp từ ngày bắt đầu.','30 báo cáo liên tiếp từ ngày bắt đầu.')
+          l=l.replace('Mỗi bản tin được xem là đã cung cấp','Mỗi báo cáo được xem là đã cung cấp')
+          l=l.replace('Nếu bản tin thuộc kỳ đã thanh toán','Nếu báo cáo thuộc kỳ đã thanh toán')
+          lp.write_text(l,encoding='utf-8')
+          PY
+      - name: Verify
+        run: |
+          grep -n 'Báo cáo PDF theo ngày' ai-methods/landing-v3.html
+          grep -n 'Mẫu báo cáo phân tích' ai-methods/landing-v3.html
+          grep -n 'PDF 1 trang' ai-methods/landing-v3.html
+          grep -n '7 báo cáo liên tiếp' ai-methods/legal-v3.html
+      - name: Commit
+        run: |
+          if git diff --quiet -- ai-methods/landing-v3.html ai-methods/legal-v3.html; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v3.html ai-methods/legal-v3.html
+          git commit -m 'Position 4SO as a daily analysis report'
+          git push origin HEAD:main

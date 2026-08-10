@@ -1,0 +1,94 @@
+name: Fix 4SO package JS v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-4so-packages-js-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Repair package selector
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/index.html')
+          s=p.read_text(encoding='utf-8')
+
+          start=s.index('const initial=tomorrow();')
+          end_marker='const track=(name,params={})=>{try{if(typeof window.fbq==="function")window.fbq("trackCustom",name,params)}catch{}};'
+          end=s.index(end_marker,start)+len(end_marker)
+
+          corrected='''const initial=tomorrow();heroDate.value=dialogDate.value=initial;heroDate.min=heroDate.max=dialogDate.min=dialogDate.max=initial;
+      const track=(name,params={})=>{try{if(typeof window.fbq==="function")window.fbq("trackCustom",name,params)}catch{}};
+      const packages={day:{label:'Gói 1 ngày',price:30000,priceText:'30.000đ',memo:'1D'},week:{label:'Gói 1 tuần · 7 ngày',price:200000,priceText:'200.000đ',memo:'7D'},month:{label:'Gói 1 tháng · 30 ngày',price:800000,priceText:'800.000đ',memo:'30D'}};
+      let selectedPackage='day';
+      const packageButtons=[...document.querySelectorAll('[data-package]')];
+      const selectedLabel=document.querySelector('#selected-package-label'),selectedPrice=document.querySelector('#selected-package-price'),payLabel=document.querySelector('#pay-package-label'),payPrice=document.querySelector('#pay-package-price');
+      const syncDate=value=>{const safe=value===initial?value:initial;heroDate.value=dialogDate.value=safe;const f=format(safe);document.querySelectorAll("[data-date]").forEach(el=>el.textContent=f.display);document.querySelectorAll("[data-lock-date]").forEach(el=>el.textContent=previousDay(safe));memo.textContent=`4SO AI ${packages[selectedPackage].memo} ${f.display.replaceAll('/','-')}`};
+      const updatePackage=(key,emit=true)=>{selectedPackage=packages[key]?key:'day';const pack=packages[selectedPackage];packageButtons.forEach(b=>b.classList.toggle('active',b.dataset.package===selectedPackage));if(selectedLabel)selectedLabel.textContent=pack.label;if(selectedPrice)selectedPrice.textContent=pack.priceText;if(payLabel)payLabel.textContent=pack.label;if(payPrice)payPrice.textContent=pack.priceText;syncDate(initial);if(emit)track('SelectPackage',{package:selectedPackage,price:pack.price})};
+      packageButtons.forEach(b=>b.addEventListener('click',()=>updatePackage(b.dataset.package)));
+      syncDate(initial);updatePackage('day',false);
+      heroDate.addEventListener("input",()=>syncDate(heroDate.value));dialogDate.addEventListener("input",()=>syncDate(dialogDate.value));'''
+          s=s[:start]+corrected+s[end:]
+
+          # Remove duplicate old input listeners immediately following the replaced block if present.
+          dup='''
+      heroDate.addEventListener("input",()=>syncDate(heroDate.value));dialogDate.addEventListener("input",()=>syncDate(dialogDate.value));
+      '''
+          # Keep only first occurrence after corrected block.
+          pos=s.find(dup,start+len(corrected))
+          if pos!=-1:
+              s=s[:pos]+'\n      '+s[pos+len(dup):]
+
+          # Ensure copy-all is wired exactly once.
+          target='document.querySelector("#copy-memo").addEventListener("click",e=>copy(memo.textContent,e.currentTarget));'
+          listener='document.querySelector("#copy-all").addEventListener("click",e=>copy(`VPBank | 1128091987 | ${packages[selectedPackage].priceText} | ${memo.textContent}`,e.currentTarget));'
+          if listener not in s:
+              s=s.replace(target,target+listener)
+
+          # Mobile and closing copy should reflect package choice.
+          s=s.replace('<div class="mobile-bar"><div><span>Bản tin <span data-date>--/--/----</span></span><strong>30.000đ / ngày</strong></div><button type="button" data-open>Đăng ký 30K</button></div>', '<div class="mobile-bar"><div><span>Bản tin từ <span data-date>--/--/----</span></span><strong>Gói từ 30.000đ</strong></div><button type="button" data-open>Chọn gói</button></div>')
+          s=s.replace('<h2>30.000đ cho một bản tin<br>đã có dữ liệu, kiểm định và xếp hạng</h2>', '<h2>Chọn gói 1 ngày, 1 tuần<br>hoặc 1 tháng</h2>')
+          s=s.replace('<p>Không cần tạo tài khoản. Bấm đăng ký để xem thông tin chuyển khoản và hướng dẫn nhận bản tin.</p>', '<p>Từ 30.000đ. Thanh toán một lần, không tự gia hạn. Gói dài ngày áp dụng cho các bản tin liên tiếp từ ngày bắt đầu.</p>')
+          s=s.replace('<button type="button" data-open>ĐĂNG KÝ NHẬN BẢN TIN →</button>', '<button type="button" data-open>CHỌN GÓI & ĐĂNG KÝ →</button>')
+
+          p.write_text(s,encoding='utf-8')
+
+          lp=Path('ai-methods/legal.html')
+          l=lp.read_text(encoding='utf-8')
+          import re
+          l=re.sub(r'<h3>1\. Phí truy cập</h3><p>.*?</p>', '<h3>1. Phí truy cập</h3><p>Các gói đang áp dụng: <strong>30.000đ / 1 ngày</strong>, <strong>200.000đ / 7 ngày liên tiếp</strong> và <strong>800.000đ / 30 ngày liên tiếp</strong>. Gói tuần và gói tháng bắt đầu từ ngày bản tin hiển thị khi đăng ký. Đây là phí dịch vụ dữ liệu, thanh toán một lần và <strong>không tự gia hạn</strong>; không phải tiền đặt cược.</p>', l, count=1, flags=re.S)
+          lp.write_text(l,encoding='utf-8')
+          PY
+      - name: Syntax sanity checks
+        run: |
+          grep -n "const track=" ai-methods/index.html
+          grep -n "const packages=" ai-methods/index.html
+          grep -n "memo.textContent=\`4SO AI" ai-methods/index.html
+          grep -n 'Gói từ 30.000đ' ai-methods/index.html
+          grep -n '200.000đ / 7 ngày' ai-methods/legal.html
+          grep -n '800.000đ / 30 ngày' ai-methods/legal.html
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('ai-methods/index.html').read_text(encoding='utf-8')
+          assert s.index('const track=') < s.index('const packages=') < s.index('updatePackage(')
+          assert "memo.textContent=`4SO AI ${packages[selectedPackage].memo}" in s
+          assert s.count('id="copy-all"')==1
+          print('checks ok')
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/index.html ai-methods/legal.html
+          git commit -m 'Repair 4SO package selector and package terms'
+          git push origin HEAD:main

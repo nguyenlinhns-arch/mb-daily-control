@@ -1,0 +1,70 @@
+name: Final landing optimization
+on:
+  push:
+    paths: ['.github/workflows/final-landing-optimization.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Optimize landing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v3.html')
+          s=p.read_text(encoding='utf-8')
+
+          # CTA wording: concrete product + price.
+          s=s.replace('>Đăng ký báo cáo</button>','>Nhận báo cáo 30K</button>',1)
+          s=s.replace('>ĐĂNG KÝ TỪ 30.000đ</button>','>NHẬN BÁO CÁO 30.000đ</button>')
+          s=s.replace('<div class="mobile"><div><span>80% lịch sử · Báo cáo XSMB</span><strong>Từ 30.000đ</strong></div><button type="button" data-open>Đăng ký</button></div>','<div class="mobile"><div><span>80% kiểm định lịch sử</span><strong>Báo cáo XSMB · 30.000đ</strong></div><button type="button" data-open>Nhận báo cáo</button></div>')
+
+          # Stronger, shorter data-vs-feeling positioning.
+          s=s.replace('<p class="data-kicker">KHÔNG CHỈ NHÌN “CẦU” VÀ CHỜ MAY MẮN</p><h2>Thay cảm tính bằng dữ liệu</h2>','<p class="data-kicker">KHÔNG CHỈ XEM “CẦU” RỒI CHỜ MAY MẮN</p><h2>Thay cảm tính bằng dữ liệu</h2>')
+          s=s.replace('Thay vì chỉ dựa vào “cầu”, số nóng/lạnh hoặc cảm tính, 4SO AI phân tích kết quả Xổ số Miền Bắc từ <strong>năm 2020 đến nay</strong> theo quy trình đã khóa trước kỳ.','4SO AI dùng dữ liệu kết quả Xổ số Miền Bắc từ <strong>năm 2020 đến hết ngày hôm qua</strong>, xử lý theo quy trình thống kê đã khóa trước kỳ thay vì chỉ dựa vào “cầu”, số nóng/lạnh hay cảm tính.')
+
+          # Make package value easier to compare without changing prices.
+          s=s.replace('<small>7 báo cáo liên tiếp · <span class="save">tiết kiệm 10K</span></small>','<small>7 báo cáo · ≈28.600đ/báo cáo · <span class="save">tiết kiệm 10K</span></small>')
+          s=s.replace('<small>30 báo cáo liên tiếp</small>','<small>30 báo cáo · ≈26.700đ/báo cáo</small>')
+
+          # Full sample report link inside sample card.
+          anchor='<button class="sample-cta" type="button" data-open>ĐĂNG KÝ NHẬN BÁO CÁO →</button>'
+          repl=anchor+'<a class="sample-full" href="sample-report.html" target="_blank" rel="noopener">Xem toàn bộ báo cáo mẫu ↗</a>'
+          if 'class="sample-full"' not in s:
+              s=s.replace(anchor,repl)
+
+          # Reduce checkout copy and sharpen selected purchase context.
+          s=s.replace('Thanh toán một lần, không tự gia hạn. Chọn gói, chuyển khoản và gửi ảnh qua Zalo để nhận báo cáo.','Chọn gói, chuyển khoản đúng thông tin và gửi ảnh giao dịch qua Zalo để nhận báo cáo.')
+          s=s.replace('<div class="checkout-trust"><span>✓ Không cần tạo tài khoản</span><span>✓ Không tự gia hạn</span><span>✓ Lỗi dịch vụ được xử lý theo chính sách hoàn phí</span></div>','<div class="checkout-trust"><span>✓ Không cần tài khoản</span><span>✓ Thanh toán một lần · không tự gia hạn</span><span>✓ Lỗi dịch vụ áp dụng chính sách hoàn phí</span></div>')
+
+          # Slightly stronger trust microcopy near primary CTA.
+          s=s.replace('<div class="purchase-reassure"><span>Không cần tài khoản</span><span>Không tự gia hạn</span><span>Hỗ trợ qua Zalo</span></div>','<div class="purchase-reassure"><span>Không cần tài khoản</span><span>Thanh toán một lần</span><span>Hỗ trợ qua Zalo</span></div>')
+
+          # Styles for full sample link and reduce vertical waste on mobile.
+          css='''.sample-full{min-height:48px;margin-top:8px;border:1px solid var(--line);border-radius:13px;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--navy);font-size:12px;font-weight:850;text-decoration:none}.top-proof-actions button{font-size:12px}.package small{line-height:1.4}@media(max-width:420px){.top-proof{padding:14px}.data-position{margin-top:9px}.hero{padding-top:12px}.sell{padding:13px}.buy{padding:16px}.sample-full{min-height:46px}}'''
+          if '.sample-full{' not in s:
+              s=s.replace('    @media(max-width:819px)', '    '+css+'\n    @media(max-width:819px)')
+
+          # Track full sample intent if Meta Pixel is installed later.
+          hook="document.querySelector('.sample-full')?.addEventListener('click',()=>track('OpenFullReportSample',{report_date:start}));"
+          if 'OpenFullReportSample' not in s:
+              s=s.replace("document.querySelector('.top-proof-actions button')?.addEventListener('click',()=>track('TopProofCTA',{report_date:start,price:30000}));", "document.querySelector('.top-proof-actions button')?.addEventListener('click',()=>track('TopProofCTA',{report_date:start,price:30000}));"+hook)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify and commit
+        run: |
+          grep -n 'NHẬN BÁO CÁO 30.000đ' ai-methods/landing-v3.html | head
+          grep -n 'Xem toàn bộ báo cáo mẫu' ai-methods/landing-v3.html
+          grep -n '28.600đ/báo cáo' ai-methods/landing-v3.html
+          grep -n 'OpenFullReportSample' ai-methods/landing-v3.html
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v3.html
+          git commit -m 'Finalize 4SO landing conversion UX' || exit 0
+          git push origin HEAD:main

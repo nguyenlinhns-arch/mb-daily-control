@@ -40,6 +40,31 @@ jobs:
           cp ai-methods/landing-v3.html _site/ai-methods/index.html
           cp ai-methods/legal-v3.html _site/legal.html
           cp ai-methods/legal-v3.html _site/ai-methods/legal.html
+
+          python - <<'PY'
+          from pathlib import Path
+          targets=[Path('_site/index.html'),Path('_site/ai-methods/index.html')]
+          reps={
+            'Bản tin 4SO AI phân tích dữ liệu Xổ số Miền Bắc: 15.000+ lượt tính toán, 7 lớp phương pháp, lịch sử đối chiếu công khai. Gói từ 30.000đ.':'4SO AI thống kê Xổ số Miền Bắc bằng AI từ dữ liệu đã công bố: 15.000+ lượt tính toán, 7 lớp phương pháp, lịch sử đối chiếu công khai. Gói từ 30.000đ.',
+            '4SO AI – Bản tin phân tích dữ liệu Xổ số Miền Bắc':'4SO AI – Thống kê Xổ số Miền Bắc bằng AI',
+            'Bản tin theo ngày với 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.':'Thống kê Xổ số Miền Bắc bằng AI theo ngày với 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.',
+            '<span>Bản tin dữ liệu theo ngày</span>':'<span>Thống kê Xổ số Miền Bắc</span>',
+            'Bản tin AI 4SO theo ngày':'AI thống kê Xổ số Miền Bắc',
+            '<h1>Nhận bản tin AI 4SO<br>cho ngày <span data-date>--/--/----</span></h1>':'<h1>Thống kê Xổ số Miền Bắc<br>bằng AI</h1><p class="date-headline">Bản tin ngày <strong><span data-date>--/--/----</span></strong></p>',
+            '<strong>Mỗi ngày, hệ thống phân tích dữ liệu đã công bố đến hết ngày hôm qua</strong>':'<strong>Mỗi ngày, AI thống kê toàn bộ dữ liệu Xổ số Miền Bắc đã công bố đến hết ngày hôm qua</strong>',
+            '<h2>Đăng ký nhận bản tin hôm nay</h2>':'<h2>Đăng ký bản tin thống kê Xổ số Miền Bắc</h2>',
+            '<p class="buy-kicker">Bản tin ngày <span data-date>--/--/----</span></p>':'<p class="buy-kicker">Thống kê Xổ số Miền Bắc · <span data-date>--/--/----</span></p>'
+          }
+          for p in targets:
+              s=p.read_text(encoding='utf-8')
+              for a,b in reps.items():
+                  s=s.replace(a,b)
+              if '.date-headline{' not in s:
+                  s=s.replace('.lead{margin:16px 0 0;color:#50636f;font-size:17px}', '.date-headline{margin:12px 0 0;color:#536873;font-size:16px}.date-headline strong{color:var(--orange);font-size:19px}.lead{margin:14px 0 0;color:#50636f;font-size:17px}')
+              p.write_text(s,encoding='utf-8')
+          PY
+
+          grep -n 'Thống kê Xổ số Miền Bắc' _site/index.html | head -10
           touch _site/.nojekyll
 
       - name: Upload artifact

@@ -28,3 +28,4 @@ jobs:
           git add ai-methods/landing-v3.html
           git commit -m 'Fix public sample report link' || exit 0
           git push origin HEAD:main
+# retrigger

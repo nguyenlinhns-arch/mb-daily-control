@@ -36,7 +36,8 @@ jobs:
           cp index.html styles.css app.js _site/control/
           cp 404.html favicon.svg robots.txt sitemap.xml _site/
           cp -R ai-methods _site/
-          cp ai-methods/index.html _site/index.html
+          cp ai-methods/landing-v3.html _site/index.html
+          cp ai-methods/landing-v3.html _site/ai-methods/index.html
           touch _site/.nojekyll
 
       - name: Upload artifact

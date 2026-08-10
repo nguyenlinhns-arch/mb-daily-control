@@ -47,3 +47,4 @@ jobs:
           git add ai-methods/landing-v6.html
           git commit -m 'Polish v6 premium visual system' || exit 0
           git push origin HEAD:main
+# rerun 2

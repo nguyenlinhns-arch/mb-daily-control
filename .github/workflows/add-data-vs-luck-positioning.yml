@@ -28,10 +28,7 @@ jobs:
           if 'class="data-position' not in s:
               s=s.replace(proof,proof+compare)
 
-          # Refresh hero copy so the same positioning is reinforced without repeating a long paragraph.
           s=s.replace('<p class="lead"><strong>Mỗi ngày AI chỉ dùng kết quả Xổ số Miền Bắc đã công bố đến hết ngày hôm qua</strong>, chạy hơn 15.000 lượt tính toán qua 7 lớp phương pháp rồi xuất bản một báo cáo phân tích ngắn gọn.</p>', '<p class="lead"><strong>Mỗi báo cáo dùng dữ liệu Xổ số Miền Bắc từ 2020 đến hết ngày hôm qua</strong>, xử lý theo 7 lớp phương pháp rồi xuất bản kết quả phân tích ngắn gọn, có lịch sử để đối chiếu.</p>')
-
-          # Make the proof mini cards complement rather than duplicate the new positioning block.
           s=s.replace('<div class="proof-mini"><div class="mini"><strong>15.000+</strong><span>lượt tính toán</span></div><div class="mini"><strong>7 lớp</strong><span>phương pháp</span></div><div class="mini"><strong>45/45</strong><span>cặp được chấm</span></div></div>', '<div class="proof-mini"><div class="mini"><strong>45/45</strong><span>cặp được chấm</span></div><div class="mini"><strong>t−1</strong><span>khóa dữ liệu</span></div><div class="mini"><strong>Top 2</strong><span>đầu ra cuối</span></div></div>')
 
           css='''.data-position{margin-top:12px;padding:18px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:0 12px 30px rgba(7,27,43,.06)}.data-kicker{margin:0;color:var(--orange);font-size:10px;font-weight:900;letter-spacing:.06em}.data-position h2{margin:5px 0 0;font-size:25px;line-height:1.1;letter-spacing:-.035em}.data-intro{margin:8px 0 0;color:#536873;font-size:13px;line-height:1.55}.data-points{margin-top:13px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.data-points div{padding:11px 8px;border-radius:12px;background:var(--navy);text-align:center}.data-points strong{display:block;color:var(--lime);font-size:15px;line-height:1.1}.data-points span{display:block;margin-top:5px;color:#c6d2d8;font-size:8px;line-height:1.3}.data-note{margin:10px 0 0;color:#6b7d86;font-size:9px;line-height:1.45}.data-intro strong{color:var(--ink)}'''
@@ -42,9 +39,7 @@ jobs:
           if 'data-points div:last-child' not in s:
               s=s.replace('    @media(max-width:420px)', '    '+mobile+'\n    @media(max-width:420px)')
 
-          # Structured-data description follows public positioning.
           s=s.replace('"description":"Báo cáo phân tích dữ liệu Xổ số Miền Bắc bằng AI theo ngày."', '"description":"Báo cáo phân tích dữ liệu Xổ số Miền Bắc bằng AI, sử dụng dữ liệu lịch sử từ 2020 đến nay theo quy trình thống kê nhiều lớp."')
-
           p.write_text(s,encoding='utf-8')
           PY
       - name: Verify and commit
@@ -57,3 +52,4 @@ jobs:
           git add ai-methods/landing-v3.html
           git commit -m 'Explain data-driven 4SO positioning' || exit 0
           git push origin HEAD:main
+# retrigger

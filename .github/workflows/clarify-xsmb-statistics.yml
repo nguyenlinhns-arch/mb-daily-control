@@ -1,0 +1,55 @@
+name: Clarify XSMB statistics wording
+
+on:
+  push:
+    paths:
+      - '.github/workflows/clarify-xsmb-statistics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Clarify public wording
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v3.html')
+          s=p.read_text(encoding='utf-8')
+          reps={
+            'Bản tin 4SO AI phân tích dữ liệu Xổ số Miền Bắc: 15.000+ lượt tính toán, 7 lớp phương pháp, lịch sử đối chiếu công khai. Gói từ 30.000đ.':'4SO AI thống kê Xổ số Miền Bắc bằng AI từ dữ liệu đã công bố: 15.000+ lượt tính toán, 7 lớp phương pháp, lịch sử đối chiếu công khai. Gói từ 30.000đ.',
+            '4SO AI – Bản tin phân tích dữ liệu Xổ số Miền Bắc':'4SO AI – Thống kê Xổ số Miền Bắc bằng AI',
+            'Bản tin theo ngày với 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.':'Thống kê Xổ số Miền Bắc bằng AI theo ngày với 15.000+ lượt tính toán, 7 lớp phương pháp và lịch sử đối chiếu công khai. Gói từ 30.000đ.',
+            '<span>Bản tin dữ liệu theo ngày</span>':'<span>Thống kê Xổ số Miền Bắc</span>',
+            'Bản tin AI 4SO theo ngày':'AI thống kê Xổ số Miền Bắc',
+            '<h1>Nhận bản tin AI 4SO<br>cho ngày <span data-date>--/--/----</span></h1>':'<h1>Thống kê Xổ số Miền Bắc<br>bằng AI</h1><p class="date-headline">Bản tin ngày <strong><span data-date>--/--/----</span></strong></p>',
+            '<strong>Mỗi ngày, hệ thống phân tích dữ liệu đã công bố đến hết ngày hôm qua</strong>':'<strong>Mỗi ngày, AI thống kê toàn bộ dữ liệu Xổ số Miền Bắc đã công bố đến hết ngày hôm qua</strong>',
+            '<h2>Đăng ký nhận bản tin hôm nay</h2>':'<h2>Đăng ký bản tin thống kê Xổ số Miền Bắc</h2>',
+            '<p class="buy-kicker">Bản tin ngày <span data-date>--/--/----</span></p>':'<p class="buy-kicker">Thống kê Xổ số Miền Bắc · <span data-date>--/--/----</span></p>',
+            'Bạn nhận được gì?':'Bản tin thống kê Xổ số Miền Bắc gồm gì?',
+            'Bản tin không được tạo bằng cách chọn thủ công vài mã.':'Bản tin thống kê Xổ số Miền Bắc không được tạo bằng cách chọn thủ công vài mã.'
+          }
+          for a,b in reps.items():
+              s=s.replace(a,b)
+          if '.date-headline{' not in s:
+              s=s.replace('.lead{margin:16px 0 0;color:#50636f;font-size:17px}', '.date-headline{margin:12px 0 0;color:#536873;font-size:16px}.date-headline strong{color:var(--orange);font-size:19px}.lead{margin:14px 0 0;color:#50636f;font-size:17px}')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify wording
+        run: |
+          grep -n 'Thống kê Xổ số Miền Bắc' ai-methods/landing-v3.html | head -20
+          grep -n 'AI thống kê toàn bộ dữ liệu Xổ số Miền Bắc' ai-methods/landing-v3.html
+      - name: Commit
+        run: |
+          if git diff --quiet -- ai-methods/landing-v3.html; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v3.html
+          git commit -m 'Clarify Xổ số Miền Bắc statistics positioning'
+          git push origin HEAD:main

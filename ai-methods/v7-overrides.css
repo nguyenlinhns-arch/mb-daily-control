@@ -1,0 +1,67 @@
+/* Premium refinement for landing v7 */
+:root{--acid:#dcff72;--navy:#0d2a38;--cream:#f4f1e9;--paper:#fbfaf6;--line:#d7d9d3;--muted:#66777f}
+body{background:var(--cream)}
+.mark{border-radius:9px}
+.header-cta{min-height:46px;padding:0 17px}
+.proof-strip{box-shadow:inset 0 -1px rgba(255,255,255,.05)}
+.proof-in{padding-top:24px;padding-bottom:24px}
+.proof-number{font-size:78px}
+.proof-copy strong{font-size:20px}
+.proof-copy span{font-size:11px;line-height:1.45}
+.proof-note{font-size:10px;line-height:1.55;max-width:520px}
+.proof-cta{min-height:48px;border-radius:12px;padding:0 16px;font-size:11px}
+.hero{padding-top:62px;padding-bottom:66px}
+.hero h1{max-width:940px}
+.lead{max-width:770px}
+.btn-primary,.btn-secondary{border-radius:14px;min-height:52px}
+.fact strong,.proof-number,.pair strong,.plan-price,.history-item strong,.payrow strong{font-variant-numeric:tabular-nums}
+.fact strong{font-size:32px}
+.section{padding-top:86px;padding-bottom:86px}
+.section h2{max-width:850px}
+.report{border-radius:18px;overflow:hidden}
+.report-head{padding:25px}
+.report-actions a,.report-actions button{border-radius:11px}
+.plan.featured{border-radius:16px;box-shadow:0 18px 50px rgba(13,36,47,.08)}
+.plan button{border-radius:11px}
+.mobile-bar{border-radius:16px}
+.mobile-bar button{border-radius:11px}
+.dialog{border-radius:20px 20px 0 0}
+.modal-plan,.payment,.copy,.copy-all,.zalo{border-radius:10px}
+summary{scroll-margin-top:90px}
+@media(max-width:719px){
+  .brand-copy span{display:none}
+  .header-in{min-height:64px}
+  .mark{width:38px;height:38px}
+  .header-cta{min-height:44px;padding:0 14px;font-size:10px}
+  .proof-in{padding-top:20px;padding-bottom:20px;gap:14px}
+  .proof-top{display:grid;grid-template-columns:auto 1fr;align-items:end;gap:14px}
+  .proof-number{font-size:72px}
+  .proof-copy strong{font-size:18px}
+  .proof-copy span{font-size:11px}
+  .proof-bottom{gap:12px;padding-top:14px}
+  .proof-note{font-size:10px}
+  .proof-cta{width:100%;min-height:48px;font-size:11px}
+  .hero{padding-top:42px;padding-bottom:50px}
+  .hero h1{font-size:clamp(44px,13vw,58px);line-height:.98}
+  .lead{font-size:16px;line-height:1.62}
+  .meta{font-size:10px;line-height:1.55}
+  .hero-actions{gap:8px}
+  .btn-primary,.btn-secondary{display:flex;width:100%;border-radius:13px}
+  .fact{grid-template-columns:105px 1fr}
+  .fact strong{font-size:21px}
+  .fact span{font-size:10px}
+  .section{padding-top:64px;padding-bottom:64px}
+  .section h2{font-size:clamp(32px,9vw,44px)}
+  .sample-copy p,.intro{font-size:13px}
+  .report{border-radius:15px}
+  .plan{grid-template-columns:1fr}
+  .plan button{width:100%}
+  .plan.featured{margin:0;padding:22px 16px}
+  .faq details:first-child[open]{padding-top:15px}
+  .dialog{border-radius:20px 20px 0 0}
+}
+@media(min-width:720px){
+  .proof-in{min-height:118px}
+  .section{padding-top:94px;padding-bottom:94px}
+  .dialog{border-radius:20px}
+}

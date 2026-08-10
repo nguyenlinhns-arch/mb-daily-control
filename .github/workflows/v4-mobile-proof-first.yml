@@ -1,0 +1,32 @@
+name: V4 mobile proof first
+on:
+  push:
+    paths: ['.github/workflows/v4-mobile-proof-first.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch mobile hero order
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/landing-v4.html')
+          s=p.read_text(encoding='utf-8')
+          css='@media(max-width:719px){.hero{padding-top:18px}.proof{order:-1}.hero-grid{gap:20px}.proof-value{font-size:82px}.proof-main{gap:12px}.proof-detail strong{font-size:18px}.hero-actions{display:grid;grid-template-columns:1fr}.primary,.secondary{width:100%}}'
+          if css not in s:
+              s=s.replace('@media(min-width:720px)',css+'\n    @media(min-width:720px)')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify and commit
+        run: |
+          grep -n 'proof{order:-1}' ai-methods/landing-v4.html
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai-methods/landing-v4.html
+          git commit -m 'Put 80 percent proof first on mobile' || exit 0
+          git push origin HEAD:main

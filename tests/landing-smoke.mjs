@@ -6,7 +6,11 @@ const overrides = readFileSync(new URL("../ai-methods/v7-overrides.css", import.
 const workflow = readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
 
 const requiredLandingTokens = [
-  "Chuyển khoản &amp; nhận báo cáo · 30.000đ",
+  "BẢNG PHÂN TÍCH AI 4SO",
+  "method-board",
+  "KẾT LUẬN CUỐI CÙNG",
+  "paywall-lock",
+  "MỞ KẾT LUẬN · 30.000đ",
   "checkout-progress",
   "SAO CHÉP STK + SỐ TIỀN + NỘI DUNG",
   "TÔI ĐÃ CHUYỂN KHOẢN · GỬI ẢNH QUA ZALO",
@@ -35,10 +39,14 @@ if ((landing.match(/data-package=/g) || []).length !== 3) {
   throw new Error("Checkout must expose exactly three package choices");
 }
 
-for (const token of ["body{background:var(--cream);font-size:18px", ".modal-plans{grid-template-columns:1fr}", ".mobile-bar button"]) {
+for (const token of ["body{margin:0;min-width:320px", ".method-board{background:#fff}", ".modal-plans{margin-top:15px;display:grid;grid-template-columns:1fr", ".mobile-bar button"]) {
   if (!overrides.includes(token)) {
     throw new Error(`Missing mobile readability rule: ${token}`);
   }
+}
+
+if (landing.includes("final_codes") || landing.includes("final_pairs")) {
+  throw new Error("Current paid conclusion must not be embedded in public landing source");
 }
 
 if (!workflow.includes("Path('ai-methods/landing-v7.html').read_text")) {

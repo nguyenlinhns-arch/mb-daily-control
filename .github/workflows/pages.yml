@@ -53,9 +53,10 @@ jobs:
               target.write_bytes(data)
           PY
 
-          grep -n 'Thay cảm tính' _site/index.html | head
+          grep -n 'BẢNG PHÂN TÍCH AI 4SO' _site/index.html | head
           grep -n '80%' _site/index.html | head
-          grep -n 'Chuyển khoản nhận báo cáo' _site/index.html | head
+          grep -n 'KẾT LUẬN CUỐI CÙNG' _site/index.html | head
+          grep -n 'MỞ KẾT LUẬN' _site/index.html | head
           grep -n 'v7-overrides.css' _site/index.html | head
           touch _site/.nojekyll
 

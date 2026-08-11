@@ -250,10 +250,7 @@
           empty.textContent='Chưa có số exact';
           numbers.append(empty);
         }
-        const note=document.createElement('span');
-        note.className='method-note';
-        note.textContent=String(method.note||'Đầu ra công khai của phương pháp.');
-        result.append(numbers,note);
+        result.append(numbers);
 
         const tone=['pass','watch','muted'].includes(method.tone)?method.tone:'muted';
         const status=document.createElement('span');

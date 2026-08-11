@@ -52,22 +52,68 @@
             <p>Lô tô Miền Bắc · Ngày <strong data-date>--/--/----</strong></p>
           </header>
 
-          <div class="report-meta" aria-label="Thông tin báo cáo">
-            <div><span>Dữ liệu đến ngày hôm qua</span><strong data-lock>--/--/----</strong></div>
-            <div><span>Nguồn dữ liệu</span><strong>Đủ 27/27 mã</strong></div>
-            <div><span>Khối lượng tính toán</span><strong>15.000+ lượt</strong></div>
-          </div>
+          <section class="month-wins" aria-labelledby="month-wins-title">
+            <div class="month-wins-heading">
+              <div><span>ĐỐI CHIẾU THÁNG 8/2026</span><h2 id="month-wins-title">Các ngày trúng trong tháng</h2></div>
+              <strong id="month-win-score">8/11 ngày trúng</strong>
+            </div>
+            <div class="month-wins-table" role="table" aria-label="Số khuyến nghị và kết quả các ngày trúng tháng 8 năm 2026">
+              <div class="month-wins-head" role="row"><span role="columnheader">Ngày</span><span role="columnheader">Số khuyến nghị</span><span role="columnheader">Kết quả thắng</span></div>
+              <div id="month-winning-rows">
+                <div class="win-row" role="row"><time datetime="2026-08-01">01/08</time><div class="win-picks"><b>06</b><b>60</b><b>48</b><b>84</b></div><strong>60 × 2 · 48</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-02">02/08</time><div class="win-picks"><b>38</b><b>83</b><b>05</b><b>50</b></div><strong>38 · 83</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-05">05/08</time><div class="win-picks"><b>05</b><b>50</b><b>06</b><b>60</b></div><strong>05 · 60</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-06">06/08</time><div class="win-picks"><b>48</b><b>84</b><b>36</b><b>63</b></div><strong>84</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-07">07/08</time><div class="win-picks"><b>36</b><b>63</b><b>05</b><b>50</b></div><strong>50</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-08">08/08</time><div class="win-picks"><b>19</b><b>91</b><b>06</b><b>60</b></div><strong>19</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-10">10/08</time><div class="win-picks"><b>06</b><b>60</b><b>38</b><b>83</b></div><strong>06 · 83</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-11">11/08</time><div class="win-picks"><b>05</b><b>91</b><b>50</b><b>19</b></div><strong>05 · 91 × 2 · 50</strong></div>
+              </div>
+            </div>
+            <p class="month-wins-note">Danh sách chỉ gồm các ngày có ít nhất 1 trong 4 số khuyến nghị xuất hiện; 3 ngày chưa trúng không được ẩn khỏi tỷ lệ 8/11.</p>
+          </section>
+
+          <section class="yesterday-proof" aria-labelledby="yesterday-title">
+            <div class="yesterday-heading">
+              <div><span>ĐỐI CHIẾU HÔM QUA · <b id="yesterday-date">11/08/2026</b></span><h2 id="yesterday-title">Số khuyến nghị và kết quả</h2></div>
+              <strong class="hit-summary" id="hit-summary">3/4 số trúng · 4 nháy</strong>
+            </div>
+            <div class="yesterday-grid">
+              <article class="recommendation-card">
+                <span>SỐ KHUYẾN NGHỊ HÔM QUA</span>
+                <div class="yesterday-numbers" id="yesterday-numbers" aria-label="Số khuyến nghị ngày 11 tháng 8 năm 2026">
+                  <b class="hit">05</b><b class="hit multi-hit">91<small>×2</small></b><b class="hit">50</b><b>19</b>
+                </div>
+              </article>
+              <article class="result-card">
+                <span>KẾT QUẢ XUẤT HIỆN</span>
+                <strong id="yesterday-result">05 · 91 × 2 · 50</strong>
+                <small id="yesterday-result-summary">3 trong 4 số khuyến nghị đã xuất hiện</small>
+              </article>
+              <article class="rate-card">
+                <strong id="validation-rate">80%</strong>
+                <span>TỶ LỆ KIỂM ĐỊNH LỊCH SỬ</span>
+                <small id="validation-window">24/30 ngày</small>
+              </article>
+            </div>
+            <p class="yesterday-disclaimer">Tỷ lệ 80% là kết quả đối chiếu của một cửa sổ lịch sử 30 ngày, không phải cam kết cho kỳ tiếp theo.</p>
+          </section>
+
+          <section class="ai-intro" aria-labelledby="ai-intro-title">
+            <div class="ai-intro-copy"><span>GIỚI THIỆU 4SO AI</span><h2 id="ai-intro-title">AI tổng hợp dữ liệu và nhiều phương pháp trước khi kết luận</h2><p>Hệ thống chỉ dùng dữ liệu đã công bố đến ngày hôm qua, kiểm tra đủ 27/27 mã và chấm toàn bộ không gian cặp trước khi xuất bản báo cáo.</p></div>
+            <div class="ai-stats" aria-label="Quy mô phân tích"><div><strong>15.000+</strong><span>lượt tính toán</span></div><div><strong>7 lớp</strong><span>phương pháp</span></div><div><strong>45/45</strong><span>cặp được chấm</span></div></div>
+            <div class="ai-meta"><span>Dữ liệu khóa</span><strong data-lock>--/--/----</strong><span>Nguồn</span><strong>Đủ 27/27 mã</strong></div>
+          </section>
 
           <section class="method-board" aria-labelledby="method-board-title">
-            <div class="board-heading" id="method-board-title">
+            <div class="method-title" id="method-board-title"><div><span>BÁO CÁO CÔNG KHAI</span><h2>Số theo các phương pháp</h2></div><strong>Ngày <b data-date>--/--/----</b></strong></div>
+            <div class="board-heading">
               <span>PHƯƠNG PHÁP</span>
-              <span>DANH SÁCH SỐ CÔNG KHAI</span>
-              <span>TRẠNG THÁI</span>
+              <span>SỐ</span>
             </div>
             <div id="method-rows" aria-live="polite">
               <div class="method-loading"><span class="loading-dot" aria-hidden="true"></span>Đang tải danh sách số đã khóa...</div>
             </div>
-            <div class="method-footnote" id="method-footnote" hidden></div>
           </section>
 
           <section class="final-conclusion" aria-labelledby="final-title">
@@ -95,19 +141,6 @@
           <button type="button" data-plan-open="day">CHUYỂN KHOẢN &amp; NHẬN KẾT LUẬN</button>
           <p>Không cần tài khoản · Thanh toán một lần · Xác nhận qua Zalo</p>
         </div>
-      </div>
-    </section>
-
-    <section class="proof-section">
-      <div class="wrap">
-        <div class="proof-head"><p class="section-kicker">Số liệu đã đối chiếu</p><h2>Người xem thấy căn cứ trước khi trả phí.</h2><p>Website công khai quy trình và lịch sử; chỉ khóa phần kết luận có giá trị sử dụng trong báo cáo hiện tại.</p></div>
-        <div class="proof-grid">
-          <article><strong>72,7%</strong><span>8/11 ngày có đầu ra xuất hiện trong tháng 8/2026</span></article>
-          <article><strong>76,2%</strong><span>32/42 ngày có đầu ra xuất hiện trong tháng 7–8/2026</span></article>
-          <article><strong>64</strong><span>tổng lần xuất hiện trong 42 ngày đã đối chiếu</span></article>
-          <article><strong>1.890</strong><span>lượt chấm cặp trong toàn giai đoạn</span></article>
-        </div>
-        <p class="proof-note"><strong>Cập nhật dữ liệu 11/08/2026:</strong> phiên 11/08 có 4 lần xuất hiện. Cửa sổ kiểm định lịch sử 30 ngày trước đây đạt 80%. Một ngày được ghi nhận khi có ít nhất 1 trong 4 đầu ra xuất hiện trong 27 mã kết quả; đây là thống kê lịch sử, không phải xác suất bảo đảm.</p>
       </div>
     </section>
 
@@ -208,7 +241,15 @@
     const packageButtons=[...document.querySelectorAll('[data-package]')];
     const openButtons=[...document.querySelectorAll('[data-open],[data-plan-open]')];
     const methodRows=document.querySelector('#method-rows');
-    const methodFootnote=document.querySelector('#method-footnote');
+    const yesterdayDate=document.querySelector('#yesterday-date');
+    const yesterdayNumbers=document.querySelector('#yesterday-numbers');
+    const yesterdayResult=document.querySelector('#yesterday-result');
+    const yesterdayResultSummary=document.querySelector('#yesterday-result-summary');
+    const hitSummary=document.querySelector('#hit-summary');
+    const validationRate=document.querySelector('#validation-rate');
+    const validationWindow=document.querySelector('#validation-window');
+    const monthWinScore=document.querySelector('#month-win-score');
+    const monthWinningRows=document.querySelector('#month-winning-rows');
     let selected='day';
     let lastFocus=null;
 
@@ -222,17 +263,15 @@
       const methods=Array.isArray(data.methods)?data.methods:[];
       if(!methods.length)throw new Error('Không có đầu ra phương pháp công khai');
       methodRows.replaceChildren();
-      methods.forEach((method,index)=>{
+      methods.forEach(method=>{
         const row=document.createElement('div');
         row.className='method-row';
 
         const label=document.createElement('div');
         label.className='method-label';
-        const order=document.createElement('b');
-        order.textContent=String(index+1).padStart(2,'0');
         const name=document.createElement('strong');
         name.textContent=String(method.name||method.id||'Phương pháp');
-        label.append(order,name);
+        label.append(name);
 
         const result=document.createElement('div');
         result.className='method-result';
@@ -252,30 +291,64 @@
         }
         result.append(numbers);
 
-        const tone=['pass','watch','muted'].includes(method.tone)?method.tone:'muted';
-        const status=document.createElement('span');
-        status.className=`status-pass status-${tone}`;
-        status.textContent=String(method.status||'ĐÃ RÀ SOÁT');
-        row.append(label,result,status);
+        row.append(label,result);
         methodRows.append(row);
       });
+    };
 
-      const unavailable=Array.isArray(data.unavailable_methods)?data.unavailable_methods:[];
-      methodFootnote.replaceChildren();
-      methodFootnote.hidden=!unavailable.length;
-      if(unavailable.length){
-        const title=document.createElement('strong');
-        title.textContent='Nhóm chưa có số exact trong ngày';
-        const list=document.createElement('ul');
-        unavailable.forEach(item=>{
-          const entry=document.createElement('li');
-          const name=document.createElement('b');
-          name.textContent=String(item.name||'Phương pháp');
-          entry.append(name,document.createTextNode(`: ${String(item.reason||'Không suy diễn số khi thiếu đầu ra khóa.')}`));
-          list.append(entry);
-        });
-        methodFootnote.append(title,list);
-      }
+    const shortDate=iso=>{const[y,m,d]=String(iso).split('-');return `${d}/${m}`};
+    const fullDate=iso=>{const[y,m,d]=String(iso).split('-');return `${d}/${m}/${y}`};
+    const hitText=hits=>hits.map(hit=>`${hit.number}${Number(hit.count)>1?` × ${hit.count}`:''}`).join(' · ');
+    const renderYesterdayProof=data=>{
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(data.date||''))throw new Error('Ngày đối chiếu không hợp lệ');
+      const recommended=Array.isArray(data.recommended_numbers)?data.recommended_numbers.filter(value=>/^\d{2}$/.test(String(value))):[];
+      const hits=Array.isArray(data.hits)?data.hits.filter(hit=>/^\d{2}$/.test(String(hit.number))&&Number(hit.count)>0):[];
+      if(recommended.length!==4||!hits.length)throw new Error('Dữ liệu đối chiếu không đầy đủ');
+      const hitMap=new Map(hits.map(hit=>[String(hit.number),Number(hit.count)]));
+      yesterdayDate.textContent=fullDate(data.date);
+      yesterdayNumbers.setAttribute('aria-label',`Số khuyến nghị ngày ${fullDate(data.date)}`);
+      yesterdayNumbers.replaceChildren();
+      recommended.forEach(value=>{
+        const number=document.createElement('b');
+        number.textContent=value;
+        const count=hitMap.get(String(value))||0;
+        if(count){number.classList.add('hit');if(count>1){number.classList.add('multi-hit');const badge=document.createElement('small');badge.textContent=`×${count}`;number.append(badge)}}
+        yesterdayNumbers.append(number);
+      });
+      const uniqueHits=Number(data.unique_hit_count)||hits.length;
+      const recommendedCount=Number(data.recommended_count)||recommended.length;
+      const occurrences=Number(data.total_occurrences)||hits.reduce((sum,hit)=>sum+Number(hit.count),0);
+      hitSummary.textContent=`${uniqueHits}/${recommendedCount} số trúng · ${occurrences} nháy`;
+      yesterdayResult.textContent=hitText(hits);
+      yesterdayResultSummary.textContent=`${uniqueHits} trong ${recommendedCount} số khuyến nghị đã xuất hiện`;
+      const validation=data.historical_validation||{};
+      validationRate.textContent=`${Number(validation.rate_pct)||0}%`;
+      validationWindow.textContent=`${Number(validation.hit_days)||0}/${Number(validation.total_days)||0} ngày`;
+
+      const month=data.month_summary||{};
+      const winningDays=Array.isArray(month.winning_days)?month.winning_days:[];
+      if(!winningDays.length)return;
+      monthWinScore.textContent=`${Number(month.win_days)||winningDays.length}/${Number(month.observed_days)||winningDays.length} ngày trúng`;
+      monthWinningRows.replaceChildren();
+      winningDays.forEach(day=>{
+        const picks=Array.isArray(day.recommended_numbers)?day.recommended_numbers.filter(value=>/^\d{2}$/.test(String(value))):[];
+        const dayHits=Array.isArray(day.hits)?day.hits.filter(hit=>/^\d{2}$/.test(String(hit.number))&&Number(hit.count)>0):[];
+        if(picks.length!==4||!dayHits.length)return;
+        const dayHitSet=new Set(dayHits.map(hit=>String(hit.number)));
+        const row=document.createElement('div');
+        row.className='win-row';
+        row.setAttribute('role','row');
+        const time=document.createElement('time');
+        time.dateTime=day.date;
+        time.textContent=shortDate(day.date);
+        const pickList=document.createElement('div');
+        pickList.className='win-picks';
+        picks.forEach(value=>{const chip=document.createElement('b');chip.textContent=value;if(dayHitSet.has(String(value)))chip.classList.add('is-hit');pickList.append(chip)});
+        const result=document.createElement('strong');
+        result.textContent=hitText(dayHits);
+        row.append(time,pickList,result);
+        monthWinningRows.append(row);
+      });
     };
 
     const syncPackage=()=>{
@@ -331,6 +404,10 @@
     document.querySelector('#copy-all').addEventListener('click',event=>{const current=packages[selected];copy(`Ngân hàng: VPBank\nSố tài khoản: 1128091987\nSố tiền: ${current.text}\nNội dung: ${memo.textContent}`,event.currentTarget,'all')});
     document.querySelector('#zalo').addEventListener('click',()=>track('ContactZaloAfterPayment',{report_date:target,package:selected,price:packages[selected].price}));
     syncPackage();
+    fetch('/ai-methods/yesterday-proof.json',{cache:'no-store'})
+      .then(response=>{if(!response.ok)throw new Error('Không tải được dữ liệu đối chiếu');return response.json()})
+      .then(renderYesterdayProof)
+      .catch(()=>{});
     fetch('/ai-methods/public-methods.json',{cache:'no-store'})
       .then(response=>{if(!response.ok)throw new Error('Không tải được dữ liệu');return response.json()})
       .then(data=>{

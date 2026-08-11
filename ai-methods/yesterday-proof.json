@@ -1,0 +1,33 @@
+{
+  "schema_version": "MB_PUBLIC_YESTERDAY_PROOF_V1",
+  "date": "2026-08-11",
+  "recommended_numbers": ["05", "91", "50", "19"],
+  "hits": [
+    {"number": "05", "count": 1},
+    {"number": "91", "count": 2},
+    {"number": "50", "count": 1}
+  ],
+  "unique_hit_count": 3,
+  "recommended_count": 4,
+  "total_occurrences": 4,
+  "historical_validation": {
+    "hit_days": 24,
+    "total_days": 30,
+    "rate_pct": 80
+  },
+  "month_summary": {
+    "month": "2026-08",
+    "observed_days": 11,
+    "win_days": 8,
+    "winning_days": [
+      {"date": "2026-08-01", "recommended_numbers": ["06", "60", "48", "84"], "hits": [{"number": "60", "count": 2}, {"number": "48", "count": 1}]},
+      {"date": "2026-08-02", "recommended_numbers": ["38", "83", "05", "50"], "hits": [{"number": "38", "count": 1}, {"number": "83", "count": 1}]},
+      {"date": "2026-08-05", "recommended_numbers": ["05", "50", "06", "60"], "hits": [{"number": "05", "count": 1}, {"number": "60", "count": 1}]},
+      {"date": "2026-08-06", "recommended_numbers": ["48", "84", "36", "63"], "hits": [{"number": "84", "count": 1}]},
+      {"date": "2026-08-07", "recommended_numbers": ["36", "63", "05", "50"], "hits": [{"number": "50", "count": 1}]},
+      {"date": "2026-08-08", "recommended_numbers": ["19", "91", "06", "60"], "hits": [{"number": "19", "count": 1}]},
+      {"date": "2026-08-10", "recommended_numbers": ["06", "60", "38", "83"], "hits": [{"number": "06", "count": 1}, {"number": "83", "count": 1}]},
+      {"date": "2026-08-11", "recommended_numbers": ["05", "91", "50", "19"], "hits": [{"number": "05", "count": 1}, {"number": "91", "count": 2}, {"number": "50", "count": 1}]}
+    ]
+  }
+}

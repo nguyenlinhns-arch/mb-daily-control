@@ -65,8 +65,17 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(publicMethods.target_date) || !/^\d{4}-\d{2}-\d{
   throw new Error("Public method output dates are invalid");
 }
 
-if (!landing.includes(`data-report-date="${publicMethods.target_date}"`) || !landing.includes(`data-lock-date="${publicMethods.data_lock}"`)) {
-  throw new Error("Landing fallback dates must match the public method data");
+for (const token of [
+  "timeZone:'Asia/Ho_Chi_Minh'",
+  "const initialTarget=reportDay()",
+  "return `${value.year}-${value.month}-${value.day}`",
+  "lockDisplay=display(data.data_lock)",
+]) {
+  if (!landing.includes(token)) throw new Error(`Landing must use today's Vietnam date: ${token}`);
+}
+
+if (landing.includes("target=data.target_date") || landing.includes("afterDailyUpdate")) {
+  throw new Error("Public method data or the 19:15 rollover must not replace today's report date");
 }
 
 if (publicMethods.source_status !== "LOCKED_27_OF_27" || publicMethods.outcome_known_at_selection !== false) {

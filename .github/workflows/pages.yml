@@ -40,15 +40,9 @@ jobs:
           cp ai-methods/legal-v3.html _site/ai-methods/legal.html
 
           python - <<'PY'
-          import base64, gzip, re
           from pathlib import Path
 
-          payload = Path('.github/workflows/install-v7.yml').read_text(encoding='utf-8')
-          match = re.search(r'V7_GZ_B64:\s*(\S+)', payload)
-          if not match:
-              raise SystemExit('Missing V7_GZ_B64 payload')
-          html = gzip.decompress(base64.b64decode(match.group(1))).decode('utf-8')
-          html = html.replace('</head>', '<link rel="stylesheet" href="/ai-methods/v7-overrides.css">\n</head>')
+          html = Path('ai-methods/landing-v7.html').read_text(encoding='utf-8')
           html = html.replace('<details open>', '<details>')
           data = html.encode('utf-8')
           for target in [
@@ -61,6 +55,7 @@ jobs:
 
           grep -n 'Thay cảm tính' _site/index.html | head
           grep -n '80%' _site/index.html | head
+          grep -n 'Chuyển khoản nhận báo cáo' _site/index.html | head
           grep -n 'v7-overrides.css' _site/index.html | head
           touch _site/.nojekyll
 

@@ -57,6 +57,8 @@ jobs:
           grep -n '80%' _site/index.html | head
           grep -n 'KẾT LUẬN CUỐI CÙNG' _site/index.html | head
           grep -n 'MỞ KẾT LUẬN' _site/index.html | head
+          test -s _site/ai-methods/public-methods.json
+          grep -n 'MB_PUBLIC_METHOD_OUTPUTS_V1' _site/ai-methods/public-methods.json | head
           grep -n 'v7-overrides.css' _site/index.html | head
           touch _site/.nojekyll
 

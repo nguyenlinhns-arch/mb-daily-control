@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/ai-methods/v7-overrides.css" />
+  <link rel="stylesheet" href="/ai-methods/v7-overrides.css?v=20260812-context" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"4SO AI","description":"Báo cáo phân tích dữ liệu Lô tô Miền Bắc bằng AI, công khai danh sách số theo từng phương pháp và khóa riêng kết luận 4SO cuối cùng.","areaServed":"VN","audience":{"@type":"Audience","suggestedMinAge":18},"offers":[{"@type":"Offer","name":"Gói 1 ngày","price":"30000","priceCurrency":"VND"},{"@type":"Offer","name":"Gói 1 tuần","price":"200000","priceCurrency":"VND"},{"@type":"Offer","name":"Gói 1 tháng","price":"800000","priceCurrency":"VND"}]}</script>
 </head>
 <body>
@@ -45,29 +45,29 @@
           <header class="report-titlebar">
             <div class="report-brandline">
               <span class="live-dot" aria-hidden="true"></span>
-              <span>BÁO CÁO AI THEO NGÀY</span>
+              <span class="keep-together">BÁO CÁO AI THEO NGÀY</span>
               <b id="report-status">ĐANG KIỂM TRA DỮ LIỆU</b>
             </div>
-            <h1>BẢNG PHÂN TÍCH AI 4SO</h1>
-            <p>Lô tô Miền Bắc · Ngày <strong data-date>--/--/----</strong></p>
+            <h1><span class="context-phrase">BẢNG PHÂN TÍCH</span> <span class="context-phrase">AI 4SO</span></h1>
+            <p class="report-date"><span class="keep-together">Lô tô Miền Bắc</span><i aria-hidden="true">·</i><span class="keep-together">Ngày <strong data-date>--/--/----</strong></span></p>
           </header>
 
           <section class="month-wins" aria-labelledby="month-wins-title">
             <div class="month-wins-heading">
-              <div><span>ĐỐI CHIẾU THÁNG 8/2026</span><h2 id="month-wins-title">Các ngày trúng trong tháng</h2></div>
+              <div><span class="keep-together">ĐỐI CHIẾU THÁNG 8/2026</span><h2 id="month-wins-title"><span class="context-phrase">Các ngày trúng</span> <span class="context-phrase">trong tháng</span></h2></div>
               <strong id="month-win-score">8/11 ngày trúng</strong>
             </div>
             <div class="month-wins-table" role="table" aria-label="Số khuyến nghị và kết quả các ngày trúng tháng 8 năm 2026">
-              <div class="month-wins-head" role="row"><span role="columnheader">Ngày</span><span role="columnheader">Số khuyến nghị</span><span role="columnheader">Kết quả thắng</span><span class="desktop-repeat" role="columnheader">Ngày</span><span class="desktop-repeat" role="columnheader">Số khuyến nghị</span><span class="desktop-repeat" role="columnheader">Kết quả thắng</span></div>
+              <div class="month-wins-head" role="row"><span role="columnheader">Ngày</span><span class="table-label" role="columnheader"><span>Số</span><span>khuyến nghị</span></span><span class="table-label" role="columnheader"><span>Kết quả</span><span>thắng</span></span><span class="desktop-repeat" role="columnheader">Ngày</span><span class="desktop-repeat table-label" role="columnheader"><span>Số</span><span>khuyến nghị</span></span><span class="desktop-repeat table-label" role="columnheader"><span>Kết quả</span><span>thắng</span></span></div>
               <div id="month-winning-rows">
-                <div class="win-row" role="row"><time datetime="2026-08-01">01/08</time><div class="win-picks"><b>06</b><b>60</b><b>48</b><b>84</b></div><strong>60 × 2 · 48</strong></div>
-                <div class="win-row" role="row"><time datetime="2026-08-02">02/08</time><div class="win-picks"><b>38</b><b>83</b><b>05</b><b>50</b></div><strong>38 · 83</strong></div>
-                <div class="win-row" role="row"><time datetime="2026-08-05">05/08</time><div class="win-picks"><b>05</b><b>50</b><b>06</b><b>60</b></div><strong>05 · 60</strong></div>
-                <div class="win-row" role="row"><time datetime="2026-08-06">06/08</time><div class="win-picks"><b>48</b><b>84</b><b>36</b><b>63</b></div><strong>84</strong></div>
-                <div class="win-row" role="row"><time datetime="2026-08-07">07/08</time><div class="win-picks"><b>36</b><b>63</b><b>05</b><b>50</b></div><strong>50</strong></div>
-                <div class="win-row" role="row"><time datetime="2026-08-08">08/08</time><div class="win-picks"><b>19</b><b>91</b><b>06</b><b>60</b></div><strong>19</strong></div>
-                <div class="win-row" role="row"><time datetime="2026-08-10">10/08</time><div class="win-picks"><b>06</b><b>60</b><b>38</b><b>83</b></div><strong>06 · 83</strong></div>
-                <div class="win-row" role="row"><time datetime="2026-08-11">11/08</time><div class="win-picks"><b>05</b><b>91</b><b>50</b><b>19</b></div><strong>05 · 91 × 2 · 50</strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-01">01/08</time><div class="win-picks"><b>06</b><b>60</b><b>48</b><b>84</b></div><strong class="win-result"><span>60 × 2</span><span>48</span></strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-02">02/08</time><div class="win-picks"><b>38</b><b>83</b><b>05</b><b>50</b></div><strong class="win-result"><span>38</span><span>83</span></strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-05">05/08</time><div class="win-picks"><b>05</b><b>50</b><b>06</b><b>60</b></div><strong class="win-result"><span>05</span><span>60</span></strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-06">06/08</time><div class="win-picks"><b>48</b><b>84</b><b>36</b><b>63</b></div><strong class="win-result"><span>84</span></strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-07">07/08</time><div class="win-picks"><b>36</b><b>63</b><b>05</b><b>50</b></div><strong class="win-result"><span>50</span></strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-08">08/08</time><div class="win-picks"><b>19</b><b>91</b><b>06</b><b>60</b></div><strong class="win-result"><span>19</span></strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-10">10/08</time><div class="win-picks"><b>06</b><b>60</b><b>38</b><b>83</b></div><strong class="win-result"><span>06</span><span>83</span></strong></div>
+                <div class="win-row" role="row"><time datetime="2026-08-11">11/08</time><div class="win-picks"><b>05</b><b>91</b><b>50</b><b>19</b></div><strong class="win-result"><span>05</span><span>91 × 2</span><span>50</span></strong></div>
               </div>
             </div>
             <p class="month-wins-note">Danh sách chỉ gồm các ngày có ít nhất 1 trong 4 số khuyến nghị xuất hiện; 3 ngày chưa trúng không được ẩn khỏi tỷ lệ 8/11.</p>
@@ -75,7 +75,7 @@
 
           <section class="yesterday-proof" aria-labelledby="yesterday-title">
             <div class="yesterday-heading">
-              <div><span>ĐỐI CHIẾU HÔM QUA · <b id="yesterday-date">11/08/2026</b></span><h2 id="yesterday-title">Số khuyến nghị và kết quả</h2></div>
+              <div><span><span class="keep-together">ĐỐI CHIẾU HÔM QUA</span> · <b class="keep-together" id="yesterday-date">11/08/2026</b></span><h2 id="yesterday-title"><span class="context-phrase">Số khuyến nghị</span> <span class="context-phrase">và kết quả</span></h2></div>
               <strong class="hit-summary" id="hit-summary">3/4 số trúng · 4 nháy</strong>
             </div>
             <div class="yesterday-grid">
@@ -87,7 +87,7 @@
               </article>
               <article class="result-card">
                 <span>KẾT QUẢ XUẤT HIỆN</span>
-                <strong id="yesterday-result">05 · 91 × 2 · 50</strong>
+                <strong class="result-tokens" id="yesterday-result"><span>05</span><span>91 × 2</span><span>50</span></strong>
                 <small id="yesterday-result-summary">3 trong 4 số khuyến nghị đã xuất hiện</small>
               </article>
               <article class="rate-card">
@@ -100,15 +100,15 @@
           </section>
 
           <section class="ai-intro" aria-labelledby="ai-intro-title">
-            <div class="ai-intro-copy"><span>GIỚI THIỆU 4SO AI</span><h2 id="ai-intro-title">AI tổng hợp dữ liệu và nhiều phương pháp trước khi kết luận</h2><p>Hệ thống chỉ dùng dữ liệu đã công bố đến ngày hôm qua, kiểm tra đủ 27/27 mã và chấm toàn bộ không gian cặp trước khi xuất bản báo cáo.</p></div>
-            <div class="ai-stats" aria-label="Quy mô phân tích"><div><strong>15.000+</strong><span>lượt tính toán</span></div><div><strong>7 lớp</strong><span>phương pháp</span></div><div><strong>45/45</strong><span>cặp được chấm</span></div></div>
+            <div class="ai-intro-copy"><span>GIỚI THIỆU 4SO AI</span><h2 id="ai-intro-title"><span class="context-phrase">AI tổng hợp dữ liệu</span> <span class="context-phrase">và nhiều phương pháp</span> <span class="context-phrase">trước khi kết luận</span></h2><p>Hệ thống chỉ dùng dữ liệu đã công bố đến ngày hôm qua, kiểm tra đủ <span class="keep-together">27/27 mã</span> và chấm toàn bộ không gian cặp trước khi xuất bản báo cáo.</p></div>
+            <div class="ai-stats" aria-label="Quy mô phân tích"><div><strong>15.000+</strong><span class="keep-together">lượt tính toán</span></div><div><strong>7 lớp</strong><span>phương pháp</span></div><div><strong>45/45</strong><span class="keep-together">cặp được chấm</span></div></div>
             <div class="ai-meta"><span>Dữ liệu khóa</span><strong data-lock>--/--/----</strong><span>Nguồn</span><strong>Đủ 27/27 mã</strong></div>
           </section>
 
           <section class="method-board" aria-labelledby="method-board-title">
-            <div class="method-title" id="method-board-title"><div><span>KHUYẾN NGHỊ HÔM NAY</span><h2>Số theo các phương pháp</h2></div><strong>Ngày <b data-date>--/--/----</b></strong></div>
+            <div class="method-title" id="method-board-title"><div><span>KHUYẾN NGHỊ HÔM NAY</span><h2><span class="context-phrase">Số theo</span> <span class="context-phrase">các phương pháp</span></h2></div><strong><span>Ngày hôm nay</span><b data-date>--/--/----</b></strong></div>
             <div class="board-heading">
-              <span>PHƯƠNG PHÁP</span>
+              <span class="table-label"><span>PHƯƠNG</span><span>PHÁP</span></span>
               <span>SỐ</span>
             </div>
             <div id="method-rows" aria-live="polite">
@@ -118,7 +118,7 @@
 
           <section class="final-conclusion" aria-labelledby="final-title">
             <div class="conclusion-heading">
-              <div><span>KẾT LUẬN CUỐI CÙNG · 4SO</span><h2 id="final-title">2 cặp đảo · 4 số ưu tiên</h2></div>
+              <div><span><span class="keep-together">KẾT LUẬN CUỐI CÙNG</span> · <b class="keep-together">4SO</b></span><h2 id="final-title"><span class="context-phrase">2 cặp đảo</span> · <span class="context-phrase">4 số ưu tiên</span></h2></div>
               <span class="locked-badge">ĐANG KHÓA</span>
             </div>
             <div class="locked-output" aria-label="Kết luận chỉ dành cho người đã thanh toán">
@@ -126,7 +126,7 @@
               <div class="locked-pair"><small>CẶP TOP 2</small><div><span>••</span><i>—</i><span>••</span></div></div>
               <div class="paywall-lock">
                 <span class="lock-icon" aria-hidden="true">🔒</span>
-                <strong>Nạp phí báo cáo để xem kết luận 4SO</strong>
+                <strong><span class="context-phrase">Nạp phí báo cáo</span> <span class="context-phrase">để xem kết luận 4SO</span></strong>
                 <p>Các số theo từng phương pháp đã công khai ở trên. Thanh toán để nhận đúng 2 cặp, 4 số và thứ tự ưu tiên cuối cùng.</p>
                 <button type="button" data-open>MỞ KẾT LUẬN · 30.000đ</button>
               </div>
@@ -136,9 +136,9 @@
         </div>
 
         <div class="hero-sale">
-          <div><span>50.000đ trước đây</span><strong>Chỉ từ 30.000đ</strong><small>cho 01 báo cáo theo ngày</small></div>
+          <div><span><span class="keep-together">50.000đ</span> trước đây</span><strong><span class="context-phrase">Chỉ từ</span> <span class="keep-together">30.000đ</span></strong><small>cho 01 báo cáo theo ngày</small></div>
           <ul><li>Danh sách số từng phương pháp được công khai</li><li>15.000+ lượt tính toán thống kê</li><li>7 lớp phương pháp độc lập</li><li>Chỉ khóa kết luận 4SO: 2 cặp · 4 số</li></ul>
-          <button type="button" data-plan-open="day">CHUYỂN KHOẢN &amp; NHẬN KẾT LUẬN</button>
+          <button type="button" data-plan-open="day"><span class="button-line">CHUYỂN KHOẢN</span><span class="button-line">&amp; NHẬN KẾT LUẬN</span></button>
           <p>Không cần tài khoản · Thanh toán một lần · Xác nhận qua Zalo</p>
         </div>
       </div>
@@ -146,7 +146,7 @@
 
     <section class="pricing-section" id="pricing">
       <div class="wrap">
-        <div class="section-heading"><p class="section-kicker">Chọn quyền truy cập</p><h2>Thử một ngày hoặc nhận liên tục.</h2><p>Các gói thanh toán một lần, không tự gia hạn.</p></div>
+        <div class="section-heading"><p class="section-kicker">Chọn quyền truy cập</p><h2><span class="context-phrase">Thử một ngày</span> <span class="context-phrase">hoặc nhận liên tục.</span></h2><p>Các gói thanh toán một lần, không tự gia hạn.</p></div>
         <div class="pricing-grid">
           <article class="price-card featured"><span class="price-tag">NÊN BẮT ĐẦU</span><h3>1 ngày</h3><strong>30.000đ</strong><p>01 báo cáo và kết luận của ngày đã chọn.</p><button type="button" data-plan-open="day">Mở báo cáo 1 ngày</button></article>
           <article class="price-card"><span class="price-tag">TIẾT KIỆM 10K</span><h3>1 tuần</h3><strong>200.000đ</strong><p>7 báo cáo liên tiếp từ ngày bắt đầu.</p><button type="button" data-plan-open="week">Chọn gói tuần</button></article>
@@ -157,7 +157,7 @@
 
     <section class="trust-section">
       <div class="wrap trust-layout">
-        <div><p class="section-kicker">Minh bạch trước thanh toán</p><h2>Đây là phí dịch vụ dữ liệu.</h2><p>4SO AI không nhận cược, không giữ tiền cược, không trả thưởng và không đặt cược thay. Kết quả lịch sử không bảo đảm kết quả tương lai.</p></div>
+        <div><p class="section-kicker">Minh bạch trước thanh toán</p><h2><span class="context-phrase">Đây là phí</span> <span class="context-phrase">dịch vụ dữ liệu.</span></h2><p>4SO AI không nhận cược, không giữ tiền cược, không trả thưởng và không đặt cược thay. Kết quả lịch sử không bảo đảm kết quả tương lai.</p></div>
         <div class="trust-list">
           <div><b>18+</b><span>Dịch vụ chỉ dành cho người đủ 18 tuổi.</span></div>
           <div><b>Không tự gia hạn</b><span>Gói kết thúc đúng thời hạn đã chọn.</span></div>
@@ -182,7 +182,7 @@
     <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
       <button class="close" id="close" type="button" aria-label="Đóng">×</button>
       <p class="dialog-kicker">Thanh toán phí báo cáo AI</p>
-      <h2 id="dialog-title">Mở kết luận cuối cùng</h2>
+      <h2 id="dialog-title"><span class="context-phrase">Mở kết luận</span> <span class="context-phrase">cuối cùng</span></h2>
       <p class="dialog-intro">Báo cáo bắt đầu từ ngày <strong data-date>--/--/----</strong>. Sau khi chuyển khoản, gửi ảnh giao dịch qua Zalo để nhận kết luận.</p>
       <ol class="checkout-progress" aria-label="Ba bước nhận kết luận"><li class="active"><b>1</b><span>Chọn gói</span></li><li><b>2</b><span>Chuyển khoản</span></li><li><b>3</b><span>Nhận kết luận</span></li></ol>
       <div class="modal-plans" role="group" aria-label="Chọn gói báo cáo">
@@ -196,10 +196,10 @@
         <div class="payrow"><span>Số tài khoản</span><strong>1128091987</strong><button class="copy" type="button" data-copy="1128091987">Sao chép</button></div>
         <div class="payrow"><span id="pay-label">Gói 1 ngày</span><strong id="pay-price">30.000đ</strong></div>
         <div class="payrow"><span>Nội dung chuyển khoản</span><strong id="memo">4SO AI --</strong><button class="copy" id="copy-memo" type="button">Sao chép</button></div>
-        <button class="copy-all" id="copy-all" type="button">SAO CHÉP STK + SỐ TIỀN + NỘI DUNG</button>
+        <button class="copy-all" id="copy-all" type="button"><span class="button-line">SAO CHÉP STK + SỐ TIỀN</span><span class="button-line">+ NỘI DUNG</span></button>
       </div>
       <div class="after-payment"><strong>Sau khi chuyển khoản</strong><span>Bấm nút dưới đây và gửi ảnh giao dịch để đối soát, nhận đúng báo cáo và kết luận đã chọn.</span></div>
-      <a class="zalo" id="zalo" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">TÔI ĐÃ CHUYỂN KHOẢN · GỬI ẢNH QUA ZALO →</a>
+      <a class="zalo" id="zalo" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer"><span class="button-line">TÔI ĐÃ CHUYỂN KHOẢN</span><span class="button-line">GỬI ẢNH QUA ZALO →</span></a>
       <p class="terms">Bằng việc thanh toán, bạn xác nhận đủ 18 tuổi và đồng ý với <a href="/legal.html#terms" target="_blank">Điều khoản</a> và <a href="/legal.html#privacy" target="_blank">Bảo mật</a>. Đây là dịch vụ dữ liệu, không phải tiền đặt cược.</p>
       <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
     </section>
@@ -298,7 +298,11 @@
 
     const shortDate=iso=>{const[y,m,d]=String(iso).split('-');return `${d}/${m}`};
     const fullDate=iso=>{const[y,m,d]=String(iso).split('-');return `${d}/${m}/${y}`};
-    const hitText=hits=>hits.map(hit=>`${hit.number}${Number(hit.count)>1?` × ${hit.count}`:''}`).join(' · ');
+    const hitText=hit=>`${hit.number}${Number(hit.count)>1?` × ${hit.count}`:''}`;
+    const renderHitTokens=(element,hits)=>{
+      element.replaceChildren();
+      hits.forEach(hit=>{const token=document.createElement('span');token.textContent=hitText(hit);element.append(token)});
+    };
     const renderYesterdayProof=data=>{
       if(!/^\d{4}-\d{2}-\d{2}$/.test(data.date||''))throw new Error('Ngày đối chiếu không hợp lệ');
       const recommended=Array.isArray(data.recommended_numbers)?data.recommended_numbers.filter(value=>/^\d{2}$/.test(String(value))):[];
@@ -319,7 +323,7 @@
       const recommendedCount=Number(data.recommended_count)||recommended.length;
       const occurrences=Number(data.total_occurrences)||hits.reduce((sum,hit)=>sum+Number(hit.count),0);
       hitSummary.textContent=`${uniqueHits}/${recommendedCount} số trúng · ${occurrences} nháy`;
-      yesterdayResult.textContent=hitText(hits);
+      renderHitTokens(yesterdayResult,hits);
       yesterdayResultSummary.textContent=`${uniqueHits} trong ${recommendedCount} số khuyến nghị đã xuất hiện`;
       const validation=data.historical_validation||{};
       validationRate.textContent=`${Number(validation.rate_pct)||0}%`;
@@ -345,7 +349,8 @@
         pickList.className='win-picks';
         picks.forEach(value=>{const chip=document.createElement('b');chip.textContent=value;if(dayHitSet.has(String(value)))chip.classList.add('is-hit');pickList.append(chip)});
         const result=document.createElement('strong');
-        result.textContent=hitText(dayHits);
+        result.className='win-result';
+        renderHitTokens(result,dayHits);
         row.append(time,pickList,result);
         monthWinningRows.append(row);
       });
@@ -393,11 +398,11 @@
       let ok=false;
       try{await navigator.clipboard.writeText(value);ok=true}catch{}
       if(!ok){const area=document.createElement('textarea');area.value=value;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();ok=document.execCommand('copy');area.remove()}
-      const old=button.textContent;
+      const old=button.innerHTML;
       button.textContent=ok?'Đã sao chép':'Chép lại';
       announce(ok?'Đã sao chép. Mở ứng dụng ngân hàng và dán thông tin.':'Chưa sao chép được. Vui lòng thử lại.');
       if(ok)track('CopyPaymentDetails',{kind,package:selected,price:packages[selected].price});
-      setTimeout(()=>button.textContent=old,1500);
+      setTimeout(()=>button.innerHTML=old,1500);
     };
     document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',()=>copy(button.dataset.copy,button,'account')));
     document.querySelector('#copy-memo').addEventListener('click',event=>copy(memo.textContent,event.currentTarget,'memo'));

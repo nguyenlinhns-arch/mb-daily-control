@@ -10,10 +10,8 @@ const yesterdayProof = JSON.parse(yesterdayProofText);
 const workflow = readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
 
 const requiredLandingTokens = [
-  "BẢNG PHÂN TÍCH AI 4SO",
   "KHUYẾN NGHỊ HÔM NAY",
   "ĐANG KIỂM TRA DỮ LIỆU",
-  "Các ngày trúng trong tháng",
   "month-winning-rows",
   "SỐ KHUYẾN NGHỊ HÔM QUA",
   "80%",
@@ -26,8 +24,6 @@ const requiredLandingTokens = [
   "paywall-lock",
   "MỞ KẾT LUẬN · 30.000đ",
   "checkout-progress",
-  "SAO CHÉP STK + SỐ TIỀN + NỘI DUNG",
-  "TÔI ĐÃ CHUYỂN KHOẢN · GỬI ẢNH QUA ZALO",
   "1128091987",
   "CopyPaymentDetails",
   "og-4so-ai-v2.jpg",
@@ -43,7 +39,23 @@ for (const token of requiredLandingTokens) {
 const visibleText = landing
   .replace(/<script[\s\S]*?<\/script>/gi, " ")
   .replace(/<style[\s\S]*?<\/style>/gi, " ")
-  .replace(/<[^>]+>/g, " ");
+  .replace(/<[^>]+>/g, " ")
+  .replace(/\s+/g, " ")
+  .trim();
+
+for (const token of [
+  "BẢNG PHÂN TÍCH AI 4SO",
+  "Các ngày trúng trong tháng",
+  "Số khuyến nghị và kết quả",
+  "AI tổng hợp dữ liệu và nhiều phương pháp trước khi kết luận",
+  "Số theo các phương pháp",
+  "SAO CHÉP STK + SỐ TIỀN + NỘI DUNG",
+  "TÔI ĐÃ CHUYỂN KHOẢN GỬI ẢNH QUA ZALO",
+]) {
+  if (!visibleText.includes(token)) {
+    throw new Error(`Contextual markup must preserve visible copy: ${token}`);
+  }
+}
 
 if (visibleText.includes("0398696879")) {
   throw new Error("Zalo phone number must not be visible on the landing page");
@@ -57,6 +69,40 @@ for (const token of ["body{margin:0;min-width:320px", ".month-wins{padding:16px"
   if (!overrides.includes(token)) {
     throw new Error(`Missing mobile readability rule: ${token}`);
   }
+}
+
+for (const token of [
+  'class="context-phrase"',
+  'class="keep-together"',
+  'class="table-label"',
+  'class="button-line"',
+  'class="win-result"',
+  'class="result-tokens"',
+  "const renderHitTokens=",
+  "const old=button.innerHTML",
+  "button.innerHTML=old",
+]) {
+  if (!landing.includes(token)) throw new Error(`Missing contextual line-wrap structure: ${token}`);
+}
+
+if ((landing.match(/class="context-phrase"/g) || []).length < 12) {
+  throw new Error("Long headings must be split into enough semantic phrases");
+}
+
+for (const token of [
+  ".context-phrase{display:inline-block;max-width:100%;white-space:nowrap}",
+  ".keep-together{white-space:nowrap}",
+  ".table-label>span{display:block;white-space:nowrap}",
+  ".method-label strong{max-width:100%;",
+  "overflow-wrap:normal;word-break:normal;hyphens:none",
+  ".board-heading,.method-row{grid-template-columns:86px minmax(0,1fr)}",
+  ".report-titlebar h1 .context-phrase{display:block}",
+]) {
+  if (!overrides.includes(token)) throw new Error(`Missing contextual line-wrap CSS: ${token}`);
+}
+
+if (/\.method-label strong\{[^}]*overflow-wrap:anywhere/.test(overrides) || /word-break:\s*break-all/.test(overrides)) {
+  throw new Error("Method names must never break in the middle of a word");
 }
 
 if (landing.includes("final_codes") || landing.includes("final_pairs")) {

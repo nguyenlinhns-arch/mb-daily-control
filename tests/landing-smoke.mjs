@@ -24,6 +24,11 @@ const requiredLandingTokens = [
   "paywall-lock",
   "MỞ KẾT LUẬN · 30.000đ",
   "checkout-progress",
+  "seo-guide-section",
+  "/cho-so-mien-bac-hom-nay/",
+  "/phuong-phap-4so/",
+  "/lich-su-doi-chieu/",
+  "/thong-ke-lo-to-mien-bac-bang-ai/",
   "1128091987",
   "CopyPaymentDetails",
   "og-4so-ai-v2.jpg",
@@ -51,6 +56,10 @@ for (const token of [
   "Số theo các phương pháp",
   "SAO CHÉP STK + SỐ TIỀN + NỘI DUNG",
   "TÔI ĐÃ CHUYỂN KHOẢN GỬI ẢNH QUA ZALO",
+  "Cho số Miền Bắc hôm nay",
+  "Phương pháp 4SO",
+  "Lịch sử đối chiếu",
+  "Thống kê Lô tô bằng AI",
 ]) {
   if (!visibleText.includes(token)) {
     throw new Error(`Contextual markup must preserve visible copy: ${token}`);

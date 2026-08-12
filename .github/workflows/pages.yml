@@ -4,6 +4,9 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+  schedule:
+    # 01:15 Vietnam time: rebuild dated HTML even if daily data has not changed.
+    - cron: "15 18 * * *"
 
 permissions:
   contents: read
@@ -54,6 +57,8 @@ jobs:
               target.write_bytes(data)
           PY
 
+          python scripts/build_seo_pages.py --output-root _site
+
           grep -n 'class="context-phrase">BẢNG PHÂN TÍCH</span>' _site/index.html | head
           grep -n 'class="context-phrase">AI 4SO</span>' _site/index.html | head
           grep -n '80%' _site/index.html | head
@@ -62,6 +67,12 @@ jobs:
           test -s _site/ai-methods/public-methods.json
           grep -n 'MB_PUBLIC_METHOD_OUTPUTS_V2_TODAY_ONLY' _site/ai-methods/public-methods.json | head
           grep -n 'v7-overrides.css' _site/index.html | head
+          grep -n 'Cho số Miền Bắc hôm nay' _site/cho-so-mien-bac-hom-nay/index.html | head
+          grep -n 'cssSelector":".paywall"' _site/cho-so-mien-bac-hom-nay/index.html | head
+          grep -n 'Phương pháp 4SO' _site/phuong-phap-4so/index.html | head
+          grep -n 'Lịch sử đối chiếu' _site/lich-su-doi-chieu/index.html | head
+          grep -n 'Thống kê Lô tô Miền Bắc' _site/thong-ke-lo-to-mien-bac-bang-ai/index.html | head
+          grep -n 'https://lemienbac.com/cho-so-mien-bac-hom-nay/' _site/sitemap.xml | head
           touch _site/.nojekyll
 
       - name: Upload artifact

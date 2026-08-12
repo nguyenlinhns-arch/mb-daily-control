@@ -158,7 +158,7 @@ h1,h2,h3{overflow-wrap:normal;text-wrap:balance}
 .hero-sale>button{width:100%;min-height:60px;padding:8px 12px;border:0;border-radius:12px;background:var(--navy);color:#fff;font-size:14px;line-height:1.3;font-weight:900}
 .hero-sale>p{margin:9px 0 0;color:var(--muted);font-size:10px;text-align:center}
 
-.proof-section,.pricing-section,.trust-section{padding:58px 0}
+.proof-section,.pricing-section,.seo-guide-section,.trust-section{padding:58px 0}
 .proof-section{background:#fff}
 .section-kicker{margin:0 0 8px;color:var(--red);font-size:12px;font-weight:900;letter-spacing:.075em;text-transform:uppercase}
 .proof-head h2,.section-heading h2,.trust-layout h2{margin:0;font-size:clamp(30px,8vw,46px);line-height:1.08;letter-spacing:-.04em;text-wrap:balance}
@@ -181,6 +181,13 @@ h1,h2,h3{overflow-wrap:normal;text-wrap:balance}
 .price-card p{margin:8px 0 15px;color:var(--muted);font-size:13px}
 .price-card button{width:100%;min-height:50px;border:1px solid var(--navy);border-radius:10px;background:#fff;color:var(--navy);font-size:13px;font-weight:900}
 .price-card.featured button{border-color:var(--red);background:var(--red);color:#fff}
+
+.seo-guide-section{background:#fff}
+.seo-guide-grid{margin-top:23px;display:grid;gap:10px}
+.seo-guide-grid>a{min-height:150px;padding:18px;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;background:#fff;box-shadow:0 9px 26px rgba(7,31,51,.06)}
+.seo-guide-grid strong{color:var(--navy);font-size:18px;line-height:1.2}
+.seo-guide-grid>a>span{margin-top:8px;color:var(--muted);font-size:11px;line-height:1.55}
+.seo-guide-grid>a>b{margin-top:auto;padding-top:13px;color:#075fd0;font-size:11px}
 
 .trust-section{background:var(--navy);color:#fff}
 .trust-section .section-kicker{color:#ff7a84}
@@ -268,6 +275,7 @@ h1,h2,h3{overflow-wrap:normal;text-wrap:balance}
   .proof-grid article{border-right:1px solid var(--line)!important;border-top:0!important}
   .proof-grid article:last-child{border-right:0!important}
   .pricing-grid{grid-template-columns:repeat(3,1fr)}
+  .seo-guide-grid{grid-template-columns:1fr 1fr}
   .price-card{display:flex;flex-direction:column}
   .price-card button{margin-top:auto}
   .trust-list{display:grid;grid-template-columns:1fr 1fr}
@@ -310,7 +318,8 @@ h1,h2,h3{overflow-wrap:normal;text-wrap:balance}
   .paywall-lock{left:19%;right:19%;padding:18px}
   .paywall-lock strong{font-size:21px}
   .paywall-lock p{font-size:13px}
-  .proof-section,.pricing-section,.trust-section{padding:78px 0}
+  .proof-section,.pricing-section,.seo-guide-section,.trust-section{padding:78px 0}
+  .seo-guide-grid{grid-template-columns:repeat(4,1fr)}
   .mobile-bar{display:none}
   .footer{padding-bottom:28px}
   .modal{align-items:center;justify-content:center;padding:22px}

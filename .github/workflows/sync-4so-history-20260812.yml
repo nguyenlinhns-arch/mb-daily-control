@@ -1,0 +1,53 @@
+name: Sync 4SO history 2026-08-12
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-4so-history-20260812.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Update public 4SO history through 12 Aug 2026
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('ai-methods/index.html')
+          s=p.read_text(encoding='utf-8')
+          repl={
+            '{d:"11/08",s:"05 91 50 19",h:"05, 91×2, 50",n:4}':'{d:"11/08",s:"05 91 50 19",h:"05, 91×2, 50",n:4},{d:"12/08",s:"61 18 81 16",h:"81",n:1}',
+            '01/08–11/08/2026':'01/08–12/08/2026',
+            '<b>72,7%</b>':'<b>75,0%</b>',
+            '<strong>8/11</strong>':'<strong>9/12</strong>',
+            '16 lần xuất hiện trong 11 ngày đã đối chiếu':'17 lần xuất hiện trong 12 ngày đã đối chiếu',
+            '<b>76,2%</b>':'<b>76,7%</b>',
+            '<strong>32/42</strong>':'<strong>33/43</strong>',
+            '64 lần xuất hiện · 1.890 lượt chấm cặp':'65 lần xuất hiện · 1.935 lượt chấm cặp',
+            '<strong>Cập nhật dữ liệu:</strong> 11/08/2026':'<strong>Cập nhật dữ liệu:</strong> 12/08/2026',
+            'Xem đối chiếu 11 ngày gần nhất ▾':'Xem đối chiếu 12 ngày gần nhất ▾',
+          }
+          for old,new in repl.items():
+            if old not in s:
+              raise SystemExit(f'Missing expected text: {old}')
+            s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+      - name: Commit website sync
+        run: |
+          git config user.name "mb-daily-control-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add ai-methods/index.html
+          if git diff --cached --quiet; then
+            echo "No website change needed"
+            exit 0
+          fi
+          git commit -m "site: sync 4SO history through 12 Aug 2026"
+          git push origin HEAD:main

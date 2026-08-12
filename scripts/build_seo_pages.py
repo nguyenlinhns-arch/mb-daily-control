@@ -10,6 +10,7 @@ with a T-1 data lock, the page fails closed and publishes no method numbers.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -23,8 +24,11 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_METHODS = ROOT / "ai-methods" / "public-methods.json"
 YESTERDAY_PROOF = ROOT / "ai-methods" / "yesterday-proof.json"
+LANDING_TEMPLATE = ROOT / "ai-methods" / "landing-v7.html"
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 BASE_URL = "https://lemienbac.com"
+SEARCH_CONSOLE_TOKEN = "YsFOP33bdoRwdFS2sVoqfnzoxmniLWHrJzxpSx2uDsA"
+GA4_MEASUREMENT_ID = "G-R9TBYP97BC"
 LOCKED_FIELD_PATTERN = re.compile(
     r"(?:final|canonical)[_-]?(?:codes|pairs)", re.IGNORECASE
 )
@@ -34,6 +38,7 @@ NAV_LINKS = (
     ("/phuong-phap-4so/", "Phương pháp 4SO"),
     ("/lich-su-doi-chieu/", "Lịch sử"),
     ("/thong-ke-lo-to-mien-bac-bang-ai/", "Thống kê AI"),
+    ("/gioi-thieu/", "Giới thiệu"),
 )
 
 
@@ -83,6 +88,71 @@ def validate_public_payload(payload: dict[str, Any]) -> None:
             raise ValueError("Invalid public method row")
         if any(not re.fullmatch(r"\d{2}", str(number)) for number in numbers):
             raise ValueError(f"Invalid public number in {method.get('name')}")
+
+
+def validate_proof_payload(proof: dict[str, Any]) -> None:
+    if proof.get("schema_version") != "MB_PUBLIC_YESTERDAY_PROOF_V2":
+        raise ValueError("Invalid public proof schema")
+    proof_day = date.fromisoformat(str(proof.get("date")))
+    recommended = proof.get("recommended_numbers")
+    if not isinstance(recommended, list) or len(recommended) != 4:
+        raise ValueError("Yesterday proof must contain exactly four recommendations")
+    validation = proof.get("historical_validation") or {}
+    window_start = date.fromisoformat(str(validation.get("window_start")))
+    window_end = date.fromisoformat(str(validation.get("window_end")))
+    total_days = int(validation.get("total_days") or 0)
+    hit_days = int(validation.get("hit_days") or 0)
+    if window_end != proof_day or (window_end - window_start).days + 1 != total_days:
+        raise ValueError("Historical validation window is incomplete")
+    if int(validation.get("rate_pct") or -1) != round(hit_days * 100 / total_days):
+        raise ValueError("Historical validation rate is inconsistent")
+
+    month = proof.get("month_summary") or {}
+    records = month.get("daily_records")
+    observed = int(month.get("observed_days") or 0)
+    if not isinstance(records, list) or len(records) != observed:
+        raise ValueError("Month history must contain one record per observed day")
+    expected_start = date.fromisoformat(str(month.get("period_start")))
+    expected_end = date.fromisoformat(str(month.get("period_end")))
+    if expected_end != proof_day or (expected_end - expected_start).days + 1 != observed:
+        raise ValueError("Month history dates are not continuous")
+    wins = 0
+    for index, record in enumerate(records):
+        if not isinstance(record, dict):
+            raise ValueError("Invalid month history record")
+        record_day = date.fromisoformat(str(record.get("date")))
+        if record_day != expected_start + timedelta(days=index):
+            raise ValueError("Month history is not ordered or continuous")
+        picks = record.get("recommended_numbers")
+        hits = record.get("hits")
+        if not isinstance(picks, list) or len(picks) != 4 or len(set(picks)) != 4:
+            raise ValueError(f"Invalid four-number record for {record_day}")
+        if any(not re.fullmatch(r"\d{2}", str(number)) for number in picks):
+            raise ValueError(f"Invalid number in history for {record_day}")
+        if not isinstance(hits, list):
+            raise ValueError(f"Invalid hits for {record_day}")
+        status = "hit" if hits else "miss"
+        if record.get("status") != status:
+            raise ValueError(f"History status mismatch for {record_day}")
+        record_hash = str(record.get("record_hash") or "")
+        if not re.fullmatch(r"[0-9a-f]{64}", record_hash):
+            raise ValueError(f"Missing record hash for {record_day}")
+        canonical_record = {key: value for key, value in record.items() if key != "record_hash"}
+        expected_hash = hashlib.sha256(
+            json.dumps(
+                canonical_record,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        if record_hash != expected_hash:
+            raise ValueError(f"Record hash mismatch for {record_day}")
+        wins += bool(hits)
+    if wins != int(month.get("win_days") or -1):
+        raise ValueError("Month win count is inconsistent")
+    if observed - wins != int(month.get("miss_days") or -1):
+        raise ValueError("Month miss count is inconsistent")
 
 
 def breadcrumb_schema(items: list[tuple[str, str]]) -> dict[str, Any]:
@@ -140,12 +210,26 @@ def web_page_schema(
         "@context": "https://schema.org",
         "@graph": [
             {
+                "@type": "Organization",
+                "@id": f"{BASE_URL}/#organization",
+                "name": "4SO AI",
+                "url": f"{BASE_URL}/",
+                "logo": f"{BASE_URL}/favicon.svg",
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "contactType": "customer support",
+                    "url": "https://zalo.me/0398696879",
+                    "availableLanguage": "Vietnamese",
+                },
+            },
+            {
                 "@type": "WebSite",
                 "@id": f"{BASE_URL}/#website",
                 "url": f"{BASE_URL}/",
                 "name": "4SO AI",
                 "description": "Phân tích dữ liệu Lô tô Miền Bắc bằng AI theo ngày.",
                 "inLanguage": "vi-VN",
+                "publisher": {"@id": f"{BASE_URL}/#organization"},
             },
             page,
             breadcrumb,
@@ -188,6 +272,7 @@ def shell(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+  <meta name="google-site-verification" content="{SEARCH_CONSOLE_TOKEN}" />
   <meta name="theme-color" content="#071f33" />
   <title>{esc(title)}</title>
   <meta name="description" content="{esc(description)}" />
@@ -203,7 +288,9 @@ def shell(
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="4SO AI phân tích dữ liệu Lô tô Miền Bắc" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="/ai-methods/seo.css?v=20260812" />
+  <link rel="stylesheet" href="/ai-methods/seo.css?v=20260812-final" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id={GA4_MEASUREMENT_ID}"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','{GA4_MEASUREMENT_ID}',{{allow_google_signals:false,allow_ad_personalization_signals:false}});</script>
   <script type="application/ld+json">{structured}</script>
 </head>
 <body>
@@ -227,6 +314,9 @@ def shell(
   </footer>
   <script>
   (()=>{{
+    const emit=(name,params={{}})=>{{try{{window.dataLayer=window.dataLayer||[];window.dataLayer.push({{event:name,page_path:location.pathname,...params}})}}catch{{}}}};
+    document.querySelectorAll('.top-cta,.primary-cta').forEach(link=>link.addEventListener('click',()=>emit('seo_cta_click',{{destination:link.getAttribute('href')||''}})));
+    document.querySelectorAll('details').forEach(item=>item.addEventListener('toggle',()=>{{if(item.open)emit('seo_faq_open',{{question:item.querySelector('summary')?.textContent||''}})}}));
     const target=document.documentElement.dataset.targetDate;
     if(!target)return;
     const parts=new Intl.DateTimeFormat('en-CA',{{timeZone:'Asia/Ho_Chi_Minh',year:'numeric',month:'2-digit',day:'2-digit'}}).formatToParts(new Date());
@@ -262,6 +352,156 @@ def method_rows(payload: dict[str, Any]) -> str:
     return "".join(rows)
 
 
+def replace_marker_block(source: str, marker: str, replacement: str) -> str:
+    pattern = re.compile(
+        rf"(?P<start><!-- {re.escape(marker)}_START -->).*?(?P<end><!-- {re.escape(marker)}_END -->)",
+        re.DOTALL,
+    )
+    updated, count = pattern.subn(
+        lambda match: f'{match.group("start")}\n{replacement}\n{match.group("end")}',
+        source,
+    )
+    if count != 1:
+        raise ValueError(f"Landing marker {marker} must occur exactly once")
+    return updated
+
+
+def replace_element_text(source: str, element_id: str, value: str) -> str:
+    pattern = re.compile(
+        rf'(?P<open><(?P<tag>[a-z0-9]+)[^>]*\bid="{re.escape(element_id)}"[^>]*>).*?(?P<close></(?P=tag)>)',
+        re.IGNORECASE | re.DOTALL,
+    )
+    updated, count = pattern.subn(
+        lambda match: f'{match.group("open")}{esc(value)}{match.group("close")}',
+        source,
+    )
+    if count != 1:
+        raise ValueError(f"Landing element #{element_id} must occur exactly once")
+    return updated
+
+
+def replace_data_text(source: str, attribute: str, value: str) -> str:
+    pattern = re.compile(
+        rf'(?P<open><(?P<tag>strong|b)[^>]*\b{re.escape(attribute)}\b[^>]*>).*?(?P<close></(?P=tag)>)',
+        re.IGNORECASE | re.DOTALL,
+    )
+    return pattern.sub(
+        lambda match: f'{match.group("open")}{esc(value)}{match.group("close")}',
+        source,
+    )
+
+
+def landing_method_rows(payload: dict[str, Any]) -> str:
+    rows = []
+    for method in payload.get("methods", []):
+        rows.append(
+            '<div class="method-row">'
+            f'<div class="method-label"><strong>{esc(method["name"])}</strong></div>'
+            '<div class="method-result"><div class="number-list">'
+            f'{number_chips(method["numbers"])}'
+            '</div></div></div>'
+        )
+    return "\n".join(rows)
+
+
+def landing_month_rows(proof: dict[str, Any]) -> str:
+    rows = []
+    for item in (proof.get("month_summary") or {}).get("winning_days") or []:
+        hits = item.get("hits") or []
+        hit_set = {str(hit.get("number")) for hit in hits}
+        picks = "".join(
+            f'<b class="{"is-hit" if str(number) in hit_set else ""}">{esc(number)}</b>'
+            for number in item.get("recommended_numbers") or []
+        )
+        results = "".join(
+            f'<span>{esc(hit.get("number"))}{f" × {int(hit.get("count"))}" if int(hit.get("count") or 0) > 1 else ""}</span>'
+            for hit in hits
+        )
+        rows.append(
+            f'<div class="win-row" role="row"><time datetime="{esc(item.get("date"))}">{compact_day(str(item.get("date")))}</time>'
+            f'<div class="win-picks">{picks}</div><strong class="win-result">{results}</strong></div>'
+        )
+    return "\n".join(rows)
+
+
+def render_landing(public: dict[str, Any], proof: dict[str, Any], today: date) -> str:
+    source = LANDING_TEMPLATE.read_text(encoding="utf-8")
+    if LOCKED_FIELD_PATTERN.search(source):
+        raise ValueError("Paid 4SO field leaked into landing template")
+    expected_lock = today - timedelta(days=1)
+    fresh = (
+        public.get("target_date") == today.isoformat()
+        and public.get("data_lock") == expected_lock.isoformat()
+        and public.get("source_status") == "LOCKED_27_OF_27"
+        and public.get("outcome_known_at_selection") is False
+    )
+    source = source.replace(
+        '<html lang="vi">',
+        f'<html lang="vi" data-static-date="{today.isoformat()}" data-static-fresh="{str(fresh).lower()}">',
+    )
+    source = replace_data_text(source, "data-date", display_day(today))
+    source = replace_data_text(source, "data-lock", display_day(expected_lock))
+    source = replace_element_text(
+        source,
+        "report-status",
+        "ĐÃ HOÀN TẤT PHÂN TÍCH" if fresh else "ĐANG CẬP NHẬT DỮ LIỆU HÔM NAY",
+    )
+    methods = (
+        landing_method_rows(public)
+        if fresh
+        else '<div class="method-loading method-loading-error">Số khuyến nghị hôm nay đang được cập nhật. Không hiển thị lại số của ngày cũ.</div>'
+    )
+    source = replace_marker_block(source, "METHOD_ROWS", methods)
+
+    proof_fresh = proof.get("date") == expected_lock.isoformat()
+    if proof_fresh:
+        month = proof.get("month_summary") or {}
+        validation = proof.get("historical_validation") or {}
+        recommended = proof.get("recommended_numbers") or []
+        hits = proof.get("hits") or []
+        hit_map = {str(hit.get("number")): int(hit.get("count") or 0) for hit in hits}
+        yesterday_numbers = "".join(
+            f'<b class="{"hit" if hit_map.get(str(number)) else ""}{" multi-hit" if hit_map.get(str(number), 0) > 1 else ""}">{esc(number)}'
+            f'{f"<small>×{hit_map[str(number)]}</small>" if hit_map.get(str(number), 0) > 1 else ""}</b>'
+            for number in recommended
+        )
+        yesterday_results = "".join(
+            f'<span>{esc(hit.get("number"))}{f" × {int(hit.get("count"))}" if int(hit.get("count") or 0) > 1 else ""}</span>'
+            for hit in hits
+        ) or "<span>0/4 số xuất hiện</span>"
+        source = replace_marker_block(source, "MONTH_ROWS", landing_month_rows(proof))
+        source = replace_marker_block(source, "YESTERDAY_NUMBERS", yesterday_numbers)
+        source = replace_marker_block(source, "YESTERDAY_RESULTS", yesterday_results)
+        source = replace_element_text(source, "month-label", f'ĐỐI CHIẾU THÁNG {str(month.get("month"))[5:7]}/{str(month.get("month"))[:4]}')
+        source = replace_element_text(source, "month-win-score", f'{month.get("win_days")}/{month.get("observed_days")} ngày trúng')
+        source = replace_element_text(source, "yesterday-date", display_day(str(proof.get("date"))))
+        source = replace_element_text(source, "hit-summary", f'{proof.get("unique_hit_count")}/{proof.get("recommended_count")} số trúng · {proof.get("total_occurrences")} nháy')
+        source = replace_element_text(source, "yesterday-result-summary", f'{proof.get("unique_hit_count")} trong {proof.get("recommended_count")} số khuyến nghị đã xuất hiện')
+        source = replace_element_text(source, "validation-rate", f'{validation.get("rate_pct")}%')
+        source = replace_element_text(source, "validation-window", f'{validation.get("hit_days")}/{validation.get("total_days")} ngày')
+    else:
+        source = replace_marker_block(
+            source,
+            "YESTERDAY_NUMBERS",
+            '<span class="proof-pending">Đang cập nhật đối chiếu ngày mới</span>',
+        )
+        source = replace_marker_block(
+            source,
+            "YESTERDAY_RESULTS",
+            "<span>Đang cập nhật</span>",
+        )
+        source = replace_element_text(source, "yesterday-date", display_day(expected_lock))
+        source = replace_element_text(source, "hit-summary", "Đang cập nhật")
+        source = replace_element_text(
+            source,
+            "yesterday-result-summary",
+            "Chưa dùng lại kết quả đối chiếu của ngày cũ",
+        )
+    if LOCKED_FIELD_PATTERN.search(source):
+        raise ValueError("Paid 4SO field leaked into rendered landing")
+    return source
+
+
 def today_page(
     public: dict[str, Any], proof: dict[str, Any], today: date
 ) -> tuple[str, str]:
@@ -290,6 +530,38 @@ def today_page(
         breadcrumbs=breadcrumbs,
         modified=generated,
         paywalled=fresh,
+    )
+    schema["@graph"].append(
+        {
+            "@type": "FAQPage",
+            "@id": f"{BASE_URL}{canonical_path}#faq",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Các số trên trang có phải kết luận 4SO không?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Không. Đây là đầu ra của từng phương pháp; kết luận 4SO là bước tổng hợp riêng gồm hai cặp đảo và bốn số.",
+                    },
+                },
+                {
+                    "@type": "Question",
+                    "name": "Số hôm nay được tính từ dữ liệu nào?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Chỉ dùng kết quả đã công bố đến hết ngày hôm qua và phải đủ 27 trên 27 mã.",
+                    },
+                },
+                {
+                    "@type": "Question",
+                    "name": "Tỷ lệ lịch sử có phải cam kết thắng không?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Không. Tỷ lệ lịch sử chỉ mô tả một cửa sổ dữ liệu đã kiểm định và không bảo đảm kết quả tương lai.",
+                    },
+                },
+            ],
+        }
     )
     method_content = (
         f'<div class="method-list" data-current-methods>{method_rows(public)}</div>'
@@ -445,33 +717,39 @@ def history_page(proof: dict[str, Any]) -> tuple[str, str]:
     month_label = month_date.strftime("%m/%Y")
     observed = int(month.get("observed_days") or 0)
     wins = int(month.get("win_days") or 0)
-    winning_days = {
-        str(item.get("date")): item
-        for item in month.get("winning_days") or []
-        if isinstance(item, dict) and item.get("date")
-    }
+    records = month.get("daily_records") or []
     rows = []
-    for day_number in range(1, observed + 1):
-        day_value = month_date.replace(day=day_number)
-        item = winning_days.get(day_value.isoformat())
-        if item:
-            hits = item.get("hits") or []
-            hits_html = "".join(
+    for item in records:
+        day_value = date.fromisoformat(str(item.get("date")))
+        hits = item.get("hits") or []
+        status = "hit" if hits else "miss"
+        hits_html = (
+            "".join(
                 f'<span>{esc(hit.get("number"))}{f" × {int(hit.get("count"))}" if int(hit.get("count") or 0) > 1 else ""}</span>'
                 for hit in hits
             )
-            picks = number_chips(item.get("recommended_numbers") or [], "mini-number")
-            rows.append(
-                f'<article class="history-row hit-row"><time datetime="{day_value.isoformat()}">{compact_day(day_value)}</time><div class="history-picks">{picks}</div><strong class="history-status hit">Trúng</strong><div class="history-hits">{hits_html}</div></article>'
-            )
-        else:
-            rows.append(
-                f'<article class="history-row miss-row"><time datetime="{day_value.isoformat()}">{compact_day(day_value)}</time><div class="history-picks muted">Đã ghi nhận trong mẫu</div><strong class="history-status miss">Chưa trúng</strong><div class="history-hits"><span>0/4 số xuất hiện</span></div></article>'
-            )
+            if hits
+            else "<span>0/4 số xuất hiện</span>"
+        )
+        evidence_parts = [f'Bản ghi #{esc(str(item.get("record_hash"))[:12])}']
+        if item.get("published_at"):
+            published = datetime.fromisoformat(str(item["published_at"]))
+            evidence_parts.append(f'khóa {published.strftime("%d/%m %H:%M")} ICT')
+        evidence = " · ".join(evidence_parts)
+        rows.append(
+            f'<article class="history-row {status}-row" role="row">'
+            f'<time datetime="{day_value.isoformat()}">{compact_day(day_value)}</time>'
+            f'<div class="history-picks">{number_chips(item.get("recommended_numbers") or [], "mini-number")}</div>'
+            f'<strong class="history-status {status}">{"Trúng" if hits else "Chưa trúng"}</strong>'
+            f'<div class="history-hits">{hits_html}<small class="record-evidence">{evidence}</small></div>'
+            "</article>"
+        )
     validation = proof.get("historical_validation") or {}
     rate = int(validation.get("rate_pct") or 0)
     history_total = int(validation.get("total_days") or 0)
     history_hits = int(validation.get("hit_days") or 0)
+    window_start = display_day(str(validation.get("window_start")))
+    window_end = display_day(str(validation.get("window_end")))
     title = f"Lịch sử đối chiếu số Miền Bắc tháng {month_label} | 4SO AI"
     description = f"Lịch sử đối chiếu 4SO AI tháng {month_label}: {wins}/{observed} ngày trúng đã quan sát; hiển thị cả ngày trúng và ngày chưa trúng, không ẩn khỏi tỷ lệ."
     breadcrumbs = [("/", "Trang chủ"), (path, "Lịch sử đối chiếu")]
@@ -480,6 +758,20 @@ def history_page(proof: dict[str, Any]) -> tuple[str, str]:
         description=description,
         canonical_path=path,
         breadcrumbs=breadcrumbs,
+    )
+    schema["@graph"].append(
+        {
+            "@type": "Dataset",
+            "@id": f"{BASE_URL}{path}#dataset",
+            "name": f"Lịch sử đối chiếu 4SO AI tháng {month_label}",
+            "description": description,
+            "url": f"{BASE_URL}{path}",
+            "inLanguage": "vi-VN",
+            "temporalCoverage": f'{month.get("period_start")}/{month.get("period_end")}',
+            "creator": {"@id": f"{BASE_URL}/#organization"},
+            "license": f"{BASE_URL}/legal.html#terms",
+            "isAccessibleForFree": True,
+        }
     )
     body = f'''
     <section class="seo-hero compact-hero"><div class="seo-wrap reading-width">
@@ -493,7 +785,7 @@ def history_page(proof: dict[str, Any]) -> tuple[str, str]:
         <div class="history-head" role="row"><span>Ngày</span><span>4 số đã khóa</span><span>Trạng thái</span><span>Kết quả xuất hiện</span></div>
         {''.join(rows)}
       </div>
-      <p class="fine-print">Các ngày chưa trúng được giữ trong mẫu và mẫu số. Tỷ lệ lịch sử chỉ mô tả dữ liệu đã qua, không phải cam kết hoặc xác suất bảo đảm cho ngày tiếp theo.</p>
+      <p class="fine-print">Cửa sổ kiểm định 30 ngày: {window_start}–{window_end}. Các ngày chưa trúng được giữ nguyên bốn số đã khóa, trạng thái và hash bản ghi; không bị loại khỏi mẫu số. Tỷ lệ lịch sử chỉ mô tả dữ liệu đã qua, không phải cam kết hoặc xác suất bảo đảm cho ngày tiếp theo.</p>
     </div></section>
     <section class="seo-section soft"><div class="seo-wrap two-column"><div><p class="eyebrow">NGUYÊN TẮC ĐỐI CHIẾU</p><h2><span class="phrase">Khóa trước,</span> <span class="phrase">settlement sau</span></h2><p>Số của ngày T phải được khóa khi kết quả T chưa biết. Sau khi có đủ 27 mã, hệ thống đếm số lần xuất hiện của từng số, xác định ngày trúng hoặc chưa trúng rồi mới cập nhật lịch sử.</p></div><div class="plain-card"><ul class="check-list"><li>Không sửa ngược dãy đã công bố</li><li>Không bỏ ngày chưa trúng khỏi mẫu</li><li>Nháy được đếm từ đủ 27 mã</li><li>Không suy diễn khi nguồn còn thiếu</li></ul></div></div></section>
     '''
@@ -556,6 +848,58 @@ def statistics_page(today: date) -> tuple[str, str]:
     )
 
 
+def about_page() -> tuple[str, str]:
+    path = "/gioi-thieu/"
+    title = "Giới thiệu 4SO AI và nguyên tắc biên tập dữ liệu"
+    description = "Thông tin về 4SO AI, người phụ trách nội dung, nguồn dữ liệu, quy trình kiểm tra, giới hạn của AI và cách yêu cầu sửa sai."
+    breadcrumbs = [("/", "Trang chủ"), (path, "Giới thiệu")]
+    schema = web_page_schema(
+        title=title,
+        description=description,
+        canonical_path=path,
+        breadcrumbs=breadcrumbs,
+        modified="2026-08-12",
+    )
+    page_node = next(
+        node for node in schema["@graph"] if node.get("@id") == f"{BASE_URL}{path}#webpage"
+    )
+    page_node["@type"] = "AboutPage"
+    page_node["about"] = {"@id": f"{BASE_URL}/#organization"}
+    body = '''
+    <section class="seo-hero compact-hero"><div class="seo-wrap reading-width">
+      <p class="eyebrow">GIỚI THIỆU &amp; TRÁCH NHIỆM NỘI DUNG</p>
+      <h1><span class="phrase">4SO AI là</span> <span class="phrase">dịch vụ phân tích</span> <span class="phrase">dữ liệu theo ngày</span></h1>
+      <p class="lead">Website công khai đầu ra của sáu phương pháp thống kê và lịch sử đối chiếu; chỉ khóa phần kết luận 4SO cuối cùng. Nội dung nhằm giúp người đọc kiểm tra quy trình và giới hạn của dữ liệu trước khi sử dụng.</p>
+    </div></section>
+    <section class="seo-section"><div class="seo-wrap reading-width">
+      <div class="section-heading"><p class="eyebrow">ĐƠN VỊ VẬN HÀNH</p><h2><span class="phrase">Ai chịu trách nhiệm</span> <span class="phrase">cho nội dung?</span></h2></div>
+      <div class="plain-card"><p><strong>Tên dịch vụ:</strong> 4SO AI.</p><p><strong>Người phụ trách nội dung:</strong> Thầy Linh, đại diện nhóm vận hành 4SO AI.</p><p><strong>Kênh hỗ trợ công khai:</strong> <a class="text-link" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Zalo hỗ trợ 4SO AI →</a></p><p><strong>Cập nhật tài liệu:</strong> 12/08/2026.</p></div>
+    </div></section>
+    <section class="seo-section soft"><div class="seo-wrap two-column">
+      <div><p class="eyebrow">NGUYÊN TẮC BIÊN TẬP</p><h2><span class="phrase">Khóa dữ liệu trước,</span> <span class="phrase">đối chiếu sau</span></h2><p>Báo cáo ngày T chỉ dùng dữ liệu đã công bố đến T−1. Nguồn phải đủ 27/27 mã, ngày không trùng, đầu ra không biết trước kết quả và các kiểm tra audit phải hoàn tất trước khi hiển thị số ngày mới.</p></div>
+      <div class="plain-card"><ul class="check-list"><li>Không gắn số ngày cũ cho ngày mới</li><li>Không sửa ngược lịch sử sau kết quả</li><li>Giữ cả ngày trúng và ngày chưa trúng</li><li>Không đưa kết luận trả phí vào HTML/JSON công khai</li></ul></div>
+    </div></section>
+    <section class="seo-section"><div class="seo-wrap reading-width">
+      <div class="section-heading"><p class="eyebrow">NGUỒN &amp; GIỚI HẠN</p><h2><span class="phrase">AI tính toán,</span> <span class="phrase">không biết trước</span> <span class="phrase">kết quả</span></h2></div>
+      <p>Hệ thống chuẩn hóa kết quả Xổ số Miền Bắc đã công bố thành 27 mã hai chữ số, sau đó áp dụng cùng các công thức tần suất, chuyển tiếp, gan, tăng trưởng và cặp đảo. Hash nguồn và hash bản ghi được dùng để hỗ trợ kiểm tra tính nhất quán.</p>
+      <p>Tần suất, backtest và tỷ lệ lịch sử chỉ mô tả dữ liệu đã qua. Chúng không biến một kết quả tương lai thành chắc chắn, không phải tư vấn tài chính và không phải cam kết lợi nhuận.</p>
+    </div></section>
+    <section class="seo-section soft"><div class="seo-wrap reading-width">
+      <div class="section-heading"><p class="eyebrow">SỬA SAI &amp; KHIẾU NẠI</p><h2><span class="phrase">Cách yêu cầu</span> <span class="phrase">kiểm tra lại</span></h2></div>
+      <p>Nếu phát hiện sai ngày, thiếu số, sai kết quả đối chiếu hoặc lỗi thanh toán, hãy gửi URL, ảnh chụp và thời điểm quan sát qua Zalo. Nhóm vận hành sẽ kiểm tra bản ghi nguồn, công bố phần sửa trên trang liên quan và không xóa ngày chưa trúng để làm đẹp tỷ lệ.</p>
+      <div class="cta-panel"><div><strong>Xem điều khoản và chính sách dữ liệu</strong><span>Phạm vi dịch vụ, hoàn phí, bảo mật và quyền của người dùng.</span></div><a class="primary-cta" href="/legal.html"><span>ĐỌC ĐIỀU KHOẢN</span><span>&amp; BẢO MẬT →</span></a></div>
+    </div></section>
+    '''
+    return path, shell(
+        title=title,
+        description=description,
+        canonical_path=path,
+        breadcrumbs=breadcrumbs,
+        body=body,
+        schema=schema,
+    )
+
+
 def sitemap_xml(today: date) -> str:
     daily = today.isoformat()
     fixed = "2026-08-12"
@@ -565,6 +909,7 @@ def sitemap_xml(today: date) -> str:
         ("/phuong-phap-4so/", fixed, "monthly", "0.8"),
         ("/lich-su-doi-chieu/", daily, "daily", "0.8"),
         ("/thong-ke-lo-to-mien-bac-bang-ai/", fixed, "monthly", "0.8"),
+        ("/gioi-thieu/", fixed, "yearly", "0.6"),
         ("/legal.html", fixed, "yearly", "0.3"),
     )
     urls = "\n".join(
@@ -584,15 +929,40 @@ def sitemap_xml(today: date) -> str:
     )
 
 
+def llms_text(today: date) -> str:
+    return f'''# 4SO AI
+
+> Website phân tích dữ liệu Lô tô Miền Bắc theo ngày, công khai đầu ra của sáu phương pháp và lịch sử đối chiếu. Kết luận 4SO trả phí không nằm trong HTML hoặc JSON công khai.
+
+## Trang chính
+
+- [Báo cáo công khai hôm nay]({BASE_URL}/cho-so-mien-bac-hom-nay/): dữ liệu ngày {display_day(today)}, khóa T−1 và số theo từng phương pháp.
+- [Phương pháp 4SO]({BASE_URL}/phuong-phap-4so/): quy trình khóa dữ liệu, chấm 45 cặp đảo và audit chống look-ahead.
+- [Lịch sử đối chiếu]({BASE_URL}/lich-su-doi-chieu/): đủ ngày trúng và chưa trúng, bốn số đã khóa và hash bản ghi.
+- [Thống kê bằng AI]({BASE_URL}/thong-ke-lo-to-mien-bac-bang-ai/): vai trò của sáu phương pháp công khai.
+- [Giới thiệu và trách nhiệm nội dung]({BASE_URL}/gioi-thieu/): người phụ trách, nguồn, giới hạn và quy trình sửa sai.
+- [Điều khoản và bảo mật]({BASE_URL}/legal.html): phạm vi dịch vụ, thanh toán, hoàn phí và dữ liệu cá nhân.
+
+## Nguyên tắc sử dụng
+
+- Báo cáo ngày T chỉ dùng dữ liệu đã công bố đến T−1 và phải đủ 27/27 mã.
+- Tỷ lệ lịch sử và backtest không phải cam kết hoặc xác suất bảo đảm cho tương lai.
+- Dịch vụ chỉ dành cho người đủ 18 tuổi; không nhận cược, giữ tiền cược hay trả thưởng.
+'''
+
+
 def build(output_root: Path, today: date) -> list[Path]:
+    output_root.mkdir(parents=True, exist_ok=True)
     public = load_json(PUBLIC_METHODS)
     proof = load_json(YESTERDAY_PROOF)
     validate_public_payload(public)
+    validate_proof_payload(proof)
     pages = [
         today_page(public, proof, today),
         method_page(today),
         history_page(proof),
         statistics_page(today),
+        about_page(),
     ]
     written = []
     for path, content in pages:
@@ -600,9 +970,21 @@ def build(output_root: Path, today: date) -> list[Path]:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
         written.append(target)
+    landing = render_landing(public, proof, today)
+    for target in (
+        output_root / "index.html",
+        output_root / "ai-methods" / "index.html",
+        output_root / "ai-methods" / "landing-v7.html",
+    ):
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(landing, encoding="utf-8")
+        written.append(target)
     sitemap = output_root / "sitemap.xml"
     sitemap.write_text(sitemap_xml(today), encoding="utf-8")
     written.append(sitemap)
+    llms = output_root / "llms.txt"
+    llms.write_text(llms_text(today), encoding="utf-8")
+    written.append(llms)
     return written
 
 
@@ -612,6 +994,7 @@ def validate_output(output_root: Path, today: date) -> None:
         "phuong-phap-4so": "4SO là gì?",
         "lich-su-doi-chieu": "Lịch sử đối chiếu",
         "thong-ke-lo-to-mien-bac-bang-ai": "Thống kê Lô tô Miền Bắc",
+        "gioi-thieu": "Người phụ trách nội dung",
     }
     for slug, token in expected.items():
         page = output_root / slug / "index.html"
@@ -638,6 +1021,24 @@ def validate_output(output_root: Path, today: date) -> None:
         for token in ("A1", "2SO / X2", "F01 TẦN SUẤT", "F06 CHUYỂN TIẾP"):
             if token not in today_text:
                 raise AssertionError(f"Static current method missing: {token}")
+    landing = (output_root / "index.html").read_text(encoding="utf-8")
+    if SEARCH_CONSOLE_TOKEN not in landing:
+        raise AssertionError("Search Console verification tag missing from homepage")
+    if "fonts.googleapis.com" in landing or "fonts.gstatic.com" in landing:
+        raise AssertionError("Homepage must not block rendering on external fonts")
+    if is_fresh and landing.count('class="method-row"') != 6:
+        raise AssertionError("Homepage must statically render exactly six public methods")
+    if not is_fresh and 'class="method-row"' in landing:
+        raise AssertionError("Stale homepage must remove old public methods")
+    if not all(token in landing for token in ("disabled", "setPaymentAvailability(false)", "dataReady")):
+        raise AssertionError("Homepage payment must fail closed until daily data validates")
+    history = (output_root / "lich-su-doi-chieu" / "index.html").read_text(encoding="utf-8")
+    if history.count('class="history-row ') != 11 or "Đã ghi nhận trong mẫu" in history:
+        raise AssertionError("History page must show all four picks for all eleven observed days")
+    if "Dataset" not in history or "Bản ghi #" not in history:
+        raise AssertionError("History dataset provenance is incomplete")
+    if not (output_root / "llms.txt").read_text(encoding="utf-8").startswith("# 4SO AI"):
+        raise AssertionError("llms.txt was not generated")
     sitemap = (output_root / "sitemap.xml").read_text(encoding="utf-8")
     for slug in expected:
         if f"{BASE_URL}/{slug}/" not in sitemap:
@@ -663,6 +1064,9 @@ def main() -> None:
                 raise AssertionError("Stale SEO page must hide old method numbers and disable the paywall")
             if "CHƯA NHẬN THANH TOÁN" not in stale_text:
                 raise AssertionError("Stale SEO page must fail closed before payment")
+            stale_landing = (output / "index.html").read_text(encoding="utf-8")
+            if "Chưa dùng lại kết quả đối chiếu của ngày cũ" not in stale_landing:
+                raise AssertionError("Stale homepage must not present an older proof as yesterday")
         print("SEO_STATIC_RENDER_SELF_TEST_OK")
         return
     paths = build(args.output_root, today)

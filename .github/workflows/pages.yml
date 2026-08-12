@@ -5,7 +5,9 @@ on:
     branches: ["main"]
   workflow_dispatch:
   schedule:
-    # 01:15 Vietnam time: rebuild dated HTML even if daily data has not changed.
+    # 00:01 Vietnam time: immediately fail closed at the date boundary.
+    - cron: "1 17 * * *"
+    # 01:15 Vietnam time: retry after the daily 00:05 data operation.
     - cron: "15 18 * * *"
 
 permissions:
@@ -36,26 +38,14 @@ jobs:
           python scripts/build_public_methods.py --self-test
           npm test
           rm -rf _site
-          mkdir -p _site/control
+          mkdir -p _site/control _site/ai-methods
           cp index.html styles.css app.js _site/control/
-          cp 404.html favicon.svg robots.txt sitemap.xml _site/
-          cp -R ai-methods _site/
+          cp 404.html favicon.svg robots.txt _site/
+          cp ai-methods/v7-overrides.css ai-methods/seo.css _site/ai-methods/
+          cp ai-methods/public-methods.json ai-methods/yesterday-proof.json _site/ai-methods/
+          cp ai-methods/og-4so-ai-v2.jpg _site/ai-methods/
           cp ai-methods/legal-v3.html _site/legal.html
           cp ai-methods/legal-v3.html _site/ai-methods/legal.html
-
-          python - <<'PY'
-          from pathlib import Path
-
-          html = Path('ai-methods/landing-v7.html').read_text(encoding='utf-8')
-          html = html.replace('<details open>', '<details>')
-          data = html.encode('utf-8')
-          for target in [
-              Path('_site/index.html'),
-              Path('_site/ai-methods/index.html'),
-              Path('_site/ai-methods/landing-v7.html'),
-          ]:
-              target.write_bytes(data)
-          PY
 
           python scripts/build_seo_pages.py --output-root _site
 
@@ -72,7 +62,10 @@ jobs:
           grep -n 'Phương pháp 4SO' _site/phuong-phap-4so/index.html | head
           grep -n 'Lịch sử đối chiếu' _site/lich-su-doi-chieu/index.html | head
           grep -n 'Thống kê Lô tô Miền Bắc' _site/thong-ke-lo-to-mien-bac-bang-ai/index.html | head
+          grep -n 'Người phụ trách nội dung' _site/gioi-thieu/index.html | head
           grep -n 'https://lemienbac.com/cho-so-mien-bac-hom-nay/' _site/sitemap.xml | head
+          grep -n '# 4SO AI' _site/llms.txt | head
+          test ! -e _site/ai-methods/report-data.json
           touch _site/.nojekyll
 
       - name: Upload artifact

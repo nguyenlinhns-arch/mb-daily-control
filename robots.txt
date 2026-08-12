@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /control/
 
 Sitemap: https://lemienbac.com/sitemap.xml

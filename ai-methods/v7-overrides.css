@@ -17,7 +17,7 @@
   --line-dark:#b8c2c9;
   --soft:#edf1f4;
   --shadow:0 22px 60px rgba(7,31,51,.13);
-  --font:"Be Vietnam Pro","Segoe UI",Arial,sans-serif;
+  --font:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 
 *{box-sizing:border-box}
@@ -27,6 +27,7 @@ body.lock{overflow:hidden}
 [hidden]{display:none!important}
 button,a{font:inherit;-webkit-tap-highlight-color:transparent}
 button{cursor:pointer}
+button:disabled{cursor:wait;opacity:.68;box-shadow:none!important;transform:none!important}
 a{color:inherit;text-decoration:none}
 button:focus-visible,a:focus-visible{outline:4px solid rgba(8,120,249,.25);outline-offset:3px}
 .wrap{width:min(calc(100% - 24px),1080px);margin-inline:auto}
@@ -84,6 +85,7 @@ h1,h2,h3{overflow-wrap:normal;text-wrap:balance}
 .recommendation-card,.result-card,.rate-card{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .recommendation-card>span,.result-card>span{display:block;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.05em}
 .yesterday-numbers{margin-top:9px;display:flex;flex-wrap:wrap;gap:7px}
+.proof-pending{color:var(--muted);font-size:12px;font-weight:750}
 .yesterday-numbers>b{position:relative;width:47px;height:47px;display:grid;place-items:center;border:2px solid #cbd3d8;border-radius:50%;background:#f8fafb;color:#71808a;font-size:21px;line-height:1;font-weight:900}
 .yesterday-numbers>b.hit{border-color:var(--green);background:var(--green-soft);color:var(--green)}
 .yesterday-numbers small{position:absolute;top:-7px;right:-6px;min-width:23px;padding:3px 4px;border-radius:999px;background:var(--red);color:#fff;font-size:8px;font-weight:900}
@@ -159,6 +161,7 @@ h1,h2,h3{overflow-wrap:normal;text-wrap:balance}
 .hero-sale>p{margin:9px 0 0;color:var(--muted);font-size:10px;text-align:center}
 
 .proof-section,.pricing-section,.seo-guide-section,.trust-section{padding:58px 0}
+.pricing-section,.seo-guide-section,.trust-section{content-visibility:auto;contain-intrinsic-size:760px}
 .proof-section{background:#fff}
 .section-kicker{margin:0 0 8px;color:var(--red);font-size:12px;font-weight:900;letter-spacing:.075em;text-transform:uppercase}
 .proof-head h2,.section-heading h2,.trust-layout h2{margin:0;font-size:clamp(30px,8vw,46px);line-height:1.08;letter-spacing:-.04em;text-wrap:balance}
@@ -319,7 +322,7 @@ h1,h2,h3{overflow-wrap:normal;text-wrap:balance}
   .paywall-lock strong{font-size:21px}
   .paywall-lock p{font-size:13px}
   .proof-section,.pricing-section,.seo-guide-section,.trust-section{padding:78px 0}
-  .seo-guide-grid{grid-template-columns:repeat(4,1fr)}
+  .seo-guide-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
   .mobile-bar{display:none}
   .footer{padding-bottom:28px}
   .modal{align-items:center;justify-content:center;padding:22px}

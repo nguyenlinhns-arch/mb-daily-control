@@ -33,6 +33,10 @@ const requiredLandingTokens = [
   "CopyPaymentDetails",
   "og-4so-ai-v2.jpg",
   "v7-overrides.css",
+  "google-site-verification",
+  "/gioi-thieu/",
+  "setPaymentAvailability(false)",
+  "G-R9TBYP97BC",
 ];
 
 for (const token of requiredLandingTokens) {
@@ -204,22 +208,62 @@ if (monthSummary.month !== "2026-08" || monthSummary.observed_days !== 11 || mon
   throw new Error("August winning-day summary must remain 8/11 through 11/08/2026");
 }
 
+if (yesterdayProof.schema_version !== "MB_PUBLIC_YESTERDAY_PROOF_V2") {
+  throw new Error("Yesterday proof must use the complete V2 public audit schema");
+}
+
+if (validation.window_start !== "2026-07-13" || validation.window_end !== "2026-08-11") {
+  throw new Error("Historical validation must disclose its exact 30-day window");
+}
+
+if (!Array.isArray(monthSummary.daily_records) || monthSummary.daily_records.length !== 11 || monthSummary.miss_days !== 3) {
+  throw new Error("August history must include all eleven daily records and three misses");
+}
+
+for (const [index, record] of monthSummary.daily_records.entries()) {
+  const expectedDate = `2026-08-${String(index + 1).padStart(2, "0")}`;
+  if (record.date !== expectedDate || record.recommended_numbers?.length !== 4 || !/^[0-9a-f]{64}$/.test(record.record_hash || "")) {
+    throw new Error(`Incomplete auditable history record: ${expectedDate}`);
+  }
+  if ((record.hits?.length ? "hit" : "miss") !== record.status) {
+    throw new Error(`History status does not match hits: ${expectedDate}`);
+  }
+}
+
 if (/final_codes|final_pairs|canonical_codes|canonical_pairs/i.test(yesterdayProofText)) {
   throw new Error("Locked 4SO conclusion must not appear in public proof data");
 }
 
-if (!workflow.includes("Path('ai-methods/landing-v7.html').read_text")) {
-  throw new Error("GitHub Pages must deploy the maintained landing-v7 source");
+if (!workflow.includes("python scripts/build_seo_pages.py --output-root _site")) {
+  throw new Error("GitHub Pages must statically render the maintained landing-v7 source");
 }
 
 if (workflow.includes("V7_GZ_B64")) {
   throw new Error("GitHub Pages must not deploy the obsolete embedded v7 payload");
 }
 
-const scriptMatch = landing.match(/<script>([\s\S]*?)<\/script>/i);
-if (!scriptMatch) {
+if (workflow.includes("cp -R ai-methods") || !workflow.includes("test ! -e _site/ai-methods/report-data.json")) {
+  throw new Error("GitHub Pages artifact must exclude obsolete reports and landing versions");
+}
+
+if (!workflow.includes('cron: "1 17 * * *"') || !workflow.includes('cron: "15 18 * * *"')) {
+  throw new Error("GitHub Pages must fail closed at midnight and retry after the daily operation");
+}
+
+if (landing.includes("fonts.googleapis.com") || landing.includes("fonts.gstatic.com")) {
+  throw new Error("Landing page must not block rendering on external font requests");
+}
+
+if ((landing.match(/data-(?:plan-)?open[^>]*disabled/g) || []).length < 6 || !landing.includes("let dataReady=false")) {
+  throw new Error("Payment controls must start disabled until today's payload validates");
+}
+
+const inlineScripts = [...landing.matchAll(/<script>([\s\S]*?)<\/script>/gi)].map((match) => match[1]);
+if (!inlineScripts.length || !inlineScripts.some((script) => script.includes("const initialTarget=reportDay()"))) {
   throw new Error("Landing page script is missing");
 }
-new vm.Script(scriptMatch[1], { filename: "landing-v7-inline.js" });
+for (const [index, script] of inlineScripts.entries()) {
+  new vm.Script(script, { filename: `landing-v7-inline-${index}.js` });
+}
 
 console.log("4SO AI conversion landing smoke test passed.");

@@ -11,6 +11,8 @@ const workflow = readFileSync(new URL("../.github/workflows/pages.yml", import.m
 
 const requiredLandingTokens = [
   "BẢNG PHÂN TÍCH AI 4SO",
+  "KHUYẾN NGHỊ HÔM NAY",
+  "ĐANG KIỂM TRA DỮ LIỆU",
   "Các ngày trúng trong tháng",
   "month-winning-rows",
   "SỐ KHUYẾN NGHỊ HÔM QUA",
@@ -69,7 +71,14 @@ for (const token of [
   "timeZone:'Asia/Ho_Chi_Minh'",
   "const initialTarget=reportDay()",
   "return `${value.year}-${value.month}-${value.day}`",
+  "const previousISO=",
+  "const initialLock=previousISO(initialTarget)",
   "lockDisplay=display(data.data_lock)",
+  "data.target_date!==initialTarget",
+  "data.data_lock!==previousISO(initialTarget)",
+  "data.recommendation_scope!=='TODAY_ONLY'",
+  "Không hiển thị lại số của ngày cũ.",
+  "ĐANG CẬP NHẬT DỮ LIỆU HÔM NAY",
 ]) {
   if (!landing.includes(token)) throw new Error(`Landing must use today's Vietnam date: ${token}`);
 }
@@ -80,6 +89,16 @@ if (landing.includes("target=data.target_date") || landing.includes("afterDailyU
 
 if (publicMethods.source_status !== "LOCKED_27_OF_27" || publicMethods.outcome_known_at_selection !== false) {
   throw new Error("Public method data must come from a locked 27/27 no-look-ahead snapshot");
+}
+
+if (publicMethods.schema_version !== "MB_PUBLIC_METHOD_OUTPUTS_V2_TODAY_ONLY" || publicMethods.recommendation_scope !== "TODAY_ONLY") {
+  throw new Error("Public method output must be explicitly scoped to today's recommendation block");
+}
+
+const targetMs = Date.parse(`${publicMethods.target_date}T00:00:00Z`);
+const lockMs = Date.parse(`${publicMethods.data_lock}T00:00:00Z`);
+if (!Number.isFinite(targetMs) || targetMs - lockMs !== 86_400_000) {
+  throw new Error("Public method data lock must be exactly target date minus one day");
 }
 
 if (!Array.isArray(publicMethods.methods) || publicMethods.methods.length < 4) {

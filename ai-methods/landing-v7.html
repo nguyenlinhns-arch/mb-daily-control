@@ -46,7 +46,7 @@
             <div class="report-brandline">
               <span class="live-dot" aria-hidden="true"></span>
               <span>BÁO CÁO AI THEO NGÀY</span>
-              <b>ĐÃ HOÀN TẤT PHÂN TÍCH</b>
+              <b id="report-status">ĐANG KIỂM TRA DỮ LIỆU</b>
             </div>
             <h1>BẢNG PHÂN TÍCH AI 4SO</h1>
             <p>Lô tô Miền Bắc · Ngày <strong data-date>--/--/----</strong></p>
@@ -106,13 +106,13 @@
           </section>
 
           <section class="method-board" aria-labelledby="method-board-title">
-            <div class="method-title" id="method-board-title"><div><span>BÁO CÁO CÔNG KHAI</span><h2>Số theo các phương pháp</h2></div><strong>Ngày <b data-date>--/--/----</b></strong></div>
+            <div class="method-title" id="method-board-title"><div><span>KHUYẾN NGHỊ HÔM NAY</span><h2>Số theo các phương pháp</h2></div><strong>Ngày <b data-date>--/--/----</b></strong></div>
             <div class="board-heading">
               <span>PHƯƠNG PHÁP</span>
               <span>SỐ</span>
             </div>
             <div id="method-rows" aria-live="polite">
-              <div class="method-loading"><span class="loading-dot" aria-hidden="true"></span>Đang tải danh sách số đã khóa...</div>
+              <div class="method-loading"><span class="loading-dot" aria-hidden="true"></span>Đang tải số khuyến nghị hôm nay...</div>
             </div>
           </section>
 
@@ -217,7 +217,8 @@
       return `${value.year}-${value.month}-${value.day}`;
     };
     const display=iso=>{const[y,m,d]=iso.split('-');return `${d}/${m}/${y}`};
-    const previous=iso=>{const[y,m,d]=iso.split('-').map(Number);const date=new Date(Date.UTC(y,m-1,d-1));return `${pad(date.getUTCDate())}/${pad(date.getUTCMonth()+1)}/${date.getUTCFullYear()}`};
+    const previousISO=iso=>{const[y,m,d]=iso.split('-').map(Number);const value=new Date(Date.UTC(y,m-1,d-1));return `${value.getUTCFullYear()}-${pad(value.getUTCMonth()+1)}-${pad(value.getUTCDate())}`};
+    const previous=iso=>display(previousISO(iso));
     const track=(name,params={})=>{try{if(typeof window.fbq==='function')window.fbq('trackCustom',name,params)}catch{}};
     const packages={
       day:{label:'Gói 1 ngày',price:30000,text:'30.000đ',memo:'1D'},
@@ -225,7 +226,7 @@
       month:{label:'Gói 1 tháng · 30 ngày',price:800000,text:'800.000đ',memo:'30D'}
     };
     const initialTarget=reportDay();
-    const initialLock=null;
+    const initialLock=previousISO(initialTarget);
     let target=initialTarget;
     let targetDisplay=display(target);
     let lockDisplay=initialLock?display(initialLock):previous(target);
@@ -239,6 +240,7 @@
     const packageButtons=[...document.querySelectorAll('[data-package]')];
     const openButtons=[...document.querySelectorAll('[data-open],[data-plan-open]')];
     const methodRows=document.querySelector('#method-rows');
+    const reportStatus=document.querySelector('#report-status');
     const yesterdayDate=document.querySelector('#yesterday-date');
     const yesterdayNumbers=document.querySelector('#yesterday-numbers');
     const yesterdayResult=document.querySelector('#yesterday-result');
@@ -409,19 +411,23 @@
     fetch('/ai-methods/public-methods.json',{cache:'no-store'})
       .then(response=>{if(!response.ok)throw new Error('Không tải được dữ liệu');return response.json()})
       .then(data=>{
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(data.target_date||'')||!/^\d{4}-\d{2}-\d{2}$/.test(data.data_lock||''))throw new Error('Ngày dữ liệu không hợp lệ');
-        // Ngày nhận báo cáo luôn là ngày hiện tại theo giờ Việt Nam.
-        // JSON phương pháp chỉ cung cấp nội dung công khai và ngày khóa dữ liệu.
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(data.target_date||'')||!/^\d{4}-\d{2}-\d{2}$/.test(data.data_lock||''))throw new Error('INVALID_METHOD_DATES');
+        if(data.target_date!==initialTarget||data.data_lock!==previousISO(initialTarget))throw new Error('STALE_TODAY_RECOMMENDATION');
+        if(data.recommendation_scope!=='TODAY_ONLY'||data.source_status!=='LOCKED_27_OF_27'||data.outcome_known_at_selection!==false)throw new Error('INVALID_METHOD_LOCK');
         lockDisplay=display(data.data_lock);
         applyReportDates();
         renderMethodRows(data);
+        reportStatus.textContent='ĐÃ HOÀN TẤT PHÂN TÍCH';
         syncPackage();
       })
-      .catch(()=>{
+      .catch(error=>{
         methodRows.replaceChildren();
         const message=document.createElement('div');
         message.className='method-loading method-loading-error';
-        message.textContent='Chưa tải được danh sách số. Vui lòng mở lại trang sau ít phút.';
+        message.textContent=error?.message==='STALE_TODAY_RECOMMENDATION'
+          ?'Số khuyến nghị hôm nay đang được cập nhật. Không hiển thị lại số của ngày cũ.'
+          :'Chưa tải được số khuyến nghị hôm nay. Vui lòng mở lại trang sau ít phút.';
+        reportStatus.textContent='ĐANG CẬP NHẬT DỮ LIỆU HÔM NAY';
         methodRows.append(message);
       });
   })();

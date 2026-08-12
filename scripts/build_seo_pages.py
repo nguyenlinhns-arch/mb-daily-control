@@ -367,7 +367,7 @@ def today_page(
     </section>
     <section class="seo-section soft" aria-labelledby="faq-title">
       <div class="seo-wrap reading-width">
-        <div class="section-heading"><p class="eyebrow">CÂU HỎI THƯỜNG GẶP</p><h2 id="faq-title"><span class="phrase">Hiểu đúng về</span> <span class="phrase">“cho số Miền Bắc hôm nay”</span></h2></div>
+        <div class="section-heading"><p class="eyebrow">CÂU HỎI THƯỜNG GẶP</p><h2 id="faq-title"><span class="phrase">Hiểu đúng về</span> <span class="phrase">“cho số Miền Bắc</span> <span class="phrase">hôm nay”</span></h2></div>
         <details><summary>Các số trên trang có phải kết luận 4SO không?</summary><p>Không. Các dãy đang công khai là đầu ra của từng phương pháp. Kết luận 4SO là bước tổng hợp riêng, chỉ gồm 2 cặp đảo và 4 số.</p></details>
         <details><summary>Số hôm nay được tính từ dữ liệu nào?</summary><p>Chỉ dùng kết quả đã công bố đến hết ngày hôm qua. Nếu nguồn chưa đủ 27/27 mã hoặc ngày khóa không đúng T−1, website không công khai lại số cũ.</p></details>
         <details><summary>Tỷ lệ 80% có phải cam kết thắng không?</summary><p>Không. 80% chỉ mô tả 24 ngày có ít nhất một số xuất hiện trong một cửa sổ 30 ngày đã kiểm định. Kết quả tương lai có thể khác.</p></details>
@@ -401,7 +401,7 @@ def method_page(today: date) -> tuple[str, str]:
     body = f'''
     <section class="seo-hero compact-hero"><div class="seo-wrap reading-width">
       <p class="eyebrow">PHƯƠNG PHÁP MB 4SO</p>
-      <h1><span class="phrase">4SO là gì?</span> <span class="phrase">Cách chọn 2 cặp đảo</span></h1>
+      <h1><span class="phrase">4SO là gì?</span> <span class="phrase">Cách chọn</span> <span class="phrase">2 cặp đảo</span></h1>
       <p class="lead">4SO là quy trình phân tích Lô tô Miền Bắc theo ngày: dùng toàn bộ dữ liệu đã công bố đến T−1, chấm đủ 45 cặp đảo không kép và chọn đúng hai cặp đứng đầu, tương ứng bốn số khác nhau.</p>
     </div></section>
     <section class="seo-section"><div class="seo-wrap reading-width">
@@ -418,7 +418,7 @@ def method_page(today: date) -> tuple[str, str]:
       <div class="plain-card"><ul class="check-list"><li>Không dùng kết quả ngày T</li><li>Không sửa công thức sau khi biết kết quả</li><li>Không thêm số ngoài hai cặp canonical</li><li>Không coi backtest là bảo đảm thắng</li></ul></div>
     </div></section>
     <section class="seo-section"><div class="seo-wrap reading-width">
-      <div class="section-heading"><p class="eyebrow">CÁCH ĐỌC BÁO CÁO</p><h2><span class="phrase">Số phương pháp</span> <span class="phrase">khác với kết luận cuối</span></h2></div>
+      <div class="section-heading"><p class="eyebrow">CÁCH ĐỌC BÁO CÁO</p><h2><span class="phrase">Số phương pháp</span> <span class="phrase">khác với</span> <span class="phrase">kết luận cuối</span></h2></div>
       <p>Các số ở bảng công khai cho biết từng mô hình đang ưu tiên điều gì. Chúng có thể trùng nhau hoặc khác nhau. Người đọc không nên tự cộng toàn bộ dãy thành một giỏ mới, vì kết luận 4SO chỉ lấy đúng hai cặp sau bước chấm và audit riêng.</p>
       <p>Ngày báo cáo và ngày khóa dữ liệu luôn tách biệt: báo cáo ngày T phải dùng dữ liệu đến T−1. Nếu hai mốc không khớp, website chuyển sang trạng thái đang cập nhật và không dùng lại số của ngày trước.</p>
       <div class="cta-panel"><div><strong>Xem số công khai ngày {display_day(today)}</strong><span>HTML được dựng sẵn từ dữ liệu đã khóa đến hôm qua.</span></div><a class="primary-cta" href="/cho-so-mien-bac-hom-nay/"><span>XEM SỐ</span><span>HÔM NAY →</span></a></div>
@@ -484,7 +484,7 @@ def history_page(proof: dict[str, Any]) -> tuple[str, str]:
     body = f'''
     <section class="seo-hero compact-hero"><div class="seo-wrap reading-width">
       <p class="eyebrow">LỊCH SỬ ĐỐI CHIẾU</p>
-      <h1><span class="phrase">Kết quả số</span> <span class="phrase">Miền Bắc tháng {esc(month_label)}</span></h1>
+      <h1><span class="phrase">Kết quả số</span> <span class="phrase">Miền Bắc</span> <span class="phrase">tháng {esc(month_label)}</span></h1>
       <p class="lead">Bảng này ghi đủ {observed} ngày đã quan sát trong tháng, gồm cả ngày trúng và ngày chưa trúng. Một ngày được tính là trúng khi ít nhất một trong bốn số đã khóa trước kết quả xuất hiện trong 27 mã.</p>
     </div></section>
     <section class="seo-section"><div class="seo-wrap">
@@ -525,7 +525,7 @@ def statistics_page(today: date) -> tuple[str, str]:
       <p class="lead">AI trong 4SO không “biết trước” kết quả. Hệ thống tự động chuẩn hóa lịch sử, tính các đặc trưng thống kê theo cùng một công thức và kiểm tra dữ liệu trước khi xuất bản báo cáo ngày mới.</p>
     </div></section>
     <section class="seo-section"><div class="seo-wrap">
-      <div class="section-heading"><p class="eyebrow">SÁU GÓC NHÌN CÔNG KHAI</p><h2><span class="phrase">Mỗi phương pháp</span> <span class="phrase">đo một tín hiệu khác nhau</span></h2></div>
+      <div class="section-heading"><p class="eyebrow">SÁU GÓC NHÌN CÔNG KHAI</p><h2><span class="phrase">Mỗi phương pháp</span> <span class="phrase">đo một tín hiệu</span> <span class="phrase">khác nhau</span></h2></div>
       <div class="explain-grid">
         <article><b>A1</b><h3>Gan và gan tối đa</h3><p>Theo dõi khoảng cách từ lần xuất hiện gần nhất và vị trí của số trong vùng điều kiện đã định trước.</p></article>
         <article><b>2SO / X2</b><h3>Cân bằng cặp đảo</h3><p>So sánh hai chiều của một cặp đảo trên nhiều cửa sổ để tránh chỉ nhìn một số đơn lẻ.</p></article>
@@ -541,7 +541,7 @@ def statistics_page(today: date) -> tuple[str, str]:
       <div class="data-flow"><div><b>1</b><span>Kết quả đã công bố</span></div><div><b>2</b><span>Chuẩn hóa 27 mã</span></div><div><b>3</b><span>Tính 6 phương pháp</span></div><div><b>4</b><span>Audit 4SO</span></div></div>
     </div></section>
     <section class="seo-section"><div class="seo-wrap reading-width">
-      <div class="section-heading"><p class="eyebrow">GIỚI HẠN CẦN BIẾT</p><h2><span class="phrase">Thống kê hỗ trợ</span> <span class="phrase">quyết định,</span> <span class="phrase">không tạo sự chắc chắn</span></h2></div>
+      <div class="section-heading"><p class="eyebrow">GIỚI HẠN CẦN BIẾT</p><h2><span class="phrase">Thống kê hỗ trợ</span> <span class="phrase">quyết định,</span> <span class="phrase">không tạo sự</span> <span class="phrase">chắc chắn</span></h2></div>
       <p>Tần suất cao, gan dài hoặc một chuyển tiếp mạnh chỉ là mô tả lịch sử. Những tín hiệu đó không làm kết quả ngẫu nhiên trong tương lai trở thành chắc chắn. Vì thế website công bố nguồn, ngày khóa, lịch sử có cả ngày chưa trúng và cảnh báo rõ rằng backtest không phải bảo đảm.</p>
       <div class="cta-panel"><div><strong>Xem báo cáo ngày {display_day(today)}</strong><span>Các số công khai được dựng trực tiếp trong HTML.</span></div><a class="primary-cta" href="/cho-so-mien-bac-hom-nay/"><span>XEM PHÂN TÍCH</span><span>HÔM NAY →</span></a></div>
     </div></section>

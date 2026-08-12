@@ -1033,8 +1033,9 @@ def validate_output(output_root: Path, today: date) -> None:
     if not all(token in landing for token in ("disabled", "setPaymentAvailability(false)", "dataReady")):
         raise AssertionError("Homepage payment must fail closed until daily data validates")
     history = (output_root / "lich-su-doi-chieu" / "index.html").read_text(encoding="utf-8")
-    if history.count('class="history-row ') != 11 or "Đã ghi nhận trong mẫu" in history:
-        raise AssertionError("History page must show all four picks for all eleven observed days")
+    expected_history_rows = int((load_json(YESTERDAY_PROOF).get("month_summary") or {}).get("observed_days") or 0)
+    if history.count('class="history-row ') != expected_history_rows or "Đã ghi nhận trong mẫu" in history:
+        raise AssertionError("History page must show all four picks for every observed day")
     if "Dataset" not in history or "Bản ghi #" not in history:
         raise AssertionError("History dataset provenance is incomplete")
     if not (output_root / "llms.txt").read_text(encoding="utf-8").startswith("# 4SO AI"):

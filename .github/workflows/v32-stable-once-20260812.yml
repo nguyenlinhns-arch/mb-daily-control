@@ -1,0 +1,76 @@
+name: V32 Stable one-off 2026-08-12
+
+on:
+  push:
+    paths:
+      - '.github/workflows/v32-stable-once-20260812.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-v32-stable:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONHASHSEED: '0'
+      TZ: Asia/Ho_Chi_Minh
+      TARGET_DATE: '2026-08-12'
+      SOURCE_END: '2026-08-11'
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-v32.txt
+
+      - name: Install frozen runtime
+        run: python -m pip install --requirement requirements-v32.txt
+
+      - name: Fetch frozen V32 engine
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          test -n "$GOOGLE_SERVICE_ACCOUNT_JSON"
+          python scripts/fetch_v32_engine.py --metadata data/v32-engine-runtime.json --destination engine_v32
+
+      - name: Verify frozen engine
+        run: python scripts/v32_daily.py verify-seed
+
+      - name: Snapshot source through 2026-08-11
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v32stable"
+          python scripts/google_sheets_bridge.py snapshot --settlement-date "$SOURCE_END" --output-xlsx "$RUNNER_TEMP/v32stable/source.xlsx" --output-pnl-json "$RUNNER_TEMP/v32stable/pnl-snapshot.json"
+
+      - name: Run exact V32 engine read-only
+        env:
+          MB_V32_SOURCE_XLSX: ${{ runner.temp }}/v32stable/source.xlsx
+          MB_V32_CODE_CACHE: ${{ runner.temp }}/v32stable/v9_code_predictions.pkl
+          MB_V32_SEED_CACHE: ${{ runner.temp }}/v32stable/v9_code_seed_predictions.pkl
+        run: |
+          set -euo pipefail
+          python engine_v32/runtime_plan.py --source-end "$SOURCE_END" | tee "$RUNNER_TEMP/v32stable/result.log"
+          grep '^V32_PLAN_JSON=' "$RUNNER_TEMP/v32stable/result.log" > "$RUNNER_TEMP/v32stable/final.txt"
+          test -s "$RUNNER_TEMP/v32stable/final.txt"
+
+      - name: Upload result only
+        uses: actions/upload-artifact@v4
+        with:
+          name: v32-stable-20260812-result
+          path: |
+            ${{ runner.temp }}/v32stable/final.txt
+            ${{ runner.temp }}/v32stable/result.log
+          retention-days: 1

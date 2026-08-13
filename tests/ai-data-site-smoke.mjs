@@ -51,6 +51,7 @@ assert.match(index, /80%/);
 assert.match(index, /24\/30 ngày/);
 assert.match(index, /14\/07\/2026–12\/08\/2026/);
 assert.match(index, /Có cả ngày xuất hiện và không xuất hiện/i);
+assert.doesNotMatch(index, /Dịch vụ phân tích dữ liệu; không bán số, không nhận cược và không bảo đảm kết quả tương lai/i);
 assert.doesNotMatch(index, /Số được lưu theo 7 lớp báo cáo/i);
 assert.doesNotMatch(index, /6 phương pháp độc lập và 1 lớp tổng hợp 4SO/i);
 assert.match(index, /Nhận báo cáo đầy đủ/i);

@@ -1,5 +1,5 @@
 /**
- * 4SO AI order approval service for Google Apps Script.
+ * Le Mien Bac AI order approval service for Google Apps Script.
  *
  * Deploy as a web app, execute as the owner, access "Anyone". Put the deployed
  * /exec URL into window.ORDER_CONFIRMATION_ENDPOINT before app.js loads.
@@ -47,7 +47,7 @@ function doPost(event) {
 
     const approveUrl = approvalUrl(code, "approve");
     const rejectUrl = approvalUrl(code, "reject");
-    const subject = `[4SO AI] Khách báo đã chuyển khoản – ${code}`;
+    const subject = `[Lê Miền Bắc AI] Khách báo đã chuyển khoản – ${code}`;
     const html = [
       `<p>Có khách vừa báo đã chuyển khoản.</p>`,
       `<p><b>Mã yêu cầu:</b> ${htmlEscape(code)}<br>`,
@@ -58,7 +58,7 @@ function doPost(event) {
       `<p><a href="${approveUrl}" style="display:inline-block;padding:14px 20px;background:#087c75;color:#fff;text-decoration:none;border-radius:9px;font-weight:bold">XÁC NHẬN ĐÃ NHẬN TIỀN</a></p>`,
       `<p><a href="${rejectUrl}">Không tìm thấy giao dịch</a></p>`
     ].join("");
-    MailApp.sendEmail({ to: OWNER_EMAIL, subject, htmlBody: html, name: "4SO AI Website" });
+    MailApp.sendEmail({ to: OWNER_EMAIL, subject, htmlBody: html, name: "Lê Miền Bắc AI" });
     return textOutput("ok");
   } finally {
     lock.releaseLock();
@@ -150,7 +150,7 @@ function getOrderSheet() {
   let spreadsheetId = properties.getProperty("ORDER_SHEET_ID");
   let spreadsheet;
   if (!spreadsheetId) {
-    spreadsheet = SpreadsheetApp.create("4SO AI – Xác nhận thanh toán");
+    spreadsheet = SpreadsheetApp.create("Lê Miền Bắc AI – Xác nhận thanh toán");
     spreadsheetId = spreadsheet.getId();
     properties.setProperty("ORDER_SHEET_ID", spreadsheetId);
   } else {

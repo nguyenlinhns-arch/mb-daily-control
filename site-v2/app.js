@@ -9,9 +9,9 @@
 
   // Filled after the Google Apps Script approval service is deployed.
   const BACKEND_ENDPOINT = String(window.ORDER_CONFIRMATION_ENDPOINT || "").trim();
-  const ORDER_KEY = "4so_order_v2";
-  const ATTRIBUTION_KEY = "4so_attribution_v2";
-  const CONSENT_KEY = "4so_measurement_consent_v1";
+  const ORDER_KEY = "lemienbac_order_v3";
+  const ATTRIBUTION_KEY = "lemienbac_attribution_v3";
+  const CONSENT_KEY = "lemienbac_measurement_consent_v1";
   const ZALO_URL = "https://zalo.me/0398696879";
   const POLL_INTERVAL_MS = 5000;
 
@@ -237,7 +237,7 @@
     deliveryLink.hidden = !safeUrl;
     if (safeUrl) deliveryLink.href = safeUrl;
 
-    const purchaseKey = `4so_purchase_${order.code}`;
+    const purchaseKey = `lemienbac_purchase_${order.code}`;
     if (!localStorage.getItem(purchaseKey)) {
       track("purchase", {
         transaction_id: order.code,
@@ -318,7 +318,7 @@
 
   function jsonp(params) {
     return new Promise((resolve, reject) => {
-      const callbackName = `__fourSoStatus_${randomToken(6)}`;
+      const callbackName = `__leMienBacStatus_${randomToken(6)}`;
       const script = document.createElement("script");
       const timeout = window.setTimeout(() => finish(new Error("timeout")), 12000);
       const finish = (error, data) => {

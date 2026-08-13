@@ -1,22 +1,22 @@
 {
   "schema_version": "MB_PUBLIC_METHOD_OUTPUTS_V2_TODAY_ONLY",
   "recommendation_scope": "TODAY_ONLY",
-  "target_date": "2026-08-13",
-  "data_lock": "2026-08-12",
-  "generated_at": "2026-08-13T08:34:00+07:00",
+  "target_date": "2026-08-14",
+  "data_lock": "2026-08-13",
+  "generated_at": "2026-08-14T00:10:50+07:00",
   "source_status": "LOCKED_27_OF_27",
-  "source_row_count": 2366,
-  "source_sha256": "6097b4f96ec8b7565caa86119c654b668bcba019f58f194b5e2b44029d3fe6e4",
+  "source_row_count": 2367,
+  "source_sha256": "803c627b889371ce0646cf9c3a88c5eb15bb3e64f095d67ea48ff4bd96396295",
   "outcome_known_at_selection": false,
   "methods": [
     {
       "id": "A1",
       "name": "A1",
       "numbers": [
+        "37",
         "70",
         "65",
-        "74",
-        "37"
+        "74"
       ]
     },
     {
@@ -31,21 +31,21 @@
       "id": "X3_GROWTH",
       "name": "X3 GROWTH",
       "numbers": [
-        "75",
-        "90",
-        "35"
+        "02",
+        "10",
+        "05"
       ]
     },
     {
       "id": "F01_FREQUENCY60",
       "name": "F01 TẦN SUẤT",
       "numbers": [
-        "83",
         "50",
+        "83",
+        "60",
         "95",
         "06",
-        "60",
-        "13",
+        "19",
         "32"
       ]
     },
@@ -53,12 +53,12 @@
       "id": "F06_TRANSITION180",
       "name": "F06 CHUYỂN TIẾP",
       "numbers": [
+        "13",
         "91",
         "83",
-        "13",
         "52",
-        "31",
         "92",
+        "95",
         "50"
       ]
     },

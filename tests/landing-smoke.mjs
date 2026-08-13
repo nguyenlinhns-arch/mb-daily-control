@@ -181,15 +181,15 @@ if (landing.includes("method.status") || landing.includes("method.note") || land
   throw new Error("Public method rows must show only method names and numbers");
 }
 
-if (yesterdayProof.date !== "2026-08-12") {
-  throw new Error("Yesterday proof must be settled through 12/08/2026");
+if (yesterdayProof.date !== "2026-08-13") {
+  throw new Error("Yesterday proof must be settled through 13/08/2026");
 }
 
-if (JSON.stringify(yesterdayProof.recommended_numbers) !== JSON.stringify(["61", "18", "81", "16"])) {
-  throw new Error("Yesterday recommendation does not match the locked 12/08/2026 record");
+if (JSON.stringify(yesterdayProof.recommended_numbers) !== JSON.stringify(["06", "60", "38", "83"])) {
+  throw new Error("Yesterday recommendation does not match the locked 13/08/2026 record");
 }
 
-const expectedHits = {"81": 1};
+const expectedHits = {"60": 1};
 for (const hit of yesterdayProof.hits || []) {
   if (expectedHits[hit.number] !== hit.count) throw new Error(`Unexpected yesterday hit: ${hit.number}`);
   delete expectedHits[hit.number];
@@ -199,25 +199,25 @@ if (Object.keys(expectedHits).length || yesterdayProof.unique_hit_count !== 1 ||
 }
 
 const validation = yesterdayProof.historical_validation || {};
-if (validation.hit_days !== 24 || validation.total_days !== 30 || validation.rate_pct !== 80) {
-  throw new Error("Historical 30-day validation must remain 24/30 = 80%");
+if (validation.hit_days !== 25 || validation.total_days !== 30 || validation.rate_pct !== 83) {
+  throw new Error("Historical 30-day validation must be 25/30 = 83%");
 }
 
 const monthSummary = yesterdayProof.month_summary || {};
-if (monthSummary.month !== "2026-08" || monthSummary.observed_days !== 12 || monthSummary.win_days !== 9 || monthSummary.winning_days?.length !== 9) {
-  throw new Error("August winning-day summary must remain 9/12 through 12/08/2026");
+if (monthSummary.month !== "2026-08" || monthSummary.observed_days !== 13 || monthSummary.win_days !== 10 || monthSummary.winning_days?.length !== 10) {
+  throw new Error("August winning-day summary must be 10/13 through 13/08/2026");
 }
 
 if (yesterdayProof.schema_version !== "MB_PUBLIC_YESTERDAY_PROOF_V2") {
   throw new Error("Yesterday proof must use the complete V2 public audit schema");
 }
 
-if (validation.window_start !== "2026-07-14" || validation.window_end !== "2026-08-12") {
+if (validation.window_start !== "2026-07-15" || validation.window_end !== "2026-08-13") {
   throw new Error("Historical validation must disclose its exact 30-day window");
 }
 
-if (!Array.isArray(monthSummary.daily_records) || monthSummary.daily_records.length !== 12 || monthSummary.miss_days !== 3) {
-  throw new Error("August history must include all twelve daily records and three misses");
+if (!Array.isArray(monthSummary.daily_records) || monthSummary.daily_records.length !== 13 || monthSummary.miss_days !== 3) {
+  throw new Error("August history must include all thirteen daily records and three misses");
 }
 
 for (const [index, record] of monthSummary.daily_records.entries()) {

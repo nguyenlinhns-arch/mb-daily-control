@@ -14,6 +14,7 @@ import hashlib
 import html
 import json
 import re
+import shutil
 import tempfile
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -25,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_METHODS = ROOT / "ai-methods" / "public-methods.json"
 YESTERDAY_PROOF = ROOT / "ai-methods" / "yesterday-proof.json"
 LANDING_TEMPLATE = ROOT / "ai-methods" / "landing-v7.html"
+SITE_V2_TEMPLATE = ROOT / "site-v2" / "index.html"
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 BASE_URL = "https://lemienbac.com"
 SEARCH_CONSOLE_TOKEN = "YsFOP33bdoRwdFS2sVoqfnzoxmniLWHrJzxpSx2uDsA"
@@ -422,6 +424,105 @@ def landing_month_rows(proof: dict[str, Any]) -> str:
             f'<div class="win-picks">{picks}</div><strong class="win-result">{results}</strong></div>'
         )
     return "\n".join(rows)
+
+
+def site_v2_history_block(proof: dict[str, Any], expected_lock: date) -> str:
+    if proof.get("date") != expected_lock.isoformat():
+        return f'''<section class="historical-proof-section" id="statistics">
+      <div class="wrap historical-proof-shell"><div class="historical-proof-copy">
+        <p class="eyebrow">THỐNG KÊ THEO NGÀY</p><h2>Đang cập nhật đối chiếu {display_day(expected_lock)}</h2>
+        <p>Không dùng lại dữ liệu đối chiếu của ngày cũ dưới nhãn ngày mới.</p>
+      </div></div>
+    </section>'''
+    validation = proof.get("historical_validation") or {}
+    month = proof.get("month_summary") or {}
+    rows = []
+    for item in month.get("daily_records") or []:
+        hit_map = {
+            str(hit.get("number")): int(hit.get("count") or 0)
+            for hit in item.get("hits") or []
+        }
+        picks = "".join(
+            f'<b class="{"is-observed" if hit_map.get(str(number)) else ""}">{esc(number)}</b>'
+            for number in item.get("recommended_numbers") or []
+        )
+        observed = "".join(
+            f'<span>{esc(number)}{f" × {count}" if count > 1 else ""}</span>'
+            for number, count in hit_map.items()
+        ) or '<span class="history-miss">Không xuất hiện</span>'
+        rows.append(
+            f'<div class="history-day-row" role="row"><time datetime="{esc(item.get("date"))}">'
+            f'{display_day(str(item.get("date")))}</time><div class="history-outputs">{picks}</div>'
+            f'<strong class="history-observed {"has-observed" if hit_map else ""}">{observed}</strong></div>'
+        )
+    return f'''<section class="historical-proof-section" id="statistics">
+      <div class="wrap historical-proof-shell">
+        <div class="historical-proof-summary">
+          <div class="historical-rate"><p>CỬA SỔ KIỂM ĐỊNH 30 NGÀY</p><strong>{int(validation.get("rate_pct") or 0)}%</strong><span>{int(validation.get("hit_days") or 0)}/{int(validation.get("total_days") or 0)} ngày có ít nhất một đầu ra xuất hiện</span></div>
+          <div class="historical-proof-copy"><p class="eyebrow">THỐNG KÊ THEO NGÀY</p><h2>Có cả ngày xuất hiện và không xuất hiện</h2><p>Bảng dưới hiển thị đủ {int(month.get("observed_days") or 0)} ngày đã hoàn tất từ {display_day(str(month.get("period_start")))}–{display_day(str(month.get("period_end")))}; không chỉ chọn các ngày thuận lợi.</p><div><strong>{int(month.get("win_days") or 0)}/{int(month.get("observed_days") or 0)} ngày</strong><span>trong giai đoạn gần nhất có đầu ra xuất hiện</span></div></div>
+        </div>
+        <div class="history-days" role="table" aria-label="Đối chiếu đầu ra theo từng ngày đã hoàn tất">
+          <div class="history-day-head" role="row"><span>Ngày</span><span>4 đầu ra đã lưu</span><span>Đối chiếu thực tế</span></div>
+          {"".join(rows)}
+        </div>
+        <p class="historical-disclaimer"><strong>Cách tính:</strong> Một ngày được ghi nhận khi có ít nhất một trong bốn đầu ra đã lưu xuất hiện trong 27 mã kết quả đã công bố. Tỷ lệ lịch sử không phải xác suất hoặc cam kết cho ngày tiếp theo. <a href="/ai-methods/yesterday-proof.json" target="_blank" rel="noopener">Hồ sơ thống kê</a>.</p>
+      </div>
+    </section>'''
+
+
+def render_site_v2_landing(public: dict[str, Any], proof: dict[str, Any], today: date) -> str:
+    source = SITE_V2_TEMPLATE.read_text(encoding="utf-8")
+    expected_lock = today - timedelta(days=1)
+    fresh = (
+        public.get("target_date") == today.isoformat()
+        and public.get("data_lock") == expected_lock.isoformat()
+        and public.get("source_status") == "LOCKED_27_OF_27"
+        and public.get("outcome_known_at_selection") is False
+        and len(public.get("methods") or []) == 6
+    )
+    report_match = re.search(r'data-report-date="([^"]+)"', source)
+    lock_match = re.search(r'data-lock-date="([^"]+)"', source)
+    if not report_match or not lock_match:
+        raise ValueError("site-v2 template is missing report date attributes")
+    old_report, old_lock = report_match.group(1), lock_match.group(1)
+    report_display, lock_display = display_day(today), display_day(expected_lock)
+    source = source.replace(old_report, report_display).replace(old_lock, lock_display)
+    source = re.sub(
+        r'<body class="landing-simple" data-report-date="[^"]+" data-lock-date="[^"]+"(?: data-public-ready="[^"]+")?>',
+        f'<body class="landing-simple" data-report-date="{report_display}" data-lock-date="{lock_display}" data-public-ready="{str(fresh).lower()}">',
+        source,
+        count=1,
+    )
+    source = re.sub(r"BÁO CÁO NGÀY \d{2}/\d{2}/\d{4}", f"BÁO CÁO NGÀY {report_display}", source)
+    history = site_v2_history_block(proof, expected_lock)
+    source = re.sub(
+        r'<!-- COMPLETED_DRAW_REPORT:START -->.*?<!-- COMPLETED_DRAW_REPORT:END -->',
+        f'<!-- COMPLETED_DRAW_REPORT:START -->\n{history}\n    <!-- COMPLETED_DRAW_REPORT:END -->',
+        source,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if fresh:
+        methods = f'''<section class="public-methods-v2" data-current-methods>
+      <div class="wrap"><div class="section-copy"><p class="eyebrow">SỐ CÔNG KHAI HÔM NAY</p><h2>Số theo từng phương pháp AI</h2><p>Mỗi hàng chỉ hiển thị tên phương pháp và số. Đây là đầu ra riêng lẻ, chưa phải kết luận 4SO trả phí.</p></div>
+      <div class="public-method-grid">{method_rows(public)}</div></div>
+    </section>'''
+    else:
+        methods = '''<section class="public-methods-v2"><div class="wrap"><div class="section-copy"><p class="eyebrow">SỐ CÔNG KHAI HÔM NAY</p><h2>Đang cập nhật dữ liệu hôm nay</h2></div><div class="public-method-pending">Không hiển thị lại dãy của ngày cũ và chưa mở thanh toán.</div></div></section>'''
+        source = re.sub(r'(<button\b[^>]*\bdata-open-checkout\b)(?![^>]*\bdisabled\b)', r'\1 disabled', source)
+    source = source.replace(
+        '    <section class="buy-simple" id="buy">',
+        f'    {methods}\n\n    <section class="buy-simple" id="buy">',
+        1,
+    )
+    source = source.replace(
+        '<nav><a href="/mau-bao-cao.html">Báo cáo mẫu</a><a href="/legal.html">Điều khoản</a></nav>',
+        '<nav><a href="/cho-so-mien-bac-hom-nay/">Số hôm nay</a><a href="/phuong-phap-4so/">Phương pháp</a><a href="/lich-su-doi-chieu/">Lịch sử</a><a href="/thong-ke-lo-to-mien-bac-bang-ai/">Thống kê AI</a><a href="/gioi-thieu/">Giới thiệu</a><a href="/mau-bao-cao.html">Báo cáo mẫu</a><a href="/legal.html">Điều khoản</a></nav>',
+        1,
+    )
+    if LOCKED_FIELD_PATTERN.search(source):
+        raise ValueError("Paid 4SO field leaked into site-v2 landing")
+    return source
 
 
 def render_landing(public: dict[str, Any], proof: dict[str, Any], today: date) -> str:
@@ -970,14 +1071,18 @@ def build(output_root: Path, today: date) -> list[Path]:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
         written.append(target)
-    landing = render_landing(public, proof, today)
+    landing = render_site_v2_landing(public, proof, today)
     for target in (
         output_root / "index.html",
-        output_root / "ai-methods" / "index.html",
-        output_root / "ai-methods" / "landing-v7.html",
     ):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(landing, encoding="utf-8")
+        written.append(target)
+    public_dir = output_root / "ai-methods"
+    public_dir.mkdir(parents=True, exist_ok=True)
+    for source in (PUBLIC_METHODS, YESTERDAY_PROOF):
+        target = public_dir / source.name
+        shutil.copyfile(source, target)
         written.append(target)
     sitemap = output_root / "sitemap.xml"
     sitemap.write_text(sitemap_xml(today), encoding="utf-8")
@@ -1026,11 +1131,14 @@ def validate_output(output_root: Path, today: date) -> None:
         raise AssertionError("Search Console verification tag missing from homepage")
     if "fonts.googleapis.com" in landing or "fonts.gstatic.com" in landing:
         raise AssertionError("Homepage must not block rendering on external fonts")
-    if is_fresh and landing.count('class="method-row"') != 6:
+    if is_fresh and landing.count('class="method-item"') != 6:
         raise AssertionError("Homepage must statically render exactly six public methods")
-    if not is_fresh and 'class="method-row"' in landing:
+    if not is_fresh and 'class="method-item"' in landing:
         raise AssertionError("Stale homepage must remove old public methods")
-    if not all(token in landing for token in ("disabled", "setPaymentAvailability(false)", "dataReady")):
+    if f'data-public-ready="{str(is_fresh).lower()}"' not in landing:
+        raise AssertionError("Homepage must publish an explicit daily readiness state")
+    app_text = (ROOT / "site-v2" / "app.js").read_text(encoding="utf-8")
+    if not all(token in app_text for token in ("setPaymentAvailability(", "STATIC_PUBLIC_READY", "dataReady")):
         raise AssertionError("Homepage payment must fail closed until daily data validates")
     history = (output_root / "lich-su-doi-chieu" / "index.html").read_text(encoding="utf-8")
     expected_history_rows = int((load_json(YESTERDAY_PROOF).get("month_summary") or {}).get("observed_days") or 0)
@@ -1066,7 +1174,7 @@ def main() -> None:
             if "CHƯA NHẬN THANH TOÁN" not in stale_text:
                 raise AssertionError("Stale SEO page must fail closed before payment")
             stale_landing = (output / "index.html").read_text(encoding="utf-8")
-            if "Chưa dùng lại kết quả đối chiếu của ngày cũ" not in stale_landing:
+            if "Không dùng lại dữ liệu đối chiếu của ngày cũ" not in stale_landing:
                 raise AssertionError("Stale homepage must not present an older proof as yesterday")
         print("SEO_STATIC_RENDER_SELF_TEST_OK")
         return

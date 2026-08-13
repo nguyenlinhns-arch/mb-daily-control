@@ -4,6 +4,10 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+  schedule:
+    # Fail closed just after the Vietnam date changes, then retry after the 00:05 operation.
+    - cron: "1 17 * * *"
+    - cron: "15 18 * * *"
 
 permissions:
   contents: read
@@ -38,9 +42,10 @@ jobs:
       - name: Build static artifact
         run: |
           set -euo pipefail
+          python scripts/build_public_methods.py --self-test
+          python scripts/build_seo_pages.py --self-test
           rm -rf _site
-          mkdir -p _site
-          cp site-v2/index.html _site/
+          mkdir -p _site/ai-methods
           cp site-v2/styles.css _site/
           cp site-v2/app.js _site/
           cp site-v2/config.js _site/
@@ -48,13 +53,25 @@ jobs:
           cp site-v2/legal.html _site/
           cp site-v2/404.html _site/
           cp site-v2/robots.txt _site/
-          cp site-v2/sitemap.xml _site/
           cp site-v2/favicon.svg _site/
           cp site-v2/og.png _site/
+          cp ai-methods/seo.css _site/ai-methods/
+          cp ai-methods/og-4so-ai-v2.jpg _site/ai-methods/
           cp data/source-access.json _site/
           cp data/public-historical-proof.json _site/historical-proof.json
+          python scripts/build_seo_pages.py --output-root _site
+          test -s _site/ai-methods/public-methods.json
+          test -s _site/ai-methods/yesterday-proof.json
+          test -s _site/cho-so-mien-bac-hom-nay/index.html
+          test -s _site/phuong-phap-4so/index.html
+          test -s _site/lich-su-doi-chieu/index.html
+          test -s _site/thong-ke-lo-to-mien-bac-bang-ai/index.html
+          test -s _site/gioi-thieu/index.html
+          test -s _site/sitemap.xml
+          test -s _site/llms.txt
           touch _site/.nojekyll
           test ! -e _site/approval-backend.gs
+          test ! -e _site/ai-methods/report-data.json
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -6,6 +6,7 @@
   const ITEM_NAME = "Báo cáo dữ liệu AI ngày hôm nay";
   const REPORT_DATE = document.body.dataset.reportDate || "13/08/2026";
   const DATA_LOCK_DATE = document.body.dataset.lockDate || "12/08/2026";
+  const STATIC_PUBLIC_READY = document.body.dataset.publicReady === "true";
   const rawEndpoint = String(window.ORDER_CONFIRMATION_ENDPOINT || "").trim();
   const BACKEND_ENDPOINT = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(rawEndpoint)
     ? rawEndpoint
@@ -33,6 +34,27 @@
   let pollTimer = 0;
   let submitting = false;
   let order = loadOrder();
+  let dataReady = false;
+
+  function vietnamReportDate() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${values.day}/${values.month}/${values.year}`;
+  }
+
+  function setPaymentAvailability(ready) {
+    dataReady = Boolean(ready);
+    document.querySelectorAll("[data-open-checkout]").forEach((button) => {
+      button.disabled = !dataReady;
+      button.setAttribute("aria-disabled", String(!dataReady));
+    });
+    document.body.classList.toggle("data-stale", !dataReady);
+  }
 
   function track(eventName, parameters = {}) {
     if (typeof window.gtag === "function") window.gtag("event", eventName, parameters);
@@ -263,6 +285,7 @@
   }
 
   function openCheckout() {
+    if (!dataReady) return;
     updateCheckoutState();
     checkout.hidden = false;
     document.body.classList.add("modal-open");
@@ -461,10 +484,13 @@
   else if (storedConsent === "denied") updateConsent(false);
   else consentPanel.hidden = false;
 
-  updateCheckoutState();
-  track("view_item", {
-    currency: "VND",
-    value: PRICE,
-    items: [{ item_id: "daily-report", item_name: ITEM_NAME, price: PRICE, quantity: 1 }]
-  });
+  setPaymentAvailability(STATIC_PUBLIC_READY && REPORT_DATE === vietnamReportDate());
+  if (dataReady) {
+    updateCheckoutState();
+    track("view_item", {
+      currency: "VND",
+      value: PRICE,
+      items: [{ item_id: "daily-report", item_name: ITEM_NAME, price: PRICE, quantity: 1 }]
+    });
+  }
 })();

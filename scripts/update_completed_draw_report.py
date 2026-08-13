@@ -117,6 +117,7 @@ def build_report_block(
     counts = Counter(codes)
     unique_count = len(counts)
     repeated_count = sum(1 for value in counts.values() if value > 1)
+    window_values = {size: summarize_window(history_rows, size) for size in (7, 30, 90)}
     source_count = len(sources)
     source_names = " · ".join(
         SOURCE_LABELS.get(str(source.get("source", "")), str(source.get("source", "")))
@@ -125,10 +126,7 @@ def build_report_block(
     history_start = vi_date(date.fromisoformat(history_rows[0][0]))
     history_count = len(history_rows)
     digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
-    days = "".join(
-        f'<span class="hit" title="Đủ 27/27 ngày {vi_date(date.fromisoformat(row[0]))}">{date.fromisoformat(row[0]).day:02d}</span>'
-        for row in recent_rows[-12:]
-    )
+    _ = recent_rows
     return "\n".join(
         [
             START_MARKER,
@@ -147,24 +145,18 @@ def build_report_block(
             '    <section class="product-section" id="methods">',
             '      <div class="wrap product-shell">',
             '        <header class="product-head">',
-            f'          <div><p class="eyebrow">PHIÊN ĐÃ CÔNG BỐ · {formatted}</p><h2>7 lớp kiểm định của báo cáo gần nhất</h2></div>',
-            '          <a href="/mau-bao-cao.html">Xem báo cáo mẫu đầy đủ →</a>',
+            f'          <div><p class="eyebrow">DỮ LIỆU ĐẾN · {formatted}</p><h2>7 phương pháp trong báo cáo hôm nay</h2></div>',
+            '          <a href="/mau-bao-cao.html">Xem cách lập báo cáo →</a>',
             '        </header>',
             "",
-            '        <section class="proof-strip" aria-label="Mười hai phiên gần nhất đã kiểm tra nguồn">',
-            '          <div><small>12 PHIÊN GẦN NHẤT</small><strong>12/12 phiên đủ dữ liệu</strong></div>',
-            f'          <div class="proof-days">{days}</div>',
-            '          <p><i></i> Đủ dữ liệu <i></i> Chưa đủ</p>',
-            '        </section>',
-            "",
-            f'        <div class="method-list audit-methods" role="table" aria-label="Bảy lớp kiểm định dữ liệu lịch sử ngày {formatted}">',
-            f'          <article role="row"><div><span>01</span><strong>Đối chiếu đa nguồn</strong></div><p><b class="metric-chip">{source_count} nguồn khớp</b><small>Chỉ khóa phiên khi tối thiểu hai nguồn cho cùng 27 mã.</small></p></article>',
-            '          <article role="row"><div><span>02</span><strong>Độ đầy đủ</strong></div><p><b class="metric-chip">27/27 bản ghi</b><small>Kiểm tra đúng cấu trúc giải trước khi phân tích.</small></p></article>',
-            f'          <article role="row"><div><span>03</span><strong>Độ phân tán</strong></div><p><b class="metric-chip">{unique_count} mã khác nhau</b><small>Đếm số giá trị khác nhau trong phiên đã khóa.</small></p></article>',
-            f'          <article role="row"><div><span>04</span><strong>Độ lặp trong phiên</strong></div><p><b class="metric-chip">{repeated_count} mã lặp</b><small>Ghi nhận giá trị xuất hiện từ hai lần trở lên.</small></p></article>',
-            '          <article role="row"><div><span>05</span><strong>Cửa sổ ngắn</strong></div><p><b class="metric-chip">7 phiên · 189 dòng</b><small>So sánh biến động gần với nền dài hơn.</small></p></article>',
-            '          <article role="row"><div><span>06</span><strong>Nền đối chiếu</strong></div><p><b class="metric-chip">30 phiên · 810 dòng</b><small>Giảm việc diễn giải quá mức từ một vài ngày.</small></p></article>',
-            '          <article role="row"><div><span>07</span><strong>Chống nhìn trước</strong></div><p><b class="metric-chip">0 dòng tương lai</b><small>Không đưa dữ liệu chưa tồn tại vào phép tính.</small></p></article>',
+            f'        <div class="method-list audit-methods" role="table" aria-label="Bảy phương pháp phân tích dữ liệu ngày {formatted}">',
+            f'          <article role="row"><div><span>01</span><strong>Đối chiếu nguồn</strong></div><p><b class="metric-chip">{source_count} nguồn khớp</b><small>Chỉ dùng phiên đã được xác nhận đồng nhất.</small></p></article>',
+            '          <article role="row"><div><span>02</span><strong>Kiểm tra cấu trúc</strong></div><p><b class="metric-chip">27/27 bản ghi</b><small>Loại phiên thiếu dữ liệu trước khi phân tích.</small></p></article>',
+            f'          <article role="row"><div><span>03</span><strong>Độ phân tán phiên gần nhất</strong></div><p><b class="metric-chip">{unique_count} giá trị khác nhau</b><small>Mô tả mức độ phân tán của dữ liệu đã khóa.</small></p></article>',
+            f'          <article role="row"><div><span>04</span><strong>Độ lặp phiên gần nhất</strong></div><p><b class="metric-chip">{repeated_count} giá trị lặp</b><small>Đếm giá trị xuất hiện từ hai lần trở lên.</small></p></article>',
+            f'          <article role="row"><div><span>05</span><strong>Cửa sổ 7 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[7][0])} giá trị</b><small>So sánh quan sát rất gần.</small></p></article>',
+            f'          <article role="row"><div><span>06</span><strong>Cửa sổ 30 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[30][0])} giá trị</b><small>Tạo nền đối chiếu ngắn hạn.</small></p></article>',
+            f'          <article role="row"><div><span>07</span><strong>Cửa sổ 90 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[90][0])} giá trị</b><small>Đặt dữ liệu gần trong bối cảnh rộng hơn.</small></p></article>',
             '        </div>',
             "",
             f'        <div class="audit-signature"><div><small>MÃ KIỂM TRA PHIÊN</small><strong>{digest}</strong></div><p><strong>Nguồn đối chiếu:</strong> {source_names}. Mã rút gọn từ SHA-256 của 27 bản ghi đã khóa. <a href="/source-access.json" target="_blank" rel="noopener">Mở hồ sơ nguồn →</a></p></div>',
@@ -215,14 +207,14 @@ def update_daily_index(content: str, target: date) -> str:
             "phạm vi dữ liệu hero",
         ),
         (
-            r'(<article><small>BÁO CÁO NGÀY HÔM NAY</small><strong>30\.000đ</strong><p><b>Ngày )\d{2}/\d{2}/\d{4}(\.</b> Một báo cáo đầy đủ, dùng dữ liệu đã khóa đến )\d{2}/\d{2}/\d{4}(\.</p>)',
-            rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
-            "gói báo cáo ngày",
-        ),
-        (
             r'(<p class="checkout-scope" id="checkout-scope">01 báo cáo ngày )\d{2}/\d{2}/\d{4}( · dữ liệu khóa đến )\d{2}/\d{2}/\d{4}(\.</p>)',
             rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
             "phạm vi thanh toán",
+        ),
+        (
+            r'(<p class="checkout-scope" id="checkout-modal-scope">01 báo cáo ngày )\d{2}/\d{2}/\d{4}( · dữ liệu khóa đến )\d{2}/\d{2}/\d{4}(\.</p>)',
+            rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
+            "phạm vi thanh toán trong hộp thoại",
         ),
     )
     for pattern, replacement, label in replacements:
@@ -390,7 +382,7 @@ def main() -> None:
         ]
         sample_sources = [{"source": "a"}, {"source": "b"}]
         block = build_report_block(sample_target, sample_codes, sample_rows[-12:], sample_rows, sample_sources)
-        assert "7 lớp kiểm định của báo cáo gần nhất" in block
+        assert "7 phương pháp trong báo cáo hôm nay" in block
         assert block.count('role="row"') == 7
         assert "2 nguồn khớp" in block
         assert "27/27 bản ghi" in block

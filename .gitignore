@@ -2,3 +2,5 @@ __pycache__/
 *.py[cod]
 # Engine/model V32 chi nam trong Google Drive rieng tu va duoc tai khi chay.
 engine_v32/
+# Local Windows Task Scheduler execution logs.
+runtime/

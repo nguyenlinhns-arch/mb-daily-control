@@ -197,7 +197,9 @@ const submitPaymentClaim = app.slice(app.indexOf("function submitPaymentClaim"),
 const showDelivery = app.slice(app.indexOf("function showDelivery"), app.indexOf("function updateCheckoutState"));
 assert.match(submitPaymentClaim, /track\("payment_submitted"/);
 assert.doesNotMatch(submitPaymentClaim, /track\("purchase"/);
+assert.doesNotMatch(submitPaymentClaim, /track\("manual_event_PURCHASE"/);
 assert.match(showDelivery, /track\("purchase"/);
+assert.match(showDelivery, /track\("manual_event_PURCHASE"/);
 
 // Only the public endpoint is shipped. Approval credentials stay server-side.
 assert.match(config, /window\.ORDER_CONFIRMATION_ENDPOINT\s*=\s*"https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec"/);

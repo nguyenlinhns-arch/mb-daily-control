@@ -245,12 +245,15 @@
 
     const purchaseKey = `lemienbac_purchase_${order.code}`;
     if (!localStorage.getItem(purchaseKey)) {
-      track("purchase", {
+      const purchasePayload = {
         transaction_id: order.code,
         currency: "VND",
         value: PRICE,
         items: [{ item_id: "daily-report", item_name: ITEM_NAME, price: PRICE, quantity: 1 }]
-      });
+      };
+      track("purchase", purchasePayload);
+      // Google Ads currently imports this GA4 key event as its primary purchase conversion.
+      track("manual_event_PURCHASE", purchasePayload);
       localStorage.setItem(purchaseKey, "1");
     }
   }

@@ -8,6 +8,8 @@
 
 const SITE_URL = "https://lemienbac.com/";
 const SHEET_NAME = "Orders";
+const PAID_REPORT_SHEET_NAME = "Paid_Report";
+const DELIVERY_SCHEMA = "fourso-top2-v1";
 const VALID_PLANS = Object.freeze({ day: 30000, week: 200000, month: 800000 });
 const SERVICE_NAME = "Lê Miền Bắc AI order approval";
 const SERVICE_VERSION = "1.0";
@@ -125,30 +127,45 @@ function approvalResponse(data, action) {
 }
 
 function buildDelivery(plan) {
-  const snapshot = readPublicReportSnapshot();
-  const labels = {
-    day: `Báo cáo dữ liệu AI ngày ${snapshot.reportDate}`,
-    week: "Bộ 07 báo cáo dữ liệu hằng ngày",
-    month: "Bộ 30 báo cáo dữ liệu hằng ngày"
-  };
+  const report = readPaidFourSoReport();
   return {
-    title: labels[plan] || "Báo cáo dữ liệu AI đã xác nhận",
-    summary: `Báo cáo ngày ${snapshot.reportDate} sử dụng ${snapshot.historyRows} phiên đã công bố và khóa toàn bộ dữ liệu tại ngày ${snapshot.lockDate}.`,
-    metrics: [
-      { label: "Phiên lịch sử", value: String(snapshot.historyRows) },
-      { label: "Phiên gần nhất", value: "27 / 27" },
-      { label: "Nguồn trùng khớp", value: String(snapshot.sourceCount) },
-      { label: "Giá trị khác nhau", value: snapshot.uniqueCount },
-      { label: "Giá trị lặp", value: snapshot.repeatedCount },
-      { label: "Dữ liệu tương lai", value: "0" }
-    ],
-    notes: [
-      snapshot.verifiedFinding,
-      snapshot.observationFinding,
-      "Kết luận được tạo từ 7 lớp kiểm định và so sánh các cửa sổ 7/30/90 phiên đã hoàn tất.",
-      "Báo cáo không bán số, không đưa danh sách số khuyến nghị và không suy diễn dữ liệu lịch sử thành bảo đảm cho kết quả tương lai."
+    schema: DELIVERY_SCHEMA,
+    title: `4SO ngày ${report.reportDate}`,
+    pairs: [
+      { rank: 1, numbers: [report.top1Left, report.top1Right] },
+      { rank: 2, numbers: [report.top2Left, report.top2Right] }
     ]
   };
+}
+
+function readPaidFourSoReport() {
+  const spreadsheetId = PropertiesService.getScriptProperties().getProperty("ORDER_SHEET_ID");
+  if (!spreadsheetId) throw new Error("ORDER_SHEET_ID is not configured");
+
+  const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName(PAID_REPORT_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) throw new Error("Paid 4SO report is not available");
+
+  const values = sheet.getRange(2, 1, 1, 7).getDisplayValues()[0];
+  const report = {
+    reportDate: clean(values[0], 10),
+    lockDate: clean(values[1], 10),
+    top1Left: clean(values[2], 2),
+    top1Right: clean(values[3], 2),
+    top2Left: clean(values[4], 2),
+    top2Right: clean(values[5], 2)
+  };
+  const snapshot = readPublicReportSnapshot();
+  const codes = [report.top1Left, report.top1Right, report.top2Left, report.top2Right];
+  if (
+    !/^\d{2}\/\d{2}\/\d{4}$/.test(report.reportDate)
+    || !/^\d{2}\/\d{2}\/\d{4}$/.test(report.lockDate)
+    || codes.some((code) => !/^\d{2}$/.test(code))
+    || report.reportDate !== snapshot.reportDate
+    || report.lockDate !== snapshot.lockDate
+  ) {
+    throw new Error("Paid 4SO report does not match the current report date");
+  }
+  return report;
 }
 
 function readPublicReportSnapshot() {

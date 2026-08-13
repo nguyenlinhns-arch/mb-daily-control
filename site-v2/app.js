@@ -15,6 +15,7 @@
   const CONSENT_KEY = "lemienbac_measurement_consent_v1";
   const ZALO_URL = "https://zalo.me/0398696879";
   const POLL_INTERVAL_MS = 5000;
+  const DELIVERY_SCHEMA = "fourso-top2-v1";
 
   const checkout = document.getElementById("checkout");
   const checkoutClose = document.getElementById("checkout-close");
@@ -25,9 +26,7 @@
   const pendingCopy = document.getElementById("pending-copy");
   const deliveryView = document.getElementById("delivery-view");
   const deliveryTitle = document.getElementById("delivery-title");
-  const deliverySummary = document.getElementById("delivery-summary");
-  const deliveryMetrics = document.getElementById("delivery-metrics");
-  const deliveryNotes = document.getElementById("delivery-notes");
+  const deliveryPairs = document.getElementById("delivery-pairs");
   const consentPanel = document.getElementById("consent");
 
   let pollTimer = 0;
@@ -126,7 +125,31 @@
     deliveryView.hidden = true;
   }
 
+  function validDelivery(delivery) {
+    return delivery?.schema === DELIVERY_SCHEMA
+      && Array.isArray(delivery.pairs)
+      && delivery.pairs.length === 2
+      && delivery.pairs.every((pair, index) => (
+        Number(pair.rank) === index + 1
+        && Array.isArray(pair.numbers)
+        && pair.numbers.length === 2
+        && pair.numbers.every((code) => /^\d{2}$/.test(String(code)))
+      ));
+  }
+
   function showDelivery(delivery) {
+    if (!validDelivery(delivery)) {
+      order.status = "pending";
+      order.delivery = null;
+      saveOrder();
+      showPending(
+        "Đang tải kết quả 4SO",
+        "Hệ thống đang cập nhật hai cặp theo thứ tự xếp hạng."
+      );
+      startPolling();
+      return;
+    }
+
     stopPolling();
     order.status = "approved";
     order.approvedAt = order.approvedAt || new Date().toISOString();
@@ -136,31 +159,27 @@
     pendingPanel.hidden = true;
     deliveryView.hidden = false;
     selfConfirmButton.hidden = true;
-    deliveryTitle.textContent = String(delivery.title || `Báo cáo ngày ${REPORT_DATE}`);
-    deliverySummary.textContent = String(delivery.summary || "Giao dịch đã được chủ dịch vụ xác nhận.");
+    deliveryTitle.textContent = String(delivery.title || `4SO ngày ${REPORT_DATE}`);
 
-    deliveryMetrics.replaceChildren();
-    const metrics = Array.isArray(delivery.metrics) ? delivery.metrics.slice(0, 6) : [];
-    for (const metric of metrics) {
+    deliveryPairs.replaceChildren();
+    for (const pair of delivery.pairs) {
       const card = document.createElement("article");
-      const label = document.createElement("small");
-      const value = document.createElement("strong");
-      label.textContent = String(metric.label || "");
-      value.textContent = String(metric.value || "");
-      card.append(label, value);
-      deliveryMetrics.append(card);
-    }
+      card.className = "delivery-pair";
 
-    deliveryNotes.replaceChildren();
-    const notes = Array.isArray(delivery.notes) ? delivery.notes.slice(0, 8) : [];
-    if (notes.length) {
-      const list = document.createElement("ul");
-      for (const note of notes) {
-        const item = document.createElement("li");
-        item.textContent = String(note || "");
-        list.append(item);
+      const rank = document.createElement("span");
+      rank.className = "delivery-pair-rank";
+      rank.textContent = `TOP ${pair.rank}`;
+
+      const numbers = document.createElement("div");
+      numbers.className = "delivery-pair-numbers";
+      for (const code of pair.numbers) {
+        const value = document.createElement("strong");
+        value.textContent = String(code);
+        numbers.append(value);
       }
-      deliveryNotes.append(list);
+
+      card.append(rank, numbers);
+      deliveryPairs.append(card);
     }
 
     const purchaseKey = `lemienbac_purchase_${order.code}`;

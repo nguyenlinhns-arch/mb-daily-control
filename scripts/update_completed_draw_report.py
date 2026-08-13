@@ -145,10 +145,6 @@ def build_report_block(
     proof = load_historical_proof()
     validation = proof["validation"]
     recent = proof["recent_period"]
-    validation_window = (
-        f'{vi_date(date.fromisoformat(validation["window_start"]))}'
-        f'–{vi_date(date.fromisoformat(validation["window_end"]))}'
-    )
     recent_window = (
         f'{vi_date(date.fromisoformat(recent["period_start"]))}'
         f'–{vi_date(date.fromisoformat(recent["period_end"]))}'
@@ -179,7 +175,7 @@ def build_report_block(
             '    <section class="historical-proof-section" id="statistics">',
             '      <div class="wrap historical-proof-shell">',
             '        <div class="historical-proof-summary">',
-            f'          <div class="historical-rate"><p>ĐỐI CHIẾU LỊCH SỬ · {validation_window}</p><strong>{int(validation["rate_pct"])}%</strong><span>{int(validation["hit_days"])}/{int(validation["total_days"])} ngày có ít nhất một đầu ra xuất hiện</span></div>',
+            f'          <div class="historical-rate"><p>DỮ LIỆU TỪ 2024 ĐẾN NGÀY HÔM NAY</p><strong>{int(validation["rate_pct"])}%</strong><span>{int(validation["hit_days"])}/{int(validation["total_days"])} ngày có ít nhất một đầu ra xuất hiện</span></div>',
             f'          <div class="historical-proof-copy"><p class="eyebrow">THỐNG KÊ THEO NGÀY</p><h2>Có cả ngày xuất hiện và không xuất hiện</h2><p>Bảng dưới hiển thị đủ {int(recent["total_days"])} ngày đã hoàn tất từ {recent_window}; không chỉ chọn các ngày thuận lợi.</p><div><strong>{int(recent["hit_days"])}/{int(recent["total_days"])} ngày</strong><span>trong giai đoạn gần nhất có đầu ra xuất hiện</span></div></div>',
             '        </div>',
             '        <div class="history-days" role="table" aria-label="Đối chiếu đầu ra theo từng ngày đã hoàn tất">',
@@ -391,7 +387,8 @@ def main() -> None:
         block = build_report_block(sample_target, sample_codes, sample_rows[-12:], sample_rows, sample_sources)
         assert "80%" in block
         assert "24/30 ngày" in block
-        assert "14/07/2026–12/08/2026" in block
+        assert "DỮ LIỆU TỪ 2024 ĐẾN NGÀY HÔM NAY" in block
+        assert "ĐỐI CHIẾU LỊCH SỬ" not in block
         assert "Số được lưu theo 7 lớp báo cáo" not in block
         assert 'id="methods"' not in block
         assert block.count('class="history-day-row"') == 12

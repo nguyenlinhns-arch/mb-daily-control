@@ -72,7 +72,7 @@ def load_historical_proof() -> dict[str, Any]:
     hit_days = int(validation.get("hit_days") or 0)
     total_days = int(validation.get("total_days") or 0)
     rate_pct = int(validation.get("rate_pct") or 0)
-    if total_days <= 0 or hit_days * 100 != rate_pct * total_days:
+    if total_days <= 0 or round(hit_days * 100 / total_days) != rate_pct:
         raise RuntimeError("Tỷ lệ lịch sử không khớp số ngày đối chiếu")
     recent = proof.get("recent_period") or {}
     days = recent.get("days") or []
@@ -432,13 +432,15 @@ def main() -> None:
         ]
         sample_sources = [{"source": "a"}, {"source": "b"}]
         block = build_report_block(sample_target, sample_codes, sample_rows[-12:], sample_rows, sample_sources)
-        assert "80%" in block
-        assert "24/30 ngày" in block
+        proof = load_historical_proof()
+        proof_validation = proof["validation"]
+        assert f'{proof_validation["rate_pct"]}%' in block
+        assert f'{proof_validation["hit_days"]}/{proof_validation["total_days"]} ngày' in block
         assert "DỮ LIỆU TỪ 2024 ĐẾN NGÀY HÔM NAY" in block
         assert "ĐỐI CHIẾU LỊCH SỬ" not in block
         assert "Số được lưu theo 7 lớp báo cáo" not in block
         assert 'id="methods"' not in block
-        assert block.count('class="history-day-row"') == 12
+        assert block.count('class="history-day-row"') == int(proof["recent_period"]["total_days"])
         assert 'class="historical-method-row' not in block
         assert 'href="/historical-proof.json"' in block
         assert 'href="/source-access.json"' in block

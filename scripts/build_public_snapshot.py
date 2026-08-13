@@ -20,6 +20,7 @@ import sys
 import urllib.error
 import urllib.request
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -226,18 +227,36 @@ def fetch_page(url: str) -> str:
 def crosscheck_draw(draw_date: date) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
     groups: dict[tuple[str, ...], list[dict[str, Any]]] = defaultdict(list)
     failures: list[dict[str, Any]] = []
-    for source, url in result_urls(draw_date):
-        try:
-            raw = fetch_page(url)
-            codes = parse_prizes(raw)
-            record = {
-                "source": source,
-                "url": url,
-                "codes_sha256": hashlib.sha256("|".join(codes).encode()).hexdigest(),
-            }
-            groups[tuple(codes)].append(record)
-        except Exception as exc:
-            failures.append({"source": source, "url": url, "error": repr(exc)[:300]})
+
+    def fetch_source(source: str, url: str) -> tuple[str, str, list[str]]:
+        raw = fetch_page(url)
+        return source, url, parse_prizes(raw)
+
+    urls = result_urls(draw_date)
+    # A single slow public mirror must not make six independent 30-second
+    # requests run serially. Fetch all mirrors together, then apply the same
+    # fail-closed two-source equality rule to their completed responses.
+    with ThreadPoolExecutor(max_workers=len(urls), thread_name_prefix="xsmb-source") as executor:
+        futures = {
+            executor.submit(fetch_source, source, url): (source, url)
+            for source, url in urls
+        }
+        for future in as_completed(futures):
+            source, url = futures[future]
+            try:
+                _, _, codes = future.result()
+                record = {
+                    "source": source,
+                    "url": url,
+                    "codes_sha256": hashlib.sha256("|".join(codes).encode()).hexdigest(),
+                }
+                groups[tuple(codes)].append(record)
+            except Exception as exc:
+                failures.append({"source": source, "url": url, "error": repr(exc)[:300]})
+
+    for records in groups.values():
+        records.sort(key=lambda item: str(item["source"]))
+    failures.sort(key=lambda item: str(item["source"]))
     if not groups:
         raise RuntimeError(f"Không nguồn nào tách được kết quả {draw_date}: {failures}")
     ranked = sorted(groups.items(), key=lambda item: (len(item[1]), item[0]), reverse=True)

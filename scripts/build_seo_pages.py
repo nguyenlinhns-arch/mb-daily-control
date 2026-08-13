@@ -807,7 +807,7 @@ def method_page(today: date) -> tuple[str, str]:
     )
 
 
-def history_page(proof: dict[str, Any]) -> tuple[str, str]:
+def history_page(proof: dict[str, Any], today: date) -> tuple[str, str]:
     path = "/lich-su-doi-chieu/"
     month = proof.get("month_summary") or {}
     month_iso = str(month.get("month") or proof.get("date", "")[:7])
@@ -859,6 +859,7 @@ def history_page(proof: dict[str, Any]) -> tuple[str, str]:
         description=description,
         canonical_path=path,
         breadcrumbs=breadcrumbs,
+        modified=today.isoformat(),
     )
     schema["@graph"].append(
         {
@@ -878,6 +879,7 @@ def history_page(proof: dict[str, Any]) -> tuple[str, str]:
     <section class="seo-hero compact-hero"><div class="seo-wrap reading-width">
       <p class="eyebrow">LỊCH SỬ ĐỐI CHIẾU</p>
       <h1><span class="phrase">Kết quả số</span> <span class="phrase">Miền Bắc</span> <span class="phrase">tháng {esc(month_label)}</span></h1>
+      <p class="hero-date">Trang cập nhật ngày <time datetime="{today.isoformat()}">{display_day(today)}</time></p>
       <p class="lead">Bảng này ghi đủ {observed} ngày đã quan sát trong tháng, gồm cả ngày trúng và ngày chưa trúng. Một ngày được tính là trúng khi ít nhất một trong bốn số đã khóa trước kết quả xuất hiện trong 27 mã.</p>
     </div></section>
     <section class="seo-section"><div class="seo-wrap">
@@ -949,7 +951,7 @@ def statistics_page(today: date) -> tuple[str, str]:
     )
 
 
-def about_page() -> tuple[str, str]:
+def about_page(today: date) -> tuple[str, str]:
     path = "/gioi-thieu/"
     title = "Giới thiệu 4SO AI và nguyên tắc biên tập dữ liệu"
     description = "Thông tin về 4SO AI, người phụ trách nội dung, nguồn dữ liệu, quy trình kiểm tra, giới hạn của AI và cách yêu cầu sửa sai."
@@ -959,22 +961,23 @@ def about_page() -> tuple[str, str]:
         description=description,
         canonical_path=path,
         breadcrumbs=breadcrumbs,
-        modified="2026-08-12",
+        modified=today.isoformat(),
     )
     page_node = next(
         node for node in schema["@graph"] if node.get("@id") == f"{BASE_URL}{path}#webpage"
     )
     page_node["@type"] = "AboutPage"
     page_node["about"] = {"@id": f"{BASE_URL}/#organization"}
-    body = '''
+    body = f'''
     <section class="seo-hero compact-hero"><div class="seo-wrap reading-width">
       <p class="eyebrow">GIỚI THIỆU &amp; TRÁCH NHIỆM NỘI DUNG</p>
       <h1><span class="phrase">4SO AI là</span> <span class="phrase">dịch vụ phân tích</span> <span class="phrase">dữ liệu theo ngày</span></h1>
+      <p class="hero-date">Trang cập nhật ngày <time datetime="{today.isoformat()}">{display_day(today)}</time></p>
       <p class="lead">Website công khai đầu ra của sáu phương pháp thống kê và lịch sử đối chiếu; chỉ khóa phần kết luận 4SO cuối cùng. Nội dung nhằm giúp người đọc kiểm tra quy trình và giới hạn của dữ liệu trước khi sử dụng.</p>
     </div></section>
     <section class="seo-section"><div class="seo-wrap reading-width">
       <div class="section-heading"><p class="eyebrow">ĐƠN VỊ VẬN HÀNH</p><h2><span class="phrase">Ai chịu trách nhiệm</span> <span class="phrase">cho nội dung?</span></h2></div>
-      <div class="plain-card"><p><strong>Tên dịch vụ:</strong> 4SO AI.</p><p><strong>Người phụ trách nội dung:</strong> Thầy Linh, đại diện nhóm vận hành 4SO AI.</p><p><strong>Kênh hỗ trợ công khai:</strong> <a class="text-link" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Zalo hỗ trợ 4SO AI →</a></p><p><strong>Cập nhật tài liệu:</strong> 12/08/2026.</p></div>
+      <div class="plain-card"><p><strong>Tên dịch vụ:</strong> 4SO AI.</p><p><strong>Người phụ trách nội dung:</strong> Thầy Linh, đại diện nhóm vận hành 4SO AI.</p><p><strong>Kênh hỗ trợ công khai:</strong> <a class="text-link" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Zalo hỗ trợ 4SO AI →</a></p><p><strong>Cập nhật tài liệu:</strong> {display_day(today)}.</p></div>
     </div></section>
     <section class="seo-section soft"><div class="seo-wrap two-column">
       <div><p class="eyebrow">NGUYÊN TẮC BIÊN TẬP</p><h2><span class="phrase">Khóa dữ liệu trước,</span> <span class="phrase">đối chiếu sau</span></h2><p>Báo cáo ngày T chỉ dùng dữ liệu đã công bố đến T−1. Nguồn phải đủ 27/27 mã, ngày không trùng, đầu ra không biết trước kết quả và các kiểm tra audit phải hoàn tất trước khi hiển thị số ngày mới.</p></div>
@@ -1007,10 +1010,10 @@ def sitemap_xml(today: date) -> str:
     rows = (
         ("/", daily, "daily", "1.0"),
         ("/cho-so-mien-bac-hom-nay/", daily, "daily", "0.9"),
-        ("/phuong-phap-4so/", fixed, "monthly", "0.8"),
+        ("/phuong-phap-4so/", daily, "monthly", "0.8"),
         ("/lich-su-doi-chieu/", daily, "daily", "0.8"),
-        ("/thong-ke-lo-to-mien-bac-bang-ai/", fixed, "monthly", "0.8"),
-        ("/gioi-thieu/", fixed, "yearly", "0.6"),
+        ("/thong-ke-lo-to-mien-bac-bang-ai/", daily, "monthly", "0.8"),
+        ("/gioi-thieu/", daily, "yearly", "0.6"),
         ("/legal.html", fixed, "yearly", "0.3"),
     )
     urls = "\n".join(
@@ -1061,9 +1064,9 @@ def build(output_root: Path, today: date) -> list[Path]:
     pages = [
         today_page(public, proof, today),
         method_page(today),
-        history_page(proof),
+        history_page(proof, today),
         statistics_page(today),
-        about_page(),
+        about_page(today),
     ]
     written = []
     for path, content in pages:

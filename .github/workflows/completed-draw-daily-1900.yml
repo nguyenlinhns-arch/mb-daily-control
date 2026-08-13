@@ -78,7 +78,7 @@ jobs:
         run: |
           python scripts/update_completed_draw_report.py --self-test
           npm test
-          ! grep -niE 'hôm nay đánh|chốt số|số đẹp|bao lô|xiên|cam kết trúng|mở kết luận|15\.000|80%' \
+          ! grep -niE 'hôm nay đánh|chốt số|số đẹp|bao lô|xiên|cam kết trúng|mở kết luận|15\.000' \
             site-v2/index.html site-v2/mau-bao-cao.html
           git diff --check
 

@@ -52,6 +52,7 @@ jobs:
           cp site-v2/favicon.svg _site/
           cp site-v2/og.png _site/
           cp data/source-access.json _site/
+          cp data/public-historical-proof.json _site/historical-proof.json
           touch _site/.nojekyll
           test ! -e _site/approval-backend.gs
 

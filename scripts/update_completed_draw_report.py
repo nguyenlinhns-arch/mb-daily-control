@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import re
 from collections import Counter
@@ -28,6 +29,7 @@ INDEX_FILE = ROOT / "site-v2" / "index.html"
 SAMPLE_FILE = ROOT / "site-v2" / "mau-bao-cao.html"
 AUDIT_FILE = ROOT / "data" / "completed-draw-audit.json"
 ACCESS_FILE = ROOT / "data" / "source-access.json"
+HISTORICAL_PROOF_FILE = ROOT / "data" / "public-historical-proof.json"
 VN = timezone(timedelta(hours=7))
 START_MARKER = "    <!-- COMPLETED_DRAW_REPORT:START -->"
 END_MARKER = "    <!-- COMPLETED_DRAW_REPORT:END -->"
@@ -56,6 +58,32 @@ def write_json_if_changed(path: Path, value: Any) -> bool:
 
 def vi_date(day: date) -> str:
     return day.strftime("%d/%m/%Y")
+
+
+def esc(value: Any) -> str:
+    return html.escape(str(value), quote=True)
+
+
+def load_historical_proof() -> dict[str, Any]:
+    proof = json.loads(HISTORICAL_PROOF_FILE.read_text(encoding="utf-8"))
+    if proof.get("schema_version") != "MB_PUBLIC_HISTORICAL_PROOF_V1_COMPLETED_ONLY":
+        raise RuntimeError("Sai schema hồ sơ đối chiếu lịch sử công khai")
+    validation = proof.get("validation") or {}
+    hit_days = int(validation.get("hit_days") or 0)
+    total_days = int(validation.get("total_days") or 0)
+    rate_pct = int(validation.get("rate_pct") or 0)
+    if total_days <= 0 or hit_days * 100 != rate_pct * total_days:
+        raise RuntimeError("Tỷ lệ lịch sử không khớp số ngày đối chiếu")
+    recent = proof.get("recent_period") or {}
+    days = recent.get("days") or []
+    if len(days) != int(recent.get("total_days") or 0):
+        raise RuntimeError("Thiếu ngày trong bảng đối chiếu gần nhất")
+    if sum(bool(item.get("observed")) for item in days) != int(recent.get("hit_days") or 0):
+        raise RuntimeError("Số ngày xuất hiện không khớp bảng đối chiếu")
+    layers = (proof.get("method_snapshot") or {}).get("layers") or []
+    if len(layers) != 7 or [int(item.get("index") or 0) for item in layers] != list(range(1, 8)):
+        raise RuntimeError("Hồ sơ mẫu phải có đúng 7 lớp theo thứ tự")
+    return proof
 
 
 def resolve_target(raw: str | None, now: datetime) -> date:
@@ -114,11 +142,6 @@ def build_report_block(
     sources: list[dict[str, Any]],
 ) -> str:
     formatted = vi_date(target)
-    report_formatted = vi_date(target + timedelta(days=1))
-    counts = Counter(codes)
-    unique_count = len(counts)
-    repeated_count = sum(1 for value in counts.values() if value > 1)
-    window_values = {size: summarize_window(history_rows, size) for size in (7, 30, 90)}
     source_count = len(sources)
     source_names = " · ".join(
         SOURCE_LABELS.get(str(source.get("source", "")), str(source.get("source", "")))
@@ -128,23 +151,72 @@ def build_report_block(
     history_count = len(history_rows)
     digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
     _ = recent_rows
+    proof = load_historical_proof()
+    validation = proof["validation"]
+    recent = proof["recent_period"]
+    snapshot = proof["method_snapshot"]
+    validation_window = (
+        f'{vi_date(date.fromisoformat(validation["window_start"]))}'
+        f'–{vi_date(date.fromisoformat(validation["window_end"]))}'
+    )
+    recent_window = (
+        f'{vi_date(date.fromisoformat(recent["period_start"]))}'
+        f'–{vi_date(date.fromisoformat(recent["period_end"]))}'
+    )
+    day_rows: list[str] = []
+    for item in recent["days"]:
+        observed = [str(value) for value in item.get("observed") or []]
+        observed_numbers = {value.split()[0] for value in observed}
+        output_html = "".join(
+            '<b'
+            + (' class="is-observed"' if str(value) in observed_numbers else "")
+            + f'>{esc(value)}</b>'
+            for value in item.get("outputs") or []
+        )
+        observed_html = (
+            "".join(f'<span>{esc(value)}</span>' for value in observed)
+            if observed
+            else '<span class="history-miss">Không xuất hiện</span>'
+        )
+        day_rows.append(
+            f'          <div class="history-day-row" role="row"><time datetime="{esc(item["date"])}">'
+            f'{vi_date(date.fromisoformat(item["date"]))}</time><div class="history-outputs">{output_html}</div>'
+            f'<strong class="history-observed {"has-observed" if observed else ""}">{observed_html}</strong></div>'
+        )
+    method_rows: list[str] = []
+    for layer in snapshot["layers"]:
+        numbers = "".join(f'<b>{esc(value)}</b>' for value in layer.get("numbers") or [])
+        final_class = " is-summary" if int(layer["index"]) == 7 else ""
+        method_rows.append(
+            f'          <article class="historical-method-row{final_class}" role="listitem">'
+            f'<span class="method-index">{int(layer["index"]):02d}</span>'
+            f'<strong>{esc(layer["name"])}</strong><div class="historical-number-list">{numbers}</div></article>'
+        )
     return "\n".join(
         [
             START_MARKER,
-            '    <section class="product-section simple-product" id="methods">',
-            '      <div class="wrap product-shell">',
-            f'        <header class="product-head"><div><p class="eyebrow">DỮ LIỆU KHÓA ĐẾN HẾT NGÀY HÔM QUA · {formatted}</p><h2>7 phương pháp cho ngày hôm nay ({report_formatted})</h2></div><a href="/mau-bao-cao.html">Xem mẫu 4SO →</a></header>',
-            f'        <div class="status-strip" aria-label="Tình trạng dữ liệu"><span title="Từ {history_start} đến {formatted}"><strong>{history_count}</strong> phiên lịch sử</span><span><strong>27/27</strong> bản ghi</span><span><strong>{source_count}</strong> nguồn khớp</span><span><strong>0</strong> dữ liệu tương lai</span></div>',
-            f'        <div class="method-pills" role="list" aria-label="Bảy phương pháp phân tích dữ liệu ngày {formatted}">',
-            f'          <article role="listitem"><strong>Đối chiếu nguồn</strong><span>{source_count} nguồn</span></article>',
-            '          <article role="listitem"><strong>Kiểm tra cấu trúc</strong><span>27/27</span></article>',
-            f'          <article role="listitem"><strong>Độ phân tán</strong><span>{unique_count} mã</span></article>',
-            f'          <article role="listitem"><strong>Độ lặp</strong><span>{repeated_count} mã</span></article>',
-            f'          <article role="listitem"><strong>Cửa sổ 7 phiên</strong><span>TB {vi_decimal(window_values[7][0])}</span></article>',
-            f'          <article role="listitem"><strong>Cửa sổ 30 phiên</strong><span>TB {vi_decimal(window_values[30][0])}</span></article>',
-            f'          <article role="listitem"><strong>Cửa sổ 90 phiên</strong><span>TB {vi_decimal(window_values[90][0])}</span></article>',
+            '    <section class="historical-proof-section" id="statistics">',
+            '      <div class="wrap historical-proof-shell">',
+            '        <div class="historical-proof-summary">',
+            f'          <div class="historical-rate"><p>ĐỐI CHIẾU LỊCH SỬ · {validation_window}</p><strong>{int(validation["rate_pct"])}%</strong><span>{int(validation["hit_days"])}/{int(validation["total_days"])} ngày có ít nhất một đầu ra xuất hiện</span></div>',
+            f'          <div class="historical-proof-copy"><p class="eyebrow">THỐNG KÊ THEO NGÀY</p><h2>Có cả ngày xuất hiện và không xuất hiện</h2><p>Bảng dưới hiển thị đủ {int(recent["total_days"])} ngày đã hoàn tất từ {recent_window}; không chỉ chọn các ngày thuận lợi.</p><div><strong>{int(recent["hit_days"])}/{int(recent["total_days"])} ngày</strong><span>trong giai đoạn gần nhất có đầu ra xuất hiện</span></div></div>',
             '        </div>',
-            f'        <p class="source-line"><strong>Mã kiểm tra:</strong> {digest} · {source_names} · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a></p>',
+            '        <div class="history-days" role="table" aria-label="Đối chiếu đầu ra theo từng ngày đã hoàn tất">',
+            '          <div class="history-day-head" role="row"><span>Ngày</span><span>4 đầu ra đã lưu</span><span>Đối chiếu thực tế</span></div>',
+            *day_rows,
+            '        </div>',
+            f'        <p class="historical-disclaimer"><strong>Cách tính:</strong> {esc(validation["definition"])} Tỷ lệ 80% chỉ mô tả cửa sổ lịch sử đã hoàn tất, không phải xác suất hoặc cam kết cho ngày tiếp theo.</p>',
+            '      </div>',
+            '    </section>',
+            '    <section class="product-section simple-product historical-methods" id="methods">',
+            '      <div class="wrap product-shell">',
+            f'        <header class="product-head"><div><p class="eyebrow">HỒ SƠ LỊCH SỬ ĐÃ HOÀN TẤT · {vi_date(date.fromisoformat(snapshot["target_date"]))}</p><h2>Số được lưu theo 7 lớp báo cáo</h2><p>6 phương pháp độc lập và 1 lớp tổng hợp 4SO · dữ liệu khóa {vi_date(date.fromisoformat(snapshot["data_lock"]))}.</p></div><a href="/mau-bao-cao.html">Xem mẫu 4SO →</a></header>',
+            f'        <div class="status-strip" aria-label="Tình trạng dữ liệu"><span title="Từ {history_start} đến {formatted}"><strong>{history_count}</strong> phiên lịch sử</span><span><strong>27/27</strong> bản ghi</span><span><strong>{source_count}</strong> nguồn khớp</span><span><strong>0</strong> dữ liệu tương lai</span></div>',
+            '        <div class="historical-method-list" role="list" aria-label="Bảy lớp trong hồ sơ lịch sử ngày 12 tháng 8 năm 2026">',
+            *method_rows,
+            '        </div>',
+            f'        <p class="source-line"><strong>Mã kiểm tra dữ liệu hiện tại:</strong> {digest} · {source_names} · <a href="/historical-proof.json" target="_blank" rel="noopener">Hồ sơ thống kê</a> · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a></p>',
+            '        <p class="historical-method-note">Các số trên thuộc hồ sơ ngày đã hoàn tất 12/08/2026, không phải đầu ra của ngày hôm nay.</p>',
             '      </div>',
             '    </section>',
             END_MARKER,
@@ -347,12 +419,18 @@ def main() -> None:
         ]
         sample_sources = [{"source": "a"}, {"source": "b"}]
         block = build_report_block(sample_target, sample_codes, sample_rows[-12:], sample_rows, sample_sources)
-        assert "DỮ LIỆU KHÓA ĐẾN HẾT NGÀY HÔM QUA · 12/08/2026" in block
-        assert "7 phương pháp cho ngày hôm nay (13/08/2026)" in block
+        assert "80%" in block
+        assert "24/30 ngày" in block
+        assert "14/07/2026–12/08/2026" in block
+        assert "Số được lưu theo 7 lớp báo cáo" in block
+        assert "6 phương pháp độc lập và 1 lớp tổng hợp 4SO" in block
+        assert block.count('class="history-day-row"') == 12
+        assert block.count('class="historical-method-row') == 7
         assert block.count('role="listitem"') == 7
         assert "<strong>2</strong> nguồn khớp" in block
         assert "<strong>27/27</strong> bản ghi" in block
-        assert "kỳ tiếp theo" not in block.lower()
+        assert "không phải xác suất hoặc cam kết" in block
+        assert "không phải đầu ra của ngày hôm nay" in block
         daily_index = update_daily_index(INDEX_FILE.read_text(encoding="utf-8"), sample_target)
         assert 'data-report-date="13/08/2026"' in daily_index
         assert 'data-lock-date="12/08/2026"' in daily_index

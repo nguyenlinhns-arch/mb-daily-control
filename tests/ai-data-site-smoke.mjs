@@ -14,7 +14,8 @@ const [
   completedWorkflow,
   completedScript,
   sourceAccessRaw,
-  midnightWorkflow
+  midnightWorkflow,
+  historicalProofRaw
 ] = await Promise.all([
   read("index.html"),
   read("styles.css"),
@@ -25,9 +26,11 @@ const [
   readFile(resolve(process.cwd(), ".github/workflows/completed-draw-daily-1900.yml"), "utf8"),
   readFile(resolve(process.cwd(), "scripts/update_completed_draw_report.py"), "utf8"),
   readFile(resolve(process.cwd(), "data/source-access.json"), "utf8"),
-  readFile(resolve(process.cwd(), ".github/workflows/daily-report-midnight.yml"), "utf8")
+  readFile(resolve(process.cwd(), ".github/workflows/daily-report-midnight.yml"), "utf8"),
+  readFile(resolve(process.cwd(), "data/public-historical-proof.json"), "utf8")
 ]);
 const sourceAccess = JSON.parse(sourceAccessRaw);
+const historicalProof = JSON.parse(historicalProofRaw);
 
 for (const file of ["styles.css", "app.js", "mau-bao-cao.html", "legal.html", "robots.txt", "sitemap.xml", "404.html", "favicon.svg"]) {
   assert.ok(await read(file), `${file} must not be empty`);
@@ -40,6 +43,12 @@ assert.match(index, /Báo cáo dữ liệu AI[\s\S]*ngày hôm nay/i);
 assert.match(index, /30\.000đ/);
 assert.match(index, /Thanh toán một lần · Không tự gia hạn/i);
 assert.match(index, /khỏi tự gom|Không cần tự gom/i);
+assert.match(index, /80%/);
+assert.match(index, /24\/30 ngày/);
+assert.match(index, /14\/07\/2026–12\/08\/2026/);
+assert.match(index, /Có cả ngày xuất hiện và không xuất hiện/i);
+assert.match(index, /Số được lưu theo 7 lớp báo cáo/i);
+assert.match(index, /6 phương pháp độc lập và 1 lớp tổng hợp 4SO/i);
 assert.match(index, /Nhận báo cáo đầy đủ/i);
 assert.match(index, /Nhắn Zalo để nhận báo cáo/i);
 assert.match(index, /Hiện thông tin chuyển khoản/i);
@@ -69,7 +78,6 @@ const viDateToIso = (value) => {
 assert.equal(parseViDate(reportDateMatch[1]) - parseViDate(reportDateMatch[2]), 86400000, "report date must be T+1 from locked data");
 assert.equal(sourceAccess.history_end, viDateToIso(reportDateMatch[2]), "public source record must match the displayed lock date");
 assert.match(index, new RegExp(`Báo cáo cho ngày hôm nay \\(${reportDateMatch[1].replaceAll("/", "\\/")}\\)`, "i"));
-assert.match(index, new RegExp(`7 phương pháp cho ngày hôm nay \\(${reportDateMatch[1].replaceAll("/", "\\/")}\\)`, "i"));
 assert.match(index, new RegExp(`Dữ liệu khóa đến hết ngày hôm qua \\(${reportDateMatch[2].replaceAll("/", "\\/")}\\)`, "i"));
 assert.ok(index.indexOf('id="methods"') < index.indexOf('id="buy"'));
 assert.doesNotMatch(index, /id="included"|id="about"|faq-section|steps-section|pricing-section/);
@@ -77,13 +85,25 @@ assert.doesNotMatch(index, /id="included"|id="about"|faq-section|steps-section|p
 // Future-pick, betting and unverifiable-performance copy must stay absent.
 const publicCopy = `${index}\n${sample}\n${legal}`;
 assert.doesNotMatch(publicCopy, /hôm nay đánh|chốt số|số đẹp|bao lô|xiên|cam kết trúng/i);
-assert.doesNotMatch(publicCopy, /15\.000|24\/30|80%/i);
+assert.doesNotMatch(publicCopy, /15\.000/i);
 assert.doesNotMatch(publicCopy, /mở kết luận|kết luận 1 số|kết luận 2 số|kết luận 4 số|dàn số/i);
 assert.doesNotMatch(publicCopy, /MB THANG/i);
 assert.doesNotMatch(publicCopy, />[^<]*0398[^<]*</i);
 assert.match(publicCopy, /không bán số/i);
+assert.match(publicCopy, /Tỷ lệ 80% chỉ mô tả cửa sổ lịch sử đã hoàn tất, không phải xác suất hoặc cam kết/i);
 
 // Evidence and the public sample must remain inspectable.
+assert.equal(historicalProof.schema_version, "MB_PUBLIC_HISTORICAL_PROOF_V1_COMPLETED_ONLY");
+assert.equal(historicalProof.validation.hit_days * 100, historicalProof.validation.rate_pct * historicalProof.validation.total_days);
+assert.equal(historicalProof.recent_period.days.length, historicalProof.recent_period.total_days);
+assert.equal(historicalProof.recent_period.days.filter((day) => day.observed.length > 0).length, historicalProof.recent_period.hit_days);
+assert.equal(historicalProof.method_snapshot.layers.length, 7);
+assert.equal(historicalProof.method_snapshot.target_date, "2026-08-12");
+assert.equal(historicalProof.method_snapshot.data_lock, "2026-08-11");
+assert.equal((index.match(/class="history-day-row"/g) || []).length, historicalProof.recent_period.total_days);
+assert.equal((index.match(/class="historical-method-row/g) || []).length, historicalProof.method_snapshot.layers.length);
+for (const day of historicalProof.recent_period.days) assert.match(index, new RegExp(day.date.split("-").reverse().join("\\/")));
+assert.match(index, /href="\/historical-proof\.json"/);
 assert.match(index, new RegExp(`${sourceAccess.history_rows}[\\s\\S]*phiên lịch sử`));
 assert.match(index, /27\/27[\s\S]*bản ghi/);
 assert.match(index, new RegExp(`<strong>${sourceAccess.source_count}<\\/strong> nguồn khớp`));
@@ -122,6 +142,7 @@ assert.match(styles, /\.checkout-actions/);
 assert.doesNotMatch(workflow, /schedule:/);
 assert.match(workflow, /cp site-v2\/index\.html/);
 assert.match(workflow, /cp site-v2\/og\.png/);
+assert.match(workflow, /cp data\/public-historical-proof\.json _site\/historical-proof\.json/);
 assert.match(completedWorkflow, /cron: "0 12 \* \* \*"/);
 assert.match(completedWorkflow, /for attempt in \{1\.\.6\}/);
 assert.match(completedWorkflow, /sleep 300/);
@@ -130,7 +151,8 @@ assert.match(midnightWorkflow, /cron: "0 17 \* \* \*"/);
 assert.match(midnightWorkflow, /date -d 'yesterday'/);
 assert.match(midnightWorkflow, /update_completed_draw_report\.py --draw-date "\$LOCK_DATE"/);
 assert.match(completedScript, /POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL/);
-assert.match(completedScript, /7 phương pháp cho ngày hôm nay/);
+assert.match(completedScript, /Số được lưu theo 7 lớp báo cáo/);
+assert.match(completedScript, /public-historical-proof\.json/);
 assert.match(completedScript, /stage_only/);
 assert.doesNotMatch(completedScript, /plan_next_day|actual_order|pnl_vnd/i);
 

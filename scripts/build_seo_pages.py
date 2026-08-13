@@ -743,7 +743,7 @@ def today_page(
         <div class="section-heading"><p class="eyebrow">CÂU HỎI THƯỜNG GẶP</p><h2 id="faq-title"><span class="phrase">Hiểu đúng về</span> <span class="phrase">“cho số Miền Bắc</span> <span class="phrase">hôm nay”</span></h2></div>
         <details><summary>Các số trên trang có phải kết luận 4SO không?</summary><p>Không. Các dãy đang công khai là đầu ra của từng phương pháp. Kết luận 4SO là bước tổng hợp riêng, chỉ gồm 2 cặp đảo và 4 số.</p></details>
         <details><summary>Số hôm nay được tính từ dữ liệu nào?</summary><p>Chỉ dùng kết quả đã công bố đến hết ngày hôm qua. Nếu nguồn chưa đủ 27/27 mã hoặc ngày khóa không đúng T−1, website không công khai lại số cũ.</p></details>
-        <details><summary>Tỷ lệ 80% có phải cam kết thắng không?</summary><p>Không. 80% chỉ mô tả 24 ngày có ít nhất một số xuất hiện trong một cửa sổ 30 ngày đã kiểm định. Kết quả tương lai có thể khác.</p></details>
+        <details><summary>Tỷ lệ {rate}% có phải cam kết thắng không?</summary><p>Không. {rate}% chỉ mô tả {hit_days} ngày có ít nhất một số xuất hiện trong một cửa sổ {total_days} ngày đã kiểm định. Kết quả tương lai có thể khác.</p></details>
         <details><summary>Website có nhận cược hoặc trả thưởng không?</summary><p>Không. Đây là dịch vụ dữ liệu và báo cáo thống kê dành cho người đủ 18 tuổi; website không nhận cược, giữ tiền cược hoặc trả thưởng.</p></details>
       </div>
     </section>

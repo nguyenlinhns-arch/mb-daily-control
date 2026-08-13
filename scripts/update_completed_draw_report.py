@@ -182,7 +182,7 @@ def build_report_block(
             '          <div class="history-day-head" role="row"><span>Ngày</span><span>4 đầu ra đã lưu</span><span>Đối chiếu thực tế</span></div>',
             *day_rows,
             '        </div>',
-            f'        <p class="historical-disclaimer"><strong>Cách tính:</strong> {esc(validation["definition"])} Tỷ lệ 80% chỉ mô tả cửa sổ lịch sử đã hoàn tất, không phải xác suất hoặc cam kết cho ngày tiếp theo. <a href="/historical-proof.json" target="_blank" rel="noopener">Hồ sơ thống kê</a> · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a>.</p>',
+            f'        <p class="historical-disclaimer"><strong>Cách tính:</strong> {esc(validation["definition"])} Tỷ lệ {int(validation["rate_pct"])}% chỉ mô tả cửa sổ lịch sử đã hoàn tất, không phải xác suất hoặc cam kết cho ngày tiếp theo. <a href="/historical-proof.json" target="_blank" rel="noopener">Hồ sơ thống kê</a> · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a>.</p>',
             '      </div>',
             '    </section>',
             END_MARKER,
@@ -385,29 +385,55 @@ def update_source_access(
     doc: dict[str, Any], target: date, codes: list[str], sources: list[dict[str, Any]], now: datetime
 ) -> bool:
     rows = doc["rows"]
+    canonical_hash = hashlib.sha256("|".join(codes).encode()).hexdigest()
+    merged_sources = [
+        {
+            "name": str(source.get("source", "")),
+            "url": str(source.get("url", "")),
+            "codes_sha256": str(source.get("codes_sha256", "")),
+        }
+        for source in sources
+    ]
+    existing: dict[str, Any] = {}
+    if ACCESS_FILE.exists():
+        existing = json.loads(ACCESS_FILE.read_text(encoding="utf-8"))
+        # The 19:00 audit can add an official source which the 00:05 public
+        # mirror checker does not fetch. Preserve only same-day, same-result
+        # evidence so a later refresh cannot downgrade a stronger audit.
+        if (
+            existing.get("history_end") == target.isoformat()
+            and existing.get("latest_codes_sha256") == canonical_hash
+        ):
+            for source in existing.get("sources") or []:
+                normalized = {
+                    "name": str(source.get("name", "")),
+                    "url": str(source.get("url", "")),
+                    "codes_sha256": str(source.get("codes_sha256", "")),
+                }
+                if normalized["name"] and normalized["url"] and normalized["codes_sha256"] == canonical_hash:
+                    merged_sources.append(normalized)
+    merged_sources = list({
+        (source["name"], source["url"], source["codes_sha256"]): source
+        for source in merged_sources
+    }.values())
+    merged_sources.sort(key=lambda item: (item["name"], item["url"]))
+    has_official = any("official" in source["name"].lower() for source in merged_sources)
     access_without_time = {
         "schema_version": "MB_SOURCE_ACCESS_V3_POST_DRAW_ONLY",
         "status": "LOCKED_CROSSCHECKED_PUBLIC",
-        "selected": "PUBLIC_MULTI_SOURCE_CROSSCHECK",
+        "selected": "OFFICIAL_PLUS_MULTI_SOURCE_CROSSCHECK" if has_official else "PUBLIC_MULTI_SOURCE_CROSSCHECK",
         "history_start": rows[0][0],
         "history_end": target.isoformat(),
         "history_rows": len(rows),
-        "latest_codes_sha256": hashlib.sha256("|".join(codes).encode()).hexdigest(),
-        "source_count": len(sources),
-        "sources": [
-            {
-                "name": str(source.get("source", "")),
-                "url": str(source.get("url", "")),
-                "codes_sha256": str(source.get("codes_sha256", "")),
-            }
-            for source in sorted(sources, key=lambda item: str(item.get("source", "")))
-        ],
+        "latest_codes_sha256": canonical_hash,
+        "source_count": len(merged_sources),
+        "sources": merged_sources,
         "policy": "COMPLETED_DRAW_ONLY_FAIL_CLOSED_MINIMUM_TWO_EXACT_SOURCES",
     }
-    if ACCESS_FILE.exists():
-        existing = json.loads(ACCESS_FILE.read_text(encoding="utf-8"))
-        existing.pop("locked_at", None)
-        if existing == access_without_time:
+    if existing:
+        existing_without_time = dict(existing)
+        existing_without_time.pop("locked_at", None)
+        if existing_without_time == access_without_time:
             return False
     access = {**access_without_time, "locked_at": now.isoformat(timespec="seconds")}
     return write_json_if_changed(ACCESS_FILE, access)

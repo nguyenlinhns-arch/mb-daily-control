@@ -3,16 +3,36 @@
 
   const PRICE = 30000;
   const PRICE_TEXT = "30.000đ";
+  const ITEM_NAME = "Báo cáo dữ liệu AI ngày hôm nay";
   const REPORT_DATE = document.body.dataset.reportDate || "13/08/2026";
   const DATA_LOCK_DATE = document.body.dataset.lockDate || "12/08/2026";
-  const ORDER_KEY = "lemienbac_simple_order_v1";
+  const rawEndpoint = String(window.ORDER_CONFIRMATION_ENDPOINT || "").trim();
+  const BACKEND_ENDPOINT = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(rawEndpoint)
+    ? rawEndpoint
+    : "";
+  const ORDER_KEY = "lemienbac_email_order_v1";
+  const ATTRIBUTION_KEY = "lemienbac_attribution_v1";
   const CONSENT_KEY = "lemienbac_measurement_consent_v1";
   const ZALO_URL = "https://zalo.me/0398696879";
+  const POLL_INTERVAL_MS = 5000;
 
   const checkout = document.getElementById("checkout");
   const checkoutClose = document.getElementById("checkout-close");
   const orderCodeNodes = [...document.querySelectorAll("#order-code, #payment-memo")];
+  const selfConfirmButton = document.getElementById("payment-self-confirm");
+  const pendingPanel = document.getElementById("payment-pending");
+  const pendingTitle = document.getElementById("pending-title");
+  const pendingCopy = document.getElementById("pending-copy");
+  const deliveryView = document.getElementById("delivery-view");
+  const deliveryTitle = document.getElementById("delivery-title");
+  const deliverySummary = document.getElementById("delivery-summary");
+  const deliveryMetrics = document.getElementById("delivery-metrics");
+  const deliveryNotes = document.getElementById("delivery-notes");
   const consentPanel = document.getElementById("consent");
+
+  let pollTimer = 0;
+  let submitting = false;
+  let order = loadOrder();
 
   function track(eventName, parameters = {}) {
     if (typeof window.gtag === "function") window.gtag("event", eventName, parameters);
@@ -35,34 +55,296 @@
     return `${get("year")}${get("month")}${get("day")}`;
   }
 
-  function loadOrderCode() {
-    const saved = sessionStorage.getItem(ORDER_KEY) || "";
-    if (/^AI-\d{6}-[A-Z0-9]{6}$/.test(saved)) return saved;
-    const fresh = `AI-${dateStamp()}-${randomToken().slice(0, 6).toUpperCase()}`;
-    sessionStorage.setItem(ORDER_KEY, fresh);
+  function newOrder() {
+    return {
+      code: `AI-${dateStamp()}-${randomToken(4).slice(0, 6).toUpperCase()}`,
+      customerToken: randomToken(20),
+      reportDate: REPORT_DATE,
+      status: "draft",
+      createdAt: new Date().toISOString(),
+      submittedAt: "",
+      approvedAt: "",
+      delivery: null
+    };
+  }
+
+  function loadOrder() {
+    try {
+      const parsed = JSON.parse(sessionStorage.getItem(ORDER_KEY) || "null");
+      if (
+        parsed
+        && /^AI-\d{6}-[A-Z0-9]{6}$/.test(parsed.code)
+        && typeof parsed.customerToken === "string"
+        && parsed.customerToken.length >= 20
+        && parsed.reportDate === REPORT_DATE
+      ) {
+        return { ...newOrder(), ...parsed };
+      }
+    } catch (_) {
+      // Dữ liệu phiên lỗi sẽ được thay bằng một yêu cầu mới.
+    }
+    const fresh = newOrder();
+    sessionStorage.setItem(ORDER_KEY, JSON.stringify(fresh));
     return fresh;
   }
 
-  const orderCode = loadOrderCode();
-  orderCodeNodes.forEach((node) => { node.textContent = orderCode; });
-  document.querySelectorAll(".checkout-scope").forEach((node) => {
-    node.textContent = `01 báo cáo ngày ${REPORT_DATE} · dữ liệu khóa đến ${DATA_LOCK_DATE}.`;
-  });
+  function saveOrder() {
+    sessionStorage.setItem(ORDER_KEY, JSON.stringify(order));
+  }
+
+  function collectAttribution() {
+    const allowed = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "gbraid", "wbraid"];
+    const url = new URL(window.location.href);
+    let saved = {};
+    try {
+      saved = JSON.parse(localStorage.getItem(ATTRIBUTION_KEY) || "{}") || {};
+    } catch (_) {
+      saved = {};
+    }
+    for (const key of allowed) {
+      const value = url.searchParams.get(key);
+      if (value) saved[key] = value.slice(0, 250);
+    }
+    if (!saved.landing_page) saved.landing_page = `${url.origin}${url.pathname}`;
+    if (!saved.first_seen_at) saved.first_seen_at = new Date().toISOString();
+    try {
+      localStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(saved));
+    } catch (_) {
+      // Thông tin nguồn truy cập là tùy chọn.
+    }
+    return saved;
+  }
+
+  const attribution = collectAttribution();
+
+  function showPending(title, copy, error = false) {
+    pendingPanel.hidden = false;
+    pendingPanel.classList.toggle("is-error", error);
+    pendingPanel.querySelector(".pending-icon").textContent = error ? "!" : "…";
+    pendingTitle.textContent = title;
+    pendingCopy.textContent = copy;
+    deliveryView.hidden = true;
+  }
+
+  function showDelivery(delivery) {
+    stopPolling();
+    order.status = "approved";
+    order.approvedAt = order.approvedAt || new Date().toISOString();
+    order.delivery = delivery;
+    saveOrder();
+
+    pendingPanel.hidden = true;
+    deliveryView.hidden = false;
+    selfConfirmButton.hidden = true;
+    deliveryTitle.textContent = String(delivery.title || `Báo cáo ngày ${REPORT_DATE}`);
+    deliverySummary.textContent = String(delivery.summary || "Giao dịch đã được chủ dịch vụ xác nhận.");
+
+    deliveryMetrics.replaceChildren();
+    const metrics = Array.isArray(delivery.metrics) ? delivery.metrics.slice(0, 6) : [];
+    for (const metric of metrics) {
+      const card = document.createElement("article");
+      const label = document.createElement("small");
+      const value = document.createElement("strong");
+      label.textContent = String(metric.label || "");
+      value.textContent = String(metric.value || "");
+      card.append(label, value);
+      deliveryMetrics.append(card);
+    }
+
+    deliveryNotes.replaceChildren();
+    const notes = Array.isArray(delivery.notes) ? delivery.notes.slice(0, 8) : [];
+    if (notes.length) {
+      const list = document.createElement("ul");
+      for (const note of notes) {
+        const item = document.createElement("li");
+        item.textContent = String(note || "");
+        list.append(item);
+      }
+      deliveryNotes.append(list);
+    }
+
+    const purchaseKey = `lemienbac_purchase_${order.code}`;
+    if (!localStorage.getItem(purchaseKey)) {
+      track("purchase", {
+        transaction_id: order.code,
+        currency: "VND",
+        value: PRICE,
+        items: [{ item_id: "daily-report", item_name: ITEM_NAME, price: PRICE, quantity: 1 }]
+      });
+      localStorage.setItem(purchaseKey, "1");
+    }
+  }
+
+  function updateCheckoutState() {
+    orderCodeNodes.forEach((node) => { node.textContent = order.code; });
+    document.querySelectorAll(".checkout-scope").forEach((node) => {
+      node.textContent = `01 báo cáo ngày ${REPORT_DATE} · dữ liệu khóa đến ${DATA_LOCK_DATE}.`;
+    });
+
+    selfConfirmButton.disabled = order.status !== "draft" || submitting;
+    selfConfirmButton.hidden = order.status === "approved";
+    if (order.status === "pending") {
+      showPending(
+        "Đã gửi email báo chủ dịch vụ",
+        "Hệ thống đang chờ đối soát. Khi chủ dịch vụ bấm xác nhận trong email, báo cáo sẽ tự mở tại đây."
+      );
+      startPolling();
+    } else if (order.status === "approved") {
+      showDelivery(order.delivery || {});
+    } else if (order.status === "rejected") {
+      showPending(
+        "Chưa tìm thấy giao dịch",
+        "Vui lòng kiểm tra lại mã chuyển khoản hoặc dùng nút Hỗ trợ ngay để được đối soát.",
+        true
+      );
+    } else {
+      pendingPanel.hidden = true;
+      deliveryView.hidden = true;
+    }
+  }
 
   function openCheckout() {
+    updateCheckoutState();
     checkout.hidden = false;
     document.body.classList.add("modal-open");
     checkoutClose.focus();
     track("begin_checkout", {
       currency: "VND",
       value: PRICE,
-      items: [{ item_id: "daily-report", item_name: "Báo cáo dữ liệu AI ngày hôm nay", price: PRICE, quantity: 1 }]
+      items: [{ item_id: "daily-report", item_name: ITEM_NAME, price: PRICE, quantity: 1 }]
     });
   }
 
   function closeCheckout() {
     checkout.hidden = true;
     document.body.classList.remove("modal-open");
+  }
+
+  function hiddenPost(endpoint, fields) {
+    const frameName = `order-frame-${randomToken(5)}`;
+    const iframe = document.createElement("iframe");
+    iframe.name = frameName;
+    iframe.title = "Gửi yêu cầu xác nhận thanh toán";
+    iframe.hidden = true;
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = endpoint;
+    form.target = frameName;
+    form.hidden = true;
+    form.referrerPolicy = "no-referrer";
+    for (const [name, value] of Object.entries(fields)) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = String(value ?? "");
+      form.append(input);
+    }
+    document.body.append(iframe, form);
+    form.submit();
+    window.setTimeout(() => { form.remove(); iframe.remove(); }, 60000);
+  }
+
+  function submitPaymentClaim() {
+    if (submitting || order.status !== "draft") return;
+    if (!BACKEND_ENDPOINT) {
+      showPending(
+        "Kênh email xác nhận chưa sẵn sàng",
+        "Chưa gửi yêu cầu. Vui lòng dùng nút Hỗ trợ ngay để được kiểm tra.",
+        true
+      );
+      return;
+    }
+
+    submitting = true;
+    selfConfirmButton.disabled = true;
+    selfConfirmButton.textContent = "Đang gửi email thông báo…";
+    hiddenPost(BACKEND_ENDPOINT, {
+      action: "create",
+      order_code: order.code,
+      customer_token: order.customerToken,
+      plan: "day",
+      amount: PRICE,
+      submitted_at: new Date().toISOString(),
+      page_url: window.location.href.slice(0, 1000),
+      attribution: JSON.stringify({ ...attribution, report_date: REPORT_DATE }).slice(0, 3000),
+      contact: "",
+      website: ""
+    });
+
+    order.status = "pending";
+    order.submittedAt = new Date().toISOString();
+    saveOrder();
+    track("payment_submitted", {
+      currency: "VND",
+      value: PRICE,
+      transaction_id: order.code,
+      report_date: REPORT_DATE
+    });
+    showPending(
+      "Đã gửi email báo chủ dịch vụ",
+      "Giữ màn hình này. Khi giao dịch được xác nhận từ email, báo cáo sẽ tự mở tại đây."
+    );
+    selfConfirmButton.textContent = "Đã gửi yêu cầu xác nhận";
+    submitting = false;
+    startPolling();
+  }
+
+  function jsonp(params) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `__fourSoStatus_${randomToken(6)}`;
+      const script = document.createElement("script");
+      const timeout = window.setTimeout(() => finish(new Error("timeout")), 12000);
+      const finish = (error, data) => {
+        window.clearTimeout(timeout);
+        delete window[callbackName];
+        script.remove();
+        error ? reject(error) : resolve(data);
+      };
+      window[callbackName] = (data) => finish(null, data);
+      script.onerror = () => finish(new Error("network"));
+      const url = new URL(BACKEND_ENDPOINT);
+      for (const [key, value] of Object.entries({ ...params, callback: callbackName, _: Date.now() })) {
+        url.searchParams.set(key, String(value));
+      }
+      script.referrerPolicy = "no-referrer";
+      script.src = url.toString();
+      document.head.append(script);
+    });
+  }
+
+  async function checkStatus() {
+    if (!BACKEND_ENDPOINT || order.status !== "pending") return;
+    try {
+      const result = await jsonp({
+        action: "status",
+        order_code: order.code,
+        customer_token: order.customerToken
+      });
+      if (!result || result.ok !== true) return;
+      if (result.status === "approved") {
+        order.approvedAt = result.approved_at || new Date().toISOString();
+        showDelivery(result.delivery || {});
+      } else if (result.status === "rejected") {
+        order.status = "rejected";
+        saveOrder();
+        stopPolling();
+        updateCheckoutState();
+      }
+    } catch (_) {
+      // Lỗi mạng tạm thời sẽ được thử lại ở lượt tiếp theo.
+    }
+  }
+
+  function startPolling() {
+    if (!BACKEND_ENDPOINT || pollTimer || order.status !== "pending") return;
+    checkStatus();
+    pollTimer = window.setInterval(checkStatus, POLL_INTERVAL_MS);
+  }
+
+  function stopPolling() {
+    if (pollTimer) window.clearInterval(pollTimer);
+    pollTimer = 0;
   }
 
   async function copyText(value, button) {
@@ -83,6 +365,7 @@
   checkoutClose.addEventListener("click", closeCheckout);
   checkout.addEventListener("click", (event) => { if (event.target === checkout) closeCheckout(); });
   document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !checkout.hidden) closeCheckout(); });
+  selfConfirmButton.addEventListener("click", submitPaymentClaim);
 
   document.querySelectorAll("[data-copy-target]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -92,21 +375,12 @@
       copyText(value, button);
     });
   });
-
   document.getElementById("copy-payment").addEventListener("click", (event) => {
-    copyText(`VPBank\n1128091987\nSố tiền: ${PRICE_TEXT}\nNội dung: ${orderCode}`, event.currentTarget);
-  });
-  document.getElementById("copy-order-code").addEventListener("click", (event) => {
-    copyText(orderCode, event.currentTarget);
+    copyText(`VPBank\n1128091987\nSố tiền: ${PRICE_TEXT}\nNội dung: ${order.code}`, event.currentTarget);
   });
 
-  document.getElementById("zalo-delivery").addEventListener("click", () => {
-    navigator.clipboard?.writeText(orderCode).catch(() => {});
-    track("generate_lead", { method: "zalo_after_bank_transfer", order_code: orderCode, currency: "VND", value: PRICE });
-  });
   document.querySelectorAll(`a[href^="${ZALO_URL}"]`).forEach((link) => {
-    if (link.id === "zalo-delivery") return;
-    link.addEventListener("click", () => track("generate_lead", { method: "zalo_support" }));
+    link.addEventListener("click", () => track("generate_lead", { method: "zalo_support", order_code: order.code }));
   });
 
   function updateConsent(granted) {
@@ -128,9 +402,10 @@
   else if (storedConsent === "denied") updateConsent(false);
   else consentPanel.hidden = false;
 
+  updateCheckoutState();
   track("view_item", {
     currency: "VND",
     value: PRICE,
-    items: [{ item_id: "daily-report", item_name: "Báo cáo dữ liệu AI ngày hôm nay", price: PRICE, quantity: 1 }]
+    items: [{ item_id: "daily-report", item_name: ITEM_NAME, price: PRICE, quantity: 1 }]
   });
 })();

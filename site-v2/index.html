@@ -32,7 +32,8 @@
     gtag('config','G-R9TBYP97BC',{allow_google_signals:false,allow_ad_personalization_signals:false});
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-R9TBYP97BC"></script>
-  <script defer src="./app.js?v=20260813-10"></script>
+  <script src="./config.js?v=20260813-2"></script>
+  <script defer src="./app.js?v=20260813-11"></script>
 </head>
 <body class="landing-simple" data-report-date="13/08/2026" data-lock-date="12/08/2026">
   <a class="skip-link" href="#main">Bỏ qua điều hướng</a>
@@ -104,7 +105,7 @@
     <section class="buy-simple" id="buy">
       <div class="wrap buy-simple-card">
         <div><p class="eyebrow">BÁO CÁO ĐẦY ĐỦ HÔM NAY</p><h2>30.000đ</h2><p class="buy-copy">Trang trên cho xem thống kê và một hồ sơ 7 lớp đã hoàn tất. Bản trả phí tổng hợp 7 lớp báo cáo, kết luận dữ liệu ngày hôm nay, hồ sơ nguồn và giới hạn sử dụng.</p><p class="checkout-scope" id="checkout-scope">01 báo cáo ngày 13/08/2026 · dữ liệu khóa đến 12/08/2026.</p></div>
-        <ol><li><span>1</span>Chuyển khoản đúng nội dung</li><li><span>2</span>Nhắn mã yêu cầu qua Zalo</li><li><span>3</span>Nhận báo cáo trong Zalo</li></ol>
+        <ol><li><span>1</span>Chuyển khoản đúng nội dung</li><li><span>2</span>Bấm báo đã chuyển khoản</li><li><span>3</span>Chủ dịch vụ xác nhận, báo cáo mở trên màn hình</li></ol>
         <button class="button button-primary button-large" type="button" data-open-checkout>Hiện thông tin chuyển khoản</button>
       </div>
       <p class="buy-legal">Thanh toán một lần · Không tự gia hạn · <a href="/legal.html">Điều khoản và hoàn phí</a></p>
@@ -129,9 +130,17 @@
         <button class="copy-payment" id="copy-payment" type="button">Sao chép toàn bộ</button>
       </div>
       <div class="bank-warning"><span>!</span><p>Chỉ chuyển khi ứng dụng ngân hàng hiển thị đúng thông tin người nhận.</p></div>
-      <p class="zalo-instruction">Sau khi chuyển khoản, sao chép mã yêu cầu và nhắn mã này qua Zalo.</p>
-      <div class="checkout-actions"><button class="button button-light" id="copy-order-code" type="button">Sao chép mã yêu cầu</button><a class="button button-primary" id="zalo-delivery" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Nhắn Zalo để nhận báo cáo</a></div>
-      <p class="checkout-legal">Giá trọn gói 30.000đ, thanh toán một lần, không tự gia hạn. Xem <a href="/legal.html#payment" target="_blank">thanh toán và hoàn phí</a>.</p>
+      <p class="zalo-instruction">Sau khi chuyển khoản, bấm nút dưới đây. Hệ thống sẽ gửi email để chủ dịch vụ kiểm tra và xác nhận.</p>
+      <button class="payment-confirm" id="payment-self-confirm" type="button">Tôi đã chuyển khoản – gửi email xác nhận</button>
+      <div class="payment-pending" id="payment-pending" hidden role="status"><span class="pending-icon">…</span><div><strong id="pending-title">Đã gửi email báo chủ dịch vụ</strong><small id="pending-copy">Vui lòng giữ màn hình này trong khi chờ xác nhận.</small></div></div>
+      <section class="delivery-view" id="delivery-view" hidden aria-live="polite">
+        <div class="delivery-head"><span>✓</span><div><small>THANH TOÁN ĐÃ ĐƯỢC XÁC NHẬN</small><h3 id="delivery-title">Báo cáo dữ liệu AI</h3></div></div>
+        <p id="delivery-summary"></p>
+        <div class="delivery-metrics" id="delivery-metrics"></div>
+        <div class="delivery-notes" id="delivery-notes"></div>
+      </section>
+      <a class="button button-zalo" id="zalo-order" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Cần hỗ trợ? Mở Zalo</a>
+      <p class="checkout-legal">Nút “Tôi đã chuyển khoản” chỉ gửi yêu cầu đối soát, chưa tự xác nhận tiền đã vào tài khoản. Báo cáo chỉ mở sau khi chủ dịch vụ bấm xác nhận trong email. Giá trọn gói 30.000đ, thanh toán một lần, không tự gia hạn. Xem <a href="/legal.html#payment" target="_blank">thanh toán và hoàn phí</a>.</p>
     </section>
   </div>
 

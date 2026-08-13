@@ -8,6 +8,8 @@ const [
   index,
   styles,
   app,
+  config,
+  approvalBackend,
   legal,
   sample,
   workflow,
@@ -20,6 +22,8 @@ const [
   read("index.html"),
   read("styles.css"),
   read("app.js"),
+  read("config.js"),
+  read("approval-backend.gs"),
   read("legal.html"),
   read("mau-bao-cao.html"),
   readFile(resolve(process.cwd(), ".github/workflows/pages.yml"), "utf8"),
@@ -37,7 +41,7 @@ for (const file of ["styles.css", "app.js", "mau-bao-cao.html", "legal.html", "r
 }
 assert.ok((await stat(resolve(root, "og.png"))).size > 100_000, "og.png must be a real social preview image");
 
-// One clearly described daily report, one clear price, and one simple delivery flow.
+// One clearly described daily report, one clear price, and one email-approved delivery flow.
 assert.match(index, /BÁO CÁO DỮ LIỆU AI NGÀY/i);
 assert.match(index, /Báo cáo dữ liệu AI[\s\S]*ngày hôm nay/i);
 assert.match(index, /30\.000đ/);
@@ -50,19 +54,24 @@ assert.match(index, /Có cả ngày xuất hiện và không xuất hiện/i);
 assert.match(index, /Số được lưu theo 7 lớp báo cáo/i);
 assert.match(index, /6 phương pháp độc lập và 1 lớp tổng hợp 4SO/i);
 assert.match(index, /Nhận báo cáo đầy đủ/i);
-assert.match(index, /Nhắn Zalo để nhận báo cáo/i);
+assert.match(index, /Bấm báo đã chuyển khoản/i);
+assert.match(index, /Chủ dịch vụ xác nhận, báo cáo mở trên màn hình/i);
 assert.match(index, /Hiện thông tin chuyển khoản/i);
 assert.match(index, /id="bank-account">1128091987/);
 assert.match(index, /data-open-checkout/);
 assert.match(index, /id="copy-payment"/);
-assert.match(index, /id="copy-order-code"/);
-assert.match(index, /id="zalo-delivery"/);
+assert.match(index, /id="payment-self-confirm"/);
+assert.match(index, /id="payment-pending"/);
+assert.match(index, /id="delivery-view"/);
+assert.match(index, /id="zalo-order"/);
+assert.match(index, /chỉ gửi yêu cầu đối soát, chưa tự xác nhận tiền đã vào tài khoản/i);
 assert.match(index, /Hỗ trợ ngay/);
 assert.match(index, /https:\/\/lemienbac\.com\/og\.png/);
 assert.match(index, /COMPLETED_DRAW_REPORT:START/);
 assert.equal((index.match(/role="listitem"/g) || []).length, 7);
 assert.doesNotMatch(index, /200\.000đ|800\.000đ|07 BÁO CÁO HẰNG NGÀY|30 BÁO CÁO HẰNG NGÀY/);
-assert.doesNotMatch(index, /config\.js/);
+assert.ok(index.indexOf('src="./config.js') < index.indexOf('src="./app.js'), "public endpoint config must load before app.js");
+assert.doesNotMatch(index, /type="email"|name="email"|type="tel"|name="phone"/i);
 
 // The published report date must always be one day after the locked data date.
 const reportDateMatch = index.match(/data-report-date="(\d{2}\/\d{2}\/\d{4})" data-lock-date="(\d{2}\/\d{2}\/\d{4})"/);
@@ -117,31 +126,65 @@ assert.match(sample, /không phải 4SO của ngày hôm nay/i);
 assert.match(sample, /7 phương pháp/i);
 assert.match(sample, /Mọi thứ gọn trong một màn hình/i);
 
-// Legal copy must match the one-report, bank-transfer-to-Zalo experience.
+// Legal copy must match the one-report, email-approved, on-screen delivery experience.
 assert.match(legal, /một loại sản phẩm[\s\S]*30\.000đ/i);
 assert.match(legal, /một báo cáo/i);
 assert.match(legal, /không tự gia hạn/i);
-assert.match(legal, /chuyển khoản[\s\S]*nhắn qua Zalo/i);
-assert.match(legal, /Đối soát thủ công/);
+assert.match(legal, /chuyển khoản[\s\S]*gửi email cho chủ dịch vụ[\s\S]*tự mở trên chính màn hình/i);
+assert.match(legal, /Đối soát thủ công qua email/);
+assert.match(legal, /không phải bằng chứng tiền đã vào tài khoản/i);
+assert.match(legal, /Zalo chỉ là kênh hỗ trợ tự nguyện/i);
+assert.match(legal, /Google Apps Script, Google Sheets và email/i);
 assert.match(legal, /Điều kiện hoàn phí/);
 assert.match(legal, /Google Analytics chỉ được bật sau khi người dùng đồng ý/i);
+assert.match(legal, /Sự kiện mua chỉ được ghi nhận sau khi hệ thống nhận trạng thái đã xác nhận/i);
 assert.doesNotMatch(legal, /200\.000đ|800\.000đ|07 báo cáo|30 báo cáo/);
+assert.match(sample, /chủ dịch vụ xác nhận qua email và báo cáo tự mở trên màn hình/i);
 
-// Browser code tracks real funnel steps but never claims an unverified purchase.
+// Browser code submits an anonymous claim, polls a protected status, and tracks purchase only after approval.
 assert.match(app, /begin_checkout/);
 assert.match(app, /add_payment_info/);
 assert.match(app, /generate_lead/);
-assert.match(app, /zalo_after_bank_transfer/);
 assert.match(app, /Báo cáo dữ liệu AI ngày hôm nay/);
-assert.doesNotMatch(app, /BACKEND_ENDPOINT|ORDER_CONFIRMATION_ENDPOINT|payment_submitted|track\("purchase"|startPolling|checkStatus/);
+assert.match(app, /ORDER_CONFIRMATION_ENDPOINT/);
+assert.match(app, /BACKEND_ENDPOINT/);
+assert.match(app, /hiddenPost/);
+assert.match(app, /customer_token/);
+assert.match(app, /payment_submitted/);
+assert.match(app, /startPolling/);
+assert.match(app, /checkStatus/);
+assert.match(app, /result\.status === "approved"/);
+assert.match(app, /showDelivery/);
+assert.match(app, /plan: "day"/);
+assert.match(app, /const PRICE = 30000/);
+assert.doesNotMatch(app, /zalo_after_bank_transfer/);
+const submitPaymentClaim = app.slice(app.indexOf("function submitPaymentClaim"), app.indexOf("function jsonp"));
+const showDelivery = app.slice(app.indexOf("function showDelivery"), app.indexOf("function updateCheckoutState"));
+assert.match(submitPaymentClaim, /track\("payment_submitted"/);
+assert.doesNotMatch(submitPaymentClaim, /track\("purchase"/);
+assert.match(showDelivery, /track\("purchase"/);
+
+// Only the public endpoint is shipped. Approval credentials stay server-side.
+assert.match(config, /window\.ORDER_CONFIRMATION_ENDPOINT\s*=\s*"https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec"/);
+assert.doesNotMatch(config, /OWNER_EMAIL|ADMIN_SECRET|@/);
+assert.match(approvalBackend, /MailApp\.sendEmail/);
+assert.match(approvalBackend, /approvalUrl\(code, "approve"\)/);
+assert.match(approvalBackend, /hashToken\(token\)/);
+assert.match(approvalBackend, /timingSafeEqual/);
+assert.match(approvalBackend, /const OWNER_EMAIL = "REPLACE_WITH_OWNER_EMAIL"/);
+assert.match(approvalBackend, /const ADMIN_SECRET = "REPLACE_WITH_A_LONG_RANDOM_SECRET"/);
 assert.match(styles, /\.hero-offer/);
 assert.match(styles, /\.buy-simple-card/);
-assert.match(styles, /\.checkout-actions/);
+assert.match(styles, /\.payment-confirm/);
+assert.match(styles, /\.payment-pending/);
+assert.match(styles, /\.delivery-view/);
 
 // Deployment and the 19:00 completed-draw updater stay reproducible.
 assert.doesNotMatch(workflow, /schedule:/);
 assert.match(workflow, /cp site-v2\/index\.html/);
 assert.match(workflow, /cp site-v2\/og\.png/);
+assert.match(workflow, /cp site-v2\/config\.js/);
+assert.match(workflow, /test ! -e _site\/approval-backend\.gs/);
 assert.match(workflow, /cp data\/public-historical-proof\.json _site\/historical-proof\.json/);
 assert.match(completedWorkflow, /cron: "0 12 \* \* \*"/);
 assert.match(completedWorkflow, /for attempt in \{1\.\.6\}/);

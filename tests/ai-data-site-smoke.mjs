@@ -49,6 +49,10 @@ assert.match(sample, /Kết luận dàn số/);
 assert.doesNotMatch(index + sample + legal, /4SO|MB THANG/i);
 assert.doesNotMatch(index + sample + legal, />[^<]*0398[^<]*</i);
 assert.match(index + sample + legal, /Hỗ trợ ngay/);
+assert.match(index, /thống kê bằng AI qua 7 lớp phương pháp/i);
+assert.match(index, /Hơn 15\.000 lượt tính toán mỗi ngày/);
+assert.match(index, /đối chiếu lịch sử 30 ngày[\s\S]*80%/i);
+assert.doesNotMatch(index, /class="hero-card"/);
 
 assert.doesNotMatch(index + sample, /hôm nay đánh|chốt số|số đẹp|bao lô|xiên|cam kết trúng/i);
 assert.doesNotMatch(workflow, /schedule:/);

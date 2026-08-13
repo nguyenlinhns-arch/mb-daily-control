@@ -141,20 +141,10 @@ def build_report_block(
     history_rows: list[list[str]],
     sources: list[dict[str, Any]],
 ) -> str:
-    formatted = vi_date(target)
-    source_count = len(sources)
-    source_names = " · ".join(
-        SOURCE_LABELS.get(str(source.get("source", "")), str(source.get("source", "")))
-        for source in sorted(sources, key=lambda item: str(item.get("source", "")))
-    )
-    history_start = vi_date(date.fromisoformat(history_rows[0][0]))
-    history_count = len(history_rows)
-    digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
-    _ = recent_rows
+    _ = target, codes, recent_rows, history_rows, sources
     proof = load_historical_proof()
     validation = proof["validation"]
     recent = proof["recent_period"]
-    snapshot = proof["method_snapshot"]
     validation_window = (
         f'{vi_date(date.fromisoformat(validation["window_start"]))}'
         f'–{vi_date(date.fromisoformat(validation["window_end"]))}'
@@ -183,15 +173,6 @@ def build_report_block(
             f'{vi_date(date.fromisoformat(item["date"]))}</time><div class="history-outputs">{output_html}</div>'
             f'<strong class="history-observed {"has-observed" if observed else ""}">{observed_html}</strong></div>'
         )
-    method_rows: list[str] = []
-    for layer in snapshot["layers"]:
-        numbers = "".join(f'<b>{esc(value)}</b>' for value in layer.get("numbers") or [])
-        final_class = " is-summary" if int(layer["index"]) == 7 else ""
-        method_rows.append(
-            f'          <article class="historical-method-row{final_class}" role="listitem">'
-            f'<span class="method-index">{int(layer["index"]):02d}</span>'
-            f'<strong>{esc(layer["name"])}</strong><div class="historical-number-list">{numbers}</div></article>'
-        )
     return "\n".join(
         [
             START_MARKER,
@@ -205,18 +186,7 @@ def build_report_block(
             '          <div class="history-day-head" role="row"><span>Ngày</span><span>4 đầu ra đã lưu</span><span>Đối chiếu thực tế</span></div>',
             *day_rows,
             '        </div>',
-            f'        <p class="historical-disclaimer"><strong>Cách tính:</strong> {esc(validation["definition"])} Tỷ lệ 80% chỉ mô tả cửa sổ lịch sử đã hoàn tất, không phải xác suất hoặc cam kết cho ngày tiếp theo.</p>',
-            '      </div>',
-            '    </section>',
-            '    <section class="product-section simple-product historical-methods" id="methods">',
-            '      <div class="wrap product-shell">',
-            f'        <header class="product-head"><div><p class="eyebrow">HỒ SƠ LỊCH SỬ ĐÃ HOÀN TẤT · {vi_date(date.fromisoformat(snapshot["target_date"]))}</p><h2>Số được lưu theo 7 lớp báo cáo</h2><p>6 phương pháp độc lập và 1 lớp tổng hợp 4SO · dữ liệu khóa {vi_date(date.fromisoformat(snapshot["data_lock"]))}.</p></div><a href="/mau-bao-cao.html">Xem mẫu 4SO →</a></header>',
-            f'        <div class="status-strip" aria-label="Tình trạng dữ liệu"><span title="Từ {history_start} đến {formatted}"><strong>{history_count}</strong> phiên lịch sử</span><span><strong>27/27</strong> bản ghi</span><span><strong>{source_count}</strong> nguồn khớp</span><span><strong>0</strong> dữ liệu tương lai</span></div>',
-            '        <div class="historical-method-list" role="list" aria-label="Bảy lớp trong hồ sơ lịch sử ngày 12 tháng 8 năm 2026">',
-            *method_rows,
-            '        </div>',
-            f'        <p class="source-line"><strong>Mã kiểm tra dữ liệu hiện tại:</strong> {digest} · {source_names} · <a href="/historical-proof.json" target="_blank" rel="noopener">Hồ sơ thống kê</a> · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a></p>',
-            '        <p class="historical-method-note">Các số trên thuộc hồ sơ ngày đã hoàn tất 12/08/2026, không phải đầu ra của ngày hôm nay.</p>',
+            f'        <p class="historical-disclaimer"><strong>Cách tính:</strong> {esc(validation["definition"])} Tỷ lệ 80% chỉ mô tả cửa sổ lịch sử đã hoàn tất, không phải xác suất hoặc cam kết cho ngày tiếp theo. <a href="/historical-proof.json" target="_blank" rel="noopener">Hồ sơ thống kê</a> · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a>.</p>',
             '      </div>',
             '    </section>',
             END_MARKER,
@@ -422,15 +392,13 @@ def main() -> None:
         assert "80%" in block
         assert "24/30 ngày" in block
         assert "14/07/2026–12/08/2026" in block
-        assert "Số được lưu theo 7 lớp báo cáo" in block
-        assert "6 phương pháp độc lập và 1 lớp tổng hợp 4SO" in block
+        assert "Số được lưu theo 7 lớp báo cáo" not in block
+        assert 'id="methods"' not in block
         assert block.count('class="history-day-row"') == 12
-        assert block.count('class="historical-method-row') == 7
-        assert block.count('role="listitem"') == 7
-        assert "<strong>2</strong> nguồn khớp" in block
-        assert "<strong>27/27</strong> bản ghi" in block
+        assert 'class="historical-method-row' not in block
+        assert 'href="/historical-proof.json"' in block
+        assert 'href="/source-access.json"' in block
         assert "không phải xác suất hoặc cam kết" in block
-        assert "không phải đầu ra của ngày hôm nay" in block
         daily_index = update_daily_index(INDEX_FILE.read_text(encoding="utf-8"), sample_target)
         assert 'data-report-date="13/08/2026"' in daily_index
         assert 'data-lock-date="12/08/2026"' in daily_index

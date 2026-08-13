@@ -331,6 +331,11 @@ def update_source_access(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--draw-date", help="Ngày đã công bố, định dạng YYYY-MM-DD")
+    parser.add_argument(
+        "--stage-only",
+        action="store_true",
+        help="Chỉ khóa dữ liệu và nhật ký lúc 19:00; chưa đổi ngày hiển thị trên website",
+    )
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     if args.self_test:
@@ -369,23 +374,32 @@ def main() -> None:
     now = datetime.now(VN)
     target = resolve_target(args.draw_date, now)
     doc, codes, sources = lock_history_through(target)
-    recent_rows = [row for row in doc["rows"] if date.fromisoformat(row[0]) <= target][-12:]
-    index = INDEX_FILE.read_text(encoding="utf-8")
-    updated_index = replace_marked_block(index, build_report_block(target, codes, recent_rows, doc["rows"], sources))
-    updated_index = update_daily_index(updated_index, target)
-    index_changed = write_text_if_changed(INDEX_FILE, updated_index)
-    sample_changed = write_text_if_changed(
-        SAMPLE_FILE,
-        update_sample(SAMPLE_FILE.read_text(encoding="utf-8"), target, codes, sources, doc["rows"]),
-    )
     audit_changed = update_audit(target, codes, sources, now)
-    access_changed = update_source_access(doc, target, codes, sources, now)
+    if args.stage_only:
+        index_changed = False
+        sample_changed = False
+        access_changed = False
+    else:
+        recent_rows = [row for row in doc["rows"] if date.fromisoformat(row[0]) <= target][-12:]
+        index = INDEX_FILE.read_text(encoding="utf-8")
+        updated_index = replace_marked_block(
+            index,
+            build_report_block(target, codes, recent_rows, doc["rows"], sources),
+        )
+        updated_index = update_daily_index(updated_index, target)
+        index_changed = write_text_if_changed(INDEX_FILE, updated_index)
+        sample_changed = write_text_if_changed(
+            SAMPLE_FILE,
+            update_sample(SAMPLE_FILE.read_text(encoding="utf-8"), target, codes, sources, doc["rows"]),
+        )
+        access_changed = update_source_access(doc, target, codes, sources, now)
     print(
         json.dumps(
             {
                 "draw_date": target.isoformat(),
                 "status": "LOCKED_CROSSCHECKED_PUBLIC",
                 "source_count": len(sources),
+                "stage_only": args.stage_only,
                 "index_changed": index_changed,
                 "sample_changed": sample_changed,
                 "audit_changed": audit_changed,

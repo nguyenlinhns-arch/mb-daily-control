@@ -3,12 +3,17 @@
   "history_rows": 944,
   "history_start": "2024-01-01",
   "latest_codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
-  "locked_at": "2026-08-14T01:13:00+07:00",
+  "locked_at": "2026-08-14T01:13:49+07:00",
   "policy": "COMPLETED_DRAW_ONLY_FAIL_CLOSED_MINIMUM_TWO_EXACT_SOURCES",
   "schema_version": "MB_SOURCE_ACCESS_V3_POST_DRAW_ONLY",
   "selected": "OFFICIAL_PLUS_MULTI_SOURCE_CROSSCHECK",
-  "source_count": 6,
+  "source_count": 7,
   "sources": [
+    {
+      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "name": "ketqua",
+      "url": "https://ketqua.net/xo-so-truyen-thong.php?ngay=13-08-2026"
+    },
     {
       "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
       "name": "ketqua.net",

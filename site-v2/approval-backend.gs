@@ -125,21 +125,25 @@ function approvalResponse(data, action) {
 }
 
 function buildDelivery(plan) {
-  // Replace this retrospective sample with the corresponding already-published
-  // report artifact. Never place future lottery picks or betting advice here.
-  const labels = { day: "Gói 1 ngày", week: "Gói 1 tuần", month: "Gói 1 tháng" };
+  // Replace this sample with the corresponding completed-draw report artifact.
+  // Never place future lottery picks or betting advice here.
+  const labels = {
+    day: "Báo cáo 1 phiên đã công bố",
+    week: "Bộ báo cáo 7 phiên đã công bố",
+    month: "Bộ báo cáo 30 phiên đã công bố"
+  };
   return {
-    title: `Báo cáo dữ liệu AI – ${labels[plan] || "Đã xác nhận"}`,
-    summary: "Báo cáo sử dụng dữ liệu đã được công bố đến ngày hôm trước và chỉ phục vụ phân tích hồi cứu.",
+    title: `Báo cáo phân tích dữ liệu lịch sử – ${labels[plan] || "Đã xác nhận"}`,
+    summary: "Báo cáo chỉ sử dụng dữ liệu của các phiên đã công bố và khóa nguồn.",
     metrics: [
-      { label: "Trạng thái dữ liệu", value: "Đã khóa" },
-      { label: "Cửa sổ phân tích", value: "7 / 30 ngày" },
-      { label: "Dữ liệu tương lai", value: "Không sử dụng" }
+      { label: "Nguồn gần nhất", value: "Đã đối chiếu" },
+      { label: "Độ đầy đủ", value: "27 / 27" },
+      { label: "Dữ liệu tương lai", value: "0 dòng" }
     ],
     notes: [
-      "Nguồn và ngày khóa dữ liệu được ghi rõ trong báo cáo.",
-      "Có bảng đối chiếu và mô tả biến động lịch sử.",
-      "Không bao gồm dự đoán, số khuyến nghị hoặc cam kết kết quả tương lai."
+      "Báo cáo ghi rõ ngày khóa, nguồn và mã kiểm tra dữ liệu.",
+      "Có bảy lớp kiểm định và so sánh cửa sổ 7–30 phiên.",
+      "Không bao gồm dự đoán, số khuyến nghị hoặc hướng dẫn đặt cược."
     ],
     url: `${SITE_URL}mau-bao-cao.html`
   };

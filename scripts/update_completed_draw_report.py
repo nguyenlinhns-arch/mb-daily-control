@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import html
 import json
 import re
 from collections import Counter
@@ -30,18 +29,14 @@ SAMPLE_FILE = ROOT / "site-v2" / "mau-bao-cao.html"
 AUDIT_FILE = ROOT / "data" / "completed-draw-audit.json"
 ACCESS_FILE = ROOT / "data" / "source-access.json"
 VN = timezone(timedelta(hours=7))
-START_MARKER = "        <!-- COMPLETED_DRAW_REPORT:START -->"
-END_MARKER = "        <!-- COMPLETED_DRAW_REPORT:END -->"
-
-PRIZE_LAYERS = (
-    ("Lớp 1 · ĐB + Giải nhất", 0, 2),
-    ("Lớp 2 · Giải nhì", 2, 4),
-    ("Lớp 3 · Giải ba", 4, 10),
-    ("Lớp 4 · Giải tư", 10, 14),
-    ("Lớp 5 · Giải năm", 14, 20),
-    ("Lớp 6 · Giải sáu", 20, 23),
-    ("Lớp 7 · Giải bảy", 23, 27),
-)
+START_MARKER = "    <!-- COMPLETED_DRAW_REPORT:START -->"
+END_MARKER = "    <!-- COMPLETED_DRAW_REPORT:END -->"
+SOURCE_LABELS = {
+    "kqxs": "KQXS",
+    "minhngoc": "Minh Ngọc",
+    "xosodaiphat": "Xổ Số Đại Phát",
+    "xosothienphu": "Xổ Số Thiên Phú",
+}
 
 
 def write_text_if_changed(path: Path, content: str) -> bool:
@@ -111,38 +106,70 @@ def lock_history_through(target: date) -> tuple[dict[str, Any], list[str], list[
     return doc, target_codes, target_sources
 
 
-def build_report_block(target: date, codes: list[str], recent_rows: list[list[str]]) -> str:
+def build_report_block(
+    target: date,
+    codes: list[str],
+    recent_rows: list[list[str]],
+    history_rows: list[list[str]],
+    sources: list[dict[str, Any]],
+) -> str:
     formatted = vi_date(target)
-    days = "".join(
-        f'<span class="hit" title="Đã khóa đủ 27/27 ngày {vi_date(date.fromisoformat(row[0]))}">{date.fromisoformat(row[0]).day:02d}</span>'
-        for row in recent_rows[-12:]
+    counts = Counter(codes)
+    unique_count = len(counts)
+    repeated_count = sum(1 for value in counts.values() if value > 1)
+    source_count = len(sources)
+    source_names = " · ".join(
+        SOURCE_LABELS.get(str(source.get("source", "")), str(source.get("source", "")))
+        for source in sorted(sources, key=lambda item: str(item.get("source", "")))
     )
-    method_rows = []
-    for index, (label, start, end) in enumerate(PRIZE_LAYERS, 1):
-        chips = "".join(f"<b>{html.escape(code)}</b>" for code in codes[start:end])
-        method_rows.append(
-            f'          <article role="row"><div><span>{index:02d}</span><strong>{label}</strong></div><p>{chips}</p></article>'
-        )
-    method_rows.append(
-        f'          <article class="locked-method" role="row"><div><span>KQ</span><strong>Kết luận hồi cứu ngày {formatted}</strong></div><p><b>••</b><b>••</b><b>••</b><b>••</b></p></article>'
+    history_start = vi_date(date.fromisoformat(history_rows[0][0]))
+    history_count = len(history_rows)
+    digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
+    days = "".join(
+        f'<span class="hit" title="Đủ 27/27 ngày {vi_date(date.fromisoformat(row[0]))}">{date.fromisoformat(row[0]).day:02d}</span>'
+        for row in recent_rows[-12:]
     )
     return "\n".join(
         [
             START_MARKER,
-            "        <header class=\"product-head\">",
-            f'          <div><p class="eyebrow">PHIÊN ĐÃ CÔNG BỐ · KHÓA NGUỒN {formatted}</p><h2>Tham khảo 7 lớp báo cáo ngày {formatted}</h2></div>',
+            '    <section class="evidence-section" id="evidence" aria-labelledby="evidence-title">',
+            '      <div class="wrap">',
+            f'        <header class="section-heading"><div><p class="eyebrow">BẰNG CHỨNG CÓ THỂ KIỂM TRA</p><h2 id="evidence-title">Dữ liệu được khóa đến {formatted}</h2></div><p>Không dùng dữ liệu của kỳ chưa công bố.</p></header>',
+            '        <div class="evidence-grid">',
+            f'          <article><span>{history_count}</span><strong>phiên lịch sử</strong><small>Từ {history_start} đến {formatted}</small></article>',
+            '          <article><span>27/27</span><strong>bản ghi phiên gần nhất</strong><small>Không thiếu vị trí kết quả</small></article>',
+            f'          <article><span>{source_count}</span><strong>nguồn trùng khớp</strong><small>Cùng mã kiểm tra dữ liệu</small></article>',
+            '          <article><span>0</span><strong>dòng dữ liệu tương lai</strong><small>Kiểm tra chống nhìn trước</small></article>',
+            '        </div>',
+            '      </div>',
+            '    </section>',
+            "",
+            '    <section class="product-section" id="methods">',
+            '      <div class="wrap product-shell">',
+            '        <header class="product-head">',
+            f'          <div><p class="eyebrow">PHIÊN ĐÃ CÔNG BỐ · {formatted}</p><h2>7 lớp kiểm định của báo cáo gần nhất</h2></div>',
             '          <a href="/mau-bao-cao.html">Xem báo cáo mẫu đầy đủ →</a>',
-            "        </header>",
+            '        </header>',
             "",
-            '        <section class="proof-strip" aria-label="Mười hai phiên gần nhất đã khóa nguồn">',
-            '          <div><small>12 PHIÊN GẦN NHẤT</small><strong>Đủ 27/27 bản ghi mỗi phiên</strong></div>',
+            '        <section class="proof-strip" aria-label="Mười hai phiên gần nhất đã kiểm tra nguồn">',
+            '          <div><small>12 PHIÊN GẦN NHẤT</small><strong>12/12 phiên đủ dữ liệu</strong></div>',
             f'          <div class="proof-days">{days}</div>',
-            '          <p><i></i> Đã khóa nguồn <i></i> Chưa khóa</p>',
-            "        </section>",
+            '          <p><i></i> Đủ dữ liệu <i></i> Chưa đủ</p>',
+            '        </section>',
             "",
-            f'        <div class="method-list" role="table" aria-label="Bảy lớp kết quả của phiên đã công bố ngày {formatted}">',
-            *method_rows,
-            "        </div>",
+            f'        <div class="method-list audit-methods" role="table" aria-label="Bảy lớp kiểm định dữ liệu lịch sử ngày {formatted}">',
+            f'          <article role="row"><div><span>01</span><strong>Đối chiếu đa nguồn</strong></div><p><b class="metric-chip">{source_count} nguồn khớp</b><small>Chỉ khóa phiên khi tối thiểu hai nguồn cho cùng 27 mã.</small></p></article>',
+            '          <article role="row"><div><span>02</span><strong>Độ đầy đủ</strong></div><p><b class="metric-chip">27/27 bản ghi</b><small>Kiểm tra đúng cấu trúc giải trước khi phân tích.</small></p></article>',
+            f'          <article role="row"><div><span>03</span><strong>Độ phân tán</strong></div><p><b class="metric-chip">{unique_count} mã khác nhau</b><small>Đếm số giá trị khác nhau trong phiên đã khóa.</small></p></article>',
+            f'          <article role="row"><div><span>04</span><strong>Độ lặp trong phiên</strong></div><p><b class="metric-chip">{repeated_count} mã lặp</b><small>Ghi nhận giá trị xuất hiện từ hai lần trở lên.</small></p></article>',
+            '          <article role="row"><div><span>05</span><strong>Cửa sổ ngắn</strong></div><p><b class="metric-chip">7 phiên · 189 dòng</b><small>So sánh biến động gần với nền dài hơn.</small></p></article>',
+            '          <article role="row"><div><span>06</span><strong>Nền đối chiếu</strong></div><p><b class="metric-chip">30 phiên · 810 dòng</b><small>Giảm việc diễn giải quá mức từ một vài ngày.</small></p></article>',
+            '          <article role="row"><div><span>07</span><strong>Chống nhìn trước</strong></div><p><b class="metric-chip">0 dòng tương lai</b><small>Không đưa dữ liệu chưa tồn tại vào phép tính.</small></p></article>',
+            '        </div>',
+            "",
+            f'        <div class="audit-signature"><div><small>MÃ KIỂM TRA PHIÊN</small><strong>{digest}</strong></div><p><strong>Nguồn đối chiếu:</strong> {source_names}. Mã rút gọn từ SHA-256 của 27 bản ghi đã khóa. <a href="/source-access.json" target="_blank" rel="noopener">Mở hồ sơ nguồn →</a></p></div>',
+            '      </div>',
+            '    </section>',
             END_MARKER,
         ]
     )
@@ -159,8 +186,23 @@ def replace_marked_block(content: str, replacement: str) -> str:
     return updated
 
 
-def update_sample_dates(content: str, target: date) -> str:
+def update_sample(
+    content: str,
+    target: date,
+    codes: list[str],
+    sources: list[dict[str, Any]],
+    history_count: int,
+) -> str:
     formatted = vi_date(target)
+    counts = Counter(codes)
+    source_count = len(sources)
+    source_names = " · ".join(
+        SOURCE_LABELS.get(str(source.get("source", "")), str(source.get("source", "")))
+        for source in sorted(sources, key=lambda item: str(item.get("source", "")))
+    )
+    unique_count = len(counts)
+    repeated_count = sum(1 for value in counts.values() if value > 1)
+    digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
     content = re.sub(r"Ngày mẫu: \d{2}/\d{2}/\d{4}", f"Ngày báo cáo: {formatted}", content)
     content = re.sub(r"Khóa nguồn: \d{2}/\d{2}/\d{4}", f"Khóa nguồn: {formatted}", content)
     content = re.sub(
@@ -169,6 +211,20 @@ def update_sample_dates(content: str, target: date) -> str:
         content,
         count=1,
     )
+    replacements = (
+        (r"(<span data-history-count>).*?(</span>)", rf"\g<1>{history_count} phiên lịch sử\g<2>"),
+        (r"(<span data-source-count>).*?(</span>)", rf"\g<1>{source_count} nguồn trùng khớp\g<2>"),
+        (r"(<span data-source-names>).*?(</span>)", rf"\g<1>{source_names}\g<2>"),
+        (r"(<strong data-source-count-value>).*?(</strong>)", rf"\g<1>{source_count}\g<2>"),
+        (r"(<strong data-digest>).*?(</strong>)", rf"\g<1>{digest}\g<2>"),
+        (r"(<span class=\"row-chip\" data-source-count-chip>).*?(</span>)", rf"\g<1>{source_count} nguồn\g<2>"),
+        (r"(<span class=\"row-chip\" data-unique-count-chip>).*?(</span>)", rf"\g<1>{unique_count} mã\g<2>"),
+        (r"(<span class=\"row-chip\" data-repeated-count-chip>).*?(</span>)", rf"\g<1>{repeated_count} mã\g<2>"),
+    )
+    for pattern, replacement in replacements:
+        content, count = re.subn(pattern, replacement, content, count=1)
+        if count != 1:
+            raise RuntimeError(f"Không cập nhật được trường báo cáo mẫu: {pattern}")
     return content
 
 
@@ -241,10 +297,13 @@ def main() -> None:
     args = parser.parse_args()
     if args.self_test:
         sample_codes = [f"{value:02d}" for value in range(27)]
-        block = build_report_block(date(2026, 8, 12), sample_codes, [["2026-08-12", *sample_codes]])
-        assert "Tham khảo 7 lớp báo cáo ngày 12/08/2026" in block
-        assert block.count('role="row"') == 8
-        assert "Kết luận hồi cứu ngày 12/08/2026" in block
+        sample_rows = [["2026-08-12", *sample_codes]]
+        sample_sources = [{"source": "a"}, {"source": "b"}]
+        block = build_report_block(date(2026, 8, 12), sample_codes, sample_rows, sample_rows, sample_sources)
+        assert "7 lớp kiểm định của báo cáo gần nhất" in block
+        assert block.count('role="row"') == 7
+        assert "2 nguồn khớp" in block
+        assert "27/27 bản ghi" in block
         assert "kỳ tiếp theo" not in block.lower()
         print("COMPLETED_DRAW_REPORT_SELF_TEST_OK")
         return
@@ -256,11 +315,11 @@ def main() -> None:
     index = INDEX_FILE.read_text(encoding="utf-8")
     index_changed = write_text_if_changed(
         INDEX_FILE,
-        replace_marked_block(index, build_report_block(target, codes, recent_rows)),
+        replace_marked_block(index, build_report_block(target, codes, recent_rows, doc["rows"], sources)),
     )
     sample_changed = write_text_if_changed(
         SAMPLE_FILE,
-        update_sample_dates(SAMPLE_FILE.read_text(encoding="utf-8"), target),
+        update_sample(SAMPLE_FILE.read_text(encoding="utf-8"), target, codes, sources, len(doc["rows"])),
     )
     audit_changed = update_audit(target, codes, sources, now)
     access_changed = update_source_access(doc, target, codes, sources, now)

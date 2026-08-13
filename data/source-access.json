@@ -3,7 +3,7 @@
   "history_rows": 943,
   "history_start": "2024-01-01",
   "latest_codes_sha256": "95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d",
-  "locked_at": "2026-08-13T16:30:21+07:00",
+  "locked_at": "2026-08-13T17:06:48+07:00",
   "policy": "COMPLETED_DRAW_ONLY_FAIL_CLOSED_MINIMUM_TWO_EXACT_SOURCES",
   "schema_version": "MB_SOURCE_ACCESS_V3_POST_DRAW_ONLY",
   "selected": "PUBLIC_MULTI_SOURCE_CROSSCHECK",

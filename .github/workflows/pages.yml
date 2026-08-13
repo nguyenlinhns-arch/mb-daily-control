@@ -1,4 +1,4 @@
-name: Deploy 4SO AI data report site to GitHub Pages
+name: Deploy historical data report site to GitHub Pages
 
 on:
   push:
@@ -50,6 +50,8 @@ jobs:
           cp site-v2/robots.txt _site/
           cp site-v2/sitemap.xml _site/
           cp site-v2/favicon.svg _site/
+          cp site-v2/og.png _site/
+          cp data/source-access.json _site/
           touch _site/.nojekyll
           test ! -e _site/approval-backend.gs
 

@@ -2,9 +2,9 @@
   "use strict";
 
   const PLANS = Object.freeze({
-    day: { label: "Gói 1 ngày", price: 30000, priceText: "30.000đ" },
-    week: { label: "Gói 1 tuần", price: 200000, priceText: "200.000đ" },
-    month: { label: "Gói 1 tháng", price: 800000, priceText: "800.000đ" }
+    day: { label: "Báo cáo 1 phiên đã công bố", price: 30000, priceText: "30.000đ" },
+    week: { label: "Bộ báo cáo 7 phiên đã công bố", price: 200000, priceText: "200.000đ" },
+    month: { label: "Bộ báo cáo 30 phiên đã công bố", price: 800000, priceText: "800.000đ" }
   });
 
   // Filled after the Google Apps Script approval service is deployed.
@@ -130,7 +130,7 @@
     memoNode.textContent = order.code;
     if (trackSelection) {
       track("select_item", {
-        item_list_name: "Gói báo cáo AI",
+        item_list_name: "Phạm vi báo cáo lịch sử",
         items: [{ item_id: planKey, item_name: PLANS[planKey].label, price: PLANS[planKey].price, quantity: 1 }]
       });
     }
@@ -318,7 +318,9 @@
 
   function jsonp(params) {
     return new Promise((resolve, reject) => {
-      const callbackName = `__leMienBacStatus_${randomToken(6)}`;
+      // The deployed approval service retains this internal callback prefix.
+      // It is not user-facing, but must match for confirmed reports to open.
+      const callbackName = `__fourSoStatus_${randomToken(6)}`;
       const script = document.createElement("script");
       const timeout = window.setTimeout(() => finish(new Error("timeout")), 12000);
       const finish = (error, data) => {

@@ -6,11 +6,11 @@
  * Never put ADMIN_SECRET in the public website.
  */
 
-const OWNER_EMAIL = "REPLACE_WITH_OWNER_EMAIL";
-const ADMIN_SECRET = "REPLACE_WITH_A_LONG_RANDOM_SECRET";
 const SITE_URL = "https://lemienbac.com/";
 const SHEET_NAME = "Orders";
 const VALID_PLANS = Object.freeze({ day: 30000, week: 200000, month: 800000 });
+const SERVICE_NAME = "Lê Miền Bắc AI order approval";
+const SERVICE_VERSION = "1.0";
 
 function doPost(event) {
   const data = event && event.parameter ? event.parameter : {};
@@ -58,7 +58,7 @@ function doPost(event) {
       `<p><a href="${approveUrl}" style="display:inline-block;padding:14px 20px;background:#087c75;color:#fff;text-decoration:none;border-radius:9px;font-weight:bold">XÁC NHẬN ĐÃ NHẬN TIỀN</a></p>`,
       `<p><a href="${rejectUrl}">Không tìm thấy giao dịch</a></p>`
     ].join("");
-    MailApp.sendEmail({ to: OWNER_EMAIL, subject, htmlBody: html, name: "Lê Miền Bắc AI" });
+    MailApp.sendEmail({ to: ownerEmail(), subject, htmlBody: html, name: "Lê Miền Bắc AI" });
     return textOutput("ok");
   } finally {
     lock.releaseLock();
@@ -70,7 +70,7 @@ function doGet(event) {
   const action = clean(data.action, 20);
   if (action === "status") return statusResponse(data);
   if (action === "approve" || action === "reject") return approvalResponse(data, action);
-  return HtmlService.createHtmlOutput("Không có thao tác phù hợp.");
+  return jsonOutput({ ok: true, service: SERVICE_NAME, version: SERVICE_VERSION });
 }
 
 function statusResponse(data) {
@@ -265,8 +265,29 @@ function hashToken(value) {
 }
 
 function sign(value) {
-  const bytes = Utilities.computeHmacSha256Signature(value, ADMIN_SECRET, Utilities.Charset.UTF_8);
+  const bytes = Utilities.computeHmacSha256Signature(value, adminSecret(), Utilities.Charset.UTF_8);
   return Utilities.base64EncodeWebSafe(bytes).replace(/=+$/, "");
+}
+
+function ownerEmail() {
+  const properties = PropertiesService.getScriptProperties();
+  let value = clean(properties.getProperty("OWNER_EMAIL"), 320);
+  if (!value) {
+    value = clean(Session.getEffectiveUser().getEmail(), 320);
+    if (!value) throw new Error("OWNER_EMAIL is not available for this deployment");
+    properties.setProperty("OWNER_EMAIL", value);
+  }
+  return value;
+}
+
+function adminSecret() {
+  const properties = PropertiesService.getScriptProperties();
+  let value = clean(properties.getProperty("ADMIN_SECRET"), 500);
+  if (!value) {
+    value = `${Utilities.getUuid()}${Utilities.getUuid()}${Utilities.getUuid()}`;
+    properties.setProperty("ADMIN_SECRET", value);
+  }
+  return value;
 }
 
 function timingSafeEqual(left, right) {
@@ -288,5 +309,11 @@ function htmlEscape(value) {
 
 function textOutput(value) {
   return ContentService.createTextOutput(value).setMimeType(ContentService.MimeType.TEXT);
+}
+
+function jsonOutput(value) {
+  return ContentService
+    .createTextOutput(JSON.stringify(value))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 

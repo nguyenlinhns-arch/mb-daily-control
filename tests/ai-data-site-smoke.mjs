@@ -117,9 +117,24 @@ assert.match(index, /href="\/historical-proof\.json"/);
 assert.match(index, /href="\/source-access\.json"/);
 assert.ok(sample.includes(`Báo cáo cho ngày hôm nay: ${reportDateMatch[1]}`));
 assert.ok(sample.includes(`Dữ liệu khóa đến hết ngày hôm qua: ${reportDateMatch[2]}`));
-assert.match(sample, /4SO ngày 25\/07\/2026/);
-assert.match(sample, /<strong>52<\/strong>[\s\S]*<strong>83<\/strong>[\s\S]*<strong>54<\/strong>[\s\S]*<strong>90<\/strong>/);
-assert.match(sample, /mẫu lịch sử đã hoàn tất/i);
+const observedOccurrences = (values) => values.reduce((total, value) => {
+  const match = String(value).match(/×\s*(\d+)\s*$/);
+  return total + (match ? Number(match[1]) : 1);
+}, 0);
+const featuredSample = historicalProof.recent_period.days
+  .filter((day) => day.observed.length)
+  .sort((left, right) => (
+    observedOccurrences(right.observed) - observedOccurrences(left.observed)
+    || right.observed.length - left.observed.length
+    || right.date.localeCompare(left.date)
+  ))[0];
+assert.equal(featuredSample.date, "2026-08-11");
+assert.match(sample, /4SO ngày 11\/08\/2026/);
+assert.match(sample, /KHÓA 10\/08\/2026/);
+for (const output of featuredSample.outputs) assert.match(sample, new RegExp(`<strong>${output}<\\/strong>`));
+assert.match(sample, /3\/4 đầu ra xuất hiện, tổng 4 lượt/);
+assert.match(sample, /Mẫu sẽ tự cập nhật khi có ngày lịch sử nổi bật hơn/);
+assert.match(sample, /hồ sơ lịch sử đã hoàn tất/i);
 assert.match(sample, /không phải 4SO của ngày hôm nay/i);
 assert.match(sample, /7 phương pháp/i);
 assert.match(sample, /Mọi thứ gọn trong một màn hình/i);
@@ -169,8 +184,11 @@ assert.match(approvalBackend, /MailApp\.sendEmail/);
 assert.match(approvalBackend, /approvalUrl\(code, "approve"\)/);
 assert.match(approvalBackend, /hashToken\(token\)/);
 assert.match(approvalBackend, /timingSafeEqual/);
-assert.match(approvalBackend, /const OWNER_EMAIL = "REPLACE_WITH_OWNER_EMAIL"/);
-assert.match(approvalBackend, /const ADMIN_SECRET = "REPLACE_WITH_A_LONG_RANDOM_SECRET"/);
+assert.match(approvalBackend, /Session\.getEffectiveUser\(\)\.getEmail\(\)/);
+assert.match(approvalBackend, /properties\.getProperty\("OWNER_EMAIL"\)/);
+assert.match(approvalBackend, /properties\.getProperty\("ADMIN_SECRET"\)/);
+assert.match(approvalBackend, /Utilities\.getUuid\(\)/);
+assert.doesNotMatch(approvalBackend, /REPLACE_WITH_OWNER_EMAIL|REPLACE_WITH_A_LONG_RANDOM_SECRET/);
 assert.match(styles, /\.hero-offer/);
 assert.match(styles, /\.buy-simple-card/);
 assert.match(styles, /\.payment-confirm/);

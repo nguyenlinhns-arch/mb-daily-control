@@ -270,6 +270,33 @@ def comparison_phrase(value: float, baseline: float, baseline_label: str) -> str
     return f"{direction} {baseline_label} là {vi_decimal(abs(difference))}"
 
 
+def observed_occurrences(values: list[Any]) -> int:
+    total = 0
+    for raw in values:
+        match = re.search(r"×\s*(\d+)\s*$", str(raw))
+        total += int(match.group(1)) if match else 1
+    return total
+
+
+def select_featured_sample(proof: dict[str, Any]) -> dict[str, Any]:
+    days = (proof.get("recent_period") or {}).get("days") or []
+    candidates = [item for item in days if item.get("observed")]
+    if not candidates:
+        raise RuntimeError("Không có ngày lịch sử đã hoàn tất để làm mẫu 4SO")
+    featured = max(
+        candidates,
+        key=lambda item: (
+            observed_occurrences(item.get("observed") or []),
+            len(item.get("observed") or []),
+            date.fromisoformat(str(item.get("date"))),
+        ),
+    )
+    outputs = [str(value).zfill(2) for value in featured.get("outputs") or []]
+    if len(outputs) != 4 or any(not re.fullmatch(r"\d{2}", value) for value in outputs):
+        raise RuntimeError("Ngày mẫu 4SO phải có đúng bốn mã hai chữ số")
+    return {**featured, "outputs": outputs}
+
+
 def update_sample(
     content: str,
     target: date,
@@ -286,6 +313,19 @@ def update_sample(
     )
     digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
     history_count = len(history_rows)
+    featured = select_featured_sample(load_historical_proof())
+    featured_date = date.fromisoformat(str(featured["date"]))
+    featured_formatted = vi_date(featured_date)
+    featured_lock = vi_date(featured_date - timedelta(days=1))
+    featured_outputs = "".join(f"<strong>{esc(value)}</strong>" for value in featured["outputs"])
+    featured_observed = featured.get("observed") or []
+    featured_occurrences = observed_occurrences(featured_observed)
+    featured_aria = f"Bốn mã trong mẫu lịch sử ngày {featured_date.day} tháng {featured_date.month} năm {featured_date.year}"
+    featured_caption = (
+        f"Hồ sơ lịch sử đã hoàn tất ngày {featured_formatted} có {len(featured_observed)}/4 đầu ra xuất hiện, "
+        f"tổng {featured_occurrences} lượt. Mẫu sẽ tự cập nhật khi có ngày lịch sử nổi bật hơn; "
+        "không phải 4SO của ngày hôm nay và không dùng để cam kết hiệu quả."
+    )
     replacements = (
         (r"(<span data-report-date>).*?(</span>)", rf"\g<1>Báo cáo cho ngày hôm nay: {report_formatted}\g<2>"),
         (r"(<span data-lock-date>).*?(</span>)", rf"\g<1>Dữ liệu khóa đến hết ngày hôm qua: {formatted}\g<2>"),
@@ -296,6 +336,13 @@ def update_sample(
         (r"(<b data-source-count-value>).*?(</b>)", rf"\g<1>{source_count}\g<2>"),
         (r"(<b data-lock-date-value>).*?(</b>)", rf"\g<1>{formatted}\g<2>"),
         (r"(<span data-digest>).*?(</span>)", rf"\g<1>{digest}\g<2>"),
+        (r"(<h2 data-featured-sample-date>).*?(</h2>)", rf"\g<1>4SO ngày {featured_formatted}\g<2>"),
+        (r"(<span class=\"sample-status\" data-featured-sample-lock>).*?(</span>)", rf"\g<1>KHÓA {featured_lock}\g<2>"),
+        (
+            r"(<div class=\"fourso-grid\" data-featured-sample-numbers aria-label=\")[^\"]+(\">).*?(</div>)",
+            rf"\g<1>{featured_aria}\g<2>{featured_outputs}\g<3>",
+        ),
+        (r"(<p class=\"sample-caption\" data-featured-sample-caption>).*?(</p>)", rf"\g<1>{featured_caption}\g<2>"),
     )
     for pattern, replacement in replacements:
         content, count = re.subn(pattern, replacement, content, count=1)
@@ -409,7 +456,9 @@ def main() -> None:
         )
         assert "Báo cáo cho ngày hôm nay: 13/08/2026" in sample_page
         assert "Dữ liệu khóa đến hết ngày hôm qua: 12/08/2026" in sample_page
-        assert "4SO ngày 25/07/2026" in sample_page
+        assert "4SO ngày 11/08/2026" in sample_page
+        assert "<strong>05</strong><strong>91</strong><strong>50</strong><strong>19</strong>" in sample_page
+        assert "3/4 đầu ra xuất hiện, tổng 4 lượt" in sample_page
         assert "không phải 4SO của ngày hôm nay" in sample_page
         print("COMPLETED_DRAW_REPORT_SELF_TEST_OK")
         return

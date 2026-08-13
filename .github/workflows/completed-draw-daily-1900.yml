@@ -60,7 +60,19 @@ jobs:
           echo "DRAW_DATE=$target" >> "$GITHUB_ENV"
 
       - name: Cross-check published result and refresh retrospective report
-        run: python scripts/update_completed_draw_report.py --draw-date "$DRAW_DATE"
+        run: |
+          set -euo pipefail
+          for attempt in {1..6}; do
+            if python scripts/update_completed_draw_report.py --draw-date "$DRAW_DATE"; then
+              exit 0
+            fi
+            if [[ "$attempt" -eq 6 ]]; then
+              echo "Không đủ nguồn đối chiếu sau 6 lần; giữ nguyên ngày đang hiển thị."
+              exit 1
+            fi
+            echo "Nguồn chưa sẵn sàng; thử lại sau 5 phút ($attempt/6)."
+            sleep 300
+          done
 
       - name: Validate fail-closed public boundary
         run: |

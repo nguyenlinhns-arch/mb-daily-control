@@ -114,6 +114,7 @@ def build_report_block(
     sources: list[dict[str, Any]],
 ) -> str:
     formatted = vi_date(target)
+    report_formatted = vi_date(target + timedelta(days=1))
     counts = Counter(codes)
     unique_count = len(counts)
     repeated_count = sum(1 for value in counts.values() if value > 1)
@@ -132,16 +133,16 @@ def build_report_block(
             START_MARKER,
             '    <section class="product-section simple-product" id="methods">',
             '      <div class="wrap product-shell">',
-            f'        <header class="product-head"><div><p class="eyebrow">DỮ LIỆU ĐẾN · {formatted}</p><h2>7 phương pháp hôm nay</h2></div><a href="/mau-bao-cao.html">Xem báo cáo mẫu →</a></header>',
+            f'        <header class="product-head"><div><p class="eyebrow">DỮ LIỆU KHÓA ĐẾN HẾT NGÀY HÔM QUA · {formatted}</p><h2>7 phương pháp cho ngày hôm nay ({report_formatted})</h2></div><a href="/mau-bao-cao.html">Xem mẫu 4SO →</a></header>',
             f'        <div class="status-strip" aria-label="Tình trạng dữ liệu"><span title="Từ {history_start} đến {formatted}"><strong>{history_count}</strong> phiên lịch sử</span><span><strong>27/27</strong> bản ghi</span><span><strong>{source_count}</strong> nguồn khớp</span><span><strong>0</strong> dữ liệu tương lai</span></div>',
-            f'        <div class="method-list audit-methods" role="table" aria-label="Bảy phương pháp phân tích dữ liệu ngày {formatted}">',
-            f'          <article role="row"><div><span>01</span><strong>Đối chiếu nguồn</strong></div><p><b class="metric-chip">{source_count} nguồn khớp</b><small>Chỉ dùng phiên đã được xác nhận đồng nhất.</small></p></article>',
-            '          <article role="row"><div><span>02</span><strong>Kiểm tra cấu trúc</strong></div><p><b class="metric-chip">27/27 bản ghi</b><small>Loại phiên thiếu dữ liệu trước khi phân tích.</small></p></article>',
-            f'          <article role="row"><div><span>03</span><strong>Độ phân tán phiên gần nhất</strong></div><p><b class="metric-chip">{unique_count} giá trị khác nhau</b><small>Mô tả mức độ phân tán của dữ liệu đã khóa.</small></p></article>',
-            f'          <article role="row"><div><span>04</span><strong>Độ lặp phiên gần nhất</strong></div><p><b class="metric-chip">{repeated_count} giá trị lặp</b><small>Đếm giá trị xuất hiện từ hai lần trở lên.</small></p></article>',
-            f'          <article role="row"><div><span>05</span><strong>Cửa sổ 7 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[7][0])} giá trị</b><small>So sánh quan sát rất gần.</small></p></article>',
-            f'          <article role="row"><div><span>06</span><strong>Cửa sổ 30 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[30][0])} giá trị</b><small>Tạo nền đối chiếu ngắn hạn.</small></p></article>',
-            f'          <article role="row"><div><span>07</span><strong>Cửa sổ 90 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[90][0])} giá trị</b><small>Đặt dữ liệu gần trong bối cảnh rộng hơn.</small></p></article>',
+            f'        <div class="method-pills" role="list" aria-label="Bảy phương pháp phân tích dữ liệu ngày {formatted}">',
+            f'          <article role="listitem"><strong>Đối chiếu nguồn</strong><span>{source_count} nguồn</span></article>',
+            '          <article role="listitem"><strong>Kiểm tra cấu trúc</strong><span>27/27</span></article>',
+            f'          <article role="listitem"><strong>Độ phân tán</strong><span>{unique_count} mã</span></article>',
+            f'          <article role="listitem"><strong>Độ lặp</strong><span>{repeated_count} mã</span></article>',
+            f'          <article role="listitem"><strong>Cửa sổ 7 phiên</strong><span>TB {vi_decimal(window_values[7][0])}</span></article>',
+            f'          <article role="listitem"><strong>Cửa sổ 30 phiên</strong><span>TB {vi_decimal(window_values[30][0])}</span></article>',
+            f'          <article role="listitem"><strong>Cửa sổ 90 phiên</strong><span>TB {vi_decimal(window_values[90][0])}</span></article>',
             '        </div>',
             f'        <p class="source-line"><strong>Mã kiểm tra:</strong> {digest} · {source_names} · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a></p>',
             '      </div>',
@@ -186,8 +187,8 @@ def update_daily_index(content: str, target: date) -> str:
             "tiêu đề ngày báo cáo",
         ),
         (
-            r'(<p class="hero-proof-text">Chỉ dùng dữ liệu đến )\d{2}/\d{2}/\d{4}( · Không dùng dữ liệu chưa công bố\.</p>)',
-            rf'\g<1>{lock_formatted}\g<2>',
+            r'(<p class="hero-proof-text">Báo cáo cho ngày hôm nay \()\d{2}/\d{2}/\d{4}(\)\. Dữ liệu khóa đến hết ngày hôm qua \()\d{2}/\d{2}/\d{4}(\)\.</p>)',
+            rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
             "phạm vi dữ liệu hero",
         ),
         (
@@ -240,48 +241,23 @@ def update_sample(
 ) -> str:
     formatted = vi_date(target)
     report_formatted = vi_date(target + timedelta(days=1))
-    counts = Counter(codes)
     source_count = len(sources)
     source_names = " · ".join(
         SOURCE_LABELS.get(str(source.get("source", "")), str(source.get("source", "")))
         for source in sorted(sources, key=lambda item: str(item.get("source", "")))
     )
-    unique_count = len(counts)
-    repeated_count = sum(1 for value in counts.values() if value > 1)
     digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
     history_count = len(history_rows)
-    history_start = vi_date(date.fromisoformat(history_rows[0][0]))
-    window_values = {size: summarize_window(history_rows, size) for size in (7, 30, 90)}
-    unique_comparison_7 = comparison_phrase(unique_count, window_values[7][0], "trung bình 7 phiên")
-    unique_comparison_30 = comparison_phrase(unique_count, window_values[30][0], "trung bình 30 phiên")
-    repeat_comparison_30 = comparison_phrase(window_values[7][1], window_values[30][1], "nền 30 phiên")
-    repeat_comparison_90 = comparison_phrase(window_values[7][1], window_values[90][1], "nền 90 phiên")
     replacements = (
-        (r"(<span data-report-date>).*?(</span>)", rf"\g<1>Ngày báo cáo mẫu: {report_formatted}\g<2>"),
-        (r"(<span data-lock-date>).*?(</span>)", rf"\g<1>Khóa nguồn: {formatted}\g<2>"),
+        (r"(<span data-report-date>).*?(</span>)", rf"\g<1>Báo cáo cho ngày hôm nay: {report_formatted}\g<2>"),
+        (r"(<span data-lock-date>).*?(</span>)", rf"\g<1>Dữ liệu khóa đến hết ngày hôm qua: {formatted}\g<2>"),
         (r"(<span data-history-count>).*?(</span>)", rf"\g<1>{history_count} phiên lịch sử\g<2>"),
-        (r"(<span data-source-count>).*?(</span>)", rf"\g<1>{source_count} nguồn trùng khớp\g<2>"),
-        (r"(<td data-report-date-value>).*?(</td>)", rf"\g<1>{report_formatted}\g<2>"),
-        (r"(<td data-history-range>).*?(</td>)", rf"\g<1>Từ {history_start} đến hết {formatted}\g<2>"),
+        (r"(<span data-source-count>).*?(</span>)", rf"\g<1>{source_count} nguồn khớp\g<2>"),
         (r"(<strong data-history-count-value>).*?(</strong>)", rf"\g<1>{history_count} phiên\g<2>"),
-        (r"(<p class=\"sample-caption\" data-report-scope>).*?(</p>)", rf"\g<1>“Báo cáo ngày hôm nay” là báo cáo được lập trong ngày {report_formatted} từ dữ liệu đã tồn tại đến hết ngày {formatted}.\g<2>"),
         (r"(<span data-source-names>).*?(</span>)", rf"\g<1>{source_names}\g<2>"),
-        (r"(<strong data-source-count-value>).*?(</strong>)", rf"\g<1>{source_count}\g<2>"),
-        (r"(<strong data-lock-date-value>).*?(</strong>)", rf"\g<1>{formatted}\g<2>"),
-        (r"(<strong data-digest>).*?(</strong>)", rf"\g<1>{digest}\g<2>"),
-        (r"(<span class=\"status-pill status-neutral\" data-locked-session>).*?(</span>)", rf"\g<1>PHIÊN {formatted}\g<2>"),
-        (r"(<span class=\"row-chip\" data-source-count-chip>).*?(</span>)", rf"\g<1>{source_count} nguồn\g<2>"),
-        (r"(<span class=\"row-chip\" data-unique-count-chip>).*?(</span>)", rf"\g<1>{unique_count} mã\g<2>"),
-        (r"(<span class=\"row-chip\" data-repeated-count-chip>).*?(</span>)", rf"\g<1>{repeated_count} mã\g<2>"),
-        (r"(<strong data-window-7-unique>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[7][0])}\g<2>"),
-        (r"(<strong data-window-7-repeat>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[7][1])}\g<2>"),
-        (r"(<strong data-window-30-unique>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[30][0])}\g<2>"),
-        (r"(<strong data-window-30-repeat>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[30][1])}\g<2>"),
-        (r"(<strong data-window-90-unique>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[90][0])}\g<2>"),
-        (r"(<strong data-window-90-repeat>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[90][1])}\g<2>"),
-        (r"(<h2 data-conclusion-date>).*?(</h2>)", rf"\g<1>Kết luận ngày {report_formatted}\g<2>"),
-        (r"(<p data-finding-verified>).*?(</p>)", rf"\g<1>Phiên {target.strftime('%d/%m')} có {unique_count} giá trị khác nhau và {repeated_count} giá trị lặp; đủ 27/27 bản ghi từ {source_count} nguồn trùng khớp.\g<2>"),
-        (r"(<p data-finding-observation>).*?(</p>)", rf"\g<1>Mức đa dạng của phiên gần nhất {unique_comparison_7} và {unique_comparison_30}. Mức lặp của cửa sổ 7 phiên {repeat_comparison_30} và {repeat_comparison_90}.\g<2>"),
+        (r"(<b data-source-count-value>).*?(</b>)", rf"\g<1>{source_count}\g<2>"),
+        (r"(<b data-lock-date-value>).*?(</b>)", rf"\g<1>{formatted}\g<2>"),
+        (r"(<span data-digest>).*?(</span>)", rf"\g<1>{digest}\g<2>"),
     )
     for pattern, replacement in replacements:
         content, count = re.subn(pattern, replacement, content, count=1)
@@ -366,19 +342,27 @@ def main() -> None:
         ]
         sample_sources = [{"source": "a"}, {"source": "b"}]
         block = build_report_block(sample_target, sample_codes, sample_rows[-12:], sample_rows, sample_sources)
-        assert "7 phương pháp hôm nay" in block
-        assert block.count('role="row"') == 7
-        assert "2 nguồn khớp" in block
-        assert "27/27 bản ghi" in block
+        assert "DỮ LIỆU KHÓA ĐẾN HẾT NGÀY HÔM QUA · 12/08/2026" in block
+        assert "7 phương pháp cho ngày hôm nay (13/08/2026)" in block
+        assert block.count('role="listitem"') == 7
+        assert "<strong>2</strong> nguồn khớp" in block
+        assert "<strong>27/27</strong> bản ghi" in block
         assert "kỳ tiếp theo" not in block.lower()
         daily_index = update_daily_index(INDEX_FILE.read_text(encoding="utf-8"), sample_target)
         assert 'data-report-date="13/08/2026"' in daily_index
         assert 'data-lock-date="12/08/2026"' in daily_index
+        year_end_index = update_daily_index(INDEX_FILE.read_text(encoding="utf-8"), date(2026, 12, 31))
+        assert 'data-report-date="01/01/2027"' in year_end_index
+        assert 'data-lock-date="31/12/2026"' in year_end_index
+        assert "Báo cáo cho ngày hôm nay (01/01/2027)" in year_end_index
+        assert "Dữ liệu khóa đến hết ngày hôm qua (31/12/2026)" in year_end_index
         sample_page = update_sample(
             SAMPLE_FILE.read_text(encoding="utf-8"), sample_target, sample_codes, sample_sources, sample_rows
         )
-        assert "Ngày báo cáo mẫu: 13/08/2026" in sample_page
-        assert "Kết luận ngày 13/08/2026" in sample_page
+        assert "Báo cáo cho ngày hôm nay: 13/08/2026" in sample_page
+        assert "Dữ liệu khóa đến hết ngày hôm qua: 12/08/2026" in sample_page
+        assert "4SO ngày 25/07/2026" in sample_page
+        assert "không phải 4SO của ngày hôm nay" in sample_page
         print("COMPLETED_DRAW_REPORT_SELF_TEST_OK")
         return
 

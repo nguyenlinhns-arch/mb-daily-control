@@ -14,7 +14,8 @@
   "private_runtime": "Windows Task Scheduler -> Apps Script action=daily005 -> GitHub workflow_dispatch",
   "catch_up": {
     "start_when_available": true,
-    "run_when_network_available": true,
+    "task_starts_even_when_offline": true,
+    "worker_waits_for_network": true,
     "trigger_at_logon": true,
     "retry_every_seconds": 60,
     "retry_until_private_and_live_website_verify": true

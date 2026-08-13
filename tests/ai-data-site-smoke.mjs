@@ -21,6 +21,10 @@ assert.match(index, /Tôi đã chuyển khoản – báo chủ dịch vụ/);
 assert.match(index, /id="delivery-view"/);
 assert.match(index, /Zalo chỉ dùng khi bạn cần hỗ trợ/);
 assert.match(index, /không đưa ra số dự đoán/i);
+assert.match(index, /1 số[\s\S]*MB 4SO/);
+assert.match(index, /2 số[\s\S]*MB 4SO/);
+assert.match(index, /4 số[\s\S]*Đủ 2 cặp[\s\S]*MB 4SO/);
+assert.match(index, /Dàn[\s\S]*MB THANG/);
 assert.doesNotMatch(index, /RETAIL SAMPLE|Doanh thu|Đơn hàng/);
 
 assert.match(app, /payment_submitted/);
@@ -38,6 +42,8 @@ assert.match(legal, /không tự kích hoạt dịch vụ/i);
 assert.match(legal, /Chỉ sau bước này.*đã thanh toán/is);
 assert.match(sample, /dữ liệu giả lập/i);
 assert.match(sample, /không phải dự đoán/i);
+assert.match(sample, /Kết luận 1 số · MB 4SO/);
+assert.match(sample, /Kết luận dàn · MB THANG/);
 
 assert.doesNotMatch(index + sample, /hôm nay đánh|chốt số|số đẹp|bao lô|xiên|cam kết trúng/i);
 assert.doesNotMatch(workflow, /schedule:/);

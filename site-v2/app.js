@@ -156,12 +156,12 @@
     order.delivery = delivery;
     saveOrder();
 
-    pendingPanel.hidden = true;
-    deliveryView.hidden = false;
-    selfConfirmButton.hidden = true;
-    deliveryTitle.textContent = String(delivery.title || `4SO ngày ${REPORT_DATE}`);
-
-    deliveryPairs.replaceChildren();
+    // Build the complete four-number result before showing the approved panel.
+    // This prevents a partially rendered state where customers only see the
+    // payment confirmation heading without the two ranked pairs.
+    deliveryView.hidden = true;
+    deliveryView.dataset.rendered = "false";
+    const pairFragment = document.createDocumentFragment();
     for (const pair of delivery.pairs) {
       const card = document.createElement("article");
       card.className = "delivery-pair";
@@ -179,8 +179,19 @@
       }
 
       card.append(rank, numbers);
-      deliveryPairs.append(card);
+      pairFragment.append(card);
     }
+
+    deliveryPairs.replaceChildren(pairFragment);
+    deliveryTitle.textContent = String(delivery.title || `4SO ngày ${REPORT_DATE}`);
+    deliveryPairs.setAttribute(
+      "aria-label",
+      `4SO gồm TOP 1: ${delivery.pairs[0].numbers.join(", ")} và TOP 2: ${delivery.pairs[1].numbers.join(", ")}`
+    );
+    pendingPanel.hidden = true;
+    selfConfirmButton.hidden = true;
+    deliveryView.dataset.rendered = "true";
+    deliveryView.hidden = false;
 
     const purchaseKey = `lemienbac_purchase_${order.code}`;
     if (!localStorage.getItem(purchaseKey)) {

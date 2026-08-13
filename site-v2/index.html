@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Báo cáo phân tích hồi cứu dữ liệu Xổ số Miền Bắc đã công bố: kiểm tra nguồn, bảng đối chiếu, biểu đồ 7/30 ngày và diễn giải rõ giới hạn. Xem mẫu trước khi đặt.">
+  <meta name="description" content="Báo cáo AI phân tích dữ liệu Xổ số Miền Bắc đã công bố: kiểm tra 27/27 bản ghi, thống kê XSMB 30 ngày, 7 lớp phương pháp và kết luận hồi cứu chi tiết.">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <meta name="google-site-verification" content="YsFOP33bdoRwdFS2sVoqfnzoxmniLWHrJzxpSx2uDsA">
   <link rel="canonical" href="https://lemienbac.com/">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css?v=20260813-3">
+  <link rel="stylesheet" href="./styles.css?v=20260813-5">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="vi_VN">
-  <meta property="og:title" content="4SO AI – Bảng phân tích dữ liệu XSMB đã công bố">
-  <meta property="og:description" content="Xem cấu trúc báo cáo, quy trình kiểm tra và chính sách giao nội dung trước khi thanh toán.">
+  <meta property="og:title" content="4SO AI – Báo cáo phân tích dữ liệu XSMB">
+  <meta property="og:description" content="Xem 7 lớp phân tích trên một phiên đã công bố. Chỉ trả phí để mở phần kết luận hồi cứu đầy đủ.">
   <meta property="og:url" content="https://lemienbac.com/">
-  <title>Bảng phân tích dữ liệu XSMB – 4SO AI</title>
+  <title>Phân tích dữ liệu Xổ số Miền Bắc bằng AI – 4SO AI</title>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"4SO AI","url":"https://lemienbac.com/","inLanguage":"vi-VN"},{"@type":"Service","name":"Báo cáo phân tích dữ liệu Xổ số Miền Bắc","provider":{"@type":"Organization","name":"4SO AI Data Lab","url":"https://lemienbac.com/"},"description":"Báo cáo thống kê và phân tích hồi cứu dữ liệu XSMB đã công bố; không cung cấp dự đoán hoặc dịch vụ cá cược.","areaServed":"VN","offers":[{"@type":"Offer","name":"Báo cáo 1 ngày","price":"30000","priceCurrency":"VND"},{"@type":"Offer","name":"Gói 1 tuần","price":"200000","priceCurrency":"VND"},{"@type":"Offer","name":"Gói 1 tháng","price":"800000","priceCurrency":"VND"}]}]}</script>
   <script>
     window.dataLayer=window.dataLayer||[];
     function gtag(){dataLayer.push(arguments)}
@@ -24,209 +25,79 @@
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-R9TBYP97BC"></script>
   <script src="./config.js?v=20260813-1"></script>
-  <script defer src="./app.js?v=20260813-3"></script>
+  <script defer src="./app.js?v=20260813-5"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua điều hướng</a>
-  <div class="notice-bar"><div class="wrap"><span class="live-dot" aria-hidden="true"></span><strong>Dịch vụ dữ liệu 18+</strong><span>Chỉ phân tích kết quả XSMB đã công bố</span><span class="notice-spacer"></span><a href="/legal.html#terms">Phạm vi sử dụng</a></div></div>
-
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="brand" href="#top" aria-label="4SO AI Data Lab – Trang chủ">
-        <span class="brand-mark" aria-hidden="true">4SO</span>
-        <span><strong>4SO AI</strong><small>XSMB DATA LAB</small></span>
-      </a>
-      <nav class="desktop-nav" aria-label="Điều hướng chính">
-        <a href="#dashboard">Bảng phân tích</a>
-        <a href="/mau-bao-cao.html">Báo cáo mẫu</a>
-        <a href="#process">Cách nhận</a>
-        <a href="#pricing">Bảng giá</a>
-      </nav>
-      <button class="button button-small button-accent" type="button" data-open-checkout data-plan="day">Mở báo cáo</button>
-    </div>
-  </header>
+  <div class="topline"><div class="wrap"><span class="pulse"></span><strong>Dịch vụ dữ liệu 18+</strong><span>Phân tích hồi cứu · Không nhận cược</span><a href="/legal.html">Điều khoản minh bạch</a></div></div>
+  <header class="site-header"><div class="wrap header-inner"><a class="brand" href="#top" aria-label="4SO AI – Trang chủ"><span class="brand-mark">4SO</span><span><strong>4SO AI</strong><small>XSMB DATA REPORT</small></span></a><nav class="desktop-nav" aria-label="Điều hướng chính"><a href="#proof">Kiểm định lịch sử</a><a href="#methods">7 phương pháp</a><a href="/mau-bao-cao.html">Báo cáo mẫu</a><a href="#pricing">Bảng giá</a></nav><button class="button button-coral button-small" type="button" data-open-checkout data-plan="day">Mở kết luận</button></div></header>
 
   <main id="main">
-    <section class="intro wrap" id="top">
-      <div>
-        <p class="eyebrow">BÁO CÁO DỮ LIỆU XỔ SỐ MIỀN BẮC</p>
-        <h1>Xem dữ liệu và cách kiểm tra <em>trước khi mua.</em></h1>
-      </div>
-      <div class="intro-copy">
-        <p>4SO AI trình bày dữ liệu đã công bố thành một bảng phân tích dễ đọc: ngày khóa, độ đầy đủ, so sánh 7/30 ngày, thay đổi đáng chú ý và giới hạn của phép đo.</p>
-        <div class="intro-actions"><a class="button button-primary" href="/mau-bao-cao.html">Xem báo cáo mẫu đầy đủ</a><a class="text-link" href="#dashboard">Xem bảng bên dưới ↓</a></div>
-      </div>
-    </section>
-
-    <section class="report-board wrap" id="dashboard" aria-label="Bảng phân tích mẫu 4SO AI">
-      <header class="board-head">
-        <div class="board-head-top"><span><i class="live-dot" aria-hidden="true"></i> BẢN MẪU CÔNG KHAI</span><span class="board-version">REPORT STRUCTURE · V2</span></div>
-        <h2>BẢNG PHÂN TÍCH DỮ LIỆU AI 4SO</h2>
-        <p>Xổ số Miền Bắc · dữ liệu đã công bố · bản minh họa ngày 13/08/2026</p>
-        <div class="board-head-meta"><span>Không nhận cược</span><span>Không dự đoán kỳ tiếp theo</span><span>Không tự gia hạn</span></div>
-      </header>
-
-      <section class="board-block audit-block">
-        <div class="block-heading">
-          <div><p class="block-kicker">01 · KIỂM TRA NGUỒN</p><h3>Nhật ký khóa dữ liệu gần nhất</h3></div>
-          <span class="status-pill status-good">27/27 bản ghi · Đạt</span>
+    <section class="hero" id="top">
+      <div class="hero-grid wrap">
+        <div class="hero-copy">
+          <p class="eyebrow light"><span class="pulse"></span> BÁO CÁO AI · DỮ LIỆU XSMB ĐÃ CÔNG BỐ</p>
+          <h1>7 lớp phân tích.<br><em>Một kết luận dễ đọc.</em></h1>
+          <p class="hero-lead">4SO AI kiểm tra nguồn, chạy nhiều phương pháp trên dữ liệu Xổ số Miền Bắc đã công bố rồi gom kết quả vào một báo cáo duy nhất. <strong>Bạn xem các lớp phân tích trước; chỉ thanh toán nếu muốn mở phần kết luận chi tiết.</strong></p>
+          <div class="hero-actions"><a class="button button-lime button-large" href="#methods">Xem 7 lớp phân tích</a><a class="button button-dark-ghost button-large" href="/mau-bao-cao.html">Xem báo cáo mẫu</a></div>
+          <p class="hero-fineprint">Không đưa ra số dự đoán cho kỳ chưa quay, không nhận tiền cược và không bảo đảm kết quả tương lai.</p>
         </div>
-        <div class="table-scroll">
-          <table class="audit-table">
-            <thead><tr><th>Hạng mục</th><th>Phạm vi kiểm tra</th><th>Giá trị trong bản mẫu</th><th>Trạng thái</th></tr></thead>
-            <tbody>
-              <tr><td>Ngày khóa dữ liệu</td><td>Chỉ dùng dữ liệu đã công bố đến D−1</td><td><strong>12/08/2026</strong></td><td><span class="mini-status good">Đã khóa</span></td></tr>
-              <tr><td>Độ đầy đủ phiên gần nhất</td><td>Kiểm tra đủ các bản ghi kết quả</td><td><strong>27 / 27</strong></td><td><span class="mini-status good">Đầy đủ</span></td></tr>
-              <tr><td>Dữ liệu nguồn</td><td>Số dòng lịch sử trong ảnh chụp kiểm tra</td><td><strong>2.366 dòng</strong></td><td><span class="mini-status good">Đã đọc</span></td></tr>
-              <tr><td>Dữ liệu tương lai</td><td>Không đưa kết quả chưa công bố vào phép tính</td><td><strong>0 dòng</strong></td><td><span class="mini-status good">Loại trừ</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="block-note">Số liệu trên là ảnh chụp kiểm tra của bản mẫu ngày 13/08/2026. Báo cáo khách nhận luôn ghi rõ ngày khóa và phạm vi riêng.</p>
-      </section>
-
-      <section class="board-block summary-block">
-        <div class="block-heading">
-          <div><p class="block-kicker">02 · ẢNH CHỤP DỮ LIỆU</p><h3>Bốn thông tin phải có trước khi phân tích</h3></div>
-          <span class="status-pill status-neutral">DỮ LIỆU HỒI CỨU</span>
-        </div>
-        <div class="summary-grid">
-          <article><span>Phạm vi</span><strong>30 ngày</strong><small>Nền lịch sử trong bản mẫu</small></article>
-          <article><span>Cửa sổ ngắn</span><strong>7 ngày</strong><small>Đặt cạnh nền 30 ngày</small></article>
-          <article><span>Bản ghi thiếu</span><strong>0</strong><small>Trong phiên kiểm tra gần nhất</small></article>
-          <article class="summary-chart"><span>Độ đầy đủ theo nhóm</span><div class="spark-bars" aria-label="Biểu đồ độ đầy đủ minh họa"><i style="--h:72%"></i><i style="--h:88%"></i><i style="--h:65%"></i><i style="--h:100%"></i><i style="--h:84%"></i><i style="--h:94%"></i><i style="--h:78%"></i></div><small>Minh họa cách báo cáo trực quan hóa dữ liệu</small></article>
-        </div>
-      </section>
-
-      <section class="method-band">
-        <div><p class="block-kicker">03 · QUY TRÌNH 4SO AI</p><h3>AI tổng hợp dữ liệu theo từng lớp, không biến lịch sử thành lời hứa.</h3><p>Mỗi báo cáo tách riêng phần kiểm tra nguồn, mô tả phân bố, so sánh cửa sổ thời gian và diễn giải giới hạn.</p></div>
-        <div class="method-stats"><article><strong>4</strong><span>lớp kiểm tra</span></article><article><strong>7 / 30</strong><span>ngày so sánh</span></article><article><strong>D−1</strong><span>mốc khóa nguồn</span></article></div>
-      </section>
-
-      <section class="board-block contents-block">
-        <div class="block-heading">
-          <div><p class="block-kicker">04 · NỘI DUNG BÁO CÁO</p><h3>Các khối khách hàng nhận được</h3></div>
-          <a class="small-link" href="/mau-bao-cao.html">Mở bản mẫu đầy đủ ↗</a>
-        </div>
-        <div class="report-rows">
-          <article><span class="row-index">A</span><div><strong>Phạm vi và ngày khóa</strong><small>Nguồn, thời điểm khóa, số bản ghi và dữ liệu bị thiếu.</small></div><span class="row-chip">Công khai trong mẫu</span></article>
-          <article><span class="row-index">B</span><div><strong>Bảng phân bố lịch sử</strong><small>Tổng hợp theo cửa sổ 7 ngày và 30 ngày đã công bố.</small></div><span class="row-chip">Có biểu đồ</span></article>
-          <article><span class="row-index">C</span><div><strong>Điểm thay đổi cần xem lại</strong><small>Nhóm dữ liệu khác biệt đáng chú ý và cách tự đối chiếu.</small></div><span class="row-chip">Có giải thích</span></article>
-          <article><span class="row-index">D</span><div><strong>Kết luận hồi cứu chi tiết</strong><small>Điều dữ liệu đã công bố cho thấy và giới hạn của kết luận.</small></div><span class="row-chip row-chip-lock">Mở sau xác nhận</span></article>
-        </div>
-      </section>
-
-      <section class="locked-report" aria-label="Nội dung báo cáo chi tiết đang khóa">
-        <div class="locked-title"><div><small>KẾT LUẬN PHÂN TÍCH CHI TIẾT</small><h3>Tóm tắt thay đổi · bảng đối chiếu · diễn giải</h3></div><span>ĐANG KHÓA</span></div>
-        <div class="locked-body">
-          <div class="locked-preview" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="unlock-card"><span class="lock-icon">⌁</span><h3>Mở báo cáo đầy đủ trên màn hình</h3><p>Xem mẫu trước. Nếu phù hợp, chọn gói và chuyển khoản bằng mã đơn riêng. Báo cáo chỉ mở sau khi chủ dịch vụ xác nhận tiền đã vào tài khoản.</p><button class="button button-accent" type="button" data-open-checkout data-plan="day">Mở gói 1 ngày · 30.000đ</button><a href="/mau-bao-cao.html">Xem mẫu trước khi thanh toán</a></div>
-        </div>
-        <p class="locked-footnote">Báo cáo không đưa ra số dự đoán, khuyến nghị đặt cược hoặc cam kết kết quả tương lai.</p>
-      </section>
-
-      <section class="board-purchase">
-        <div class="price-intro"><small>THỬ 01 BÁO CÁO</small><strong>30.000đ</strong><span>Thanh toán một lần</span></div>
-        <ul><li>Xem bản mẫu miễn phí trước</li><li>Mã đơn riêng để đối soát</li><li>Nhận trực tiếp trên website</li><li>Hoàn phí nếu lỗi phía dịch vụ</li></ul>
-        <div><button class="button button-primary" type="button" data-open-checkout data-plan="day">Chọn gói và xem chuyển khoản</button><small>Không cần tạo tài khoản · không tự gia hạn</small></div>
-      </section>
-    </section>
-
-    <section class="confidence-strip">
-      <div class="wrap">
-        <article><span>01</span><div><strong>Xem trước sản phẩm</strong><small>Bản mẫu đầy đủ, không chỉ là ảnh quảng cáo.</small></div></article>
-        <article><span>02</span><div><strong>Đối soát hai bước</strong><small>Khách báo chuyển; chủ dịch vụ kiểm tra rồi mới mở.</small></div></article>
-        <article><span>03</span><div><strong>Không thu thập hồ sơ</strong><small>Không yêu cầu CCCD, email, số điện thoại hoặc tải file.</small></div></article>
-        <article><span>04</span><div><strong>Có kênh hỗ trợ</strong><small>Zalo dùng cho đối soát và xử lý sự cố.</small></div></article>
-      </div>
-    </section>
-
-    <section class="section wrap" id="pricing">
-      <div class="section-heading"><p class="eyebrow">CHỌN QUYỀN TRUY CẬP</p><h2>Thử một ngày hoặc nhận báo cáo liên tục.</h2><p>Các gói thanh toán một lần, không tự gia hạn. Cấu trúc báo cáo của từng ngày giống bản mẫu công khai.</p></div>
-      <div class="pricing-grid">
-        <article class="price-card featured"><span class="popular">NÊN BẮT ĐẦU</span><p class="plan-name">01 NGÀY</p><h3>30.000đ</h3><p class="plan-note">01 báo cáo dữ liệu của ngày đã chọn.</p><ul><li>Bảng kiểm tra nguồn và ngày khóa</li><li>So sánh lịch sử 7/30 ngày</li><li>Diễn giải và giới hạn sử dụng</li><li>Mở trực tiếp trên website</li></ul><button class="button button-accent" type="button" data-open-checkout data-plan="day">Mở báo cáo 1 ngày</button></article>
-        <article class="price-card"><span class="popular popular-soft">TIẾT KIỆM 10.000đ</span><p class="plan-name">01 TUẦN</p><h3>200.000đ</h3><p class="plan-note">07 báo cáo liên tiếp trong thời gian gói.</p><ul><li>Đủ nội dung như gói 1 ngày</li><li>Cập nhật liên tục 7 ngày</li><li>Theo dõi thay đổi qua nhiều phiên</li><li>Hỗ trợ trong thời gian gói</li></ul><button class="button button-outline" type="button" data-open-checkout data-plan="week">Chọn gói 1 tuần</button></article>
-        <article class="price-card"><span class="popular popular-soft">TIẾT KIỆM 100.000đ</span><p class="plan-name">01 THÁNG</p><h3>800.000đ</h3><p class="plan-note">30 báo cáo liên tiếp trong thời gian gói.</p><ul><li>Đủ nội dung như gói 1 ngày</li><li>Cập nhật liên tục 30 ngày</li><li>Quan sát xu hướng dài hơn</li><li>Hỗ trợ trong thời gian gói</li></ul><button class="button button-outline" type="button" data-open-checkout data-plan="month">Chọn gói 1 tháng</button></article>
-      </div>
-      <p class="pricing-footnote">Website tạo mã yêu cầu riêng. Zalo chỉ dùng khi bạn cần hỗ trợ.</p>
-    </section>
-
-    <section class="section process-section" id="process">
-      <div class="wrap process-layout">
-        <div class="section-heading"><p class="eyebrow">THANH TOÁN MINH BẠCH</p><h2>Từ mã đơn đến màn hình báo cáo.</h2><p>Hệ thống không coi nút bấm của khách là bằng chứng thanh toán. Việc mở nội dung cần bước đối soát của chủ dịch vụ.</p><a class="text-link" href="/legal.html#terms">Đọc điều khoản thanh toán →</a></div>
-        <ol class="timeline">
-          <li><span>1</span><div><strong>Chọn gói</strong><p>Website tạo một mã yêu cầu ngẫu nhiên cho phiên truy cập.</p></div></li>
-          <li><span>2</span><div><strong>Chuyển đúng số tiền và mã</strong><p>Kiểm tra tên người nhận trong ứng dụng ngân hàng trước khi xác nhận.</p></div></li>
-          <li><span>3</span><div><strong>Báo đã chuyển khoản</strong><p>Email đối soát được gửi tới chủ dịch vụ; trạng thái vẫn là đang chờ.</p></div></li>
-          <li><span>4</span><div><strong>Chủ dịch vụ xác nhận</strong><p>Khi tiền đã vào tài khoản, báo cáo tự mở trên đúng màn hình của khách.</p></div></li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="section wrap transparency-section">
-      <div class="transparency-card">
-        <div><p class="eyebrow">THÔNG TIN VẬN HÀNH</p><h2>Rõ ai hỗ trợ và rõ dịch vụ không làm gì.</h2><p><strong>4SO AI Data Lab</strong> vận hành độc lập, cung cấp sản phẩm thông tin từ dữ liệu đã công bố. Website không thuộc, không đại diện cho công ty xổ số; không nhận tiền cược, không giữ tiền cược và không trả thưởng.</p></div>
-        <div class="contact-panel"><small>KÊNH HỖ TRỢ TRỰC TIẾP</small><strong>Zalo · 0398 696 879</strong><p>Dùng khi cần kiểm tra mã đơn, đối soát chậm hoặc yêu cầu hoàn phí do lỗi dịch vụ.</p><a class="button button-zalo" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Mở hỗ trợ Zalo</a></div>
-      </div>
-    </section>
-
-    <section class="section faq-section">
-      <div class="wrap faq-grid">
-        <div class="section-heading"><p class="eyebrow">CÂU HỎI THƯỜNG GẶP</p><h2>Thông tin cần biết trước khi đặt.</h2><p>Nếu câu trả lời chưa đủ rõ, hãy mở Zalo hỗ trợ trước khi chuyển khoản.</p></div>
-        <div class="faq-list">
-          <details open><summary>Tôi có phải gửi file hoặc thông tin cá nhân không?</summary><p>Không. Website chỉ tạo mã yêu cầu và mã truy cập ngẫu nhiên. Bạn không phải nhập họ tên, CCCD, số điện thoại, email hoặc tải dữ liệu lên.</p></details>
-          <details><summary>Bản mẫu có giống nội dung nhận được không?</summary><p>Có cùng cấu trúc: phạm vi, ngày khóa, kiểm tra nguồn, bảng so sánh, diễn giải và giới hạn. Chỉ số thay đổi theo ngày dữ liệu của báo cáo.</p></details>
-          <details><summary>Báo cáo có dự đoán kỳ tiếp theo không?</summary><p>Không. Báo cáo chỉ phân tích hồi cứu dữ liệu đã công bố, không cung cấp số dự đoán, khuyến nghị đặt cược hoặc cam kết kết quả tương lai.</p></details>
-          <details><summary>Nếu đã chuyển tiền nhưng chưa thấy báo cáo?</summary><p>Giữ nguyên màn hình chờ và kiểm tra mã chuyển khoản. Nếu đối soát lâu, mở Zalo hỗ trợ và gửi mã yêu cầu; không cần gửi thêm dữ liệu cá nhân.</p></details>
-          <details><summary>Khi nào được hoàn phí?</summary><p>Nếu lỗi phía dịch vụ khiến báo cáo đã thanh toán không thể được cung cấp, khách có thể dùng mã yêu cầu để đối chiếu và xử lý hoàn phí theo điều khoản.</p></details>
+        <div class="hero-stats" aria-label="Quy mô kiểm định của 4SO AI">
+          <article class="stat-main"><span>ĐỐI CHIẾU LỊCH SỬ 30 NGÀY</span><strong>80%</strong><p><b>24/30 ngày</b> có ít nhất 1 trong 4 mã của báo cáo lịch sử xuất hiện khi đối chiếu.</p><small>Ảnh chụp cửa sổ 14/07–12/08/2026. Không phải tỷ lệ bảo đảm cho tương lai.</small></article>
+          <div class="stat-pair"><article><strong>15.000+</strong><span>lượt tính toán thống kê mỗi báo cáo</span></article><article><strong>7 lớp</strong><span>phương pháp và hợp nhất kết luận</span></article></div>
+          <div class="stat-source"><span>Dữ liệu phiên gần nhất</span><strong>27 / 27 bản ghi</strong><i>ĐÃ KHÓA</i></div>
         </div>
       </div>
     </section>
 
-    <section class="final-cta">
-      <div class="wrap final-inner"><div><p class="eyebrow">XEM MẪU TRƯỚC · THANH TOÁN SAU</p><h2>Bắt đầu bằng một báo cáo 30.000đ.</h2><p>Không cần tài khoản. Không tự gia hạn. Có mã riêng để đối soát.</p></div><div><a class="button button-ghost-light" href="/mau-bao-cao.html">Xem báo cáo mẫu</a><button class="button button-accent" type="button" data-open-checkout data-plan="day">Chọn gói 1 ngày</button></div></div>
+    <section class="trust-row"><div class="wrap"><span>✓ Xem phương pháp trước</span><span>✓ Xem báo cáo mẫu miễn phí</span><span>✓ Mã đơn riêng để đối soát</span><span>✓ Thanh toán một lần</span></div></section>
+
+    <section class="section wrap" id="proof">
+      <div class="section-heading split-heading"><div><p class="eyebrow">BẰNG CHỨNG ĐÃ CÔNG BỐ</p><h2>80% là số liệu lịch sử,<br>không phải lời hứa.</h2></div><p>Chúng tôi công khai cách đọc con số này: trong cửa sổ 30 ngày đã kết thúc, 24 ngày có ít nhất một mã trong bộ bốn mã lịch sử xuất hiện. Ba ngày đầu tháng không khớp cũng được giữ nguyên, không xóa khỏi bảng đối chiếu.</p></div>
+      <article class="proof-card">
+        <header><div><small>ĐỐI CHIẾU THÁNG 08/2026 · ĐẾN 12/08</small><h3>Các phiên đã kết thúc</h3></div><div class="proof-score"><strong>9/12</strong><span>ngày có đối chiếu</span></div></header>
+        <div class="proof-days"><span class="hit">01<small>Khớp</small></span><span class="hit">02<small>Khớp</small></span><span class="miss">03<small>Không</small></span><span class="miss">04<small>Không</small></span><span class="hit">05<small>Khớp</small></span><span class="hit">06<small>Khớp</small></span><span class="hit">07<small>Khớp</small></span><span class="hit">08<small>Khớp</small></span><span class="miss">09<small>Không</small></span><span class="hit">10<small>Khớp</small></span><span class="hit">11<small>Khớp</small></span><span class="hit">12<small>Khớp</small></span></div>
+        <footer><span><i class="legend-hit"></i> Có ít nhất 1 mã đối chiếu</span><span><i class="legend-miss"></i> Không có mã đối chiếu</span><a href="/mau-bao-cao.html">Xem cách báo cáo trình bày dữ liệu →</a></footer>
+      </article>
     </section>
+
+    <section class="analysis-section" id="methods">
+      <div class="wrap analysis-shell">
+        <header class="analysis-head"><div><p class="eyebrow light">BẢN MẪU LỊCH SỬ · PHIÊN ĐÃ KẾT THÚC</p><h2>Đầu ra của 7 lớp phân tích</h2><p>Ngày báo cáo mẫu <strong>12/08/2026</strong> · dữ liệu khóa đến <strong>11/08/2026</strong>. Các mã dưới đây chỉ là hồ sơ lịch sử của một phiên đã qua.</p></div><span class="past-badge">KHÔNG PHẢI SỐ HÔM NAY</span></header>
+        <div class="method-table" role="table" aria-label="Bảy lớp phương pháp của báo cáo mẫu lịch sử">
+          <div class="method-table-head" role="row"><span role="columnheader">Lớp phân tích</span><span role="columnheader">Đầu ra trong bản mẫu lịch sử</span><span role="columnheader">Vai trò</span></div>
+          <article class="method-row" role="row"><div class="method-name"><span>01</span><strong>A1</strong></div><div class="number-list"><b>70</b><b>74</b><b>65</b><b>37</b></div><small>Sàng lọc lớp A1</small></article>
+          <article class="method-row" role="row"><div class="method-name"><span>02</span><strong>2SO / X2</strong></div><div class="number-list"><b>60</b><b>06</b></div><small>So sánh cặp đảo</small></article>
+          <article class="method-row" role="row"><div class="method-name"><span>03</span><strong>X3 GROWTH</strong></div><div class="number-list"><b>75</b><b>10</b><b>61</b></div><small>Tăng trưởng lịch sử</small></article>
+          <article class="method-row" role="row"><div class="method-name"><span>04</span><strong>F01 TẦN SUẤT</strong></div><div class="number-list"><b>83</b><b>50</b><b>06</b><b>95</b><b>13</b><b>60</b><b>32</b></div><small>Cửa sổ tần suất 60</small></article>
+          <article class="method-row" role="row"><div class="method-name"><span>05</span><strong>F06 CHUYỂN TIẾP</strong></div><div class="number-list"><b>91</b><b>52</b><b>13</b><b>83</b><b>50</b><b>84</b><b>14</b></div><small>Chuyển tiếp lịch sử</small></article>
+          <article class="method-row" role="row"><div class="method-name"><span>06</span><strong>KÉP V1</strong></div><div class="number-list"><b>33</b><b>11</b><b>55</b></div><small>Nhánh đối chiếu kép</small></article>
+          <article class="method-row method-final" role="row"><div class="method-name"><span>07</span><strong>4SO HỢP NHẤT</strong></div><div class="final-placeholder"><span>● ●</span><span>● ●</span></div><small>Kết luận và thứ tự ưu tiên</small></article>
+        </div>
+
+        <section class="locked-conclusion" aria-label="Kết luận phân tích đang khóa">
+          <header><div><small>KẾT LUẬN PHÂN TÍCH CHI TIẾT</small><h3>Kết quả hợp nhất từ 7 lớp</h3></div><span>ĐANG KHÓA</span></header>
+          <div class="locked-content"><div class="blur-lines" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="unlock-box"><span class="lock-mark">⌁</span><h3>Mở kết luận đầy đủ trên màn hình</h3><p>Nhận phần tổng hợp, thứ tự ưu tiên trong báo cáo hồi cứu, bảng đối chiếu và phần giải thích giới hạn. Xem mẫu trước khi thanh toán.</p><button class="button button-coral button-large" type="button" data-open-checkout data-plan="day">Mở kết luận · 30.000đ</button><a href="/mau-bao-cao.html">Xem báo cáo mẫu miễn phí</a></div></div>
+          <footer>Kết luận chỉ mô tả dữ liệu đã công bố; không phải khuyến nghị đặt cược hoặc dự đoán kỳ tiếp theo.</footer>
+        </section>
+
+        <div class="quick-buy"><div><small>GÓI DÙNG THỬ</small><strong>30.000đ</strong><span>01 báo cáo · thanh toán một lần</span></div><ul><li>7 lớp phân tích</li><li>Kết luận hồi cứu đầy đủ</li><li>Hiển thị ngay trên website</li><li>Có mã đơn để hỗ trợ</li></ul><button class="button button-primary button-large" type="button" data-open-checkout data-plan="day">Chọn gói và xem chuyển khoản</button></div>
+      </div>
+    </section>
+
+    <section class="section pricing-section" id="pricing"><div class="wrap"><div class="section-heading centered"><p class="eyebrow">CHỌN QUYỀN TRUY CẬP</p><h2>Bắt đầu một ngày.<br>Chỉ mua dài hơn khi thấy phù hợp.</h2><p>Các gói thanh toán một lần, không tự gia hạn. Khách không cần tạo tài khoản hoặc gửi dữ liệu.</p></div><div class="pricing-grid"><article class="price-card featured"><span class="price-label">NÊN BẮT ĐẦU</span><h3>1 ngày</h3><div class="price"><strong>30.000</strong><span>đ</span></div><p>01 báo cáo hồi cứu đầy đủ.</p><ul><li>Đầu ra 7 lớp phân tích</li><li>Kết luận và bảng đối chiếu</li><li>Diễn giải bằng tiếng Việt</li><li>Nhận trực tiếp trên website</li></ul><button class="button button-coral button-large" type="button" data-open-checkout data-plan="day">Mở báo cáo 1 ngày</button></article><article class="price-card"><span class="price-label soft">TIẾT KIỆM 10.000đ</span><h3>1 tuần</h3><div class="price"><strong>200.000</strong><span>đ</span></div><p>07 báo cáo liên tiếp.</p><ul><li>Đầy đủ nội dung gói 1 ngày</li><li>Theo dõi qua 7 phiên</li><li>Hỗ trợ trong thời gian gói</li><li>Khoảng 28.600đ/báo cáo</li></ul><button class="button button-outline button-large" type="button" data-open-checkout data-plan="week">Chọn gói 1 tuần</button></article><article class="price-card"><span class="price-label soft">TIẾT KIỆM 100.000đ</span><h3>1 tháng</h3><div class="price"><strong>800.000</strong><span>đ</span></div><p>30 báo cáo liên tiếp.</p><ul><li>Đầy đủ nội dung gói 1 ngày</li><li>Theo dõi qua 30 phiên</li><li>Hỗ trợ trong thời gian gói</li><li>Khoảng 26.700đ/báo cáo</li></ul><button class="button button-outline button-large" type="button" data-open-checkout data-plan="month">Chọn gói 1 tháng</button></article></div><p class="pricing-note">Zalo chỉ dùng khi bạn cần hỗ trợ. <a href="/mau-bao-cao.html">Xem báo cáo mẫu trước khi mua</a>.</p></div></section>
+
+    <section class="section process-section"><div class="wrap process-grid"><div><p class="eyebrow">NHẬN BÁO CÁO</p><h2>Không cần gửi ảnh giao dịch.</h2><p>Khách báo đã chuyển khoản trên website. Chủ dịch vụ nhận email, kiểm tra giao dịch rồi xác nhận; nội dung tự mở trên màn hình đang chờ.</p><a href="/legal.html#payment">Xem quy trình đối soát →</a></div><ol><li><span>1</span><div><strong>Chọn gói</strong><p>Website tạo số tiền và mã đơn riêng.</p></div></li><li><span>2</span><div><strong>Chuyển khoản</strong><p>Dùng đúng mã đơn trong nội dung giao dịch.</p></div></li><li><span>3</span><div><strong>Báo đã thanh toán</strong><p>Email đối soát được gửi tới chủ dịch vụ.</p></div></li><li><span>4</span><div><strong>Nhận trên màn hình</strong><p>Báo cáo tự mở sau khi giao dịch được xác nhận.</p></div></li></ol></div></section>
+
+    <section class="faq-section"><div class="wrap faq-layout"><div><p class="eyebrow">CÂU HỎI THƯỜNG GẶP</p><h2>Hiểu rõ trước khi mua.</h2><p>4SO AI Data Lab vận hành độc lập, không thuộc hoặc đại diện cho công ty xổ số.</p><div class="support-card"><small>HỖ TRỢ TRỰC TIẾP</small><strong>Zalo · 0398 696 879</strong><a href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Mở Zalo hỗ trợ</a></div></div><div class="faq-list"><details open><summary>Con số 80% có nghĩa là gì?</summary><p>Đó là kết quả đối chiếu của một cửa sổ lịch sử đã kết thúc: 24/30 ngày có ít nhất một trong bốn mã của báo cáo xuất hiện. Đây không phải tỷ lệ bảo đảm cho ngày khác.</p></details><details><summary>Các số trong bảng 7 lớp là gì?</summary><p>Đó là đầu ra đã lưu của bản mẫu ngày 12/08/2026, một phiên đã kết thúc. Chúng được công khai để khách hiểu cấu trúc sản phẩm, không phải số cho kỳ chưa quay.</p></details><details><summary>Sau khi mua tôi nhận được gì?</summary><p>Báo cáo gồm đầu ra các lớp, kết luận hợp nhất, bảng đối chiếu, diễn giải và giới hạn sử dụng. Nội dung tự mở trên website sau khi thanh toán được xác nhận.</p></details><details><summary>Báo cáo có dự đoán kỳ tiếp theo không?</summary><p>Không. Báo cáo không đưa ra số dự đoán, khuyến nghị đặt cược hoặc cam kết kết quả tương lai.</p></details><details><summary>Gói có tự gia hạn không?</summary><p>Không. Mọi gói đều thanh toán một lần và dừng khi hết số báo cáo tương ứng.</p></details></div></div></section>
+
+    <section class="final-cta"><div class="wrap"><div><p class="eyebrow light">XEM PHƯƠNG PHÁP TRƯỚC · MỞ KẾT LUẬN SAU</p><h2>Thử một báo cáo<br>với 30.000đ.</h2></div><div><a class="button button-dark-ghost button-large" href="/mau-bao-cao.html">Xem mẫu miễn phí</a><button class="button button-lime button-large" type="button" data-open-checkout data-plan="day">Mở kết luận · 30.000đ</button></div></div></section>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap footer-grid"><a class="brand footer-brand" href="#top"><span class="brand-mark">4SO</span><span><strong>4SO AI</strong><small>XSMB DATA LAB</small></span></a><p>Sản phẩm thông tin và phân tích hồi cứu từ dữ liệu XSMB đã công bố. Không phải dịch vụ cá cược và không bảo đảm kết quả tương lai.</p><nav><a href="/mau-bao-cao.html">Báo cáo mẫu</a><a href="/legal.html#terms">Điều khoản</a><a href="/legal.html#privacy">Bảo mật</a><a href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Hỗ trợ Zalo</a></nav></div>
-    <div class="wrap footer-bottom"><span>© 2026 4SO AI Data Lab</span><span>Website độc lập · dịch vụ dữ liệu 18+</span></div>
-  </footer>
+  <footer class="site-footer"><div class="wrap footer-grid"><a class="brand footer-brand" href="#top"><span class="brand-mark">4SO</span><span><strong>4SO AI</strong><small>XSMB DATA REPORT</small></span></a><p>Sản phẩm thông tin và phân tích hồi cứu từ dữ liệu Xổ số Miền Bắc đã công bố. Dịch vụ 18+, không nhận cược và không bảo đảm kết quả tương lai.</p><nav><a href="/mau-bao-cao.html">Báo cáo mẫu</a><a href="/legal.html#terms">Điều khoản</a><a href="/legal.html#privacy">Bảo mật</a><a href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Hỗ trợ Zalo</a></nav></div><div class="wrap footer-bottom"><span>© 2026 4SO AI Data Lab</span><span>Website vận hành độc lập · hỗ trợ: 0398 696 879</span></div></footer>
 
-  <div class="modal-backdrop" id="checkout" hidden>
-    <section class="checkout" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
-      <button class="modal-close" type="button" id="checkout-close" aria-label="Đóng">×</button>
-      <p class="eyebrow">ĐẶT BÁO CÁO AI</p>
-      <h2 id="checkout-title">Chuyển khoản bằng mã đơn riêng</h2>
-      <p class="checkout-intro">Chọn gói, kiểm tra thông tin người nhận trên ứng dụng ngân hàng và dùng đúng mã <strong id="order-code">AI-000000</strong>.</p>
-      <div class="checkout-trust"><span>Không tự gia hạn</span><span>Chỉ mở sau đối soát</span><span>Có hỗ trợ Zalo</span></div>
-      <div class="modal-plans" role="group" aria-label="Chọn gói báo cáo">
-        <button type="button" data-modal-plan="day" class="active"><b>1 ngày</b><span>30.000đ</span></button>
-        <button type="button" data-modal-plan="week"><b>1 tuần</b><span>200.000đ</span></button>
-        <button type="button" data-modal-plan="month"><b>1 tháng</b><span>800.000đ</span></button>
-      </div>
-      <div class="payment-card" aria-label="Thông tin chuyển khoản">
-        <p class="payment-title">THÔNG TIN CHUYỂN KHOẢN</p>
-        <div class="pay-row"><span>Ngân hàng</span><strong>VPBank</strong></div>
-        <div class="pay-row"><span>Số tài khoản</span><strong id="bank-account">1128091987</strong><button type="button" data-copy-target="bank-account">Sao chép</button></div>
-        <div class="pay-row"><span>Số tiền</span><strong id="payment-amount">30.000đ</strong><button type="button" data-copy-target="payment-amount" data-copy-plain>Sao chép</button></div>
-        <div class="pay-row"><span>Nội dung chuyển khoản</span><strong id="payment-memo">AI-000000</strong><button type="button" data-copy-target="payment-memo">Sao chép</button></div>
-        <button class="copy-payment" id="copy-payment" type="button">Sao chép toàn bộ thông tin</button>
-      </div>
-      <div class="bank-warning"><span>!</span><p><strong>Kiểm tra trước khi chuyển:</strong> ứng dụng ngân hàng phải hiển thị đúng thông tin người nhận. Không chuyển nếu thông tin hiển thị khác.</p></div>
-      <button class="payment-confirm" id="payment-self-confirm" type="button">Tôi đã chuyển khoản – báo chủ dịch vụ</button>
-      <div class="payment-pending" id="payment-pending" hidden role="status"><span class="pending-icon">…</span><div><strong id="pending-title">Đã gửi email báo chủ dịch vụ</strong><small id="pending-copy">Vui lòng giữ màn hình này. Hệ thống đang chờ chủ dịch vụ đối soát và xác nhận giao dịch.</small></div></div>
-      <section class="delivery-view" id="delivery-view" hidden aria-live="polite">
-        <div class="delivery-head"><span>✓</span><div><small>THANH TOÁN ĐÃ ĐƯỢC XÁC NHẬN</small><h3 id="delivery-title">Báo cáo dữ liệu AI</h3></div></div>
-        <p id="delivery-summary"></p><div class="delivery-metrics" id="delivery-metrics"></div><div class="delivery-notes" id="delivery-notes"></div>
-        <a class="button button-primary" id="delivery-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Mở bản báo cáo đầy đủ</a>
-      </section>
-      <a class="button button-zalo" id="zalo-order" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Cần hỗ trợ? Mở Zalo</a>
-      <p class="checkout-legal">Nút “Tôi đã chuyển khoản” là xác nhận của khách hàng, chưa phải xác nhận tiền đã vào tài khoản. Dịch vụ chỉ được kích hoạt sau khi giao dịch được đối soát. Xem <a href="/legal.html#terms" target="_blank">Điều khoản</a> và <a href="/legal.html#privacy" target="_blank">Bảo mật</a>.</p>
-    </section>
-  </div>
-
-  <a class="floating-zalo" id="floating-zalo" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer" aria-label="Chat hỗ trợ qua Zalo"><span aria-hidden="true">Z</span><b>Chat Zalo</b></a>
+  <div class="modal-backdrop" id="checkout" hidden><section class="checkout" role="dialog" aria-modal="true" aria-labelledby="checkout-title"><button class="modal-close" type="button" id="checkout-close" aria-label="Đóng">×</button><p class="eyebrow">HOÀN TẤT ĐẶT BÁO CÁO</p><h2 id="checkout-title">Chọn gói và chuyển khoản</h2><p class="checkout-intro">Mã đơn của bạn là <strong id="order-code">AI-000000</strong>. Dùng đúng mã này trong nội dung chuyển khoản để hệ thống đối soát.</p><div class="checkout-trust"><span>✓ Thanh toán một lần</span><span>✓ Không tự gia hạn</span><span>✓ Nhận trên website</span></div><div class="modal-plans" role="group" aria-label="Chọn gói báo cáo"><button type="button" data-modal-plan="day" class="active"><b>1 ngày</b><span>30.000đ</span></button><button type="button" data-modal-plan="week"><b>1 tuần</b><span>200.000đ</span></button><button type="button" data-modal-plan="month"><b>1 tháng</b><span>800.000đ</span></button></div><div class="payment-card" aria-label="Thông tin chuyển khoản"><p class="payment-title">THÔNG TIN CHUYỂN KHOẢN</p><div class="pay-row"><span>Ngân hàng</span><strong>VPBank</strong></div><div class="pay-row"><span>Số tài khoản</span><strong id="bank-account">1128091987</strong><button type="button" data-copy-target="bank-account">Sao chép</button></div><div class="pay-row"><span>Số tiền</span><strong id="payment-amount">30.000đ</strong><button type="button" data-copy-target="payment-amount" data-copy-plain>Sao chép</button></div><div class="pay-row"><span>Nội dung chuyển khoản</span><strong id="payment-memo">AI-000000</strong><button type="button" data-copy-target="payment-memo">Sao chép</button></div><button class="copy-payment" id="copy-payment" type="button">Sao chép toàn bộ thông tin</button></div><div class="bank-warning"><span>!</span><p><strong>Kiểm tra trong ứng dụng ngân hàng:</strong> chỉ xác nhận chuyển khi thông tin người nhận hiển thị đúng. Không chuyển nếu thông tin khác.</p></div><button class="payment-confirm" id="payment-self-confirm" type="button">Tôi đã chuyển khoản – báo chủ dịch vụ</button><div class="payment-pending" id="payment-pending" hidden role="status"><span class="pending-icon">…</span><div><strong id="pending-title">Đã gửi email báo chủ dịch vụ</strong><small id="pending-copy">Giữ màn hình này. Hệ thống đang chờ đối soát giao dịch.</small></div></div><section class="delivery-view" id="delivery-view" hidden aria-live="polite"><div class="delivery-head"><span>✓</span><div><small>THANH TOÁN ĐÃ ĐƯỢC XÁC NHẬN</small><h3 id="delivery-title">Báo cáo dữ liệu AI</h3></div></div><p id="delivery-summary"></p><div class="delivery-metrics" id="delivery-metrics"></div><div class="delivery-notes" id="delivery-notes"></div><a class="button button-primary" id="delivery-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Mở bản báo cáo đầy đủ</a></section><a class="button button-zalo" id="zalo-order" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer">Cần hỗ trợ? Mở Zalo</a><p class="checkout-legal">Nút “Tôi đã chuyển khoản” mới chỉ gửi thông báo, chưa tự xác nhận tiền đã vào tài khoản. Xem <a href="/legal.html#payment" target="_blank">quy trình đối soát</a>, <a href="/legal.html#terms" target="_blank">điều khoản</a> và <a href="/legal.html#privacy" target="_blank">bảo mật</a>.</p></section></div>
+  <a class="floating-zalo" id="floating-zalo" href="https://zalo.me/0398696879" target="_blank" rel="noopener noreferrer" aria-label="Chat hỗ trợ qua Zalo"><span>Z</span><b>Hỗ trợ Zalo</b></a>
   <div class="consent" id="consent" hidden role="dialog" aria-label="Tùy chọn đo lường website"><p>Chúng tôi dùng dữ liệu đo lường tổng hợp để biết trang nào hữu ích. Không thu thập nội dung cuộc trò chuyện Zalo.</p><div><button type="button" id="consent-reject">Chỉ cần thiết</button><button type="button" id="consent-accept">Cho phép đo lường</button></div></div>
 </body>
 </html>

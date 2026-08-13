@@ -360,9 +360,9 @@ function dailyMbWebRun_() {
   if (properties.getProperty("DAILY_MB_WEB_LAST_SUCCESS") === today) {
     return textOutput(`DAILY_MB_005_ALREADY_DONE target=${today}`);
   }
-  const minuteOfDay = Number(Utilities.formatDate(new Date(), DAILY_MB_TZ, "H")) * 60
-    + Number(Utilities.formatDate(new Date(), DAILY_MB_TZ, "m"));
-  if (minuteOfDay > 60) return textOutput("DAILY_MB_005_OUTSIDE_WINDOW");
+  // Windows starts this action at 00:05. If the PC was off or Internet was
+  // unavailable, the same idempotent action may run later in the current day.
+  // The target is always derived server-side as today with DATA_LOCK=T-1.
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {

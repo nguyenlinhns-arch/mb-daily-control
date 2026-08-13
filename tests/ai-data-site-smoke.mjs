@@ -17,7 +17,8 @@ const [
   completedScript,
   sourceAccessRaw,
   midnightWorkflow,
-  historicalProofRaw
+  historicalProofRaw,
+  catchupScript
 ] = await Promise.all([
   read("index.html"),
   read("styles.css"),
@@ -31,7 +32,8 @@ const [
   readFile(resolve(process.cwd(), "scripts/update_completed_draw_report.py"), "utf8"),
   readFile(resolve(process.cwd(), "data/source-access.json"), "utf8"),
   readFile(resolve(process.cwd(), ".github/workflows/daily-report-midnight.yml"), "utf8"),
-  readFile(resolve(process.cwd(), "data/public-historical-proof.json"), "utf8")
+  readFile(resolve(process.cwd(), "data/public-historical-proof.json"), "utf8"),
+  readFile(resolve(process.cwd(), "scripts/run_mb4so_005.ps1"), "utf8")
 ]);
 const sourceAccess = JSON.parse(sourceAccessRaw);
 const historicalProof = JSON.parse(historicalProofRaw);
@@ -213,6 +215,11 @@ assert.match(approvalBackend, /action === "daily005"/);
 assert.match(approvalBackend, /function dailyMbWebRun_\(\)/);
 assert.match(approvalBackend, /MB_4SO_TOP2_2SO_T1_V1/);
 assert.match(approvalBackend, /DAILY_MB_MAX_ATTEMPTS = 6/);
+assert.doesNotMatch(approvalBackend, /DAILY_MB_005_OUTSIDE_WINDOW/);
+assert.match(catchupScript, /while \(\$true\)/);
+assert.match(catchupScript, /\$retrySeconds = 60/);
+assert.match(catchupScript, /function Test-LiveWebsite/);
+assert.match(catchupScript, /Live website verified for REPORT_DATE=/);
 assert.match(approvalBackend, /getSheetByName\(PAID_REPORT_SHEET_NAME\)/);
 assert.match(approvalBackend, /getDisplayValues\(\)/);
 assert.match(approvalBackend, /schema: DELIVERY_SCHEMA/);

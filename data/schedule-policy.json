@@ -1,6 +1,6 @@
 {
-  "schema_version": "MB_SCHEDULE_POLICY_V5_DAILY_0005",
-  "status": "ACTIVE_DAILY_0005",
+  "schema_version": "MB_SCHEDULE_POLICY_V6_DAILY_0005_CATCH_UP",
+  "status": "ACTIVE_DAILY_0005_WITH_CATCH_UP",
   "timezone": "Asia/Ho_Chi_Minh",
   "times_vn": [
     "00:05",
@@ -12,6 +12,13 @@
   "primary_workflow": ".github/workflows/daily-report-midnight.yml",
   "windows_task": "\\ThayLinh\\MB4SO-Daily-0005",
   "private_runtime": "Windows Task Scheduler -> Apps Script action=daily005 -> GitHub workflow_dispatch",
+  "catch_up": {
+    "start_when_available": true,
+    "run_when_network_available": true,
+    "trigger_at_logon": true,
+    "retry_every_seconds": 60,
+    "retry_until_private_and_live_website_verify": true
+  },
   "completed_draw_workflow": ".github/workflows/completed-draw-daily-1900.yml",
   "sequence_0005_private": [
     "cross-check and lock the completed draw T-1 from at least two exact public sources",

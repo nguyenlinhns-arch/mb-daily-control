@@ -22,10 +22,12 @@ assert.ok((await stat(resolve(root, "og.png"))).size > 100_000, "og.png must be 
 
 // One clearly described daily report, one clear price, and one simple delivery flow.
 assert.match(index, /BÁO CÁO DỮ LIỆU AI NGÀY/i);
-assert.match(index, /Báo cáo dữ liệu AI[\s\S]*cho ngày hôm nay/i);
+assert.match(index, /Báo cáo dữ liệu AI[\s\S]*ngày hôm nay/i);
 assert.match(index, /30\.000đ/);
 assert.match(index, /Thanh toán một lần · Không tự gia hạn/i);
-assert.match(index, /7 phương pháp trong báo cáo hôm nay/i);
+assert.match(index, /7 phương pháp hôm nay/i);
+assert.match(index, /khỏi tự gom|Không cần tự gom/i);
+assert.match(index, /Nhận báo cáo đầy đủ/i);
 assert.match(index, /Nhắn Zalo để nhận báo cáo/i);
 assert.match(index, /Hiện thông tin chuyển khoản/i);
 assert.match(index, /id="bank-account">1128091987/);
@@ -48,9 +50,8 @@ const parseViDate = (value) => {
   return Date.UTC(year, month - 1, day);
 };
 assert.equal(parseViDate(reportDateMatch[1]) - parseViDate(reportDateMatch[2]), 86400000, "report date must be T+1 from locked data");
-assert.ok(index.indexOf('id="evidence"') < index.indexOf('id="methods"'));
-assert.ok(index.indexOf('id="methods"') < index.indexOf('id="included"'));
-assert.ok(index.indexOf('id="included"') < index.indexOf('id="pricing"'));
+assert.ok(index.indexOf('id="methods"') < index.indexOf('id="buy"'));
+assert.doesNotMatch(index, /id="included"|id="about"|faq-section|steps-section|pricing-section/);
 
 // Future-pick, betting and unverifiable-performance copy must stay absent.
 const publicCopy = `${index}\n${sample}\n${legal}`;
@@ -63,8 +64,8 @@ assert.match(publicCopy, /không bán số/i);
 
 // Evidence and the public sample must remain inspectable.
 assert.match(index, /943[\s\S]*phiên lịch sử/);
-assert.match(index, /27\/27[\s\S]*bản ghi phiên gần nhất/);
-assert.match(index, /<span>[2-9]<\/span><strong>nguồn trùng khớp/);
+assert.match(index, /27\/27[\s\S]*bản ghi/);
+assert.match(index, /<strong>[2-9]<\/strong> nguồn khớp/);
 assert.match(index, /95cc3b29870936ff/);
 assert.match(sample, /DẤU VẾT NGUỒN/);
 assert.match(sample, /PHẠM VI BÁO CÁO/);
@@ -94,7 +95,7 @@ assert.match(app, /zalo_after_bank_transfer/);
 assert.match(app, /Báo cáo dữ liệu AI ngày hôm nay/);
 assert.doesNotMatch(app, /BACKEND_ENDPOINT|ORDER_CONFIRMATION_ENDPOINT|payment_submitted|track\("purchase"|startPolling|checkStatus/);
 assert.match(styles, /\.hero-offer/);
-assert.match(styles, /\.single-offer/);
+assert.match(styles, /\.buy-simple-card/);
 assert.match(styles, /\.checkout-actions/);
 
 // Deployment and the 19:00 completed-draw updater stay reproducible.
@@ -104,7 +105,7 @@ assert.match(workflow, /cp site-v2\/og\.png/);
 assert.match(completedWorkflow, /cron: "0 12 \* \* \*"/);
 assert.match(completedWorkflow, /update_completed_draw_report\.py/);
 assert.match(completedScript, /POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL/);
-assert.match(completedScript, /7 phương pháp trong báo cáo hôm nay/);
+assert.match(completedScript, /7 phương pháp hôm nay/);
 assert.doesNotMatch(completedScript, /plan_next_day|actual_order|pnl_vnd/i);
 
 console.log("Simple daily AI data report site smoke checks passed.");

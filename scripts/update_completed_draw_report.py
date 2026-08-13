@@ -130,25 +130,10 @@ def build_report_block(
     return "\n".join(
         [
             START_MARKER,
-            '    <section class="evidence-section" id="evidence" aria-labelledby="evidence-title">',
-            '      <div class="wrap">',
-            f'        <header class="section-heading"><div><p class="eyebrow">BẰNG CHỨNG CÓ THỂ KIỂM TRA</p><h2 id="evidence-title">Dữ liệu được khóa đến {formatted}</h2></div><p>Không dùng dữ liệu của kỳ chưa công bố.</p></header>',
-            '        <div class="evidence-grid">',
-            f'          <article><span>{history_count}</span><strong>phiên lịch sử</strong><small>Từ {history_start} đến {formatted}</small></article>',
-            '          <article><span>27/27</span><strong>bản ghi phiên gần nhất</strong><small>Không thiếu vị trí kết quả</small></article>',
-            f'          <article><span>{source_count}</span><strong>nguồn trùng khớp</strong><small>Cùng mã kiểm tra dữ liệu</small></article>',
-            '          <article><span>0</span><strong>dòng dữ liệu tương lai</strong><small>Kiểm tra chống nhìn trước</small></article>',
-            '        </div>',
-            '      </div>',
-            '    </section>',
-            "",
-            '    <section class="product-section" id="methods">',
+            '    <section class="product-section simple-product" id="methods">',
             '      <div class="wrap product-shell">',
-            '        <header class="product-head">',
-            f'          <div><p class="eyebrow">DỮ LIỆU ĐẾN · {formatted}</p><h2>7 phương pháp trong báo cáo hôm nay</h2></div>',
-            '          <a href="/mau-bao-cao.html">Xem cách lập báo cáo →</a>',
-            '        </header>',
-            "",
+            f'        <header class="product-head"><div><p class="eyebrow">DỮ LIỆU ĐẾN · {formatted}</p><h2>7 phương pháp hôm nay</h2></div><a href="/mau-bao-cao.html">Xem báo cáo mẫu →</a></header>',
+            f'        <div class="status-strip" aria-label="Tình trạng dữ liệu"><span title="Từ {history_start} đến {formatted}"><strong>{history_count}</strong> phiên lịch sử</span><span><strong>27/27</strong> bản ghi</span><span><strong>{source_count}</strong> nguồn khớp</span><span><strong>0</strong> dữ liệu tương lai</span></div>',
             f'        <div class="method-list audit-methods" role="table" aria-label="Bảy phương pháp phân tích dữ liệu ngày {formatted}">',
             f'          <article role="row"><div><span>01</span><strong>Đối chiếu nguồn</strong></div><p><b class="metric-chip">{source_count} nguồn khớp</b><small>Chỉ dùng phiên đã được xác nhận đồng nhất.</small></p></article>',
             '          <article role="row"><div><span>02</span><strong>Kiểm tra cấu trúc</strong></div><p><b class="metric-chip">27/27 bản ghi</b><small>Loại phiên thiếu dữ liệu trước khi phân tích.</small></p></article>',
@@ -158,8 +143,7 @@ def build_report_block(
             f'          <article role="row"><div><span>06</span><strong>Cửa sổ 30 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[30][0])} giá trị</b><small>Tạo nền đối chiếu ngắn hạn.</small></p></article>',
             f'          <article role="row"><div><span>07</span><strong>Cửa sổ 90 phiên</strong></div><p><b class="metric-chip">TB {vi_decimal(window_values[90][0])} giá trị</b><small>Đặt dữ liệu gần trong bối cảnh rộng hơn.</small></p></article>',
             '        </div>',
-            "",
-            f'        <div class="audit-signature"><div><small>MÃ KIỂM TRA PHIÊN</small><strong>{digest}</strong></div><p><strong>Nguồn đối chiếu:</strong> {source_names}. Mã rút gọn từ SHA-256 của 27 bản ghi đã khóa. <a href="/source-access.json" target="_blank" rel="noopener">Mở hồ sơ nguồn →</a></p></div>',
+            f'        <p class="source-line"><strong>Mã kiểm tra:</strong> {digest} · {source_names} · <a href="/source-access.json" target="_blank" rel="noopener">Hồ sơ nguồn</a></p>',
             '      </div>',
             '    </section>',
             END_MARKER,
@@ -192,18 +176,18 @@ def update_daily_index(content: str, target: date) -> str:
     lock_formatted = vi_date(target)
     replacements = (
         (
-            r'(<body data-report-date=")[^"]+(" data-lock-date=")[^"]+("\s*>)',
+            r'(<body[^>]*\bdata-report-date=")[^"]+(" data-lock-date=")[^"]+("\s*>)',
             rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
             "ngày báo cáo trong body",
         ),
         (
-            r'(BÁO CÁO DỮ LIỆU AI NGÀY )\d{2}/\d{2}/\d{4}',
+            r'(BÁO CÁO NGÀY )\d{2}/\d{2}/\d{4}',
             rf'\g<1>{report_formatted}',
             "tiêu đề ngày báo cáo",
         ),
         (
-            r'(<p class="hero-proof-text">)Báo cáo ngày \d{2}/\d{2}/\d{4} chỉ dùng dữ liệu đến \d{2}/\d{2}/\d{4}\.',
-            rf'\g<1>Báo cáo ngày {report_formatted} chỉ dùng dữ liệu đến {lock_formatted}.',
+            r'(<p class="hero-proof-text">Chỉ dùng dữ liệu đến )\d{2}/\d{2}/\d{4}( · Không dùng dữ liệu chưa công bố\.</p>)',
+            rf'\g<1>{lock_formatted}\g<2>',
             "phạm vi dữ liệu hero",
         ),
         (
@@ -382,7 +366,7 @@ def main() -> None:
         ]
         sample_sources = [{"source": "a"}, {"source": "b"}]
         block = build_report_block(sample_target, sample_codes, sample_rows[-12:], sample_rows, sample_sources)
-        assert "7 phương pháp trong báo cáo hôm nay" in block
+        assert "7 phương pháp hôm nay" in block
         assert block.count('role="row"') == 7
         assert "2 nguồn khớp" in block
         assert "27/27 bản ghi" in block

@@ -1,15 +1,32 @@
 (() => {
   "use strict";
 
+  const REPORT_DATE = document.body.dataset.reportDate || "13/08/2026";
+  const DATA_LOCK_DATE = document.body.dataset.lockDate || "12/08/2026";
   const PLANS = Object.freeze({
-    day: { label: "Báo cáo 1 phiên đã công bố", price: 30000, priceText: "30.000đ" },
-    week: { label: "Bộ báo cáo 7 phiên đã công bố", price: 200000, priceText: "200.000đ" },
-    month: { label: "Bộ báo cáo 30 phiên đã công bố", price: 800000, priceText: "800.000đ" }
+    day: {
+      label: "Báo cáo dữ liệu AI ngày hôm nay",
+      price: 30000,
+      priceText: "30.000đ",
+      scope: `01 báo cáo ngày ${REPORT_DATE} · dữ liệu khóa đến ${DATA_LOCK_DATE}.`
+    },
+    week: {
+      label: "Bộ 07 báo cáo dữ liệu hằng ngày",
+      price: 200000,
+      priceText: "200.000đ",
+      scope: "07 báo cáo liên tiếp · mỗi báo cáo chỉ dùng dữ liệu đến ngày liền trước."
+    },
+    month: {
+      label: "Bộ 30 báo cáo dữ liệu hằng ngày",
+      price: 800000,
+      priceText: "800.000đ",
+      scope: "30 báo cáo liên tiếp · mỗi báo cáo có hồ sơ nguồn, phân tích và kết luận."
+    }
   });
 
   // Filled after the Google Apps Script approval service is deployed.
   const BACKEND_ENDPOINT = String(window.ORDER_CONFIRMATION_ENDPOINT || "").trim();
-  const ORDER_KEY = "lemienbac_order_v3";
+  const ORDER_KEY = "lemienbac_order_v4";
   const ATTRIBUTION_KEY = "lemienbac_attribution_v3";
   const CONSENT_KEY = "lemienbac_measurement_consent_v1";
   const ZALO_URL = "https://zalo.me/0398696879";
@@ -20,6 +37,7 @@
   const orderCodeNode = document.getElementById("order-code");
   const amountNode = document.getElementById("payment-amount");
   const memoNode = document.getElementById("payment-memo");
+  const checkoutScope = document.getElementById("checkout-scope");
   const selfConfirmButton = document.getElementById("payment-self-confirm");
   const pendingPanel = document.getElementById("payment-pending");
   const pendingTitle = document.getElementById("pending-title");
@@ -128,9 +146,10 @@
     });
     amountNode.textContent = PLANS[planKey].priceText;
     memoNode.textContent = order.code;
+    checkoutScope.textContent = PLANS[planKey].scope;
     if (trackSelection) {
       track("select_item", {
-        item_list_name: "Phạm vi báo cáo lịch sử",
+        item_list_name: "Gói báo cáo dữ liệu AI",
         items: [{ item_id: planKey, item_name: PLANS[planKey].label, price: PLANS[planKey].price, quantity: 1 }]
       });
     }
@@ -141,6 +160,7 @@
     orderCodeNode.textContent = order.code;
     amountNode.textContent = PLANS[activePlan].priceText;
     memoNode.textContent = order.code;
+    checkoutScope.textContent = PLANS[activePlan].scope;
 
     const locked = ["pending", "approved", "rejected"].includes(order.status);
     modalPlanButtons.forEach((button) => {
@@ -206,8 +226,8 @@
     deliveryView.hidden = false;
     selfConfirmButton.hidden = true;
     modalPlanButtons.forEach((button) => { button.disabled = true; });
-    deliveryTitle.textContent = escapeText(delivery.title || "Báo cáo dữ liệu AI đã được mở");
-    deliverySummary.textContent = escapeText(delivery.summary || "Giao dịch đã được chủ dịch vụ xác nhận.");
+    deliveryTitle.textContent = escapeText(delivery.title || "Báo cáo dữ liệu AI đã sẵn sàng");
+    deliverySummary.textContent = escapeText(delivery.summary);
 
     deliveryMetrics.replaceChildren();
     const metrics = Array.isArray(delivery.metrics) ? delivery.metrics.slice(0, 6) : [];
@@ -235,7 +255,11 @@
 
     const safeUrl = /^https:\/\//i.test(delivery.url || "") ? delivery.url : "";
     deliveryLink.hidden = !safeUrl;
-    if (safeUrl) deliveryLink.href = safeUrl;
+    if (safeUrl) {
+      deliveryLink.href = safeUrl;
+      deliveryLink.textContent = escapeText(delivery.linkLabel || "Mở báo cáo đầy đủ");
+      deliveryLink.removeAttribute("download");
+    }
 
     const purchaseKey = `lemienbac_purchase_${order.code}`;
     if (!localStorage.getItem(purchaseKey)) {

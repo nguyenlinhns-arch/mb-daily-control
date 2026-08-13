@@ -1,4 +1,4 @@
-name: Deploy historical data report site to GitHub Pages
+name: Deploy daily AI data report site to GitHub Pages
 
 on:
   push:

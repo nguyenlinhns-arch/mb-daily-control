@@ -186,14 +186,84 @@ def replace_marked_block(content: str, replacement: str) -> str:
     return updated
 
 
+def replace_required(content: str, pattern: str, replacement: str, label: str) -> str:
+    updated, count = re.subn(pattern, replacement, content, count=1, flags=re.DOTALL)
+    if count != 1:
+        raise RuntimeError(f"Không cập nhật được trường {label}: {pattern}")
+    return updated
+
+
+def update_daily_index(content: str, target: date) -> str:
+    """Move the public service to the report prepared from the locked draw."""
+    report_date = target + timedelta(days=1)
+    report_formatted = vi_date(report_date)
+    lock_formatted = vi_date(target)
+    replacements = (
+        (
+            r'(<body data-report-date=")[^"]+(" data-lock-date=")[^"]+("\s*>)',
+            rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
+            "ngày báo cáo trong body",
+        ),
+        (
+            r'(BÁO CÁO DỮ LIỆU AI NGÀY )\d{2}/\d{2}/\d{4}',
+            rf'\g<1>{report_formatted}',
+            "tiêu đề ngày báo cáo",
+        ),
+        (
+            r'(<p class="hero-proof-text">)Báo cáo ngày \d{2}/\d{2}/\d{4} chỉ dùng dữ liệu đến \d{2}/\d{2}/\d{4}\.',
+            rf'\g<1>Báo cáo ngày {report_formatted} chỉ dùng dữ liệu đến {lock_formatted}.',
+            "phạm vi dữ liệu hero",
+        ),
+        (
+            r'(<article><small>BÁO CÁO NGÀY HÔM NAY</small><strong>30\.000đ</strong><p><b>Ngày )\d{2}/\d{2}/\d{4}(\.</b> Một báo cáo đầy đủ, dùng dữ liệu đã khóa đến )\d{2}/\d{2}/\d{4}(\.</p>)',
+            rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
+            "gói báo cáo ngày",
+        ),
+        (
+            r'(<p class="checkout-scope" id="checkout-scope">01 báo cáo ngày )\d{2}/\d{2}/\d{4}( · dữ liệu khóa đến )\d{2}/\d{2}/\d{4}(\.</p>)',
+            rf'\g<1>{report_formatted}\g<2>{lock_formatted}\g<3>',
+            "phạm vi thanh toán",
+        ),
+    )
+    for pattern, replacement, label in replacements:
+        content = replace_required(content, pattern, replacement, label)
+    return content
+
+
+def summarize_window(history_rows: list[list[str]], size: int) -> tuple[float, float]:
+    selected = history_rows[-size:]
+    if len(selected) != size:
+        raise RuntimeError(f"Không đủ {size} phiên để lập cửa sổ báo cáo")
+    unique_counts: list[int] = []
+    repeated_counts: list[int] = []
+    for row in selected:
+        counts = Counter(row[1:])
+        unique_counts.append(len(counts))
+        repeated_counts.append(sum(1 for count in counts.values() if count > 1))
+    return sum(unique_counts) / size, sum(repeated_counts) / size
+
+
+def vi_decimal(value: float) -> str:
+    return f"{value:.2f}".replace(".", ",")
+
+
+def comparison_phrase(value: float, baseline: float, baseline_label: str) -> str:
+    difference = value - baseline
+    if abs(difference) < 0.005:
+        return f"tương đương {baseline_label}"
+    direction = "cao hơn" if difference > 0 else "thấp hơn"
+    return f"{direction} {baseline_label} là {vi_decimal(abs(difference))}"
+
+
 def update_sample(
     content: str,
     target: date,
     codes: list[str],
     sources: list[dict[str, Any]],
-    history_count: int,
+    history_rows: list[list[str]],
 ) -> str:
     formatted = vi_date(target)
+    report_formatted = vi_date(target + timedelta(days=1))
     counts = Counter(codes)
     source_count = len(sources)
     source_names = " · ".join(
@@ -203,23 +273,39 @@ def update_sample(
     unique_count = len(counts)
     repeated_count = sum(1 for value in counts.values() if value > 1)
     digest = hashlib.sha256("|".join(codes).encode()).hexdigest()[:16]
-    content = re.sub(r"Ngày mẫu: \d{2}/\d{2}/\d{4}", f"Ngày báo cáo: {formatted}", content)
-    content = re.sub(r"Khóa nguồn: \d{2}/\d{2}/\d{4}", f"Khóa nguồn: {formatted}", content)
-    content = re.sub(
-        r"(<td><strong>)\d{2}/\d{2}/\d{4}(</strong></td>)",
-        rf"\g<1>{formatted}\g<2>",
-        content,
-        count=1,
-    )
+    history_count = len(history_rows)
+    history_start = vi_date(date.fromisoformat(history_rows[0][0]))
+    window_values = {size: summarize_window(history_rows, size) for size in (7, 30, 90)}
+    unique_comparison_7 = comparison_phrase(unique_count, window_values[7][0], "trung bình 7 phiên")
+    unique_comparison_30 = comparison_phrase(unique_count, window_values[30][0], "trung bình 30 phiên")
+    repeat_comparison_30 = comparison_phrase(window_values[7][1], window_values[30][1], "nền 30 phiên")
+    repeat_comparison_90 = comparison_phrase(window_values[7][1], window_values[90][1], "nền 90 phiên")
     replacements = (
+        (r"(<span data-report-date>).*?(</span>)", rf"\g<1>Ngày báo cáo mẫu: {report_formatted}\g<2>"),
+        (r"(<span data-lock-date>).*?(</span>)", rf"\g<1>Khóa nguồn: {formatted}\g<2>"),
         (r"(<span data-history-count>).*?(</span>)", rf"\g<1>{history_count} phiên lịch sử\g<2>"),
         (r"(<span data-source-count>).*?(</span>)", rf"\g<1>{source_count} nguồn trùng khớp\g<2>"),
+        (r"(<td data-report-date-value>).*?(</td>)", rf"\g<1>{report_formatted}\g<2>"),
+        (r"(<td data-history-range>).*?(</td>)", rf"\g<1>Từ {history_start} đến hết {formatted}\g<2>"),
+        (r"(<strong data-history-count-value>).*?(</strong>)", rf"\g<1>{history_count} phiên\g<2>"),
+        (r"(<p class=\"sample-caption\" data-report-scope>).*?(</p>)", rf"\g<1>“Báo cáo ngày hôm nay” là báo cáo được lập trong ngày {report_formatted} từ dữ liệu đã tồn tại đến hết ngày {formatted}.\g<2>"),
         (r"(<span data-source-names>).*?(</span>)", rf"\g<1>{source_names}\g<2>"),
         (r"(<strong data-source-count-value>).*?(</strong>)", rf"\g<1>{source_count}\g<2>"),
+        (r"(<strong data-lock-date-value>).*?(</strong>)", rf"\g<1>{formatted}\g<2>"),
         (r"(<strong data-digest>).*?(</strong>)", rf"\g<1>{digest}\g<2>"),
+        (r"(<span class=\"status-pill status-neutral\" data-locked-session>).*?(</span>)", rf"\g<1>PHIÊN {formatted}\g<2>"),
         (r"(<span class=\"row-chip\" data-source-count-chip>).*?(</span>)", rf"\g<1>{source_count} nguồn\g<2>"),
         (r"(<span class=\"row-chip\" data-unique-count-chip>).*?(</span>)", rf"\g<1>{unique_count} mã\g<2>"),
         (r"(<span class=\"row-chip\" data-repeated-count-chip>).*?(</span>)", rf"\g<1>{repeated_count} mã\g<2>"),
+        (r"(<strong data-window-7-unique>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[7][0])}\g<2>"),
+        (r"(<strong data-window-7-repeat>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[7][1])}\g<2>"),
+        (r"(<strong data-window-30-unique>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[30][0])}\g<2>"),
+        (r"(<strong data-window-30-repeat>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[30][1])}\g<2>"),
+        (r"(<strong data-window-90-unique>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[90][0])}\g<2>"),
+        (r"(<strong data-window-90-repeat>).*?(</strong>)", rf"\g<1>{vi_decimal(window_values[90][1])}\g<2>"),
+        (r"(<h2 data-conclusion-date>).*?(</h2>)", rf"\g<1>Kết luận ngày {report_formatted}\g<2>"),
+        (r"(<p data-finding-verified>).*?(</p>)", rf"\g<1>Phiên {target.strftime('%d/%m')} có {unique_count} giá trị khác nhau và {repeated_count} giá trị lặp; đủ 27/27 bản ghi từ {source_count} nguồn trùng khớp.\g<2>"),
+        (r"(<p data-finding-observation>).*?(</p>)", rf"\g<1>Mức đa dạng của phiên gần nhất {unique_comparison_7} và {unique_comparison_30}. Mức lặp của cửa sổ 7 phiên {repeat_comparison_30} và {repeat_comparison_90}.\g<2>"),
     )
     for pattern, replacement in replacements:
         content, count = re.subn(pattern, replacement, content, count=1)
@@ -297,14 +383,26 @@ def main() -> None:
     args = parser.parse_args()
     if args.self_test:
         sample_codes = [f"{value:02d}" for value in range(27)]
-        sample_rows = [["2026-08-12", *sample_codes]]
+        sample_target = date(2026, 8, 12)
+        sample_rows = [
+            [(sample_target - timedelta(days=offset)).isoformat(), *sample_codes]
+            for offset in range(89, -1, -1)
+        ]
         sample_sources = [{"source": "a"}, {"source": "b"}]
-        block = build_report_block(date(2026, 8, 12), sample_codes, sample_rows, sample_rows, sample_sources)
+        block = build_report_block(sample_target, sample_codes, sample_rows[-12:], sample_rows, sample_sources)
         assert "7 lớp kiểm định của báo cáo gần nhất" in block
         assert block.count('role="row"') == 7
         assert "2 nguồn khớp" in block
         assert "27/27 bản ghi" in block
         assert "kỳ tiếp theo" not in block.lower()
+        daily_index = update_daily_index(INDEX_FILE.read_text(encoding="utf-8"), sample_target)
+        assert 'data-report-date="13/08/2026"' in daily_index
+        assert 'data-lock-date="12/08/2026"' in daily_index
+        sample_page = update_sample(
+            SAMPLE_FILE.read_text(encoding="utf-8"), sample_target, sample_codes, sample_sources, sample_rows
+        )
+        assert "Ngày báo cáo mẫu: 13/08/2026" in sample_page
+        assert "Kết luận ngày 13/08/2026" in sample_page
         print("COMPLETED_DRAW_REPORT_SELF_TEST_OK")
         return
 
@@ -313,13 +411,12 @@ def main() -> None:
     doc, codes, sources = lock_history_through(target)
     recent_rows = [row for row in doc["rows"] if date.fromisoformat(row[0]) <= target][-12:]
     index = INDEX_FILE.read_text(encoding="utf-8")
-    index_changed = write_text_if_changed(
-        INDEX_FILE,
-        replace_marked_block(index, build_report_block(target, codes, recent_rows, doc["rows"], sources)),
-    )
+    updated_index = replace_marked_block(index, build_report_block(target, codes, recent_rows, doc["rows"], sources))
+    updated_index = update_daily_index(updated_index, target)
+    index_changed = write_text_if_changed(INDEX_FILE, updated_index)
     sample_changed = write_text_if_changed(
         SAMPLE_FILE,
-        update_sample(SAMPLE_FILE.read_text(encoding="utf-8"), target, codes, sources, len(doc["rows"])),
+        update_sample(SAMPLE_FILE.read_text(encoding="utf-8"), target, codes, sources, doc["rows"]),
     )
     audit_changed = update_audit(target, codes, sources, now)
     access_changed = update_source_access(doc, target, codes, sources, now)

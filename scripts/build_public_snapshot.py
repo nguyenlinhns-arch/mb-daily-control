@@ -177,7 +177,11 @@ def parse_prizes(raw_html: str) -> list[str]:
             else:
                 block = plain[current_match.end() : current_match.end() + 160]
             numbers = re.findall(rf"(?<!\d)\d{{{width}}}(?!\d)", block)
-            if len(numbers) != count:
+            # Result pages often append navigation dates or loto summaries to
+            # the final prize block. The prize labels still bound every prior
+            # block, so require the expected values and ignore trailing page
+            # chrome instead of rejecting an otherwise complete 27-code draw.
+            if len(numbers) < count:
                 ok = False
                 break
             blocks.append((key, block, width, count))

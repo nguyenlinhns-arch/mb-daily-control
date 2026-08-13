@@ -4,13 +4,15 @@ import { resolve } from "node:path";
 
 const root = resolve(process.cwd(), "site-v2");
 const read = (name) => readFile(resolve(root, name), "utf8");
-const [index, app, legal, sample, config, workflow] = await Promise.all([
+const [index, app, legal, sample, config, workflow, completedWorkflow, completedScript] = await Promise.all([
   read("index.html"),
   read("app.js"),
   read("legal.html"),
   read("mau-bao-cao.html"),
   read("config.js"),
-  readFile(resolve(process.cwd(), ".github/workflows/pages.yml"), "utf8")
+  readFile(resolve(process.cwd(), ".github/workflows/pages.yml"), "utf8"),
+  readFile(resolve(process.cwd(), ".github/workflows/completed-draw-daily-1900.yml"), "utf8"),
+  readFile(resolve(process.cwd(), "scripts/update_completed_draw_report.py"), "utf8")
 ]);
 
 for (const file of ["styles.css", "app.js", "config.js", "mau-bao-cao.html", "legal.html", "robots.txt", "sitemap.xml", "404.html", "favicon.svg"]) {
@@ -58,5 +60,12 @@ assert.doesNotMatch(index + sample, /hôm nay đánh|chốt số|số đẹp|bao
 assert.doesNotMatch(workflow, /schedule:/);
 assert.match(workflow, /cp site-v2\/index\.html/);
 assert.doesNotMatch(workflow, /build_seo_pages|landing-v7|report-data/);
+assert.match(index, /COMPLETED_DRAW_REPORT:START/);
+assert.match(index, /Tham khảo 7 lớp báo cáo ngày \d{2}\/\d{2}\/\d{4}/);
+assert.match(index, /PHIÊN ĐÃ CÔNG BỐ/);
+assert.match(completedWorkflow, /cron: "0 12 \* \* \*"/);
+assert.match(completedWorkflow, /update_completed_draw_report\.py/);
+assert.match(completedScript, /POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL/);
+assert.doesNotMatch(completedScript, /plan_next_day|actual_order|pnl_vnd/i);
 
 console.log("AI data report site smoke checks passed.");

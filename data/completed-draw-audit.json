@@ -1,0 +1,21 @@
+{
+  "draws": {
+    "2026-08-12": {
+      "code_count": 27,
+      "codes_sha256": "95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d",
+      "repeated_code_count": 4,
+      "source_count": 3,
+      "sources": [
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 22
+    }
+  },
+  "latest_completed_draw": "2026-08-12",
+  "policy": "POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL",
+  "schema_version": "MB_COMPLETED_DRAW_AUDIT_V1",
+  "updated_at": "2026-08-13T16:30:21+07:00"
+}

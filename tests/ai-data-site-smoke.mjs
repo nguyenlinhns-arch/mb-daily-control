@@ -232,7 +232,7 @@ assert.match(completedWorkflow, /cron: "0 12 \* \* \*"/);
 assert.match(completedWorkflow, /for attempt in \{1\.\.6\}/);
 assert.match(completedWorkflow, /sleep 300/);
 assert.match(completedWorkflow, /update_completed_draw_report\.py[\s\S]*--stage-only/);
-assert.match(midnightWorkflow, /cron: "0 17 \* \* \*"/);
+assert.match(midnightWorkflow, /cron: "5 17 \* \* \*"/);
 assert.match(midnightWorkflow, /date -d 'yesterday'/);
 assert.match(midnightWorkflow, /update_completed_draw_report\.py --draw-date "\$LOCK_DATE"/);
 assert.match(completedScript, /POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL/);

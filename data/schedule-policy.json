@@ -1,23 +1,27 @@
 {
-  "schema_version": "MB_SCHEDULE_POLICY_V2",
-  "status": "ACTIVE_POST_DRAW_ONLY",
-  "policy_id": "MB_COMPLETED_DRAW_1900_V1_20260813",
+  "schema_version": "MB_SCHEDULE_POLICY_V5_DAILY_0005",
+  "status": "ACTIVE_DAILY_0005",
   "timezone": "Asia/Ho_Chi_Minh",
-  "times_vn": ["19:00"],
-  "cron_utc": ["0 12 * * *"],
-  "workflow": ".github/workflows/completed-draw-daily-1900.yml",
-  "actions_each_run": [
-    "cross-check the already-published draw against at least two public sources",
-    "append the locked 27-code result to repository history",
-    "write a non-financial completed-draw audit record",
-    "refresh the dated retrospective seven-layer website block",
-    "run tests and publish only after all checks pass"
+  "times_vn": [
+    "00:05",
+    "19:00"
   ],
-  "forbidden_actions": [
-    "calculate or publish future lottery selections",
-    "create betting recommendations or stakes",
-    "record or automate financial gambling profit/loss"
+  "cron_utc": [
+    "5 17 * * *",
+    "0 12 * * *"
   ],
+  "primary_workflow": ".github/workflows/daily-report-midnight.yml",
+  "completed_draw_workflow": ".github/workflows/completed-draw-daily-1900.yml",
+  "sequence_0005": [
+    "cross-check and lock the completed draw T-1 from at least two exact public sources",
+    "write the same 27-code row to both canonical source-history tabs",
+    "settle the previous private 4SO report idempotently in the Linh P/L ledger",
+    "score all 45 reverse pairs with MB_4SO_TOP2_2SO_T1_V1 for target T",
+    "record the private TOP1/TOP2 run and update Paid_Report",
+    "publish the correctly dated public website only after private readback passes"
+  ],
+  "public_boundary": "TOP1_TOP2_CODES_NEVER_COMMITTED_TO_PUBLIC_REPOSITORY",
   "fail_closed": true,
-  "updated_at": "2026-08-13T16:25:00+07:00"
+  "failure_mode": "KEEP_LAST_VERIFIED_PUBLIC_STATE",
+  "updated_at": "2026-08-14T00:05:00+07:00"
 }

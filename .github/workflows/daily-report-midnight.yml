@@ -1,9 +1,15 @@
-name: Publish the correctly dated daily report at midnight Vietnam
+name: Daily 00:05 source, P&L, MB 4SO and website sync
 
 on:
   schedule:
-    # GitHub cron uses UTC. 17:00 UTC = 00:00 on the next calendar day in Vietnam.
-    - cron: "0 17 * * *"
+    # GitHub cron uses UTC. 17:05 UTC = 00:05 on the next calendar day in Vietnam.
+    - cron: "5 17 * * *"
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/daily-report-midnight.yml"
+      - "scripts/mb4so_daily.py"
+      - "tests/test_mb4so_daily.py"
   workflow_dispatch:
     inputs:
       lock_date:
@@ -46,7 +52,7 @@ jobs:
       - name: Install locked parser dependency
         run: python -m pip install --disable-pip-version-check openpyxl==3.1.5
 
-      - name: Resolve yesterday in Vietnam
+      - name: Resolve T-1 and T in Vietnam
         env:
           MANUAL_DATE: ${{ github.event.inputs.lock_date || '' }}
         run: |
@@ -57,9 +63,11 @@ jobs:
           else
             target="$(date -d 'yesterday' +%F)"
           fi
+          report="$(date -d "$target +1 day" +%F)"
           echo "LOCK_DATE=$target" >> "$GITHUB_ENV"
+          echo "REPORT_DATE=$report" >> "$GITHUB_ENV"
 
-      - name: Publish only the report for the new real calendar day
+      - name: Cross-check and lock the latest completed draw
         run: |
           set -euo pipefail
           for attempt in {1..6}; do
@@ -74,9 +82,24 @@ jobs:
             sleep 300
           done
 
+      - name: Install authenticated Google Sheets runtime
+        run: python -m pip install --disable-pip-version-check google-auth==2.56.0 google-api-python-client==2.198.0
+
+      - name: Settle T-1, run canonical MB 4SO, and update private paid report
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          test -n "$GOOGLE_SERVICE_ACCOUNT_JSON" || { echo "Missing GOOGLE_SERVICE_ACCOUNT_JSON"; exit 2; }
+          python scripts/mb4so_daily.py sync-google \
+            --lock-date "$LOCK_DATE" \
+            --target-date "$REPORT_DATE"
+
       - name: Validate date integrity and public boundary
         run: |
           python scripts/update_completed_draw_report.py --self-test
+          python scripts/mb4so_daily.py self-test
+          python -m unittest tests/test_mb4so_daily.py -v
           npm test
           git diff --check
 
@@ -91,6 +114,6 @@ jobs:
             echo "The correctly dated report is already published."
             exit 0
           fi
-          git commit -m "auto: publish report using locked data $LOCK_DATE"
+          git commit -m "auto: publish 00:05 report using locked data $LOCK_DATE"
           git pull --rebase origin main
           git push origin HEAD:main

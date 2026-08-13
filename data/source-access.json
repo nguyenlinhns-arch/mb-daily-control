@@ -1,28 +1,33 @@
 {
-  "history_end": "2026-08-12",
-  "history_rows": 943,
+  "history_end": "2026-08-13",
+  "history_rows": 944,
   "history_start": "2024-01-01",
-  "latest_codes_sha256": "95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d",
-  "locked_at": "2026-08-13T17:06:48+07:00",
+  "latest_codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+  "locked_at": "2026-08-14T00:14:44+07:00",
   "policy": "COMPLETED_DRAW_ONLY_FAIL_CLOSED_MINIMUM_TWO_EXACT_SOURCES",
   "schema_version": "MB_SOURCE_ACCESS_V3_POST_DRAW_ONLY",
   "selected": "PUBLIC_MULTI_SOURCE_CROSSCHECK",
-  "source_count": 3,
+  "source_count": 4,
   "sources": [
     {
-      "codes_sha256": "95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d",
+      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "name": "kqxs",
+      "url": "https://kqxs.vn/mien-bac/xsmb-13-08-2026"
+    },
+    {
+      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
       "name": "minhngoc",
-      "url": "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/12-08-2026.html"
+      "url": "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/13-08-2026.html"
     },
     {
-      "codes_sha256": "95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d",
+      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
       "name": "xosodaiphat",
-      "url": "https://xosodaiphat.com/xsmb-12-08-2026.html"
+      "url": "https://xosodaiphat.com/xsmb-13-08-2026.html"
     },
     {
-      "codes_sha256": "95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d",
+      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
       "name": "xosothienphu",
-      "url": "https://xosothienphu.vn/xsmb-12-08-2026.html"
+      "url": "https://xosothienphu.vn/xsmb-13-08-2026.html"
     }
   ],
   "status": "LOCKED_CROSSCHECKED_PUBLIC"

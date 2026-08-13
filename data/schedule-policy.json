@@ -7,18 +7,23 @@
     "19:00"
   ],
   "cron_utc": [
-    "5 17 * * *",
     "0 12 * * *"
   ],
   "primary_workflow": ".github/workflows/daily-report-midnight.yml",
+  "windows_task": "\\ThayLinh\\MB4SO-Daily-0005",
+  "private_runtime": "Windows Task Scheduler -> Apps Script action=daily005 -> GitHub workflow_dispatch",
   "completed_draw_workflow": ".github/workflows/completed-draw-daily-1900.yml",
-  "sequence_0005": [
+  "sequence_0005_private": [
     "cross-check and lock the completed draw T-1 from at least two exact public sources",
     "write the same 27-code row to both canonical source-history tabs",
     "settle the previous private 4SO report idempotently in the Linh P/L ledger",
     "score all 45 reverse pairs with MB_4SO_TOP2_2SO_T1_V1 for target T",
-    "record the private TOP1/TOP2 run and update Paid_Report",
-    "publish the correctly dated public website only after private readback passes"
+    "record the private TOP1/TOP2 run and update Paid_Report"
+  ],
+  "sequence_0005_public": [
+    "cross-check and lock the completed draw T-1 from at least two exact public sources",
+    "refresh the correctly dated public website without paid TOP1/TOP2 values",
+    "run public-boundary tests and deploy with GitHub Pages"
   ],
   "public_boundary": "TOP1_TOP2_CODES_NEVER_COMMITTED_TO_PUBLIC_REPOSITORY",
   "fail_closed": true,

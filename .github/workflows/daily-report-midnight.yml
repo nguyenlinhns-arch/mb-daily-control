@@ -1,9 +1,6 @@
-name: Daily 00:05 source, P&L, MB 4SO and website sync
+name: Publish website after private 00:05 pipeline
 
 on:
-  schedule:
-    # GitHub cron uses UTC. 17:05 UTC = 00:05 on the next calendar day in Vietnam.
-    - cron: "5 17 * * *"
   push:
     branches: ["main"]
     paths:
@@ -81,19 +78,6 @@ jobs:
             echo "Nguồn chưa sẵn sàng; thử lại sau 5 phút ($attempt/6)."
             sleep 300
           done
-
-      - name: Install authenticated Google Sheets runtime
-        run: python -m pip install --disable-pip-version-check google-auth==2.56.0 google-api-python-client==2.198.0
-
-      - name: Settle T-1, run canonical MB 4SO, and update private paid report
-        env:
-          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-        run: |
-          set -euo pipefail
-          test -n "$GOOGLE_SERVICE_ACCOUNT_JSON" || { echo "Missing GOOGLE_SERVICE_ACCOUNT_JSON"; exit 2; }
-          python scripts/mb4so_daily.py sync-google \
-            --lock-date "$LOCK_DATE" \
-            --target-date "$REPORT_DATE"
 
       - name: Validate date integrity and public boundary
         run: |

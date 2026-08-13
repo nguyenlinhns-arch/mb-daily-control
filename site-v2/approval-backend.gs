@@ -72,6 +72,7 @@ function doGet(event) {
   const action = clean(data.action, 20);
   if (action === "status") return statusResponse(data);
   if (action === "approve" || action === "reject") return approvalResponse(data, action);
+  if (action === "daily005") return dailyMbWebRun_();
   return jsonOutput({ ok: true, service: SERVICE_NAME, version: SERVICE_VERSION });
 }
 
@@ -332,5 +333,484 @@ function jsonOutput(value) {
   return ContentService
     .createTextOutput(JSON.stringify(value))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/*
+ * Daily 00:05 private pipeline.
+ *
+ * This runs inside the owner's Apps Script account, so the paid TOP1/TOP2
+ * values never pass through GitHub or the public website repository.
+ */
+const DAILY_MB_TZ = "Asia/Ho_Chi_Minh";
+const DAILY_MB_SOURCE_SHEET_ID = "1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w";
+const DAILY_MB_HISTORY_TABS = Object.freeze(["MB_History_27", "MB_History_27_IMPORT"]);
+const DAILY_MB_CONFIG_TAB = "V32_Private_Config";
+const DAILY_MB_PNL_TAB = "Linh";
+const DAILY_MB_METHOD_ID = "MB_4SO_V1";
+const DAILY_MB_CONFIG_ID = "MB_4SO_PRIMARY_V1_20260731";
+const DAILY_MB_ALGORITHM_ID = "MB_4SO_TOP2_2SO_T1_V1";
+const DAILY_MB_POINTS_PER_CODE = 50;
+const DAILY_MB_COST_PER_POINT = 23000;
+const DAILY_MB_PAYOUT_PER_HIT_POINT = 80000;
+const DAILY_MB_MAX_ATTEMPTS = 6;
+
+function dailyMbWebRun_() {
+  const today = Utilities.formatDate(new Date(), DAILY_MB_TZ, "yyyy-MM-dd");
+  const properties = PropertiesService.getScriptProperties();
+  if (properties.getProperty("DAILY_MB_WEB_LAST_SUCCESS") === today) {
+    return textOutput(`DAILY_MB_005_ALREADY_DONE target=${today}`);
+  }
+  const minuteOfDay = Number(Utilities.formatDate(new Date(), DAILY_MB_TZ, "H")) * 60
+    + Number(Utilities.formatDate(new Date(), DAILY_MB_TZ, "m"));
+  if (minuteOfDay > 60) return textOutput("DAILY_MB_005_OUTSIDE_WINDOW");
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    if (properties.getProperty("DAILY_MB_WEB_LAST_SUCCESS") === today) {
+      return textOutput(`DAILY_MB_005_ALREADY_DONE target=${today}`);
+    }
+    const result = dailyMbPipeline_(dailyMbAddDays_(today, -1), today);
+    properties.setProperty("DAILY_MB_WEB_LAST_SUCCESS", today);
+    return textOutput(result);
+  } catch (error) {
+    const message = String(error && error.stack ? error.stack : error);
+    return textOutput(`DAILY_MB_005_ERROR ${message.slice(0, 1500)}`);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function dailyMbPipeline_(lockIso, targetIso) {
+  if (targetIso !== dailyMbAddDays_(lockIso, 1)) throw new Error("Target must be exactly T after DATA_LOCK");
+  const today = Utilities.formatDate(new Date(), DAILY_MB_TZ, "yyyy-MM-dd");
+  if (lockIso >= today) throw new Error("DATA_LOCK must be a completed day");
+
+  const latest = dailyMbCrosscheck_(lockIso);
+  const sourceBook = SpreadsheetApp.openById(DAILY_MB_SOURCE_SHEET_ID);
+  const history = dailyMbSyncHistory_(sourceBook, lockIso, latest.codes);
+  const ranked = dailyMbScorePairs_(history);
+  const ids = dailyMbPrivateIds_(sourceBook);
+  const pnlBook = SpreadsheetApp.openById(ids.pnlSheetId);
+  const paidBook = SpreadsheetApp.openById(ids.paidReportSheetId);
+
+  dailyMbSettlePaid_(pnlBook, paidBook, history, lockIso, targetIso);
+  dailyMbRecordRun_(sourceBook, targetIso, lockIso, ranked, history);
+  dailyMbUpdatePaid_(paidBook, targetIso, lockIso, ranked);
+  dailyMbVerifyNoDuplicates_(pnlBook, paidBook, sourceBook, lockIso, targetIso);
+  return `DAILY_MB_005_OK lock=${lockIso} target=${targetIso} sources=${latest.sources.length} pairs=45 paid_codes=PRIVATE`;
+}
+
+function dailyMbCrosscheck_(iso) {
+  const dmy = dailyMbDmyDash_(iso);
+  const sources = [
+    ["xosodaiphat", `https://xosodaiphat.com/xsmb-${dmy}.html`],
+    ["xosothienphu", `https://xosothienphu.vn/xsmb-${dmy}.html`],
+    ["xoso.com.vn", `https://xoso.com.vn/xsmb-${dmy}.html`],
+    ["minhngoc", `https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/${dmy}.html`],
+    ["kqxs", `https://kqxs.vn/mien-bac/xsmb-${dmy}`],
+    ["ketqua", `https://ketqua.net/xo-so-truyen-thong.php?ngay=${dmy}`]
+  ];
+  const groups = {};
+  const failures = [];
+  sources.forEach(([name, url]) => {
+    try {
+      const response = UrlFetchApp.fetch(url, {
+        muteHttpExceptions: true,
+        followRedirects: true,
+        headers: {
+          "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36",
+          "Accept-Language": "vi-VN,vi;q=0.9,en;q=0.7"
+        }
+      });
+      if (response.getResponseCode() !== 200) throw new Error(`HTTP ${response.getResponseCode()}`);
+      const codes = dailyMbParsePrizes_(response.getContentText());
+      const key = codes.join("|");
+      if (!groups[key]) groups[key] = { codes, sources: [] };
+      groups[key].sources.push({ source: name, url, codes_sha256: dailyMbSha256_(key) });
+    } catch (error) {
+      failures.push(`${name}:${String(error).slice(0, 160)}`);
+    }
+  });
+  const variants = Object.keys(groups).map((key) => groups[key]);
+  variants.sort((a, b) => b.sources.length - a.sources.length || b.codes.join("").localeCompare(a.codes.join("")));
+  if (!variants.length || variants[0].sources.length < 2) {
+    throw new Error(`DAILY_MB_SOURCE_NOT_READY ${iso}; variants=${variants.map((v) => v.sources.length).join(",")}; failures=${failures.join(";")}`);
+  }
+  return variants[0];
+}
+
+function dailyMbParsePrizes_(html) {
+  const plain = dailyMbStripHtml_(html);
+  const labels = {
+    DB: "(?:G\\s*\\.\\s*(?:ĐB|DB)|Giải\\s*(?:ĐB|DB|Đặc\\s*biệt)|Đặc\\s*biệt|ĐB)",
+    G1: "(?:G\\s*\\.\\s*1|Giải\\s*(?:nhất|1)(?![0-9]))",
+    G2: "(?:G\\s*\\.\\s*2|Giải\\s*(?:nhì|hai|2)(?![0-9]))",
+    G3: "(?:G\\s*\\.\\s*3|Giải\\s*(?:ba|3)(?![0-9]))",
+    G4: "(?:G\\s*\\.\\s*4|Giải\\s*(?:tư|bốn|4)(?![0-9]))",
+    G5: "(?:G\\s*\\.\\s*5|Giải\\s*(?:năm|5)(?![0-9]))",
+    G6: "(?:G\\s*\\.\\s*6|Giải\\s*(?:sáu|6)(?![0-9]))",
+    G7: "(?:G\\s*\\.\\s*7|Giải\\s*(?:bảy|7)(?![0-9]))"
+  };
+  const prizes = [["DB", 5, 1], ["G1", 5, 1], ["G2", 5, 2], ["G3", 5, 6], ["G4", 4, 4], ["G5", 4, 6], ["G6", 3, 3], ["G7", 2, 4]];
+  const dbMatches = dailyMbAllMatches_(plain, labels.DB, 0, plain.length);
+  for (let startIndex = 0; startIndex < dbMatches.length; startIndex += 1) {
+    let current = dbMatches[startIndex];
+    const output = [];
+    let ok = true;
+    for (let index = 0; index < prizes.length; index += 1) {
+      const [key, width, count] = prizes[index];
+      if (index > 0) {
+        current = dailyMbFirstMatch_(plain, labels[key], current.end, Math.min(plain.length, current.end + 800));
+        if (!current) { ok = false; break; }
+      }
+      let blockEnd = Math.min(plain.length, current.end + 800);
+      if (index + 1 < prizes.length) {
+        const nextKey = prizes[index + 1][0];
+        const next = dailyMbFirstMatch_(plain, labels[nextKey], current.end, blockEnd);
+        if (!next) { ok = false; break; }
+        blockEnd = next.start;
+      } else {
+        blockEnd = Math.min(plain.length, current.end + 160);
+      }
+      const block = plain.slice(current.end, blockEnd);
+      const values = dailyMbNumbers_(block, width).slice(0, count);
+      if (values.length !== count) { ok = false; break; }
+      values.forEach((number) => output.push(number.slice(-2)));
+    }
+    if (ok && output.length === 27) return output;
+  }
+  throw new Error("Không tách được đủ 27 giải DB→G7");
+}
+
+function dailyMbStripHtml_(raw) {
+  return String(raw || "")
+    .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, "\"")
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&#(\d+);/g, (_, value) => String.fromCharCode(Number(value)))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function dailyMbAllMatches_(text, pattern, start, end) {
+  const selected = text.slice(start, end);
+  const regex = new RegExp(pattern, "gi");
+  const result = [];
+  let match;
+  while ((match = regex.exec(selected)) !== null) {
+    result.push({ start: start + match.index, end: start + regex.lastIndex });
+    if (match[0].length === 0) regex.lastIndex += 1;
+  }
+  return result;
+}
+
+function dailyMbFirstMatch_(text, pattern, start, end) {
+  const values = dailyMbAllMatches_(text, pattern, start, end);
+  return values.length ? values[0] : null;
+}
+
+function dailyMbNumbers_(text, width) {
+  const regex = new RegExp(`(^|[^0-9])([0-9]{${width}})(?![0-9])`, "g");
+  const values = [];
+  let match;
+  while ((match = regex.exec(text)) !== null) values.push(match[2]);
+  return values;
+}
+
+function dailyMbSyncHistory_(book, lockIso, lockCodes) {
+  const sheets = DAILY_MB_HISTORY_TABS.map((name) => {
+    const sheet = book.getSheetByName(name);
+    if (!sheet) throw new Error(`Missing canonical history tab ${name}`);
+    return sheet;
+  });
+  let history = dailyMbReadHistory_(sheets[0]);
+  let mirror = dailyMbReadHistory_(sheets[1]);
+  if (JSON.stringify(history) !== JSON.stringify(mirror)) throw new Error("Canonical history tabs differ");
+  if (!history.length) throw new Error("Canonical history is empty");
+  let latest = history[history.length - 1][0];
+  if (latest > lockIso) throw new Error(`Canonical history is ahead of DATA_LOCK: ${latest}`);
+  while (latest < lockIso) {
+    const next = dailyMbAddDays_(latest, 1);
+    const codes = next === lockIso ? lockCodes : dailyMbCrosscheck_(next).codes;
+    const row = [next].concat(codes);
+    sheets.forEach((sheet) => sheet.appendRow(row));
+    history.push(row);
+    latest = next;
+  }
+  const existing = history.filter((row) => row[0] === lockIso);
+  if (existing.length !== 1 || existing[0].slice(1).join("|") !== lockCodes.join("|")) {
+    throw new Error("Canonical source conflicts with public cross-check");
+  }
+  history = dailyMbReadHistory_(sheets[0]);
+  mirror = dailyMbReadHistory_(sheets[1]);
+  if (JSON.stringify(history) !== JSON.stringify(mirror) || history[history.length - 1][0] !== lockIso) {
+    throw new Error("Canonical history readback failed");
+  }
+  return history;
+}
+
+function dailyMbReadHistory_(sheet) {
+  const values = sheet.getDataRange().getDisplayValues();
+  const rows = [];
+  values.forEach((raw, index) => {
+    if (!raw[0] || index === 0 && String(raw[0]).toLowerCase() === "date") return;
+    const iso = dailyMbParseDate_(raw[0]);
+    const codes = raw.slice(1, 28).map((value) => String(value).trim().padStart(2, "0"));
+    if (!iso || codes.length !== 27 || codes.some((code) => !/^\d{2}$/.test(code))) {
+      throw new Error(`Invalid history row ${index + 1}`);
+    }
+    rows.push([iso].concat(codes));
+  });
+  rows.sort((a, b) => a[0].localeCompare(b[0]));
+  for (let index = 1; index < rows.length; index += 1) {
+    if (rows[index][0] <= rows[index - 1][0]) throw new Error(`Duplicate or unordered history ${rows[index][0]}`);
+  }
+  if (rows.length < 365) throw new Error("MB 4SO requires at least 365 locked draws");
+  return rows;
+}
+
+function dailyMbPrivateIds_(sourceBook) {
+  const sheet = sourceBook.getSheetByName(DAILY_MB_CONFIG_TAB);
+  if (!sheet) throw new Error("Private config tab is missing");
+  const values = sheet.getRange(1, 1, Math.min(20, sheet.getLastRow()), 3).getDisplayValues();
+  const config = {};
+  values.slice(1).forEach((row) => {
+    const key = String(row[0] || "").trim();
+    if (!key) return;
+    if (Object.prototype.hasOwnProperty.call(config, key)) throw new Error(`Duplicate private config key ${key}`);
+    config[key] = String(row[1] || "").trim();
+  });
+  if (config.CONFIG_VERSION !== "MB_V32_PRIVATE_CONFIG_V1") throw new Error("Private config version mismatch");
+  if (!/^[A-Za-z0-9_-]{20,200}$/.test(config.PNL_SHEET_ID || "")) throw new Error("Invalid P/L sheet ID");
+  if (!/^[A-Za-z0-9_-]{20,200}$/.test(config.PAID_REPORT_SHEET_ID || "")) throw new Error("Invalid paid report sheet ID");
+  return { pnlSheetId: config.PNL_SHEET_ID, paidReportSheetId: config.PAID_REPORT_SHEET_ID };
+}
+
+function dailyMbRankPct_(values) {
+  const total = values.length;
+  return values.map((value) => {
+    const lower = values.filter((item) => item < value).length;
+    const equal = values.filter((item) => item === value).length;
+    return (lower + (equal + 1) / 2) / total;
+  });
+}
+
+function dailyMbScorePairs_(history) {
+  const metrics = [];
+  for (let left = 0; left < 10; left += 1) {
+    for (let right = left + 1; right < 10; right += 1) {
+      const a = String(left) + String(right);
+      const b = String(right) + String(left);
+      const flags = history.map((row) => row.slice(1).indexOf(a) >= 0 || row.slice(1).indexOf(b) >= 0 ? 1 : 0);
+      const hitRate = (window) => {
+        const sample = flags.slice(-window);
+        return sample.reduce((sum, value) => sum + value, 0) / sample.length;
+      };
+      const occurrences = (window) => {
+        const sample = window ? history.slice(-window) : history;
+        return sample.reduce((sum, row) => sum + row.slice(1).filter((code) => code === a || code === b).length, 0);
+      };
+      let gap = flags.length;
+      for (let offset = 0; offset < flags.length; offset += 1) {
+        if (flags[flags.length - 1 - offset]) { gap = offset; break; }
+      }
+      metrics.push({ pair: `${a}-${b}`, left: a, right: b, hit_rate_60: hitRate(60), hit_rate_21: hitRate(21), occurrence_21: occurrences(21), occurrence_all: occurrences(0), hit_rate_365: hitRate(365), gap });
+    }
+  }
+  const hitRanks = dailyMbRankPct_(metrics.map((item) => item.hit_rate_60));
+  const gapRanks = dailyMbRankPct_(metrics.map((item) => Math.log1p(item.gap)));
+  metrics.forEach((item, index) => {
+    item.score = hitRanks[index] + 0.25 * gapRanks[index]
+      + 1e-6 * item.hit_rate_60 + 1e-7 * item.hit_rate_21
+      + 1e-8 * item.occurrence_21 + 1e-9 * item.occurrence_all
+      + 1e-10 * item.hit_rate_365;
+  });
+  metrics.sort((a, b) => b.score - a.score);
+  if (metrics.length !== 45 || new Set(metrics.map((item) => item.pair)).size !== 45) throw new Error("MB 4SO did not score 45 unique pairs");
+  if (Math.abs(metrics[1].score - metrics[2].score) <= 1e-12) throw new Error("TIE_REVIEW rank 2 and 3");
+  const selected = [metrics[0].left, metrics[0].right, metrics[1].left, metrics[1].right];
+  if (new Set(selected).size !== 4) throw new Error("TOP1/TOP2 must contain four distinct codes");
+  return metrics;
+}
+
+function dailyMbSettlePaid_(pnlBook, paidBook, history, lockIso, targetIso) {
+  const pnlSheet = pnlBook.getSheetByName(DAILY_MB_PNL_TAB);
+  const paidSheet = paidBook.getSheetByName(PAID_REPORT_SHEET_NAME);
+  if (!pnlSheet || !paidSheet || paidSheet.getLastRow() < 2) throw new Error("P/L or Paid_Report tab is missing");
+  const paid = paidSheet.getRange(2, 1, 1, 7).getDisplayValues()[0];
+  const activeIso = dailyMbParseDate_(paid[0]);
+  if (!activeIso || activeIso > targetIso) throw new Error(`Invalid active Paid_Report date ${paid[0]}`);
+
+  const ledgerLast = Math.max(pnlSheet.getLastRow(), 5);
+  const ledger = ledgerLast >= 6 ? pnlSheet.getRange(6, 1, ledgerLast - 5, 11).getDisplayValues() : [];
+  const matches = ledger.map((row, index) => ({ row, number: index + 6 })).filter((item) => dailyMbParseDate_(item.row[0]) === activeIso && String(item.row[1]).trim().toUpperCase() === "4SO");
+  if (matches.length > 1) throw new Error(`Duplicate 4SO P/L rows for ${activeIso}`);
+  if (activeIso === targetIso) {
+    const lockRows = ledger.filter((row) => dailyMbParseDate_(row[0]) === lockIso && String(row[1]).trim().toUpperCase() === "4SO");
+    if (lockRows.length !== 1) throw new Error("Paid report advanced but T-1 P/L is not unique");
+    return;
+  }
+  if (activeIso > lockIso) throw new Error("Paid_Report is neither settled nor current");
+  if (matches.length === 1) return;
+
+  const resultRow = history.find((row) => row[0] === activeIso);
+  if (!resultRow) throw new Error(`Missing locked result for paid report ${activeIso}`);
+  const codes = paid.slice(2, 6).map((value) => String(value).trim().padStart(2, "0"));
+  if (codes.length !== 4 || new Set(codes).size !== 4 || codes.some((code) => !/^\d{2}$/.test(code))) throw new Error("Invalid paid codes for settlement");
+  const counts = {};
+  resultRow.slice(1).forEach((code) => { counts[code] = (counts[code] || 0) + 1; });
+  const hitCodes = codes.filter((code) => Number(counts[code] || 0) > 0);
+  const totalHits = codes.reduce((sum, code) => sum + Number(counts[code] || 0), 0);
+  const points = codes.length * DAILY_MB_POINTS_PER_CODE;
+  const capital = points * DAILY_MB_COST_PER_POINT;
+  const payout = totalHits * DAILY_MB_POINTS_PER_CODE * DAILY_MB_PAYOUT_PER_HIT_POINT;
+  const pnl = payout - capital;
+  const previousCumulative = ledger.length ? dailyMbNumber_(ledger[ledger.length - 1][8]) : 0;
+  const rowNumber = ledgerLast + 1;
+  const detail = hitCodes.length ? hitCodes.map((code) => `${code} × ${counts[code]}`).join("; ") : "—";
+  const note = `Tự động quyết toán 4SO ngày ${dailyMbViDate_(activeIso)} lúc 00:05. Báo cáo đã khóa trước kết quả gồm ${codes.join(", ")}, mỗi số ${DAILY_MB_POINTS_PER_CODE} điểm; kết quả nguồn đủ 27/27; tổng ${totalHits} nháy; vốn ${capital}đ; trả thưởng ${payout}đ; P/L ${pnl}đ. SOURCE_METHOD=4SO; AUTO_SETTLED_00_05; outcome_known_at_selection=false.`;
+  pnlSheet.getRange(rowNumber, 1, 1, 11).setValues([[
+    dailyMbViDate_(activeIso), "4SO", codes.join(", "), hitCodes.length ? hitCodes.join(", ") : "Không trúng", detail,
+    totalHits, points, pnl, previousCumulative + pnl, pnl > 0 ? "Thắng" : pnl < 0 ? "Thua" : "Hòa", note
+  ]]);
+  const readback = pnlSheet.getRange(rowNumber, 1, 1, 11).getDisplayValues()[0];
+  if (dailyMbParseDate_(readback[0]) !== activeIso || String(readback[1]).trim().toUpperCase() !== "4SO") throw new Error("P/L settlement readback failed");
+}
+
+function dailyMbRecordRun_(book, targetIso, lockIso, ranked, history) {
+  const now = Utilities.formatDate(new Date(), DAILY_MB_TZ, "yyyy-MM-dd'T'HH:mm:ssXXX");
+  const runId = `MB_4SO_AUTO_${targetIso.replace(/-/g, "")}_0005`;
+  const scoreVector = `MB_4SO_TOP45_${targetIso.replace(/-/g, "")}`;
+  const top = ranked.slice(0, 4);
+  const artifact = dailyMbSha256_(JSON.stringify({ schema: "MB_4SO_DAILY_AUTO_V1", target: targetIso, lock: lockIso, history, top, config: DAILY_MB_CONFIG_ID, algorithm: DAILY_MB_ALGORITHM_ID }));
+
+  dailyMbAppendIfMissing_(book, "MB_FINAL_DECISION_CURRENT", 26,
+    (row) => dailyMbParseDate_(row[0]) === targetIso && String(row[5]) === DAILY_MB_ALGORITHM_ID,
+    (row) => String(row[11]) === top[0].pair && String(row[14]) === top[1].pair,
+    [targetIso, lockIso, now, runId, DAILY_MB_CONFIG_ID, DAILY_MB_ALGORITHM_ID, "MB_4SO_V1 > TOP2_REVERSE_PAIRS > AUTO_00_05", "LOCKED_27_27_HASH_MATCH", "PAID_REPORT_PRIVATE_FIXED50", "FALSE", "FALSE", top[0].pair, top[0].score, 100, top[1].pair, top[1].score, 100, top[2].pair, top[2].score, 0, top[3].pair, top[3].score, 0, 200, 4600000, "PAID_REPORT_READY: TOP1 + TOP2"]);
+
+  dailyMbAppendIfMissing_(book, "MB_Method_Outputs_Current", 14,
+    (row) => String(row[2]) === runId && String(row[3]) === DAILY_MB_METHOD_ID,
+    (row) => String(row[5]) === `${top[0].pair}|${top[1].pair}`,
+    [targetIso, lockIso, runId, DAILY_MB_METHOD_ID, "PRODUCTION_CANONICAL", `${top[0].pair}|${top[1].pair}`, scoreVector, "TOP2_REVERSE_PAIRS", "TRUE", 1, DAILY_MB_CONFIG_ID, artifact, "PUBLISHED_PASS_PRIVATE", "45/45 pairs; private paid delivery; automatic 00:05 run."]);
+
+  const candidateSheet = book.getSheetByName("MB_Top_Candidates_Current");
+  if (!candidateSheet) throw new Error("Missing MB_Top_Candidates_Current");
+  const candidateValues = candidateSheet.getDataRange().getDisplayValues().slice(1).filter((row) => String(row[2]) === runId);
+  if (candidateValues.length) {
+    if (candidateValues.length !== 4 || candidateValues.map((row) => String(row[5])).join("|") !== top.map((item) => item.pair).join("|")) throw new Error("Candidate ranking conflict");
+  } else {
+    const rows = top.map((item, index) => [targetIso, lockIso, runId, scoreVector, index + 1, item.pair, item.score, "", `RANK_${index + 1}`, "FALSE", index < 2 ? 100 : 0, "FALSE", index < 2 ? "TOP2_PAIR_PRIVATE" : "AUDIT_ONLY_NO_FUND", "Canonical automatic 00:05 ranking."]);
+    candidateSheet.getRange(candidateSheet.getLastRow() + 1, 1, rows.length, 14).setValues(rows);
+  }
+
+  dailyMbAppendIfMissing_(book, "MB_RUN_LOG", 22,
+    (row) => String(row[3]) === runId,
+    // A run can already have been recorded by the canonical Python worker. Its
+    // artifact serialization is intentionally implementation-specific, so
+    // idempotency is established from the shared run identity and immutable
+    // method/config fields. The selected pairs are checked independently in
+    // MB_FINAL_DECISION_CURRENT, MB_Method_Outputs_Current and Paid_Report.
+    (row) => dailyMbParseDate_(row[1]) === targetIso
+      && String(row[4]) === DAILY_MB_CONFIG_ID
+      && String(row[8]) === DAILY_MB_METHOD_ID
+      && Number(row[6]) === 27,
+    [now, targetIso, lockIso, runId, DAILY_MB_CONFIG_ID, `AUTO MB 4SO ${dailyMbViDate_(targetIso)} AT 00:05`, 27, "FALSE", DAILY_MB_METHOD_ID, DAILY_MB_METHOD_ID, "challengers_weight_0", 45, 45, "FALSE", "PAID_REPORT_READY_FIXED50", "PRIVATE_PAID_REPORT", 200, 4600000, "AUTO_00_05_PRIVATE", "PASS_27_27_TIE_NO_LOOKAHEAD_READBACK", artifact, "Paid codes remain outside the public repository."]);
+}
+
+function dailyMbAppendIfMissing_(book, tab, width, identity, verify, row) {
+  const sheet = book.getSheetByName(tab);
+  if (!sheet) throw new Error(`Missing private tab ${tab}`);
+  const values = sheet.getDataRange().getDisplayValues().slice(1).map((raw) => dailyMbPad_(raw, width));
+  const matches = values.filter(identity);
+  if (matches.length > 1) throw new Error(`${tab} duplicate automation identity`);
+  if (matches.length === 1) {
+    if (!verify(matches[0])) throw new Error(`${tab} conflicts with canonical output`);
+    return;
+  }
+  sheet.getRange(sheet.getLastRow() + 1, 1, 1, width).setValues([dailyMbPad_(row, width)]);
+}
+
+function dailyMbUpdatePaid_(paidBook, targetIso, lockIso, ranked) {
+  const sheet = paidBook.getSheetByName(PAID_REPORT_SHEET_NAME);
+  if (!sheet) throw new Error("Paid_Report is missing");
+  const top1 = ranked[0];
+  const top2 = ranked[1];
+  const expected = [dailyMbViDate_(targetIso), dailyMbViDate_(lockIso), top1.left, top1.right, top2.left, top2.right];
+  const current = dailyMbPad_(sheet.getRange(2, 1, 1, 7).getDisplayValues()[0], 7);
+  if (dailyMbParseDate_(current[0]) === targetIso) {
+    if (current.slice(0, 6).map(String).join("|") !== expected.join("|")) throw new Error("Paid_Report conflicts with canonical output");
+    return;
+  }
+  if (dailyMbParseDate_(current[0]) > targetIso) throw new Error("Paid_Report is ahead of target");
+  const stamp = Utilities.formatDate(new Date(), DAILY_MB_TZ, "dd/MM/yyyy HH:mm") + " Asia/Saigon";
+  sheet.getRange(2, 1, 1, 7).setNumberFormat("@").setValues([[].concat(expected, stamp)]);
+  const readback = sheet.getRange(2, 1, 1, 7).getDisplayValues()[0];
+  if (readback.slice(0, 6).map(String).join("|") !== expected.join("|")) throw new Error("Paid_Report readback failed");
+}
+
+function dailyMbVerifyNoDuplicates_(pnlBook, paidBook, sourceBook, lockIso, targetIso) {
+  DAILY_MB_HISTORY_TABS.forEach((tab) => {
+    const rows = dailyMbReadHistory_(sourceBook.getSheetByName(tab));
+    if (rows.filter((row) => row[0] === lockIso).length !== 1) throw new Error(`${tab} does not contain exactly one DATA_LOCK row`);
+  });
+  const pnlSheet = pnlBook.getSheetByName(DAILY_MB_PNL_TAB);
+  const pnlRows = pnlSheet.getLastRow() >= 6 ? pnlSheet.getRange(6, 1, pnlSheet.getLastRow() - 5, 11).getDisplayValues() : [];
+  if (pnlRows.filter((row) => dailyMbParseDate_(row[0]) === lockIso && String(row[1]).trim().toUpperCase() === "4SO").length !== 1) throw new Error("T-1 P/L row is not unique");
+  const paid = paidBook.getSheetByName(PAID_REPORT_SHEET_NAME).getRange(2, 1, 1, 7).getDisplayValues()[0];
+  if (dailyMbParseDate_(paid[0]) !== targetIso || dailyMbParseDate_(paid[1]) !== lockIso) throw new Error("Paid_Report dates failed final verification");
+  const runId = `MB_4SO_AUTO_${targetIso.replace(/-/g, "")}_0005`;
+  ["MB_RUN_LOG", "MB_Method_Outputs_Current"].forEach((tab) => {
+    const sheet = sourceBook.getSheetByName(tab);
+    const count = sheet.getDataRange().getDisplayValues().slice(1).filter((row) => String(row[tab === "MB_RUN_LOG" ? 3 : 2]) === runId).length;
+    if (count !== 1) throw new Error(`${tab} automation row is not unique`);
+  });
+}
+
+function dailyMbParseDate_(value) {
+  if (Object.prototype.toString.call(value) === "[object Date]" && !isNaN(value.getTime())) return Utilities.formatDate(value, DAILY_MB_TZ, "yyyy-MM-dd");
+  const text = String(value == null ? "" : value).trim().slice(0, 10);
+  let match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+  match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(text);
+  if (match) return `${match[3]}-${String(match[2]).padStart(2, "0")}-${String(match[1]).padStart(2, "0")}`;
+  return "";
+}
+
+function dailyMbAddDays_(iso, days) {
+  const date = new Date(`${iso}T12:00:00+07:00`);
+  return Utilities.formatDate(new Date(date.getTime() + Number(days) * 86400000), DAILY_MB_TZ, "yyyy-MM-dd");
+}
+
+function dailyMbViDate_(iso) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!match) throw new Error(`Invalid ISO date ${iso}`);
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
+function dailyMbDmyDash_(iso) {
+  return dailyMbViDate_(iso).replace(/\//g, "-");
+}
+
+function dailyMbPad_(row, width) {
+  const result = Array.prototype.slice.call(row || [], 0, width);
+  while (result.length < width) result.push("");
+  return result;
+}
+
+function dailyMbNumber_(value) {
+  const normalized = String(value == null ? "" : value).replace(/[^0-9-]/g, "");
+  return normalized ? Number(normalized) : 0;
+}
+
+function dailyMbSha256_(value) {
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(value), Utilities.Charset.UTF_8)
+    .map((byte) => (`0${((byte + 256) % 256).toString(16)}`).slice(-2)).join("");
 }
 

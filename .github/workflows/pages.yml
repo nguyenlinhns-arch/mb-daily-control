@@ -1,14 +1,9 @@
-name: Deploy static site to GitHub Pages
+name: Deploy 4SO AI data report site to GitHub Pages
 
 on:
   push:
     branches: ["main"]
   workflow_dispatch:
-  schedule:
-    # 00:01 Vietnam time: immediately fail closed at the date boundary.
-    - cron: "1 17 * * *"
-    # 01:15 Vietnam time: retry after the daily 00:05 data operation.
-    - cron: "15 18 * * *"
 
 permissions:
   contents: read
@@ -17,10 +12,10 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  test-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -29,44 +24,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test site
+        run: npm test
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Build static artifact
         run: |
           set -euo pipefail
-          python scripts/build_public_methods.py --self-test
-          npm test
           rm -rf _site
-          mkdir -p _site/control _site/ai-methods
-          cp index.html styles.css app.js _site/control/
-          cp 404.html favicon.svg robots.txt _site/
-          cp ai-methods/v7-overrides.css ai-methods/seo.css _site/ai-methods/
-          cp ai-methods/public-methods.json ai-methods/yesterday-proof.json _site/ai-methods/
-          cp ai-methods/og-4so-ai-v2.jpg _site/ai-methods/
-          cp ai-methods/legal-v3.html _site/legal.html
-          cp ai-methods/legal-v3.html _site/ai-methods/legal.html
-
-          python scripts/build_seo_pages.py --output-root _site
-
-          grep -n 'class="context-phrase">BẢNG PHÂN TÍCH</span>' _site/index.html | head
-          grep -n 'class="context-phrase">AI 4SO</span>' _site/index.html | head
-          grep -n '80%' _site/index.html | head
-          grep -n 'KẾT LUẬN CUỐI CÙNG' _site/index.html | head
-          grep -n 'MỞ KẾT LUẬN' _site/index.html | head
-          test -s _site/ai-methods/public-methods.json
-          grep -n 'MB_PUBLIC_METHOD_OUTPUTS_V2_TODAY_ONLY' _site/ai-methods/public-methods.json | head
-          grep -n 'v7-overrides.css' _site/index.html | head
-          grep -n 'Cho số Miền Bắc hôm nay' _site/cho-so-mien-bac-hom-nay/index.html | head
-          grep -n 'cssSelector":".paywall"' _site/cho-so-mien-bac-hom-nay/index.html | head
-          grep -n 'Phương pháp 4SO' _site/phuong-phap-4so/index.html | head
-          grep -n 'Lịch sử đối chiếu' _site/lich-su-doi-chieu/index.html | head
-          grep -n 'Thống kê Lô tô Miền Bắc' _site/thong-ke-lo-to-mien-bac-bang-ai/index.html | head
-          grep -n 'Người phụ trách nội dung' _site/gioi-thieu/index.html | head
-          grep -n 'https://lemienbac.com/cho-so-mien-bac-hom-nay/' _site/sitemap.xml | head
-          grep -n '# 4SO AI' _site/llms.txt | head
-          test ! -e _site/ai-methods/report-data.json
+          mkdir -p _site
+          cp site-v2/index.html _site/
+          cp site-v2/styles.css _site/
+          cp site-v2/app.js _site/
+          cp site-v2/config.js _site/
+          cp site-v2/mau-bao-cao.html _site/
+          cp site-v2/legal.html _site/
+          cp site-v2/404.html _site/
+          cp site-v2/robots.txt _site/
+          cp site-v2/sitemap.xml _site/
+          cp site-v2/favicon.svg _site/
           touch _site/.nojekyll
+          test ! -e _site/approval-backend.gs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

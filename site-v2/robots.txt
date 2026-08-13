@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lemienbac.com/sitemap.xml
+

@@ -19,7 +19,8 @@
 
   const checkout = document.getElementById("checkout");
   const checkoutClose = document.getElementById("checkout-close");
-  const orderCodeNodes = [...document.querySelectorAll("#order-code, #payment-memo")];
+  const orderCodeNode = document.getElementById("order-code");
+  const paymentMemoNode = document.getElementById("payment-memo");
   const selfConfirmButton = document.getElementById("payment-self-confirm");
   const pendingPanel = document.getElementById("payment-pending");
   const pendingTitle = document.getElementById("pending-title");
@@ -43,6 +44,20 @@
     return Array.from(bytes, (byte) => byte.toString(36).padStart(2, "0")).join("");
   }
 
+  function randomDigits(length = 6) {
+    let value = "";
+    while (value.length < length) {
+      const bytes = new Uint8Array(length);
+      crypto.getRandomValues(bytes);
+      for (const byte of bytes) {
+        // Discard the final six byte values to keep every decimal digit equally likely.
+        if (byte < 250) value += String(byte % 10);
+        if (value.length === length) break;
+      }
+    }
+    return value;
+  }
+
   function dateStamp() {
     const parts = new Intl.DateTimeFormat("en-CA", {
       timeZone: "Asia/Ho_Chi_Minh",
@@ -55,8 +70,13 @@
   }
 
   function newOrder() {
+    const day = dateStamp();
+    const suffix = randomDigits(6);
     return {
-      code: `AI-${dateStamp()}-${randomToken(4).slice(0, 6).toUpperCase()}`,
+      // The backend keeps its legacy identifier while the bank memo is numeric-only.
+      // Both contain the same YYMMDD date and six-digit random suffix for reconciliation.
+      code: `AI-${day}-${suffix}`,
+      paymentMemo: `${day}${suffix}`,
       customerToken: randomToken(20),
       reportDate: REPORT_DATE,
       status: "draft",
@@ -77,7 +97,15 @@
         && parsed.customerToken.length >= 20
         && parsed.reportDate === REPORT_DATE
       ) {
-        return { ...newOrder(), ...parsed };
+        if (parsed.status === "draft" && !/^\d{12}$/.test(String(parsed.paymentMemo || ""))) {
+          const refreshed = newOrder();
+          sessionStorage.setItem(ORDER_KEY, JSON.stringify(refreshed));
+          return refreshed;
+        }
+        return {
+          ...parsed,
+          paymentMemo: /^\d{12}$/.test(String(parsed.paymentMemo || "")) ? parsed.paymentMemo : parsed.code
+        };
       }
     } catch (_) {
       // Dữ liệu phiên lỗi sẽ được thay bằng một yêu cầu mới.
@@ -206,7 +234,8 @@
   }
 
   function updateCheckoutState() {
-    orderCodeNodes.forEach((node) => { node.textContent = order.code; });
+    orderCodeNode.textContent = order.paymentMemo;
+    paymentMemoNode.textContent = order.paymentMemo;
     document.querySelectorAll(".checkout-scope").forEach((node) => {
       node.textContent = `01 báo cáo ngày ${REPORT_DATE} · dữ liệu khóa đến ${DATA_LOCK_DATE}.`;
     });
@@ -406,7 +435,7 @@
     });
   });
   document.getElementById("copy-payment").addEventListener("click", (event) => {
-    copyText(`VPBank\n1128091987\nSố tiền: ${PRICE_TEXT}\nNội dung: ${order.code}`, event.currentTarget);
+    copyText(`VPBank\n1128091987\nSố tiền: ${PRICE_TEXT}\nNội dung: ${order.paymentMemo}`, event.currentTarget);
   });
 
   document.querySelectorAll(`a[href^="${ZALO_URL}"]`).forEach((link) => {

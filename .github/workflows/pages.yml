@@ -37,6 +37,7 @@ jobs:
         run: |
           npm test
           python scripts/simplify_public_site.py --self-test
+          python scripts/replace_public_analysis_wording.py --self-test
           python scripts/optimize_conversion_site.py --self-test
 
       - name: Setup Pages
@@ -67,6 +68,7 @@ jobs:
           python scripts/build_seo_pages.py --output-root _site
           python scripts/simplify_public_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
+          python scripts/replace_public_analysis_wording.py --output-root _site
           python scripts/optimize_conversion_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260814-2#g'
           test -s _site/red-white-theme.css
@@ -90,6 +92,9 @@ jobs:
           grep -q 'class="checkout-trust"' _site/index.html
           grep -q 'MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ' _site/index.html
           grep -q 'app.js?v=20260814-2' _site/index.html
+          grep -q 'có số được phân tích đúng' _site/index.html
+          ! grep -R "một trong bốn đầu ra" _site --include='*.html'
+          ! grep -R "có ít nhất một đầu ra xuất hiện" _site --include='*.html'
           ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'
           ! grep -R "public-methods-v2" _site/index.html
           ! grep -R "data-current-methods" _site/cho-so-mien-bac-hom-nay/index.html

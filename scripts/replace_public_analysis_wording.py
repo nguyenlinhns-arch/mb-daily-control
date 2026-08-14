@@ -38,9 +38,11 @@ def replace_wording(output_root: Path) -> None:
     if not html_files:
         raise FileNotFoundError(f"No HTML files found under {output_root}")
 
+    replacement_count = 0
     for page in html_files:
         content = page.read_text(encoding="utf-8")
         for old, new in REPLACEMENTS:
+            replacement_count += content.count(old)
             content = content.replace(old, new)
         page.write_text(content, encoding="utf-8")
 
@@ -48,7 +50,7 @@ def replace_wording(output_root: Path) -> None:
     if not home.exists():
         raise FileNotFoundError(f"Missing home page: {home}")
     home_content = home.read_text(encoding="utf-8")
-    if "có số được phân tích đúng" not in home_content:
+    if replacement_count and "có số được phân tích đúng" not in home_content:
         raise AssertionError("New public wording was not applied to the home page")
 
     for page in html_files:
@@ -71,6 +73,15 @@ def self_test() -> None:
         result = (root / "index.html").read_text(encoding="utf-8")
         assert "25/30 ngày có số được phân tích đúng" in result
         assert "có số được phân tích đúng trong 27 mã kết quả đã công bố" in result
+
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        (root / "index.html").write_text(
+            "Đang cập nhật đối chiếu ngày mới.",
+            encoding="utf-8",
+        )
+        replace_wording(root)
+        assert "Đang cập nhật" in (root / "index.html").read_text(encoding="utf-8")
 
 
 def main() -> None:

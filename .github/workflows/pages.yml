@@ -53,8 +53,10 @@ jobs:
           cp site-v2/styles.css _site/
           cp site-v2/red-white-theme.css _site/
           cp site-v2/conversion-accent.css _site/
+          cp site-v2/conversion-v2.css _site/
           cp site-v2/checkout-hotfix.css _site/
           cp site-v2/checkout-entry.js _site/
+          cp site-v2/checkout-enhance.js _site/
           cp site-v2/app.js _site/
           cp site-v2/config.js _site/
           cp site-v2/mau-bao-cao.html _site/
@@ -93,12 +95,15 @@ jobs:
           python scripts/replace_public_analysis_wording.py --output-root _site
           python scripts/apply_conversion_site.py --output-root _site
           python scripts/simplify_purchase_cta.py --output-root _site
+          python scripts/apply_conversion_v2.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260815-1#g'
 
           test -s _site/red-white-theme.css
           test -s _site/conversion-accent.css
+          test -s _site/conversion-v2.css
           test -s _site/checkout-hotfix.css
           test -s _site/checkout-entry.js
+          test -s _site/checkout-enhance.js
           test -s _site/report-readiness.json
           test ! -e _site/ai-methods/public-methods.json
           test -s _site/ai-methods/yesterday-proof.json
@@ -113,6 +118,8 @@ jobs:
           grep -q 'data-public-ready="true"' _site/index.html
           grep -q 'data-paid-report-ready="true"' _site/index.html
           grep -q 'checkout-entry.js?v=20260815-1' _site/index.html
+          grep -q 'checkout-enhance.js?v=20260815-1' _site/index.html
+          grep -q 'conversion-v2.css?v=20260815-1' _site/index.html
           grep -q 'class="conversion-trust"' _site/index.html
           grep -q 'class="conversion-preview"' _site/index.html
           grep -q 'NHẬN BÁO CÁO HÔM NAY – 30.000Đ' _site/index.html
@@ -126,11 +133,13 @@ jobs:
           ! grep -R 'href="/#buy"' _site --include='*.html'
           ! grep -R 'href="/#pricing"' _site --include='*.html'
 
-          if grep -q 'class="historical-disclaimer"' _site/index.html; then
-            grep -q '<details class="history-disclosure" open>' _site/index.html
-            grep -q 'Lịch sử đối chiếu từng ngày' _site/index.html
-            grep -q 'có số được phân tích đúng' _site/index.html
-          fi
+          grep -q '73%' _site/index.html
+          grep -q '22/30 ngày' _site/index.html
+          grep -q 'có ít nhất một số trong báo cáo xuất hiện' _site/index.html
+          grep -q '4 số trong báo cáo' _site/index.html
+          grep -q 'Kết quả thực tế' _site/index.html
+          grep -q '<details class="history-disclosure" open>' _site/index.html
+          grep -q 'Lịch sử đối chiếu từng ngày' _site/index.html
           ! grep -q 'class="history-cta"' _site/index.html
           ! grep -q 'class="mobile-cta"' _site/index.html
 
@@ -139,6 +148,9 @@ jobs:
           import re
 
           content = Path("_site/index.html").read_text(encoding="utf-8")
+          rows = len(re.findall(r'class="history-day-row"', content))
+          if rows != 30:
+              raise SystemExit(f"Expected 30 home history rows, found {rows}")
           buttons = re.findall(
               r'<button\b[^>]*\bdata-open-checkout\b[^>]*>',
               content,
@@ -153,17 +165,18 @@ jobs:
           )
           if not header or "data-open-checkout" in header.group(0):
               raise SystemExit("Header purchase button was not removed")
-          if not re.search(
-              r'<details\b(?=[^>]*class="history-disclosure")(?=[^>]*\bopen\b)[^>]*>',
-              content,
-              flags=re.IGNORECASE,
-          ):
-              raise SystemExit("Daily history is not open by default")
+          if re.search(r'19\s*[-–—]\s*91[\s\S]{0,120}05\s*[-–—]\s*50', content):
+              raise SystemExit("Current paid pairs leaked into public HTML")
           PY
 
+          grep -q 'NGUYEN TU LINH' _site/checkout-enhance.js
+          grep -q 'img.vietqr.io/image' _site/checkout-enhance.js
+          grep -q 'ads-landing' _site/checkout-enhance.js
           grep -q 'app.js?v=20260815-1' _site/index.html
+          ! grep -q '83% trong 30 ngày' _site/index.html
+          ! grep -q '25/30 ngày' _site/index.html
           ! grep -R "một trong bốn đầu ra" _site --include='*.html'
-          ! grep -R "có ít nhất một đầu ra xuất hiện" _site --include='*.html'
+          ! grep -R "có số được phân tích đúng" _site --include='*.html'
           ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'
           ! grep -R "public-methods-v2" _site/index.html
           ! grep -R "data-current-methods" _site/cho-so-mien-bac-hom-nay/index.html

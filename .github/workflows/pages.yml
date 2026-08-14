@@ -68,6 +68,7 @@ jobs:
           python scripts/simplify_public_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
           python scripts/optimize_conversion_site.py --output-root _site
+          find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260814-2#g'
           test -s _site/red-white-theme.css
           test -s _site/conversion-accent.css
           test ! -e _site/ai-methods/public-methods.json
@@ -88,6 +89,7 @@ jobs:
           grep -q 'class="checkout-value"' _site/index.html
           grep -q 'class="checkout-trust"' _site/index.html
           grep -q 'MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ' _site/index.html
+          grep -q 'app.js?v=20260814-2' _site/index.html
           ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'
           ! grep -R "public-methods-v2" _site/index.html
           ! grep -R "data-current-methods" _site/cho-so-mien-bac-hom-nay/index.html

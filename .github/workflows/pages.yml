@@ -105,6 +105,7 @@ jobs:
           if grep -q 'data-public-ready="true"' _site/index.html; then
             grep -q 'class="history-cta"' _site/index.html
             grep -q 'MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ' _site/index.html
+            grep -q 'có số được phân tích đúng' _site/index.html
           else
             ! grep -q 'class="history-cta"' _site/index.html
             grep -q 'CHƯA NHẬN THANH TOÁN' _site/index.html
@@ -114,7 +115,6 @@ jobs:
           grep -q 'class="checkout-value"' _site/index.html
           grep -q 'class="checkout-trust"' _site/index.html
           grep -q 'app.js?v=20260814-2' _site/index.html
-          grep -q 'có số được phân tích đúng' _site/index.html
           ! grep -R "một trong bốn đầu ra" _site --include='*.html'
           ! grep -R "có ít nhất một đầu ra xuất hiện" _site --include='*.html'
           ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'

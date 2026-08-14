@@ -1,1 +1,304 @@
-{"schema_version":"MB_PUBLIC_YESTERDAY_PROOF_V2","date":"2026-08-14","recommended_numbers":["05","50","38","83"],"hits":[{"number":"05","count":1},{"number":"38","count":1}],"unique_hit_count":2,"recommended_count":4,"total_occurrences":2,"historical_validation":{"window_start":"2026-07-16","window_end":"2026-08-14","hit_days":25,"total_days":30,"rate_pct":83},"month_summary":{"month":"2026-08","period_start":"2026-08-01","period_end":"2026-08-14","observed_days":14,"win_days":11,"miss_days":3,"daily_records":[{"date":"2026-08-01","recommended_numbers":["06","60","48","84"],"hits":[{"number":"60","count":2},{"number":"48","count":1}],"status":"hit","record_hash":"cfbe92f5de7e591794bed37933db675aadaae01f8c1e30a73ba5644cc30f8973"},{"date":"2026-08-02","recommended_numbers":["38","83","05","50"],"hits":[{"number":"38","count":1},{"number":"83","count":1}],"status":"hit","record_hash":"994f6ba4080423a4c2c62dd1ebc8cf1b2b13970daa379cecb03009b93f9a3d0e"},{"date":"2026-08-03","recommended_numbers":["05","50","06","60"],"hits":[],"status":"miss","published_at":"2026-08-02T19:39:48+07:00","source_hash":"18c1644c55bfd7dacb76061c9afebbae10157c140106acb4c43505767a4f00fe","record_hash":"a82a58ca05a56db4466c98e38affeaf4a99b0fddb8faab264bfcaafaa3640699"},{"date":"2026-08-04","recommended_numbers":["05","50","06","60"],"hits":[],"status":"miss","published_at":"2026-08-03T21:50:00+07:00","source_hash":"63d24c25b705f9fac33d812fbae06e07ed1d33ccfd3a08b23b80a20c4522f691","record_hash":"eaee92bb3ac0968c119662da17143f7b223ccb5f70eaca73ef814ccfc56b170c"},{"date":"2026-08-05","recommended_numbers":["05","50","06","60"],"hits":[{"number":"05","count":1},{"number":"60","count":1}],"status":"hit","record_hash":"59ddbd0911b60418e33700807ae586b67e70fe99428de0ebcfb4b045d6081bc9"},{"date":"2026-08-06","recommended_numbers":["48","84","36","63"],"hits":[{"number":"84","count":1}],"status":"hit","record_hash":"742524f082a6407ba16578e5df5ec94662b8d4ee750f0a0e374f47cb6b6fdeb6"},{"date":"2026-08-07","recommended_numbers":["36","63","05","50"],"hits":[{"number":"50","count":1}],"status":"hit","record_hash":"db5fe00ee72de1c7c98b515e779ee7ee35c9876b2ffca4c0d88ac1f3be473ab0"},{"date":"2026-08-08","recommended_numbers":["19","91","06","60"],"hits":[{"number":"19","count":1}],"status":"hit","published_at":"2026-08-07T19:49:00+07:00","source_hash":"db55b6c0cbeb66e709b10262d730a886768b11e48bad7c9133eeb91e6fc5c3bf","record_hash":"d3700ebb7d4bbd9d96c75bac855334a8b250fc1fb91408e07b67e94ce7dc0a9d"},{"date":"2026-08-09","recommended_numbers":["83","60","38","06"],"hits":[],"status":"miss","record_hash":"616b92dd86661c91fa013268dbf6a6e23b8fbea73562e5d480af6d1f3f553d06"},{"date":"2026-08-10","recommended_numbers":["06","60","38","83"],"hits":[{"number":"06","count":1},{"number":"83","count":1}],"status":"hit","record_hash":"e42ea39e5fca73e9585a2c6b1c01e3ec14e793f7491e7ba5a332ed1fcd5c1d09"},{"date":"2026-08-11","recommended_numbers":["05","91","50","19"],"hits":[{"number":"05","count":1},{"number":"91","count":2},{"number":"50","count":1}],"status":"hit","record_hash":"85230099c08161a233ddc3004d083a8bc651a42e84c903866c66102cbebee40b"},{"date":"2026-08-12","recommended_numbers":["61","18","81","16"],"hits":[{"number":"81","count":1}],"status":"hit","record_hash":"f9c822e8cb1e640d1bc2d9d4f9d636279651d7681a9d90f2981f7c1612bfa23d"},{"date":"2026-08-13","recommended_numbers":["06","60","38","83"],"hits":[{"number":"60","count":1}],"status":"hit","published_at":"2026-08-13T08:34:00+07:00","source_hash":"6097b4f96ec8b7565caa86119c654b668bcba019f58f194b5e2b44029d3fe6e4","record_hash":"2e97af7f0445163935ddc9ec2c741a71f1c270c1c700290073e16e245a4393bd"},{"date":"2026-08-14","recommended_numbers":["05","50","38","83"],"hits":[{"number":"05","count":1},{"number":"38","count":1}],"status":"hit","record_hash":"2618dbdc0db1093086b3b3fca18e6873bb42983ac5dae0e92e972c8adab929af"}],"winning_days":[{"date":"2026-08-01","recommended_numbers":["06","60","48","84"],"hits":[{"number":"60","count":2},{"number":"48","count":1}]},{"date":"2026-08-02","recommended_numbers":["38","83","05","50"],"hits":[{"number":"38","count":1},{"number":"83","count":1}]},{"date":"2026-08-05","recommended_numbers":["05","50","06","60"],"hits":[{"number":"05","count":1},{"number":"60","count":1}]},{"date":"2026-08-06","recommended_numbers":["48","84","36","63"],"hits":[{"number":"84","count":1}]},{"date":"2026-08-07","recommended_numbers":["36","63","05","50"],"hits":[{"number":"50","count":1}]},{"date":"2026-08-08","recommended_numbers":["19","91","06","60"],"hits":[{"number":"19","count":1}]},{"date":"2026-08-10","recommended_numbers":["06","60","38","83"],"hits":[{"number":"06","count":1},{"number":"83","count":1}]},{"date":"2026-08-11","recommended_numbers":["05","91","50","19"],"hits":[{"number":"05","count":1},{"number":"91","count":2},{"number":"50","count":1}]},{"date":"2026-08-12","recommended_numbers":["61","18","81","16"],"hits":[{"number":"81","count":1}]},{"date":"2026-08-13","recommended_numbers":["06","60","38","83"],"hits":[{"number":"60","count":1}]},{"date":"2026-08-14","recommended_numbers":["05","50","38","83"],"hits":[{"number":"05","count":1},{"number":"38","count":1}]}]}}
+{
+  "schema_version": "MB_PUBLIC_YESTERDAY_PROOF_V2",
+  "date": "2026-08-14",
+  "recommended_numbers": [
+    "05",
+    "50",
+    "38",
+    "83"
+  ],
+  "hits": [
+    {
+      "number": "05",
+      "count": 1
+    },
+    {
+      "number": "38",
+      "count": 1
+    }
+  ],
+  "unique_hit_count": 2,
+  "recommended_count": 4,
+  "total_occurrences": 2,
+  "historical_validation": {
+    "window_start": "2026-07-16",
+    "window_end": "2026-08-14",
+    "hit_days": 22,
+    "total_days": 30,
+    "rate_pct": 73
+  },
+  "month_summary": {
+    "month": "2026-07-16_to_2026-08-14",
+    "period_start": "2026-07-16",
+    "period_end": "2026-08-14",
+    "observed_days": 30,
+    "win_days": 22,
+    "miss_days": 8,
+    "daily_records": [
+      {
+        "date": "2026-07-16",
+        "recommended_numbers": ["13", "31", "36", "63"],
+        "hits": [{"number": "63", "count": 3}],
+        "status": "hit",
+        "record_hash": "2cf1f9257b38970a2c8d2c40be5e727cf19853893bbfb0e3e7523828aee3a2cb"
+      },
+      {
+        "date": "2026-07-17",
+        "recommended_numbers": ["13", "31", "45", "54"],
+        "hits": [{"number": "13", "count": 2}],
+        "status": "hit",
+        "record_hash": "0a5a0872b112a624bbb2e8b6725b51d21178fe27c9112fa79552a39a35db6cee"
+      },
+      {
+        "date": "2026-07-18",
+        "recommended_numbers": ["45", "54", "06", "60"],
+        "hits": [{"number": "54", "count": 1}],
+        "status": "hit",
+        "record_hash": "4ca8feaec0fce345db5ea46e8125efe462fd24da5639d4dc55a19ca8d0a208ac"
+      },
+      {
+        "date": "2026-07-19",
+        "recommended_numbers": ["06", "60", "38", "83"],
+        "hits": [{"number": "38", "count": 2}],
+        "status": "hit",
+        "record_hash": "0656b604a05081ad78a504328272fa0b278b27016518ddcbe8c945d600a71ad4"
+      },
+      {
+        "date": "2026-07-20",
+        "recommended_numbers": ["06", "60", "13", "31"],
+        "hits": [{"number": "60", "count": 1}],
+        "status": "hit",
+        "record_hash": "30a3472e68b8901ddb81d43c9ce62ac838bc5d481a09f51f0a52596cf079a74c"
+      },
+      {
+        "date": "2026-07-21",
+        "recommended_numbers": ["13", "31", "19", "91"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "4b990af1e1e342e3750c38c6e9e012022443a9416d2b4c15cab52e88df12073e"
+      },
+      {
+        "date": "2026-07-22",
+        "recommended_numbers": ["13", "31", "19", "91"],
+        "hits": [
+          {"number": "13", "count": 2},
+          {"number": "19", "count": 1},
+          {"number": "91", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "552abfc33fe32ff92827a69b637cb79fd9aa7e1dad3a53e361115106237ac2ec"
+      },
+      {
+        "date": "2026-07-23",
+        "recommended_numbers": ["36", "63", "38", "83"],
+        "hits": [{"number": "63", "count": 1}],
+        "status": "hit",
+        "record_hash": "c986921663d061a055320d5c8bc10d4f3c69aed60297960738ef4a224b575c51"
+      },
+      {
+        "date": "2026-07-24",
+        "recommended_numbers": ["38", "83", "06", "60"],
+        "hits": [{"number": "38", "count": 1}],
+        "status": "hit",
+        "record_hash": "5d4456c7fc2588c2bb41f6619ef37705f0d20de8b8f732c452f1333b97cc2ce1"
+      },
+      {
+        "date": "2026-07-25",
+        "recommended_numbers": ["06", "60", "36", "63"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "74ca6f83e4031993db2b35bdefc8529d7e05404b83400c87d119c52ade560af6"
+      },
+      {
+        "date": "2026-07-26",
+        "recommended_numbers": ["06", "60", "38", "83"],
+        "hits": [
+          {"number": "60", "count": 1},
+          {"number": "38", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "a7c64a1ac0d44db5a301403f9de0ed39d14d358b3626f77e00772686a26dc082"
+      },
+      {
+        "date": "2026-07-27",
+        "recommended_numbers": ["36", "63", "13", "31"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "fae76c048fbfcb5b4b09278e454ba027308633204d66a856ec1eca911ed984f9"
+      },
+      {
+        "date": "2026-07-28",
+        "recommended_numbers": ["38", "83", "06", "60"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "d4a67b16b1f7784d02530db2bf3a0451b32ee335a45a60c9f15bc2747908e004"
+      },
+      {
+        "date": "2026-07-29",
+        "recommended_numbers": ["38", "83", "06", "60"],
+        "hits": [{"number": "83", "count": 1}],
+        "status": "hit",
+        "record_hash": "5ca3668425c6f1c537f652813ba7942f0d0070be67b2968082263b292c1faeb5"
+      },
+      {
+        "date": "2026-07-30",
+        "recommended_numbers": ["06", "60", "25", "52"],
+        "hits": [{"number": "06", "count": 1}],
+        "status": "hit",
+        "record_hash": "dc35a21d5036049ea3a53e42fc8f89386084670df0d23c050bb248da8758e350"
+      },
+      {
+        "date": "2026-07-31",
+        "recommended_numbers": ["38", "83", "25", "52"],
+        "hits": [
+          {"number": "38", "count": 1},
+          {"number": "83", "count": 1},
+          {"number": "52", "count": 2}
+        ],
+        "status": "hit",
+        "record_hash": "3b3015bd1e301f8b1c3cab1829dc7b8e0bf82da510d2d936cff329e2970d33b8"
+      },
+      {
+        "date": "2026-08-01",
+        "recommended_numbers": ["06", "60", "48", "84"],
+        "hits": [
+          {"number": "60", "count": 2},
+          {"number": "48", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "cfbe92f5de7e591794bed37933db675aadaae01f8c1e30a73ba5644cc30f8973"
+      },
+      {
+        "date": "2026-08-02",
+        "recommended_numbers": ["38", "83", "05", "50"],
+        "hits": [
+          {"number": "38", "count": 1},
+          {"number": "83", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "994f6ba4080423a4c2c62dd1ebc8cf1b2b13970daa379cecb03009b93f9a3d0e"
+      },
+      {
+        "date": "2026-08-03",
+        "recommended_numbers": ["05", "50", "06", "60"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "382488718b87db5217088127e874b2053e40d6a9a018bd9119b5dff8cce40cd8"
+      },
+      {
+        "date": "2026-08-04",
+        "recommended_numbers": ["05", "50", "06", "60"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "a502d1d8bfb1f416047c042e607e29b22e824bd1eaa4c91dec98f913544a93f6"
+      },
+      {
+        "date": "2026-08-05",
+        "recommended_numbers": ["05", "50", "06", "60"],
+        "hits": [
+          {"number": "05", "count": 1},
+          {"number": "60", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "59ddbd0911b60418e33700807ae586b67e70fe99428de0ebcfb4b045d6081bc9"
+      },
+      {
+        "date": "2026-08-06",
+        "recommended_numbers": ["48", "84", "36", "63"],
+        "hits": [{"number": "84", "count": 1}],
+        "status": "hit",
+        "record_hash": "742524f082a6407ba16578e5df5ec94662b8d4ee750f0a0e374f47cb6b6fdeb6"
+      },
+      {
+        "date": "2026-08-07",
+        "recommended_numbers": ["36", "63", "05", "50"],
+        "hits": [{"number": "50", "count": 1}],
+        "status": "hit",
+        "record_hash": "db5fe00ee72de1c7c98b515e779ee7ee35c9876b2ffca4c0d88ac1f3be473ab0"
+      },
+      {
+        "date": "2026-08-08",
+        "recommended_numbers": ["19", "91", "06", "60"],
+        "hits": [{"number": "19", "count": 1}],
+        "status": "hit",
+        "record_hash": "7ad833ec7b1cae35aed3507118dd1432a9a31439273301db65c51bebf0fdf55d0"
+      },
+      {
+        "date": "2026-08-09",
+        "recommended_numbers": ["06", "60", "38", "83"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "594857b0b76532949207df461c3384e548f83914a64f5d9fc765072cdac11f48"
+      },
+      {
+        "date": "2026-08-10",
+        "recommended_numbers": ["06", "60", "38", "83"],
+        "hits": [
+          {"number": "06", "count": 1},
+          {"number": "83", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "e42ea39e5fca73e9585a2c6b1c01e3ec14e793f7491e7ba5a332ed1fcd5c1d09"
+      },
+      {
+        "date": "2026-08-11",
+        "recommended_numbers": ["19", "91", "05", "50"],
+        "hits": [
+          {"number": "91", "count": 2},
+          {"number": "05", "count": 1},
+          {"number": "50", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "914826098de1cff888b98dfde734a4e485d0047ffbc1f04475b1a91dde25fe13"
+      },
+      {
+        "date": "2026-08-12",
+        "recommended_numbers": ["06", "60", "38", "83"],
+        "hits": [],
+        "status": "miss",
+        "record_hash": "b4050356aa44a268057529c5865e9b0bfbb7cde88c9ffb111b7700edf64b5922"
+      },
+      {
+        "date": "2026-08-13",
+        "recommended_numbers": ["06", "60", "38", "83"],
+        "hits": [{"number": "60", "count": 1}],
+        "status": "hit",
+        "record_hash": "2e97af7f0445163935ddc9ec2c741a71f1c270c1c700290073e16e245a4393bd"
+      },
+      {
+        "date": "2026-08-14",
+        "recommended_numbers": ["05", "50", "38", "83"],
+        "hits": [
+          {"number": "05", "count": 1},
+          {"number": "38", "count": 1}
+        ],
+        "status": "hit",
+        "record_hash": "2618dbdc0db1093086b3b3fca18e6873bb42983ac5dae0e92e972c8adab929af"
+      }
+    ],
+    "winning_days": [
+      {"date": "2026-07-16", "recommended_numbers": ["13", "31", "36", "63"], "hits": [{"number": "63", "count": 3}]},
+      {"date": "2026-07-17", "recommended_numbers": ["13", "31", "45", "54"], "hits": [{"number": "13", "count": 2}]},
+      {"date": "2026-07-18", "recommended_numbers": ["45", "54", "06", "60"], "hits": [{"number": "54", "count": 1}]},
+      {"date": "2026-07-19", "recommended_numbers": ["06", "60", "38", "83"], "hits": [{"number": "38", "count": 2}]},
+      {"date": "2026-07-20", "recommended_numbers": ["06", "60", "13", "31"], "hits": [{"number": "60", "count": 1}]},
+      {"date": "2026-07-22", "recommended_numbers": ["13", "31", "19", "91"], "hits": [{"number": "13", "count": 2}, {"number": "19", "count": 1}, {"number": "91", "count": 1}]},
+      {"date": "2026-07-23", "recommended_numbers": ["36", "63", "38", "83"], "hits": [{"number": "63", "count": 1}]},
+      {"date": "2026-07-24", "recommended_numbers": ["38", "83", "06", "60"], "hits": [{"number": "38", "count": 1}]},
+      {"date": "2026-07-26", "recommended_numbers": ["06", "60", "38", "83"], "hits": [{"number": "60", "count": 1}, {"number": "38", "count": 1}]},
+      {"date": "2026-07-29", "recommended_numbers": ["38", "83", "06", "60"], "hits": [{"number": "83", "count": 1}]},
+      {"date": "2026-07-30", "recommended_numbers": ["06", "60", "25", "52"], "hits": [{"number": "06", "count": 1}]},
+      {"date": "2026-07-31", "recommended_numbers": ["38", "83", "25", "52"], "hits": [{"number": "38", "count": 1}, {"number": "83", "count": 1}, {"number": "52", "count": 2}]},
+      {"date": "2026-08-01", "recommended_numbers": ["06", "60", "48", "84"], "hits": [{"number": "60", "count": 2}, {"number": "48", "count": 1}]},
+      {"date": "2026-08-02", "recommended_numbers": ["38", "83", "05", "50"], "hits": [{"number": "38", "count": 1}, {"number": "83", "count": 1}]},
+      {"date": "2026-08-05", "recommended_numbers": ["05", "50", "06", "60"], "hits": [{"number": "05", "count": 1}, {"number": "60", "count": 1}]},
+      {"date": "2026-08-06", "recommended_numbers": ["48", "84", "36", "63"], "hits": [{"number": "84", "count": 1}]},
+      {"date": "2026-08-07", "recommended_numbers": ["36", "63", "05", "50"], "hits": [{"number": "50", "count": 1}]},
+      {"date": "2026-08-08", "recommended_numbers": ["19", "91", "06", "60"], "hits": [{"number": "19", "count": 1}]},
+      {"date": "2026-08-10", "recommended_numbers": ["06", "60", "38", "83"], "hits": [{"number": "06", "count": 1}, {"number": "83", "count": 1}]},
+      {"date": "2026-08-11", "recommended_numbers": ["19", "91", "05", "50"], "hits": [{"number": "91", "count": 2}, {"number": "05", "count": 1}, {"number": "50", "count": 1}]},
+      {"date": "2026-08-13", "recommended_numbers": ["06", "60", "38", "83"], "hits": [{"number": "60", "count": 1}]},
+      {"date": "2026-08-14", "recommended_numbers": ["05", "50", "38", "83"], "hits": [{"number": "05", "count": 1}, {"number": "38", "count": 1}]}
+    ]
+  }
+}

@@ -125,11 +125,42 @@ jobs:
           grep -q 'class="seo-purchase-float"' _site/cho-so-mien-bac-hom-nay/index.html
           ! grep -R 'href="/#buy"' _site --include='*.html'
           ! grep -R 'href="/#pricing"' _site --include='*.html'
+
           if grep -q 'class="historical-disclaimer"' _site/index.html; then
-            grep -q 'class="history-disclosure"' _site/index.html
-            grep -q 'class="history-cta"' _site/index.html
+            grep -q '<details class="history-disclosure" open>' _site/index.html
+            grep -q 'Lịch sử đối chiếu từng ngày' _site/index.html
             grep -q 'có số được phân tích đúng' _site/index.html
           fi
+          ! grep -q 'class="history-cta"' _site/index.html
+          ! grep -q 'class="mobile-cta"' _site/index.html
+
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          content = Path("_site/index.html").read_text(encoding="utf-8")
+          buttons = re.findall(
+              r'<button\b[^>]*\bdata-open-checkout\b[^>]*>',
+              content,
+              flags=re.IGNORECASE,
+          )
+          if len(buttons) != 2:
+              raise SystemExit(f"Expected exactly 2 home checkout buttons, found {len(buttons)}")
+          header = re.search(
+              r'<header\b[^>]*class="[^"]*site-header[^"]*"[^>]*>.*?</header>',
+              content,
+              flags=re.IGNORECASE | re.DOTALL,
+          )
+          if not header or "data-open-checkout" in header.group(0):
+              raise SystemExit("Header purchase button was not removed")
+          if not re.search(
+              r'<details\b(?=[^>]*class="history-disclosure")(?=[^>]*\bopen\b)[^>]*>',
+              content,
+              flags=re.IGNORECASE,
+          ):
+              raise SystemExit("Daily history is not open by default")
+          PY
+
           grep -q 'app.js?v=20260815-1' _site/index.html
           ! grep -R "một trong bốn đầu ra" _site --include='*.html'
           ! grep -R "có ít nhất một đầu ra xuất hiện" _site --include='*.html'

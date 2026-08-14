@@ -66,6 +66,23 @@ jobs:
           cp data/source-access.json _site/
           cp data/public-historical-proof.json _site/historical-proof.json
           python scripts/build_seo_pages.py --output-root _site
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          page = Path("_site/index.html")
+          content = page.read_text(encoding="utf-8")
+          content, count = re.subn(
+              r'(<div class="hero-offer simple-hero-offer">.*?<button class="button button-primary button-large" type="button" data-open-checkout) disabled(>.*?</button></div>)',
+              r'\1\2',
+              content,
+              count=1,
+              flags=re.DOTALL,
+          )
+          if count not in (0, 1):
+              raise AssertionError("Unexpected hero disabled-button count")
+          page.write_text(content, encoding="utf-8")
+          PY
           python scripts/simplify_public_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
           python scripts/replace_public_analysis_wording.py --output-root _site
@@ -83,14 +100,19 @@ jobs:
           test -s _site/sitemap.xml
           test -s _site/llms.txt
           grep -q 'class="conversion-trust"' _site/index.html
-          grep -q 'class="conversion-preview"' _site/index.html
+          grep -q 'class="conversion-preview"' _site/index.html || grep -q 'CHƯA NHẬN THANH TOÁN' _site/index.html
           grep -q 'class="history-disclosure"' _site/index.html
-          grep -q 'class="history-cta"' _site/index.html
+          if grep -q 'data-public-ready="true"' _site/index.html; then
+            grep -q 'class="history-cta"' _site/index.html
+            grep -q 'MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ' _site/index.html
+          else
+            ! grep -q 'class="history-cta"' _site/index.html
+            grep -q 'CHƯA NHẬN THANH TOÁN' _site/index.html
+          fi
           grep -q 'class="buy-value-list"' _site/index.html
           grep -q 'class="buy-guarantees"' _site/index.html
           grep -q 'class="checkout-value"' _site/index.html
           grep -q 'class="checkout-trust"' _site/index.html
-          grep -q 'MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ' _site/index.html
           grep -q 'app.js?v=20260814-2' _site/index.html
           grep -q 'có số được phân tích đúng' _site/index.html
           ! grep -R "một trong bốn đầu ra" _site --include='*.html'

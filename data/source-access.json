@@ -1,48 +1,38 @@
 {
-  "history_end": "2026-08-13",
-  "history_rows": 944,
+  "history_end": "2026-08-14",
+  "history_rows": 945,
   "history_start": "2024-01-01",
-  "latest_codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
-  "locked_at": "2026-08-14T01:13:49+07:00",
+  "latest_codes_sha256": "63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546",
+  "locked_at": "2026-08-14T23:47:13+07:00",
   "policy": "COMPLETED_DRAW_ONLY_FAIL_CLOSED_MINIMUM_TWO_EXACT_SOURCES",
   "schema_version": "MB_SOURCE_ACCESS_V3_POST_DRAW_ONLY",
-  "selected": "OFFICIAL_PLUS_MULTI_SOURCE_CROSSCHECK",
-  "source_count": 7,
+  "selected": "MULTI_SOURCE_CROSSCHECK_PLUS_CANONICAL_MIRROR",
+  "source_count": 5,
   "sources": [
     {
-      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "codes_sha256": "63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546",
       "name": "ketqua",
-      "url": "https://ketqua.net/xo-so-truyen-thong.php?ngay=13-08-2026"
+      "url": "https://ketqua.net/xo-so-truyen-thong.php?ngay=14-08-2026"
     },
     {
-      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
-      "name": "ketqua.net",
-      "url": "https://ketqua.net/xo-so-mien-bac.php?ngay=13-08-2026"
-    },
-    {
-      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "codes_sha256": "63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546",
       "name": "kqxs",
-      "url": "https://kqxs.vn/mien-bac/xsmb-13-08-2026"
+      "url": "https://kqxs.vn/mien-bac/xsmb-14-08-2026"
     },
     {
-      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "codes_sha256": "63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546",
       "name": "minhngoc",
-      "url": "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/13-08-2026.html"
+      "url": "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/14-08-2026.html"
     },
     {
-      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "codes_sha256": "63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546",
       "name": "xosodaiphat",
-      "url": "https://xosodaiphat.com/xsmb-13-08-2026.html"
+      "url": "https://xosodaiphat.com/xsmb-14-08-2026.html"
     },
     {
-      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "codes_sha256": "63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546",
       "name": "xosothienphu",
-      "url": "https://xosothienphu.vn/xsmb-13-08-2026.html"
-    },
-    {
-      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
-      "name": "xosothudo-official",
-      "url": "http://xosothudo.com.vn/"
+      "url": "https://xosothienphu.vn/xsmb-14-08-2026.html"
     }
   ],
   "status": "LOCKED_CROSSCHECKED_PUBLIC"

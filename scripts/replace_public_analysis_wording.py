@@ -7,22 +7,32 @@ import tempfile
 from pathlib import Path
 
 
+PUBLIC_PHRASE = "có số trong báo cáo xuất hiện"
+
 REPLACEMENTS = (
     (
         "có ít nhất một trong bốn đầu ra đã lưu xuất hiện trong 27 mã kết quả đã công bố",
-        "có số được phân tích đúng trong 27 mã kết quả đã công bố",
+        "có số trong báo cáo xuất hiện trong 27 mã kết quả đã công bố",
     ),
     (
         "có ít nhất một trong bốn đầu ra xuất hiện trong kết quả đã công bố",
-        "có số được phân tích đúng",
+        PUBLIC_PHRASE,
     ),
     (
         "có ít nhất một đầu ra xuất hiện",
-        "có số được phân tích đúng",
+        PUBLIC_PHRASE,
     ),
     (
         "có đầu ra xuất hiện",
+        PUBLIC_PHRASE,
+    ),
+    (
+        "có số được phân tích đúng và xuất hiện",
+        "có số trong báo cáo xuất hiện",
+    ),
+    (
         "có số được phân tích đúng",
+        PUBLIC_PHRASE,
     ),
 )
 
@@ -30,6 +40,7 @@ FORBIDDEN = (
     "một trong bốn đầu ra",
     "có ít nhất một đầu ra xuất hiện",
     "có đầu ra xuất hiện",
+    "có số được phân tích đúng",
 )
 
 
@@ -50,7 +61,7 @@ def replace_wording(output_root: Path) -> None:
     if not home.exists():
         raise FileNotFoundError(f"Missing home page: {home}")
     home_content = home.read_text(encoding="utf-8")
-    if replacement_count and "có số được phân tích đúng" not in home_content:
+    if replacement_count and PUBLIC_PHRASE not in home_content:
         raise AssertionError("New public wording was not applied to the home page")
 
     for page in html_files:
@@ -71,8 +82,8 @@ def self_test() -> None:
         )
         replace_wording(root)
         result = (root / "index.html").read_text(encoding="utf-8")
-        assert "25/30 ngày có số được phân tích đúng" in result
-        assert "có số được phân tích đúng trong 27 mã kết quả đã công bố" in result
+        assert "25/30 ngày có số trong báo cáo xuất hiện" in result
+        assert "có số trong báo cáo xuất hiện trong 27 mã kết quả đã công bố" in result
 
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)

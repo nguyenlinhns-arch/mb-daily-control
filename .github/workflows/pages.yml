@@ -68,6 +68,25 @@ jobs:
           cp data/public-historical-proof.json _site/historical-proof.json
           cp data/paid-report-ready.json _site/report-readiness.json
           python scripts/build_seo_pages.py --output-root _site
+
+          # The simplifier reads the legacy hero template. Normalize only the
+          # temporary build artifact so it can parse the button; the final paid
+          # gate is reapplied from the private-safe readiness manifest below.
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          page = Path("_site/index.html")
+          content = page.read_text(encoding="utf-8")
+          content = re.sub(
+              r'(<button class="button button-primary button-large" type="button" data-open-checkout)\s+disabled(?:\s+aria-disabled="true")?(>)',
+              r'\1\2',
+              content,
+              count=1,
+          )
+          page.write_text(content, encoding="utf-8")
+          PY
+
           python scripts/simplify_public_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
           python scripts/replace_public_analysis_wording.py --output-root _site

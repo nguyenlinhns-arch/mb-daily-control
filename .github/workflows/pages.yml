@@ -37,6 +37,7 @@ jobs:
         run: |
           npm test
           python scripts/simplify_public_site.py --self-test
+          python scripts/optimize_conversion_site.py --self-test
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -50,6 +51,7 @@ jobs:
           mkdir -p _site/ai-methods
           cp site-v2/styles.css _site/
           cp site-v2/red-white-theme.css _site/
+          cp site-v2/conversion-accent.css _site/
           cp site-v2/app.js _site/
           cp site-v2/config.js _site/
           cp site-v2/mau-bao-cao.html _site/
@@ -65,7 +67,9 @@ jobs:
           python scripts/build_seo_pages.py --output-root _site
           python scripts/simplify_public_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
+          python scripts/optimize_conversion_site.py --output-root _site
           test -s _site/red-white-theme.css
+          test -s _site/conversion-accent.css
           test ! -e _site/ai-methods/public-methods.json
           test -s _site/ai-methods/yesterday-proof.json
           test -s _site/cho-so-mien-bac-hom-nay/index.html
@@ -75,6 +79,11 @@ jobs:
           test -s _site/gioi-thieu/index.html
           test -s _site/sitemap.xml
           test -s _site/llms.txt
+          grep -q 'class="conversion-trust"' _site/index.html
+          grep -q 'class="history-cta"' _site/index.html
+          grep -q 'class="buy-guarantees"' _site/index.html
+          grep -q 'class="checkout-trust"' _site/index.html
+          grep -q 'NHẬN BÁO CÁO HÔM NAY – 30.000Đ' _site/index.html
           ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'
           ! grep -R "public-methods-v2" _site/index.html
           ! grep -R "data-current-methods" _site/cho-so-mien-bac-hom-nay/index.html

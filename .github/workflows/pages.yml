@@ -80,10 +80,14 @@ jobs:
           test -s _site/sitemap.xml
           test -s _site/llms.txt
           grep -q 'class="conversion-trust"' _site/index.html
+          grep -q 'class="conversion-preview"' _site/index.html
+          grep -q 'class="history-disclosure"' _site/index.html
           grep -q 'class="history-cta"' _site/index.html
+          grep -q 'class="buy-value-list"' _site/index.html
           grep -q 'class="buy-guarantees"' _site/index.html
+          grep -q 'class="checkout-value"' _site/index.html
           grep -q 'class="checkout-trust"' _site/index.html
-          grep -q 'NHẬN BÁO CÁO HÔM NAY – 30.000Đ' _site/index.html
+          grep -q 'MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ' _site/index.html
           ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'
           ! grep -R "public-methods-v2" _site/index.html
           ! grep -R "data-current-methods" _site/cho-so-mien-bac-hom-nay/index.html

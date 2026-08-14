@@ -1,0 +1,158 @@
+/* White–red conversion theme for lemienbac.com.
+   Loaded after the existing CSS so the payment flow and layout stay intact. */
+:root{
+  --navy:#a60018;
+  --navy-2:#d71920;
+  --ink:#261518;
+  --muted:#715d61;
+  --line:#efd7dc;
+  --page:#fff;
+  --white:#fff;
+  --accent:#d71920;
+  --accent-dark:#a60018;
+  --accent-soft:#fff1f3;
+  --green:#ad001b;
+  --green-soft:#fff0f2;
+  --blue:#b0001b;
+  --blue-soft:#fff0f2;
+  --red:#d71920;
+  --red-dark:#a60018;
+  --soft:#fff7f8;
+  --gold:#d71920;
+  --shadow:0 18px 48px rgba(166,0,24,.11);
+}
+html{background:#fff}
+body,.landing-simple,.simple-page{background:#fff;color:var(--ink)}
+a:focus-visible,button:focus-visible{outline:3px solid rgba(215,25,32,.28);outline-offset:3px}
+
+/* Header */
+.site-header,.topbar{border-bottom:1px solid #efd3d8;background:rgba(255,255,255,.97);color:var(--ink);box-shadow:0 6px 24px rgba(166,0,24,.06);backdrop-filter:blur(14px)}
+.brand-mark,.seo-brand>b{background:linear-gradient(145deg,#d71920,#a60018);color:#fff;box-shadow:0 7px 18px rgba(166,0,24,.18)}
+.brand small,.seo-brand small{color:#80686d}
+.sample-link,.site-header nav a,.seo-nav a{color:#7c2635}
+.seo-nav a{border-color:#efd3d8;background:#fff}
+.seo-nav a:hover,.seo-nav a:focus-visible{background:#fff0f2;color:#a60018}
+.button-primary,.top-cta,.primary-cta,.payment-confirm{background:linear-gradient(145deg,#e11c2d,#b5001c);color:#fff;box-shadow:0 10px 24px rgba(183,0,28,.2)}
+.button-primary:hover,.top-cta:hover,.primary-cta:hover,.payment-confirm:hover{background:linear-gradient(145deg,#c90020,#970016)}
+.button-light{border-color:#edcbd1;background:#fff;color:#a60018}
+
+/* Main hero: white first screen, red evidence, one clear offer. */
+.hero,.hero-simple,.seo-hero{border-bottom:1px solid #efd7dc;background:
+  radial-gradient(circle at 88% 12%,rgba(215,25,32,.08),transparent 31%),
+  linear-gradient(180deg,#fff,#fffafb);color:var(--ink)}
+.hero .eyebrow,.seo-hero .eyebrow{color:#b5001c}
+.hero h1,.seo-hero h1{color:#9f0018}
+.hero h1 em{color:#d71920}
+.hero-lead,.seo-hero .lead{color:#4f3d41}
+.hero-lead strong{color:#9f0018}
+.hero-proof-text,.hero-date{color:#786469}
+.hero-proof-text strong{color:#a60018}
+.hero-offer{border:1px solid #eab7c0;background:#fff;box-shadow:0 16px 38px rgba(166,0,24,.1)}
+.hero-offer small{color:#a60018}
+.hero-offer strong{color:#d71920}
+.simple-hero-offer strong{color:#d71920}
+.hero-offer span{color:#6d555a}
+.data-card{border:1px solid #eab7c0;background:#fff;color:var(--ink);box-shadow:0 15px 36px rgba(166,0,24,.08)}
+.data-card span{color:#80686d}
+.data-card strong{color:#a60018}
+
+/* Remove the public per-method number catalogue even if an old artifact is cached. */
+.public-methods-v2,[data-current-methods]{display:none!important}
+.public-methods-summary{background:#fff}
+.public-methods-summary .section-heading{max-width:820px;margin-bottom:0}
+.public-methods-summary .primary-cta{margin-top:18px}
+
+/* Historical proof */
+.historical-proof-section{background:#fff7f8}
+.historical-proof-summary{border-color:#eab7c0;background:#fff;box-shadow:0 20px 48px rgba(166,0,24,.09)}
+.historical-rate{background:linear-gradient(145deg,#d71920,#9f0018);color:#fff}
+.historical-rate p{color:#ffe0e4}
+.historical-rate>strong{color:#fff}
+.historical-rate>span{color:#fff1f3}
+.historical-proof-copy>div{background:#fff0f2}
+.historical-proof-copy>div strong{color:#a60018}
+.historical-proof-copy>div span{color:#70444b}
+.history-days{border-color:#ead1d6;background:#fff}
+.history-day-head{background:#fff0f2;color:#8d3443}
+.history-day-row{border-top-color:#f0dde0}
+.history-outputs b,.historical-number-list b{border-color:#e7cbd0;background:#fff;color:#4e252c}
+.history-outputs b.is-observed{border-color:#d71920;background:#fff0f2;color:#a60018}
+.history-observed.has-observed span{background:#fff0f2;color:#a60018}
+.historical-disclaimer a{color:#a60018;font-weight:800}
+
+/* Price and checkout */
+.buy-simple{background:#fff}
+.buy-simple-card{border:2px solid #d71920;background:#fff;box-shadow:0 18px 44px rgba(166,0,24,.1)}
+.buy-simple-card h2{color:#d71920}
+.buy-simple-card li span{background:#d71920;color:#fff}
+.buy-legal a{color:#a60018}
+.checkout{border:1px solid #e8c7cd;background:#fff;box-shadow:0 30px 90px rgba(80,0,13,.34)}
+.checkout h2{color:#a60018}
+.checkout-scope{background:#fff0f2;color:#8b2b3b}
+.payment-card{border-color:#e7c9ce}
+.payment-title{background:linear-gradient(145deg,#d71920,#a60018)}
+.pay-row button,.copy-payment{border-color:#e7cbd0;background:#fff0f2;color:#8f1c31}
+.payment-code-note{background:#fff7f8;color:#714d53}
+.bank-warning{border-color:#e9bdc5;background:#fff6f7}
+.bank-warning>span{background:#d71920}
+.bank-warning p{color:#75414a}
+.delivery-view{border-color:#e2aab4;background:linear-gradient(145deg,#fff0f2,#fff)}
+.delivery-head>span{background:#d71920}
+.delivery-head small,.delivery-pair-rank{color:#a60018}
+.delivery-caption{color:#735158}
+.delivery-pair{border-color:#e5bdc4}
+.delivery-pair-numbers strong{border-color:#dd9da9;background:linear-gradient(180deg,#fff,#fff2f4);color:#a60018}
+.consent button:last-child{border-color:#d71920;background:#d71920}
+.mobile-cta{background:linear-gradient(145deg,#d71920,#a60018);color:#fff}
+
+/* Samples, legal and supporting pages */
+.notice,.notice-bar{background:#a60018;color:#ffe4e8}
+.report-cover,.legal-intro{border:1px solid #e9b7c0;background:linear-gradient(145deg,#fff,#fff4f6);color:var(--ink);box-shadow:var(--shadow)}
+.report-cover .eyebrow,.legal-intro .eyebrow{color:#b5001c}
+.report-cover h1,.legal-intro h1{color:#a60018}
+.report-cover>p:last-of-type,.legal-intro>p:last-child{color:#6e555a}
+.report-badges span{border-color:#e5bcc3;background:#fff;color:#7c2635}
+.sample-section,.legal-page>section{border-color:#ecd2d7;background:#fff}
+.sample-status,.row-chip{background:#fff0f2;color:#a60018}
+.fourso-grid strong{border-color:#df9eaa;background:linear-gradient(180deg,#fff,#fff2f4);color:#a60018;box-shadow:0 12px 28px rgba(166,0,24,.08)}
+.sample-included-grid article{border-color:#ead1d6;background:#fff8f9}
+.sample-source-line{border-color:#e8c8ce;background:#fff8f9}
+.sample-buy{background:linear-gradient(145deg,#d71920,#a60018)}
+.sample-buy p{color:#ffe5e9}
+.report-disclaimer{border-left-color:#d71920;background:#fff0f2}
+.legal-page p{color:#684f54}
+
+/* SEO content pages use the same visual system. */
+h1,h2,h3{color:#870014}
+.breadcrumbs a,.text-link{color:#a60018}
+.seo-section.soft{background:#fff7f8}
+.method-list,.plain-card,.metric-grid article,.step-list li,.explain-grid article,.data-flow div,.history-table{border-color:#ecd2d7;box-shadow:0 12px 32px rgba(166,0,24,.06)}
+.number-chip,.mini-number{border-color:#e5bcc4;background:linear-gradient(145deg,#fff,#fff2f4);color:#a60018}
+.locked-card{border-color:#e2aab4;background:linear-gradient(145deg,#fff,#fff2f4)}
+.lock-badge{background:#ffe0e5;color:#9f0018}
+.masked-pairs b{border-color:#dba6af;color:#8b3b49}
+.metric-grid strong,.data-flow b{color:#d71920}
+.fine-print{border-left-color:#d71920}
+.step-list li>b,.history-head{background:#d71920;color:#fff}
+.cta-panel,.seo-footer,.site-footer{background:linear-gradient(145deg,#a60018,#780012);color:#ffe5e9}
+.cta-panel span,.seo-footer p,.site-footer p{color:#f1cbd1}
+.seo-footer nav a,.site-footer nav a,.footer-bottom a{color:#fff}
+.history-status.hit{background:#fff0f2;color:#a60018}
+.hit-row .mini-number{border-color:#d71920}
+.explain-grid article>b{background:#fff0f2;color:#a60018}
+
+@media(max-width:680px){
+  .hero,.hero-simple,.seo-hero{padding-top:38px;padding-bottom:38px}
+  .hero-simple h1{font-size:clamp(40px,12vw,54px);line-height:1.02}
+  .hero-offer,.simple-hero-offer{display:grid;gap:14px}
+  .hero-offer .button{width:100%}
+  .historical-proof-section{padding-top:38px}
+  .historical-rate{padding:26px}
+  .historical-rate>strong{font-size:76px}
+  .historical-proof-copy{padding:24px}
+  .history-days{max-height:430px;overflow:auto}
+  .buy-simple{padding:40px 0 54px}
+  .buy-simple-card{padding:24px}
+  .floating-zalo{bottom:86px}
+  .simple-header .sample-link{display:none}
+}

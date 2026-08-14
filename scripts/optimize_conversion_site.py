@@ -3,7 +3,7 @@
 
 This runs after the audited static build and the public-site simplification step.
 It does not touch analytical data, paid-report payloads, order logic or payment
-approval.  It only improves message hierarchy, trust cues and purchase CTAs.
+approval. It only improves message hierarchy, trust cues and purchase CTAs.
 """
 from __future__ import annotations
 
@@ -84,7 +84,14 @@ def optimize_home(content: str) -> str:
         if count != 1:
             raise ValueError("Home hero section was not found")
 
-    if 'class="history-cta"' not in content and 'class="historical-disclaimer"' in content:
+    # Only add a purchase CTA after historical evidence when today's report is
+    # actually ready. A stale/fail-closed build must not invite payment.
+    report_ready = 'data-public-ready="false"' not in content
+    if (
+        report_ready
+        and 'class="history-cta"' not in content
+        and 'class="historical-disclaimer"' in content
+    ):
         content = replace_one(
             content,
             r'(<p class="historical-disclaimer">.*?</p>)',
@@ -158,41 +165,57 @@ def optimize_site(output_root: Path) -> None:
         write_if_changed(page, content)
 
     home = (output_root / "index.html").read_text(encoding="utf-8")
+    report_ready = 'data-public-ready="false"' not in home
     checks = {
         "conversion stylesheet": STYLE_HREF,
         "trust strip": 'class="conversion-trust"',
-        "history CTA": 'class="history-cta"',
         "purchase guarantees": 'class="buy-guarantees"',
         "checkout trust": 'class="checkout-trust"',
-        "today CTA": "NHẬN BÁO CÁO HÔM NAY – 30.000Đ",
     }
+    if report_ready:
+        checks.update(
+            {
+                "history CTA": 'class="history-cta"',
+                "today CTA": "NHẬN BÁO CÁO HÔM NAY – 30.000Đ",
+            }
+        )
     for label, marker in checks.items():
         if marker not in home:
             raise AssertionError(f"Missing {label}: {marker}")
     if home.count('class="conversion-trust"') != 1:
         raise AssertionError("Conversion trust strip must occur exactly once")
-    if home.count('class="history-cta"') != 1:
-        raise AssertionError("History CTA must occur exactly once")
+    if report_ready and home.count('class="history-cta"') != 1:
+        raise AssertionError("Ready page must contain exactly one history CTA")
+    if not report_ready and 'class="history-cta"' in home:
+        raise AssertionError("Fail-closed page must not contain a history purchase CTA")
 
 
 def self_test() -> None:
-    sample = '''<!doctype html><html><head><title>Test</title></head><body>
+    ready_sample = '''<!doctype html><html><head><title>Test</title></head><body data-public-ready="true">
     <section class="hero hero-simple" id="top"><div>Hero</div></section>
     <section><p class="historical-disclaimer">Historical disclaimer</p></section>
     <section class="buy-simple"><p class="eyebrow">BÁO CÁO ĐẦY ĐỦ HÔM NAY</p><p class="checkout-scope" id="checkout-scope">Scope</p><p class="buy-legal">Old</p></section>
     <div><h2 id="checkout-title">Chuyển khoản 30.000đ</h2><p class="checkout-scope" id="checkout-modal-scope">Modal scope</p><p class="zalo-instruction">Old</p><button>Tôi đã chuyển khoản – gửi email xác nhận</button></div>
     <button class="mobile-cta"><span>Nhận báo cáo đầy đủ</span><strong>30.000đ</strong></button>
     </body></html>'''
+    stale_sample = ready_sample.replace('data-public-ready="true"', 'data-public-ready="false"').replace(
+        '<p class="historical-disclaimer">Historical disclaimer</p>',
+        '<p>Historical data is updating</p>',
+    )
     with tempfile.TemporaryDirectory() as temp_dir:
         root = Path(temp_dir)
         index = root / "index.html"
-        index.write_text(sample, encoding="utf-8")
+        index.write_text(ready_sample, encoding="utf-8")
         optimize_site(root)
         first = index.read_text(encoding="utf-8")
         optimize_site(root)
         second = index.read_text(encoding="utf-8")
         if first != second:
             raise AssertionError("Conversion optimizer must be idempotent")
+        index.write_text(stale_sample, encoding="utf-8")
+        optimize_site(root)
+        if 'class="history-cta"' in index.read_text(encoding="utf-8"):
+            raise AssertionError("Stale self-test page exposed a purchase CTA")
 
 
 def main() -> None:

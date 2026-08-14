@@ -86,7 +86,7 @@ jobs:
           python scripts/simplify_public_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
           python scripts/replace_public_analysis_wording.py --output-root _site
-          python scripts/optimize_conversion_site.py --output-root _site
+          python scripts/apply_conversion_site.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260814-2#g'
           test -s _site/red-white-theme.css
           test -s _site/conversion-accent.css
@@ -101,7 +101,11 @@ jobs:
           test -s _site/llms.txt
           grep -q 'class="conversion-trust"' _site/index.html
           grep -q 'class="conversion-preview"' _site/index.html || grep -q 'CHƯA NHẬN THANH TOÁN' _site/index.html
-          grep -q 'class="history-disclosure"' _site/index.html
+          if grep -q 'class="historical-disclaimer"' _site/index.html; then
+            grep -q 'class="history-disclosure"' _site/index.html
+          else
+            ! grep -q 'class="history-disclosure"' _site/index.html
+          fi
           if grep -q 'data-public-ready="true"' _site/index.html; then
             grep -q 'class="history-cta"' _site/index.html
             grep -q 'MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ' _site/index.html

@@ -1,145 +1,145 @@
-/* White–red conversion theme for lemienbac.com.
-   Loaded after the existing CSS so the payment flow and layout stay intact. */
+/* Calm white–burgundy conversion theme for lemienbac.com.
+   Loaded after the existing CSS so layout and payment behavior stay intact. */
 :root{
-  --navy:#a60018;
-  --navy-2:#d71920;
-  --ink:#261518;
-  --muted:#715d61;
-  --line:#efd7dc;
-  --page:#fff;
+  --navy:#6f2734;
+  --navy-2:#8d3948;
+  --ink:#30292b;
+  --muted:#756a6c;
+  --line:#e8dfe1;
+  --page:#fffdfb;
   --white:#fff;
-  --accent:#d71920;
-  --accent-dark:#a60018;
-  --accent-soft:#fff1f3;
-  --green:#ad001b;
-  --green-soft:#fff0f2;
-  --blue:#b0001b;
-  --blue-soft:#fff0f2;
-  --red:#d71920;
-  --red-dark:#a60018;
-  --soft:#fff7f8;
-  --gold:#d71920;
-  --shadow:0 18px 48px rgba(166,0,24,.11);
+  --accent:#8b3343;
+  --accent-dark:#6f2734;
+  --accent-soft:#f6eef0;
+  --green:#466553;
+  --green-soft:#eef4ef;
+  --blue:#0878f9;
+  --blue-soft:#eef6ff;
+  --red:#8b3343;
+  --red-dark:#6f2734;
+  --soft:#faf7f7;
+  --gold:#9a6b3e;
+  --shadow:0 16px 42px rgba(67,42,47,.09);
 }
-html{background:#fff}
-body,.landing-simple,.simple-page{background:#fff;color:var(--ink)}
-a:focus-visible,button:focus-visible{outline:3px solid rgba(215,25,32,.28);outline-offset:3px}
+html{background:#fffdfb}
+body,.landing-simple,.simple-page{background:#fffdfb;color:var(--ink)}
+a:focus-visible,button:focus-visible{outline:3px solid rgba(139,51,67,.22);outline-offset:3px}
 
 /* Header */
-.site-header,.topbar{border-bottom:1px solid #efd3d8;background:rgba(255,255,255,.97);color:var(--ink);box-shadow:0 6px 24px rgba(166,0,24,.06);backdrop-filter:blur(14px)}
-.brand-mark,.seo-brand>b{background:linear-gradient(145deg,#d71920,#a60018);color:#fff;box-shadow:0 7px 18px rgba(166,0,24,.18)}
-.brand small,.seo-brand small{color:#80686d}
-.sample-link,.site-header nav a,.seo-nav a{color:#7c2635}
-.seo-nav a{border-color:#efd3d8;background:#fff}
-.seo-nav a:hover,.seo-nav a:focus-visible{background:#fff0f2;color:#a60018}
-.button-primary,.top-cta,.primary-cta,.payment-confirm{background:linear-gradient(145deg,#e11c2d,#b5001c);color:#fff;box-shadow:0 10px 24px rgba(183,0,28,.2)}
-.button-primary:hover,.top-cta:hover,.primary-cta:hover,.payment-confirm:hover{background:linear-gradient(145deg,#c90020,#970016)}
-.button-light{border-color:#edcbd1;background:#fff;color:#a60018}
+.site-header,.topbar{border-bottom:1px solid #ece4e5;background:rgba(255,253,251,.97);color:var(--ink);box-shadow:0 5px 20px rgba(70,45,50,.045);backdrop-filter:blur(14px)}
+.brand-mark,.seo-brand>b{background:linear-gradient(145deg,#8b3948,#682631);color:#fff;box-shadow:0 6px 15px rgba(75,35,43,.14)}
+.brand small,.seo-brand small{color:#7d7173}
+.sample-link,.site-header nav a,.seo-nav a{color:#70404a}
+.seo-nav a{border-color:#e8dfe1;background:#fff}
+.seo-nav a:hover,.seo-nav a:focus-visible{background:#f7f1f2;color:#6f2734}
+.button-primary,.top-cta,.primary-cta,.payment-confirm{background:#843142;color:#fff;box-shadow:0 8px 18px rgba(91,39,50,.14)}
+.button-primary:hover,.top-cta:hover,.primary-cta:hover,.payment-confirm:hover{background:#6d2837}
+.button-light{border-color:#e3d6d9;background:#fff;color:#71303e}
 
-/* Main hero: white first screen, red evidence, one clear offer. */
-.hero,.hero-simple,.seo-hero{border-bottom:1px solid #efd7dc;background:
-  radial-gradient(circle at 88% 12%,rgba(215,25,32,.08),transparent 31%),
-  linear-gradient(180deg,#fff,#fffafb);color:var(--ink)}
-.hero .eyebrow,.seo-hero .eyebrow{color:#b5001c}
-.hero h1,.seo-hero h1{color:#9f0018}
-.hero h1 em{color:#d71920}
-.hero-lead,.seo-hero .lead{color:#4f3d41}
-.hero-lead strong{color:#9f0018}
-.hero-proof-text,.hero-date{color:#786469}
-.hero-proof-text strong{color:#a60018}
-.hero-offer{border:1px solid #eab7c0;background:#fff;box-shadow:0 16px 38px rgba(166,0,24,.1)}
-.hero-offer small{color:#a60018}
-.hero-offer strong{color:#d71920}
-.simple-hero-offer strong{color:#d71920}
-.hero-offer span{color:#6d555a}
-.data-card{border:1px solid #eab7c0;background:#fff;color:var(--ink);box-shadow:0 15px 36px rgba(166,0,24,.08)}
-.data-card span{color:#80686d}
-.data-card strong{color:#a60018}
+/* Main hero: warm white surface with restrained burgundy accents. */
+.hero,.hero-simple,.seo-hero{border-bottom:1px solid #ebe2e4;background:
+  radial-gradient(circle at 88% 12%,rgba(139,51,67,.045),transparent 32%),
+  linear-gradient(180deg,#fffdfb,#fbf7f7);color:var(--ink)}
+.hero .eyebrow,.seo-hero .eyebrow{color:#7b3442}
+.hero h1,.seo-hero h1{color:#332d2f}
+.hero h1 em{color:#7f3040}
+.hero-lead,.seo-hero .lead{color:#554d4f}
+.hero-lead strong{color:#493c3f}
+.hero-proof-text,.hero-date{color:#786f71}
+.hero-proof-text strong{color:#71303e}
+.hero-offer{border:1px solid #e4d9db;background:#fff;box-shadow:0 13px 32px rgba(68,42,47,.075)}
+.hero-offer small{color:#74303e}
+.hero-offer strong{color:#813142}
+.simple-hero-offer strong{color:#813142}
+.hero-offer span{color:#6d6264}
+.data-card{border:1px solid #e5dadd;background:#fff;color:var(--ink);box-shadow:0 12px 30px rgba(68,42,47,.06)}
+.data-card span{color:#7d7274}
+.data-card strong{color:#71303e}
 
 /* Remove the public per-method number catalogue even if an old artifact is cached. */
 .public-methods-v2,[data-current-methods]{display:none!important}
-.public-methods-summary{background:#fff}
+.public-methods-summary{background:#fffdfb}
 .public-methods-summary .section-heading{max-width:820px;margin-bottom:0}
 .public-methods-summary .primary-cta{margin-top:18px}
 
 /* Historical proof */
-.historical-proof-section{background:#fff7f8}
-.historical-proof-summary{border-color:#eab7c0;background:#fff;box-shadow:0 20px 48px rgba(166,0,24,.09)}
-.historical-rate{background:linear-gradient(145deg,#d71920,#9f0018);color:#fff}
-.historical-rate p{color:#ffe0e4}
-.historical-rate>strong{color:#fff}
-.historical-rate>span{color:#fff1f3}
-.historical-proof-copy>div{background:#fff0f2}
-.historical-proof-copy>div strong{color:#a60018}
-.historical-proof-copy>div span{color:#70444b}
-.history-days{border-color:#ead1d6;background:#fff}
-.history-day-head{background:#fff0f2;color:#8d3443}
-.history-day-row{border-top-color:#f0dde0}
-.history-outputs b,.historical-number-list b{border-color:#e7cbd0;background:#fff;color:#4e252c}
-.history-outputs b.is-observed{border-color:#d71920;background:#fff0f2;color:#a60018}
-.history-observed.has-observed span{background:#fff0f2;color:#a60018}
-.historical-disclaimer a{color:#a60018;font-weight:800}
+.historical-proof-section{background:#faf7f7}
+.historical-proof-summary{border-color:#e3d9db;background:#fff;box-shadow:0 16px 40px rgba(68,42,47,.07)}
+.historical-rate{border:1px solid #e4d6da;background:linear-gradient(145deg,#f6eff0,#eee4e6);color:#30292b}
+.historical-rate p{color:#79676b}
+.historical-rate>strong{color:#78303e}
+.historical-rate>span{color:#62575a}
+.historical-proof-copy>div{background:#f7f2f3}
+.historical-proof-copy>div strong{color:#71303e}
+.historical-proof-copy>div span{color:#6c6062}
+.history-days{border-color:#e5dcde;background:#fff}
+.history-day-head{background:#f7f2f3;color:#6e5b5f}
+.history-day-row{border-top-color:#eee6e7}
+.history-outputs b,.historical-number-list b{border-color:#e3dadd;background:#fff;color:#4f4648}
+.history-outputs b.is-observed{border-color:#b8cbbd;background:#eef4ef;color:#3f5f4b}
+.history-observed.has-observed span{background:#eef4ef;color:#3f5f4b}
+.historical-disclaimer a{color:#71303e;font-weight:800}
 
 /* Price and checkout */
-.buy-simple{background:#fff}
-.buy-simple-card{border:2px solid #d71920;background:#fff;box-shadow:0 18px 44px rgba(166,0,24,.1)}
-.buy-simple-card h2{color:#d71920}
-.buy-simple-card li span{background:#d71920;color:#fff}
-.buy-legal a{color:#a60018}
-.checkout{border:1px solid #e8c7cd;background:#fff;box-shadow:0 30px 90px rgba(80,0,13,.34)}
-.checkout h2{color:#a60018}
-.checkout-scope{background:#fff0f2;color:#8b2b3b}
-.payment-card{border-color:#e7c9ce}
-.payment-title{background:linear-gradient(145deg,#d71920,#a60018)}
-.pay-row button,.copy-payment{border-color:#e7cbd0;background:#fff0f2;color:#8f1c31}
-.payment-code-note{background:#fff7f8;color:#714d53}
-.bank-warning{border-color:#e9bdc5;background:#fff6f7}
-.bank-warning>span{background:#d71920}
-.bank-warning p{color:#75414a}
-.delivery-view{border-color:#e2aab4;background:linear-gradient(145deg,#fff0f2,#fff)}
-.delivery-head>span{background:#d71920}
-.delivery-head small,.delivery-pair-rank{color:#a60018}
-.delivery-caption{color:#735158}
-.delivery-pair{border-color:#e5bdc4}
-.delivery-pair-numbers strong{border-color:#dd9da9;background:linear-gradient(180deg,#fff,#fff2f4);color:#a60018}
-.consent button:last-child{border-color:#d71920;background:#d71920}
-.mobile-cta{background:linear-gradient(145deg,#d71920,#a60018);color:#fff}
+.buy-simple{background:#fffdfb}
+.buy-simple-card{border:1px solid #e1d6d8;border-top:4px solid #823142;background:#fff;box-shadow:0 15px 38px rgba(68,42,47,.075)}
+.buy-simple-card h2{color:#7d3040}
+.buy-simple-card li span{background:#7d3040;color:#fff}
+.buy-legal a{color:#71303e}
+.checkout{border:1px solid #e5dadd;background:#fff;box-shadow:0 28px 78px rgba(54,34,38,.26)}
+.checkout h2{color:#6f2a38}
+.checkout-scope{background:#f7f1f2;color:#714a52}
+.payment-card{border-color:#e5dadd}
+.payment-title{background:#702a38}
+.pay-row button,.copy-payment{border-color:#e1d6d8;background:#f7f2f3;color:#71303e}
+.payment-code-note{background:#faf7f7;color:#74696b}
+.bank-warning{border-color:#e7dccb;background:#faf7ef}
+.bank-warning>span{background:#9a6b3e}
+.bank-warning p{color:#6d5b45}
+.delivery-view{border-color:#d8c7cb;background:linear-gradient(145deg,#f8f2f3,#fff)}
+.delivery-head>span{background:#466553}
+.delivery-head small,.delivery-pair-rank{color:#71303e}
+.delivery-caption{color:#716669}
+.delivery-pair{border-color:#dfd3d6}
+.delivery-pair-numbers strong{border-color:#d8c7cb;background:linear-gradient(180deg,#fff,#f8f3f4);color:#71303e}
+.consent button:last-child{border-color:#7d3040;background:#7d3040}
+.mobile-cta{background:#702a38;color:#fff;box-shadow:0 10px 24px rgba(69,35,42,.22)}
 
 /* Samples, legal and supporting pages */
-.notice,.notice-bar{background:#a60018;color:#ffe4e8}
-.report-cover,.legal-intro{border:1px solid #e9b7c0;background:linear-gradient(145deg,#fff,#fff4f6);color:var(--ink);box-shadow:var(--shadow)}
-.report-cover .eyebrow,.legal-intro .eyebrow{color:#b5001c}
-.report-cover h1,.legal-intro h1{color:#a60018}
-.report-cover>p:last-of-type,.legal-intro>p:last-child{color:#6e555a}
-.report-badges span{border-color:#e5bcc3;background:#fff;color:#7c2635}
-.sample-section,.legal-page>section{border-color:#ecd2d7;background:#fff}
-.sample-status,.row-chip{background:#fff0f2;color:#a60018}
-.fourso-grid strong{border-color:#df9eaa;background:linear-gradient(180deg,#fff,#fff2f4);color:#a60018;box-shadow:0 12px 28px rgba(166,0,24,.08)}
-.sample-included-grid article{border-color:#ead1d6;background:#fff8f9}
-.sample-source-line{border-color:#e8c8ce;background:#fff8f9}
-.sample-buy{background:linear-gradient(145deg,#d71920,#a60018)}
-.sample-buy p{color:#ffe5e9}
-.report-disclaimer{border-left-color:#d71920;background:#fff0f2}
-.legal-page p{color:#684f54}
+.notice,.notice-bar{background:#682631;color:#f4e8ea}
+.report-cover,.legal-intro{border:1px solid #e3d6d9;background:linear-gradient(145deg,#fff,#faf5f6);color:var(--ink);box-shadow:var(--shadow)}
+.report-cover .eyebrow,.legal-intro .eyebrow{color:#74303e}
+.report-cover h1,.legal-intro h1{color:#642a35}
+.report-cover>p:last-of-type,.legal-intro>p:last-child{color:#706568}
+.report-badges span{border-color:#e2d6d9;background:#fff;color:#71404a}
+.sample-section,.legal-page>section{border-color:#e7dfe1;background:#fff}
+.sample-status,.row-chip{background:#f6eff0;color:#71303e}
+.fourso-grid strong{border-color:#dac9cd;background:linear-gradient(180deg,#fff,#f8f3f4);color:#71303e;box-shadow:0 10px 24px rgba(68,42,47,.06)}
+.sample-included-grid article{border-color:#e5dcde;background:#faf7f7}
+.sample-source-line{border-color:#e5dcde;background:#faf7f7}
+.sample-buy{background:linear-gradient(145deg,#71303e,#57242e)}
+.sample-buy p{color:#eee1e4}
+.report-disclaimer{border-left-color:#7d3040;background:#f7f1f2}
+.legal-page p{color:#675d5f}
 
 /* SEO content pages use the same visual system. */
-h1,h2,h3{color:#870014}
-.breadcrumbs a,.text-link{color:#a60018}
-.seo-section.soft{background:#fff7f8}
-.method-list,.plain-card,.metric-grid article,.step-list li,.explain-grid article,.data-flow div,.history-table{border-color:#ecd2d7;box-shadow:0 12px 32px rgba(166,0,24,.06)}
-.number-chip,.mini-number{border-color:#e5bcc4;background:linear-gradient(145deg,#fff,#fff2f4);color:#a60018}
-.locked-card{border-color:#e2aab4;background:linear-gradient(145deg,#fff,#fff2f4)}
-.lock-badge{background:#ffe0e5;color:#9f0018}
-.masked-pairs b{border-color:#dba6af;color:#8b3b49}
-.metric-grid strong,.data-flow b{color:#d71920}
-.fine-print{border-left-color:#d71920}
-.step-list li>b,.history-head{background:#d71920;color:#fff}
-.cta-panel,.seo-footer,.site-footer{background:linear-gradient(145deg,#a60018,#780012);color:#ffe5e9}
-.cta-panel span,.seo-footer p,.site-footer p{color:#f1cbd1}
+h1,h2,h3{color:#342e30}
+.breadcrumbs a,.text-link{color:#71303e}
+.seo-section.soft{background:#faf7f7}
+.method-list,.plain-card,.metric-grid article,.step-list li,.explain-grid article,.data-flow div,.history-table{border-color:#e7dfe1;box-shadow:0 10px 28px rgba(68,42,47,.045)}
+.number-chip,.mini-number{border-color:#ddcfd2;background:linear-gradient(145deg,#fff,#f8f3f4);color:#71303e}
+.locked-card{border-color:#dbcbd0;background:linear-gradient(145deg,#fff,#f8f3f4)}
+.lock-badge{background:#f3e8ea;color:#71303e}
+.masked-pairs b{border-color:#d9cbd0;color:#76505a}
+.metric-grid strong,.data-flow b{color:#7d3040}
+.fine-print{border-left-color:#7d3040}
+.step-list li>b,.history-head{background:#74303e;color:#fff}
+.cta-panel,.seo-footer,.site-footer{background:linear-gradient(145deg,#632833,#4b222a);color:#f1e6e8}
+.cta-panel span,.seo-footer p,.site-footer p{color:#ddcdd0}
 .seo-footer nav a,.site-footer nav a,.footer-bottom a{color:#fff}
-.history-status.hit{background:#fff0f2;color:#a60018}
-.hit-row .mini-number{border-color:#d71920}
-.explain-grid article>b{background:#fff0f2;color:#a60018}
+.history-status.hit{background:#eef4ef;color:#3f5f4b}
+.hit-row .mini-number{border-color:#aebfb3}
+.explain-grid article>b{background:#f5edef;color:#71303e}
 
 @media(max-width:680px){
   .hero,.hero-simple,.seo-hero{padding-top:38px;padding-bottom:38px}

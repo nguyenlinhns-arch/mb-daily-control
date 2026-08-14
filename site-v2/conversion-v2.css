@@ -1,0 +1,71 @@
+/* Final conversion refinements: auditable 30-day history, VietQR checkout,
+   and a lower-distraction mode for paid Google Ads visits. */
+
+/* Full 30-day evidence sits between the two purchase blocks. */
+.history-disclosure[open] > summary{border-bottom:1px solid #ebe6e7}
+.history-disclosure[open] > summary span{transform:rotate(180deg)}
+.history-disclosure .history-days{max-height:none!important;overflow:visible!important}
+.history-disclosure summary{cursor:pointer}
+.history-day-head span:nth-child(2)::after{content:""}
+.history-day-row{min-height:62px}
+.history-day-row time{font-weight:800;color:#554d4f}
+.history-observed.has-observed::before{
+  content:"Trúng";
+  margin-right:5px;padding:4px 7px;border-radius:999px;
+  background:#e9f4ec;color:#3f654a;font-size:9px;font-weight:900;
+  letter-spacing:.025em;text-transform:uppercase;
+}
+.history-miss{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  min-height:28px;padding:5px 9px!important;border-radius:999px!important;
+  background:#fff0f1!important;color:#93323e!important;font-size:10px!important;font-weight:900!important;
+}
+.historical-proof-copy>div strong{font-variant-numeric:tabular-nums}
+
+/* VietQR removes manual copy friction while retaining the exact bank details. */
+.pay-row-holder strong{letter-spacing:.025em}
+.vietqr-panel{
+  margin:14px 0 0;padding:15px;border:1px solid #e3d6d9;border-radius:16px;
+  display:grid;grid-template-columns:minmax(0,1fr) 184px;gap:14px;align-items:center;
+  background:#fff;box-shadow:0 10px 28px rgba(60,42,46,.055);
+}
+.vietqr-panel figcaption{min-width:0}
+.vietqr-panel figcaption strong{display:block;color:#3e3537;font-size:15px;line-height:1.35}
+.vietqr-panel figcaption span{display:block;margin-top:6px;color:#71686a;font-size:11px;line-height:1.55}
+.vietqr-image{
+  grid-column:2;grid-row:1 / span 2;width:184px;height:184px;max-width:100%;
+  border:1px solid #e7dfe1;border-radius:14px;display:block;background:#fff;object-fit:contain;
+}
+.vietqr-recipient{
+  margin:10px 0 0;padding:9px 10px;border-radius:10px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;background:#f7f3f3;
+}
+.vietqr-recipient span{color:#786e70;font-size:10px;font-weight:750}
+.vietqr-recipient strong{color:#6e2935;font-size:11px;letter-spacing:.035em}
+.vietqr-unavailable .vietqr-image{display:none}
+.vietqr-unavailable{grid-template-columns:1fr}
+.vietqr-unavailable figcaption span::after{content:" Có thể tiếp tục sao chép thông tin chuyển khoản bên trên."}
+
+/* Google Ads landing mode keeps useful proof and legal disclosure but removes
+   exits that do not help a first-time visitor complete the purchase. */
+.ads-landing .floating-zalo{display:none!important}
+.ads-landing .simple-footer>div>p{display:none}
+.ads-landing .simple-footer>div{justify-content:center!important}
+.ads-landing .simple-footer nav a:not([href*="legal"]){display:none!important}
+.ads-landing .simple-header .sample-link{display:inline-flex!important}
+.ads-landing .conversion-trust-item[href="/mau-bao-cao.html"]{display:grid}
+
+@media(max-width:720px){
+  .history-day-row{grid-template-columns:88px minmax(0,1fr)!important;gap:7px 9px!important}
+  .history-observed{grid-column:2!important;justify-self:start!important}
+  .vietqr-panel{grid-template-columns:1fr;text-align:center}
+  .vietqr-image{grid-column:1;grid-row:auto;width:min(260px,100%);height:auto;justify-self:center}
+  .vietqr-recipient{max-width:360px;width:100%;justify-self:center;text-align:left}
+}
+
+@media(max-width:420px){
+  .history-day-row{grid-template-columns:78px minmax(0,1fr)!important;padding:11px!important}
+  .history-outputs{gap:4px!important}
+  .history-outputs b{min-width:34px!important;padding:6px 5px!important}
+  .vietqr-panel{padding:12px}
+}

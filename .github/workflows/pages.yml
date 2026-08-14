@@ -64,6 +64,7 @@ jobs:
           cp data/public-historical-proof.json _site/historical-proof.json
           python scripts/build_seo_pages.py --output-root _site
           python scripts/simplify_public_site.py --output-root _site
+          find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
           test -s _site/red-white-theme.css
           test ! -e _site/ai-methods/public-methods.json
           test -s _site/ai-methods/yesterday-proof.json
@@ -77,6 +78,7 @@ jobs:
           ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'
           ! grep -R "public-methods-v2" _site/index.html
           ! grep -R "data-current-methods" _site/cho-so-mien-bac-hom-nay/index.html
+          ! grep -R -i "ngày hiển thị" _site --include='*.html'
           touch _site/.nojekyll
           test ! -e _site/approval-backend.gs
           test ! -e _site/ai-methods/report-data.json

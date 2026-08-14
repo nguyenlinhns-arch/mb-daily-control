@@ -109,9 +109,48 @@
     };
   }
 
+  function readStoredOrder() {
+    try {
+      const persisted = localStorage.getItem(ORDER_KEY);
+      if (persisted) return persisted;
+    } catch (_) {
+      // A privacy mode may block persistent storage. The legacy session store remains a fallback.
+    }
+    try {
+      const legacy = sessionStorage.getItem(ORDER_KEY);
+      if (legacy) {
+        try {
+          localStorage.setItem(ORDER_KEY, legacy);
+          sessionStorage.removeItem(ORDER_KEY);
+        } catch (_) {
+          // Keep using the session value when migration is unavailable.
+        }
+        return legacy;
+      }
+    } catch (_) {
+      // Continue with a fresh order.
+    }
+    return "";
+  }
+
+  function persistOrder(value) {
+    const serialized = JSON.stringify(value);
+    try {
+      localStorage.setItem(ORDER_KEY, serialized);
+      return;
+    } catch (_) {
+      // Fall back to the current tab when persistent storage is unavailable.
+    }
+    try {
+      sessionStorage.setItem(ORDER_KEY, serialized);
+    } catch (_) {
+      // The page can still show the current in-memory order.
+    }
+  }
+
   function loadOrder() {
     try {
-      const parsed = JSON.parse(sessionStorage.getItem(ORDER_KEY) || "null");
+      const parsed = JSON.parse(readStoredOrder() || "null");
       if (
         parsed
         && /^AI-\d{6}-[A-Z0-9]{6}$/.test(parsed.code)
@@ -121,7 +160,7 @@
       ) {
         if (parsed.status === "draft" && !/^\d{12}$/.test(String(parsed.paymentMemo || ""))) {
           const refreshed = newOrder();
-          sessionStorage.setItem(ORDER_KEY, JSON.stringify(refreshed));
+          persistOrder(refreshed);
           return refreshed;
         }
         return {
@@ -130,15 +169,15 @@
         };
       }
     } catch (_) {
-      // Dữ liệu phiên lỗi sẽ được thay bằng một yêu cầu mới.
+      // Dữ liệu đã lưu lỗi sẽ được thay bằng một yêu cầu mới.
     }
     const fresh = newOrder();
-    sessionStorage.setItem(ORDER_KEY, JSON.stringify(fresh));
+    persistOrder(fresh);
     return fresh;
   }
 
   function saveOrder() {
-    sessionStorage.setItem(ORDER_KEY, JSON.stringify(order));
+    persistOrder(order);
   }
 
   function collectAttribution() {
@@ -193,8 +232,8 @@
       order.delivery = null;
       saveOrder();
       showPending(
-        "Đang tải kết quả 4SO",
-        "Hệ thống đang cập nhật hai cặp theo thứ tự xếp hạng."
+        "Đang tải kết luận 4SO",
+        "Hệ thống đang cập nhật hai cặp theo đúng thứ tự xếp hạng."
       );
       startPolling();
       return;
@@ -269,8 +308,8 @@
     selfConfirmButton.hidden = order.status === "approved";
     if (order.status === "pending") {
       showPending(
-        "Đã gửi email báo chủ dịch vụ",
-        "Hệ thống đang chờ đối soát. Khi chủ dịch vụ bấm xác nhận trong email, báo cáo sẽ tự mở tại đây."
+        "Đã gửi yêu cầu đối soát",
+        "Bạn có thể tải lại trang hoặc quay lại sau. Khi giao dịch được xác nhận, kết luận AI sẽ tự mở tại đây."
       );
       startPolling();
     } else if (order.status === "approved") {
@@ -293,6 +332,7 @@
     checkout.hidden = false;
     document.body.classList.add("modal-open");
     checkoutClose.focus();
+    if (order.status === "pending") checkStatus();
     track("begin_checkout", {
       currency: "VND",
       value: PRICE,
@@ -334,7 +374,7 @@
     if (submitting || order.status !== "draft") return;
     if (!BACKEND_ENDPOINT) {
       showPending(
-        "Kênh email xác nhận chưa sẵn sàng",
+        "Kênh xác nhận chưa sẵn sàng",
         "Chưa gửi yêu cầu. Vui lòng dùng nút Hỗ trợ ngay để được kiểm tra.",
         true
       );
@@ -343,7 +383,7 @@
 
     submitting = true;
     selfConfirmButton.disabled = true;
-    selfConfirmButton.textContent = "Đang gửi email thông báo…";
+    selfConfirmButton.textContent = "Đang gửi yêu cầu đối soát…";
     hiddenPost(BACKEND_ENDPOINT, {
       action: "create",
       order_code: order.code,
@@ -367,10 +407,10 @@
       report_date: REPORT_DATE
     });
     showPending(
-      "Đã gửi email báo chủ dịch vụ",
-      "Giữ màn hình này. Khi giao dịch được xác nhận từ email, báo cáo sẽ tự mở tại đây."
+      "Đã gửi yêu cầu đối soát",
+      "Bạn có thể tải lại trang hoặc quay lại sau. Kết luận AI sẽ tự mở khi giao dịch được xác nhận."
     );
-    selfConfirmButton.textContent = "Đã gửi yêu cầu xác nhận";
+    selfConfirmButton.textContent = "Đã gửi yêu cầu đối soát";
     submitting = false;
     startPolling();
   }
@@ -451,6 +491,18 @@
   checkout.addEventListener("click", (event) => { if (event.target === checkout) closeCheckout(); });
   document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !checkout.hidden) closeCheckout(); });
   selfConfirmButton.addEventListener("click", submitPaymentClaim);
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && order.status === "pending") checkStatus();
+  });
+  window.addEventListener("focus", () => {
+    if (order.status === "pending") checkStatus();
+  });
+  window.addEventListener("storage", (event) => {
+    if (event.key !== ORDER_KEY || !event.newValue) return;
+    order = loadOrder();
+    if (dataReady) updateCheckoutState();
+  });
 
   document.querySelectorAll("[data-copy-target]").forEach((button) => {
     button.addEventListener("click", () => {

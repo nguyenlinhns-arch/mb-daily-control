@@ -11,6 +11,7 @@ SCRIPT_TAG = '<script defer src="/checkout-entry.js?v=20260815-1"></script>'
 
 TEXT_REPLACEMENTS = (
     ("MỞ KẾT LUẬN AI HÔM NAY – 30.000Đ", "NHẬN BÁO CÁO HÔM NAY – 30.000Đ"),
+    ("MỞ KẾT LUẬN AI HÔM NAY", "NHẬN BÁO CÁO HÔM NAY"),
     ("MỞ KẾT LUẬN AI · 30K", "NHẬN BÁO CÁO · 30K"),
     ("Mở kết luận AI hôm nay", "Nhận báo cáo hôm nay"),
     ("Mở kết luận AI ngày hôm nay", "Nhận báo cáo AI ngày hôm nay"),
@@ -29,11 +30,12 @@ def rewrite_page(page: Path, root: Path) -> None:
 
     if page != root / "index.html":
         content = re.sub(
-            r'(<a\b[^>]*\bclass="[^"]*(?:top-cta|primary-cta)[^"]*"[^>]*\bhref=")[^"]*(")',
+            r'(<a\b[^>]*\bclass="[^"]*(?:top-cta|primary-cta|seo-purchase-float)[^"]*"[^>]*\bhref=")[^"]*(")',
             r'\1/?checkout=1\2',
             content,
             flags=re.IGNORECASE,
         )
+        content = content.replace('href="/?buy=1"', 'href="/?checkout=1"')
 
     if page == root / "index.html" and SCRIPT_TAG not in content:
         app_tag = re.search(r'<script\s+defer\s+src="[^\"]*app\.js[^\"]*"></script>', content, re.IGNORECASE)
@@ -68,6 +70,13 @@ def apply(root: Path) -> None:
             raise AssertionError("Ready page has no checkout button")
         if all(" disabled" in tag.lower() for tag in active):
             raise AssertionError("All checkout buttons are disabled on ready page")
+
+    for page in pages:
+        if page == root / "index.html":
+            continue
+        content = page.read_text(encoding="utf-8")
+        if 'class="seo-purchase-float"' in content and 'href="/?checkout=1"' not in content:
+            raise AssertionError(f"Direct checkout route missing in {page}")
 
 
 def main() -> None:

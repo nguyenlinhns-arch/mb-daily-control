@@ -33,12 +33,15 @@ jobs:
           python scripts/public_repo_boundary_guard.py
           python scripts/bundle_portal_css.py --self-test
           python scripts/fingerprint_portal_assets.py --self-test
+          python scripts/share_statistics_loader.py --self-test
           python scripts/enrich_portal_metadata.py --self-test
           node --check site-v2/portal-v2.js
           node --check site-v2/checkout-entry.js
           grep -q 'xsmb_lookup_compare' site-v2/portal-v2.js
           grep -q 'web_vitals_summary' site-v2/portal-v2.js
           grep -q 'lm_analytics_consent_v1' site-v2/portal-v2.js
+          grep -q 'xsmb_history_date_open' site-v2/portal-v2.js
           grep -q 'portal-number-compare' site-v2/portal-v3.css
-          grep -q 'portal-consent' site-v2/portal-v3.css
+          grep -q 'portal-history-browser' site-v2/portal-v3.css
+          ! grep -q 'portal-consent' site-v2/portal-v3.css
           ! grep -q 'statistics-data.json' site-v2/checkout-entry.js

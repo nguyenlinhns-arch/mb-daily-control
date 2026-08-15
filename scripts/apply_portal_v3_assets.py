@@ -28,15 +28,18 @@ def apply(root:Path)->dict[str,object]:
     import enrich_portal_metadata as metadata
     import normalize_portal_schema as schema
     import bundle_portal_css as bundle
+    import fingerprint_portal_assets as fingerprint
     metadata_result=metadata.apply(root)
     schema_result=schema.apply(root)
     bundle_result=bundle.apply(root)
+    fingerprint_result=fingerprint.apply(root)
     result:dict[str,object]={
         'pages':n,
         'sensitive_schema_removed':stripped,
         'metadata':metadata_result,
         'schema':schema_result,
         'css_bundle':bundle_result,
+        'asset_fingerprint':fingerprint_result,
     }
     required=('statistics-data.json','source-access.json','report-readiness.json','sitemap.xml','llms.txt')
     if all((root/name).exists() for name in required):
@@ -54,6 +57,7 @@ def self_test()->None:
         assert result['pages']==1 and result['sensitive_schema_removed']==1 and 'portal-v3.css' in text and '#portal-v3' not in text
         assert 'quality_gate' not in result and 'G-R9TBYP97BC' in text and 'og:title' in text
         assert '6 phương pháp XSMB công khai hôm nay' in text and result['css_bundle']['status']=='PASS'
+        assert result['asset_fingerprint']['status']=='PASS'
     print('PORTAL_V3_ASSETS_SELF_TEST_OK')
 
 def main()->None:

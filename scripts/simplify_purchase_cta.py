@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""Keep the purchase path direct while limiting the home page to two buy blocks.
+"""Keep the purchase path direct and the visible history limited to this month.
 
 The home page intentionally has exactly two checkout entry points:
 1. the hero offer above the evidence;
 2. the final purchase card below the evidence.
 
-The full daily history is visible by default between those two blocks. Header,
-mid-history and sticky-mobile purchase buttons are removed to avoid repetition.
-Secondary pages still route directly to the home-page checkout.
+The daily history between those two blocks is expanded by default, but only
+contains completed days from the report's current calendar month. The rolling
+30-day rate remains a separate summary metric above the month list.
 """
 from __future__ import annotations
 
 import argparse
 import re
+from datetime import date
 from pathlib import Path
 
 
@@ -31,10 +32,98 @@ TEXT_REPLACEMENTS = (
     ("MỞ KẾT LUẬN", "NHẬN BÁO CÁO"),
 )
 
+HISTORY_ROW = re.compile(
+    r'<div class="history-day-row" role="row">'
+    r'<time datetime="(?P<date>\d{4}-\d{2}-\d{2})">.*?'
+    r'</strong></div>',
+    re.IGNORECASE | re.DOTALL,
+)
+
 
 def normalize_text(content: str) -> str:
     for old, new in TEXT_REPLACEMENTS:
         content = content.replace(old, new)
+    return content
+
+
+def report_month(content: str) -> tuple[int, int]:
+    match = re.search(
+        r'data-report-date="(?P<day>\d{2})/(?P<month>\d{2})/(?P<year>\d{4})"',
+        content,
+    )
+    if not match:
+        raise AssertionError("Home page is missing data-report-date")
+    return int(match.group("year")), int(match.group("month"))
+
+
+def filter_history_to_report_month(content: str) -> str:
+    """Remove history rows outside the report month and refresh month copy."""
+    year, month = report_month(content)
+    prefix = f"{year:04d}-{month:02d}"
+    rows = list(HISTORY_ROW.finditer(content))
+    if not rows:
+        return content
+
+    kept_rows = [match for match in rows if match.group("date").startswith(prefix)]
+    hit_days = sum("has-observed" in match.group(0) for match in kept_rows)
+
+    content = HISTORY_ROW.sub(
+        lambda match: match.group(0)
+        if match.group("date").startswith(prefix)
+        else "",
+        content,
+    )
+
+    if kept_rows:
+        first_day = date.fromisoformat(kept_rows[0].group("date"))
+        last_day = date.fromisoformat(kept_rows[-1].group("date"))
+        count = len(kept_rows)
+        range_copy = (
+            f"Bảng dưới chỉ hiển thị {count} ngày đã hoàn tất trong tháng "
+            f"{month:02d}/{year}, từ {first_day.strftime('%d/%m/%Y')} đến "
+            f"{last_day.strftime('%d/%m/%Y')}; có cả ngày trúng và không trúng."
+        )
+        summary = (
+            f'<div><strong>{hit_days}/{count} ngày</strong>'
+            '<span>trong tháng này có số trong báo cáo xuất hiện</span></div>'
+        )
+    else:
+        range_copy = (
+            f"Tháng {month:02d}/{year} chưa có ngày nào hoàn tất để đối chiếu."
+        )
+        summary = (
+            '<div><strong>0/0 ngày</strong>'
+            '<span>trong tháng này chưa có dữ liệu hoàn tất</span></div>'
+        )
+
+    content = re.sub(
+        r'<p>Bảng dưới(?: chỉ)? hiển thị.*?</p>',
+        f"<p>{range_copy}</p>",
+        content,
+        count=1,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    content = re.sub(
+        r'<div><strong>\d+/\d+ ngày</strong><span>.*?</span></div>',
+        summary,
+        content,
+        count=1,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+
+    month_label = f"Lịch sử đối chiếu trong tháng này ({month:02d}/{year})"
+    content = content.replace(
+        "Xem đầy đủ lịch sử đối chiếu từng ngày",
+        month_label,
+    )
+    content = content.replace(
+        "Xem lịch sử đối chiếu từng ngày",
+        month_label,
+    )
+    content = content.replace(
+        "Lịch sử đối chiếu từng ngày",
+        month_label,
+    )
     return content
 
 
@@ -69,6 +158,8 @@ def simplify_home_purchase_blocks(content: str) -> str:
         flags=re.IGNORECASE | re.DOTALL,
     )
 
+    content = filter_history_to_report_month(content)
+
     # History remains collapsible for accessibility, but it is expanded on
     # first load as requested.
     content = re.sub(
@@ -78,14 +169,6 @@ def simplify_home_purchase_blocks(content: str) -> str:
         content,
         count=1,
         flags=re.IGNORECASE,
-    )
-    content = content.replace(
-        "Xem đầy đủ lịch sử đối chiếu từng ngày",
-        "Lịch sử đối chiếu từng ngày",
-    )
-    content = content.replace(
-        "Xem lịch sử đối chiếu từng ngày",
-        "Lịch sử đối chiếu từng ngày",
     )
     return content
 
@@ -161,8 +244,14 @@ def validate_home(home: str) -> None:
     )
     if not disclosure:
         raise AssertionError("Daily history must be expanded by default")
-    if "Lịch sử đối chiếu từng ngày" not in home:
-        raise AssertionError("Daily history heading is missing")
+    if "Lịch sử đối chiếu trong tháng này" not in home:
+        raise AssertionError("Current-month history heading is missing")
+
+    year, month = report_month(home)
+    expected_prefix = f"{year:04d}-{month:02d}"
+    row_dates = [match.group("date") for match in HISTORY_ROW.finditer(home)]
+    if any(not value.startswith(expected_prefix) for value in row_dates):
+        raise AssertionError("History contains a day outside the report month")
 
     if 'data-public-ready="true"' in home:
         if all(" disabled" in tag.lower() for tag in purchase_buttons):

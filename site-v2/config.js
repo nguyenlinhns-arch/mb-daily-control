@@ -17,27 +17,19 @@ window.ORDER_CONFIRMATION_ENDPOINT = "https://script.google.com/macros/s/AKfycby
     const style=document.createElement('style');
     style.id='lm-shopee-gate-style';
     style.textContent=`
-      .lm-shopee-gate{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:16px;background:rgba(8,20,30,.72);backdrop-filter:blur(5px)}
-      .lm-shopee-gate-card{position:relative;width:min(440px,100%);overflow:hidden;border:1px solid #f0d6cb;border-radius:22px;background:#fff;box-shadow:0 26px 80px rgba(0,0,0,.28);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1d2d38}
-      .lm-shopee-gate-top{padding:25px 22px 18px;background:linear-gradient(135deg,#fff4ee,#fff)}
+      .lm-shopee-gate{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:12px;background:rgba(8,20,30,.70);backdrop-filter:blur(5px)}
+      .lm-shopee-gate-card{position:relative;width:min(440px,calc(100% - 4px));max-height:calc(100vh - 24px);overflow:auto;border:1px solid #f0d6cb;border-radius:22px;background:#fff;box-shadow:0 26px 80px rgba(0,0,0,.28);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1d2d38}
+      .lm-shopee-gate-top{padding:23px 20px 16px;background:linear-gradient(135deg,#fff4ee,#fff)}
       .lm-shopee-gate-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#fff0e8;color:#b73e22;font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
-      .lm-shopee-gate h2{margin:10px 0 0;font-size:26px;line-height:1.12;letter-spacing:-.025em;color:#152936}
+      .lm-shopee-gate h2{margin:10px 0 0;padding-right:32px;font-size:clamp(22px,6vw,26px);line-height:1.12;letter-spacing:-.025em;color:#152936}
       .lm-shopee-gate p{margin:8px 0 0;color:#62717b;font-size:13px;line-height:1.5}
-      .lm-shopee-gate-actions{display:grid;gap:9px;padding:0 22px 20px}
-      .lm-shopee-gate-primary,.lm-shopee-gate-secondary{min-height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:0 14px;font:inherit;font-size:14px;font-weight:900;text-decoration:none;cursor:pointer}
+      .lm-shopee-gate-actions{display:grid;gap:9px;padding:0 20px 18px}
+      .lm-shopee-gate-primary,.lm-shopee-gate-secondary{min-height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:0 14px;font:inherit;font-size:13px;font-weight:900;text-decoration:none;cursor:pointer}
       .lm-shopee-gate-primary{border:0;background:#ee4d2d;color:#fff!important;box-shadow:0 9px 22px rgba(238,77,45,.22)}
       .lm-shopee-gate-secondary{border:1px solid #dbe1e5;background:#fff;color:#40515d}
-      .lm-shopee-gate-note{padding:12px 22px 18px;border-top:1px solid #edf0f2;color:#879199;font-size:10px;line-height:1.45}
-      .lm-shopee-gate-close{position:absolute;right:10px;top:10px;width:38px;height:38px;border:1px solid #e1e5e8;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.95);color:#52626d;font:700 21px/1 system-ui;cursor:pointer}
+      .lm-shopee-gate-note{padding:11px 20px 15px;border-top:1px solid #edf0f2;color:#879199;font-size:10px;line-height:1.45}
+      .lm-shopee-gate-close{position:absolute;right:10px;top:10px;width:38px;height:38px;border:1px solid #e1e5e8;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.96);color:#52626d;font:700 21px/1 system-ui;cursor:pointer}
       body.lm-shopee-gate-open{overflow:hidden}
-      @media(max-width:600px){
-        .lm-shopee-gate{align-items:end;padding:0;background:rgba(8,20,30,.66)}
-        .lm-shopee-gate-card{width:100%;border-radius:22px 22px 0 0;border-left:0;border-right:0;border-bottom:0;padding-bottom:max(0px,env(safe-area-inset-bottom))}
-        .lm-shopee-gate-top{padding:23px 18px 15px}.lm-shopee-gate h2{font-size:23px}.lm-shopee-gate p{font-size:12.5px}
-        .lm-shopee-gate-actions{padding:0 18px 16px}.lm-shopee-gate-primary,.lm-shopee-gate-secondary{min-height:52px;font-size:13px}
-        .lm-shopee-gate-note{padding:11px 18px 15px}.lm-shopee-gate-close{right:12px;top:11px;width:36px;height:36px}
-      }
-      @media(prefers-reduced-motion:reduce){.lm-shopee-gate{backdrop-filter:none}}
     `;
     document.head.appendChild(style);
 

@@ -45,6 +45,8 @@ jobs:
           python scripts/optimize_portal_v2.py --self-test
           python scripts/optimize_portal_v3.py --self-test
           python scripts/apply_portal_v3_assets.py --self-test
+          python scripts/optimize_seo_ads_v1.py --self-test
+          python scripts/finalize_portal_v4.py --self-test
           python scripts/sync_statistics_history.py --self-test
 
       - name: Setup Pages
@@ -160,6 +162,8 @@ jobs:
             _site/xsmb-stats.js \
             _site/statistics-data.json \
             _site/thong-ke-xsmb/index.html \
+            _site/xsmb-30-ngay/index.html \
+            _site/nguon-du-lieu-xsmb/index.html \
             _site/tan-suat-xsmb/index.html \
             _site/lo-gan-xsmb/index.html \
             _site/cap-dao-xsmb/index.html \
@@ -177,6 +181,7 @@ jobs:
             _site/legal.html \
             _site/404.html \
             _site/sitemap.xml \
+            _site/site-status.json \
             _site/llms.txt \
             _site/checkout-entry.js \
             _site/checkout-enhance.js \
@@ -207,13 +212,28 @@ jobs:
           grep -q '•• — ••' _site/index.html
           grep -q 'Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay' _site/index.html
 
-          grep -q 'Thống kê tổng hai chữ số XSMB' _site/thong-ke-tong-xsmb/index.html
-          grep -q 'Tần suất 00–99 theo ngày trong tuần' _site/thong-ke-theo-thu-xsmb/index.html
-          grep -q 'Tần suất đầu và đuôi XSMB' _site/thong-ke-dau-duoi-xsmb/index.html
+          grep -q 'Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99' _site/thong-ke-xsmb/index.html
+          grep -q 'Tần suất XSMB 00–99 theo 7–365 kỳ' _site/tan-suat-xsmb/index.html
+          grep -q 'Lô gan XSMB 00–99: khoảng vắng hiện tại' _site/lo-gan-xsmb/index.html
+          grep -q 'Thống kê 45 cặp đảo XSMB' _site/cap-dao-xsmb/index.html
+          grep -q 'Thống kê đầu đuôi XSMB 0–9' _site/thong-ke-dau-duoi-xsmb/index.html
+          grep -q 'Thống kê tổng XSMB 0–9' _site/thong-ke-tong-xsmb/index.html
+          grep -q 'Thống kê XSMB theo thứ trong tuần' _site/thong-ke-theo-thu-xsmb/index.html
+          grep -q 'Tra cứu XSMB theo bộ số 00–99' _site/tra-cuu-xsmb/index.html
+          grep -q 'XSMB 30 ngày gần nhất: lịch sử 27 mã mỗi kỳ' _site/xsmb-30-ngay/index.html
+          grep -q 'Nguồn dữ liệu và cách tính các bảng thống kê' _site/nguon-du-lieu-xsmb/index.html
           grep -q '6 phương pháp XSMB công khai' _site/phuong-phap-cong-khai/index.html
           grep -q 'Không công khai 4SO' _site/phuong-phap-cong-khai/index.html
+
           grep -q 'https://lemienbac.com/thong-ke-tong-xsmb/' _site/sitemap.xml
           grep -q 'https://lemienbac.com/thong-ke-theo-thu-xsmb/' _site/sitemap.xml
+          grep -q 'https://lemienbac.com/xsmb-30-ngay/' _site/sitemap.xml
+          grep -q 'https://lemienbac.com/nguon-du-lieu-xsmb/' _site/sitemap.xml
+
+          grep -q 'data-google-ads-landing="true"' _site/thong-ke-xsmb/index.html
+          ! grep -Eiq '4SO|gợi ý số|báo cáo AI|nhận báo cáo' _site/thong-ke-xsmb/index.html
+          ! grep -Eiq 'data-open-checkout|accesslanding\.site|effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|affiliate-shopee' _site/thong-ke-xsmb/index.html
+          ! grep -q '/?checkout=1' _site/thong-ke-xsmb/index.html
 
           for page in \
             _site/thong-ke-xsmb/index.html \
@@ -232,6 +252,8 @@ jobs:
             _site/thong-ke-lo-to-mien-bac-bang-ai/index.html \
             _site/gioi-thieu/index.html \
             _site/thong-ke-xsmb/index.html \
+            _site/xsmb-30-ngay/index.html \
+            _site/nguon-du-lieu-xsmb/index.html \
             _site/tan-suat-xsmb/index.html \
             _site/lo-gan-xsmb/index.html \
             _site/cap-dao-xsmb/index.html \
@@ -253,6 +275,8 @@ jobs:
 
           for page in \
             _site/thong-ke-xsmb/index.html \
+            _site/xsmb-30-ngay/index.html \
+            _site/nguon-du-lieu-xsmb/index.html \
             _site/tan-suat-xsmb/index.html \
             _site/lo-gan-xsmb/index.html \
             _site/cap-dao-xsmb/index.html \
@@ -274,7 +298,10 @@ jobs:
           source = json.loads(Path('data/source-access.json').read_text(encoding='utf-8'))
           methods = json.loads(Path('ai-methods/public-methods.json').read_text(encoding='utf-8'))
           proof = json.loads(Path('data/public-historical-proof.json').read_text(encoding='utf-8'))
+          status = json.loads((site/'site-status.json').read_text(encoding='utf-8'))
           home = (site/'index.html').read_text(encoding='utf-8')
+          landing = (site/'thong-ke-xsmb/index.html').read_text(encoding='utf-8')
+          page30 = (site/'xsmb-30-ngay/index.html').read_text(encoding='utf-8')
 
           assert stats['updated_through'] == source['history_end'] == methods['data_lock']
           assert stats['row_count'] == source['history_rows']
@@ -286,6 +313,13 @@ jobs:
           assert proof['validation']['total_days'] == 30
           assert f"{proof['validation']['rate_pct']}%" in home
           assert f"{proof['validation']['hit_days']}/{proof['validation']['total_days']}" in home
+          assert status['status'] == 'HEALTHY'
+          assert status['seo_ads_cluster'] == 'PASS'
+          assert status['google_ads_statistics_landing'] == '/thong-ke-xsmb/'
+          assert status['sitemap_urls'] == 18
+          assert status['html_pages_checked'] == 20
+          assert page30.count('class="seo30-day"') == 30
+          assert 'data-google-ads-landing="true"' in landing
 
           buttons = re.findall(r'<button\b[^>]*\bdata-open-checkout\b[^>]*>', home, flags=re.I)
           if len(buttons) != 2:
@@ -300,7 +334,7 @@ jobs:
           for rel in ('phuong-phap-4so/index.html','lich-su-doi-chieu/index.html','phuong-phap-cong-khai/index.html'):
               text = (site/rel).read_text(encoding='utf-8')
               assert not re.search(r'4SO[^<]{0,180}\b\d{2}\b\s*[-–—]\s*\b\d{2}\b', text, flags=re.I)
-          print('PORTAL_V3_PRIVACY_UX_SEO_GATES_OK', stats['row_count'], stats['updated_through'])
+          print('PORTAL_SEO_ADS_PRIVACY_GATES_OK', stats['row_count'], stats['updated_through'], status['sitemap_urls'])
           PY
 
           grep -q 'NGUYEN TU LINH' _site/checkout-enhance.js

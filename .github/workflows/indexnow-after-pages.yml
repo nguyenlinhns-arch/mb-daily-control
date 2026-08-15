@@ -1,0 +1,35 @@
+name: Notify IndexNow after Pages deploy
+
+on:
+  workflow_run:
+    workflows: ["Deploy Lê Miền Bắc XSMB portal to GitHub Pages"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow-live-submit
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate IndexNow client
+        run: python scripts/indexnow_submit.py --self-test
+      - name: Submit live sitemap to IndexNow
+        run: python scripts/indexnow_submit.py --submit-live

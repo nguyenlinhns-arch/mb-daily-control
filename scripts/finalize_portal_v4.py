@@ -65,7 +65,7 @@ def ensure_canonical(path: Path, root: Path) -> bool:
 def write_llms(root: Path, stats: dict[str, Any], ready: dict[str, Any]) -> None:
     updated = stats["updated_through"]
     target = ready.get("report_date") or ""
-    text = f'''# Lê Miền Bắc\n\n> Cổng dữ liệu và thống kê XSMB. Dữ liệu công khai cập nhật đến {updated}; báo cáo ngày {target} dùng khóa dữ liệu T−1.\n\n## Công cụ công khai\n\n- [Trung tâm thống kê XSMB]({BASE}/thong-ke-xsmb/): hồ sơ 00–99 và thống kê nhiều cửa sổ.\n- [Tần suất 00–99]({BASE}/tan-suat-xsmb/): số ngày xuất hiện và tổng nháy.\n- [Lô gan]({BASE}/lo-gan-xsmb/): khoảng vắng hiện tại, cực đại và lần gần nhất.\n- [45 cặp đảo]({BASE}/cap-dao-xsmb/): thống kê lịch sử các cặp đảo.\n- [Đầu/đuôi 0–9]({BASE}/thong-ke-dau-duoi-xsmb/): phân bố chữ số hàng chục và hàng đơn vị.\n- [Theo tổng 0–9]({BASE}/thong-ke-tong-xsmb/): phân bố tổng hai chữ số.\n- [Theo thứ]({BASE}/thong-ke-theo-thu-xsmb/): tần suất 00–99 theo ngày trong tuần.\n- [Tra cứu bộ số]({BASE}/tra-cuu-xsmb/): dò bộ số trong lịch sử 30–365 kỳ.\n- [Phương pháp công khai]({BASE}/phuong-phap-cong-khai/): A1, 2SO/X2, X3, F01, F06 và KÉP.\n\n## 4SO\n\n4SO là lớp phân tích riêng. Website công khai chỉ trạng thái khóa dữ liệu và hiệu quả lịch sử tổng hợp; không công khai số/cặp đang chọn, dãy lịch sử, Score, thứ hạng, công thức, tham số hoặc tie-break.\n\n## Nguyên tắc dữ liệu\n\n- Mỗi ngày lịch sử phải đủ 27/27 mã hai chữ số.\n- Thống kê công khai chỉ mô tả dữ liệu đã công bố.\n- Không suy diễn rằng số đang gan hoặc xuất hiện nhiều có nghĩa vụ xuất hiện ở kỳ tiếp theo.\n- Tỷ lệ lịch sử không phải xác suất hay cam kết kết quả.\n'''
+    text = f'''# Lê Miền Bắc\n\n> Cổng dữ liệu và thống kê XSMB. Dữ liệu công khai cập nhật đến {updated}; báo cáo ngày {target} dùng khóa dữ liệu T−1.\n\n## Công cụ công khai\n\n- [Trung tâm thống kê XSMB]({BASE}/thong-ke-xsmb/): hồ sơ 00–99 và thống kê nhiều cửa sổ.\n- [Tần suất 00–99]({BASE}/tan-suat-xsmb/): số ngày xuất hiện và tổng nháy.\n- [Lô gan]({BASE}/lo-gan-xsmb/): khoảng vắng hiện tại, cực đại và lần gần nhất.\n- [45 cặp đảo]({BASE}/cap-dao-xsmb/): thống kê lịch sử các cặp đảo.\n- [Đầu/đuôi 0–9]({BASE}/thong-ke-dau-duoi-xsmb/): phân bố chữ số hàng chục và hàng đơn vị.\n- [Theo tổng 0–9]({BASE}/thong-ke-tong-xsmb/): phân bố tổng hai chữ số.\n- [Theo thứ]({BASE}/thong-ke-theo-thu-xsmb/): tần suất 00–99 theo ngày trong tuần.\n- [Tra cứu bộ số]({BASE}/tra-cuu-xsmb/): dò bộ số trong lịch sử 30–365 kỳ.\n- [Phương pháp công khai]({BASE}/phuong-phap-cong-khai/): A1, 2SO/X2, X3, F01, F06 và KÉP.\n\n## 4SO\n\n4SO là lớp phân tích riêng. Website chỉ công khai trạng thái khóa dữ liệu và hiệu quả lịch sử tổng hợp; đầu ra và logic nội bộ được giữ kín.\n\n## Nguyên tắc dữ liệu\n\n- Mỗi ngày lịch sử phải đủ 27/27 mã hai chữ số.\n- Thống kê công khai chỉ mô tả dữ liệu đã công bố.\n- Không suy diễn rằng số đang gan hoặc xuất hiện nhiều có nghĩa vụ xuất hiện ở kỳ tiếp theo.\n- Tỷ lệ lịch sử không phải xác suất hay cam kết kết quả.\n'''
     (root / "llms.txt").write_text(text, encoding="utf-8")
 
 
@@ -133,7 +133,7 @@ def validate_privacy(root: Path) -> None:
             raise ValueError(f"4SO detail in llms.txt: {phrase}")
 
 
-def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], ready: dict[str, Any], links: dict[str, int], sitemap: dict[str, int]) -> None:
+def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], ready: dict[str, Any], links: dict[str, int], sitemap: dict[str, int], indexnow: dict[str, Any]) -> None:
     status = {
         "schema": "LM_PUBLIC_SITE_STATUS_V1",
         "status": "HEALTHY",
@@ -148,8 +148,15 @@ def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], read
         "html_pages_checked": links["pages"],
         "internal_links_checked": links["links"],
         "sitemap_urls": sitemap["urls"],
+        "indexnow_status": indexnow.get("status"),
+        "indexnow_urls": indexnow.get("urls"),
     }
     (root / "site-status.json").write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def prepare_indexnow(root: Path) -> dict[str, Any]:
+    import indexnow_submit
+    return indexnow_submit.prepare(root)
 
 
 def apply(root: Path) -> dict[str, Any]:
@@ -167,8 +174,9 @@ def apply(root: Path) -> dict[str, Any]:
     sitemap = normalize_sitemap(root, updated)
     validate_privacy(root)
     links = validate_internal_links(root)
-    write_status(root, stats, source, ready, links, sitemap)
-    return {"status":"PASS","canonical_fixed":canonical_fixed,**links,**sitemap,"updated_through":updated}
+    indexnow = prepare_indexnow(root)
+    write_status(root, stats, source, ready, links, sitemap, indexnow)
+    return {"status":"PASS","canonical_fixed":canonical_fixed,**links,**sitemap,"updated_through":updated,"indexnow":indexnow}
 
 
 def self_test() -> None:
@@ -189,6 +197,8 @@ def self_test() -> None:
         assert result['status']=='PASS' and (root/'site-status.json').exists()
         assert '<lastmod>2026-08-15</lastmod>' in (root/'sitemap.xml').read_text()
         assert 'chấm 45 cặp' not in (root/'llms.txt').read_text().lower()
+        assert result['indexnow']['status']=='READY' and result['indexnow']['urls']==1
+        key_file=root/result['indexnow']['key_file']; assert key_file.is_file() and key_file.read_text().strip()
     print('PORTAL_V4_SELF_TEST_OK')
 
 

@@ -22,7 +22,7 @@ def section_bounds(text:str,needle:str)->tuple[int,int]|None:
 
 def apply(root:Path)->dict[str,object]:
     path=root/'index.html'
-    if not path.is_file():raise ValueError('Missing homepage')
+    if not path.is_file():return {'status':'SKIP','reason':'missing_home'}
     text=path.read_text(encoding='utf-8')
     ad=section_bounds(text,BANNER_ID);buy=section_bounds(text,BUY_MARKER)
     if not ad or not buy:
@@ -56,6 +56,7 @@ def self_test()->None:
         result=apply(root);t=p.read_text(encoding='utf-8')
         assert result['changed'] and t.find(BUY_MARKER)<t.find(BANNER_ID) and t.count(BANNER_ID)==1
         assert apply(root)['changed'] is False
+        other=Path(td)/'missing';other.mkdir();assert apply(other)['status']=='SKIP'
     print('MONETIZATION_PLACEMENT_SELF_TEST_OK')
 
 

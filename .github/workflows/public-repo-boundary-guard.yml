@@ -35,6 +35,8 @@ jobs:
           python scripts/fingerprint_portal_assets.py --self-test
           python scripts/share_statistics_loader.py --self-test
           python scripts/enrich_portal_metadata.py --self-test
+          python scripts/optimize_monetization_placement.py --self-test
+          python scripts/indexnow_submit.py --self-test
           node --check site-v2/portal-v2.js
           node --check site-v2/checkout-entry.js
           grep -q 'xsmb_lookup_compare' site-v2/portal-v2.js

@@ -36,6 +36,8 @@ jobs:
           python scripts/share_statistics_loader.py --self-test
           python scripts/enrich_portal_metadata.py --self-test
           python scripts/optimize_monetization_placement.py --self-test
+          python scripts/optimize_seo_ads_v1.py --self-test
+          python scripts/finalize_portal_v4.py --self-test
           python scripts/indexnow_submit.py --self-test
           node --check site-v2/portal-v2.js
           node --check site-v2/checkout-entry.js
@@ -43,6 +45,11 @@ jobs:
           grep -q 'web_vitals_summary' site-v2/portal-v2.js
           grep -q 'lm_analytics_consent_v1' site-v2/portal-v2.js
           grep -q 'xsmb_history_date_open' site-v2/portal-v2.js
+          grep -q "'/xsmb-30-ngay/'" site-v2/portal-v2.js
+          grep -q "'/nguon-du-lieu-xsmb/'" site-v2/portal-v2.js
+          grep -q 'const dataRoutes=' site-v2/portal-v2.js
+          grep -q 'data-google-ads-landing' scripts/optimize_seo_ads_v1.py
+          grep -q 'MONETIZATION_TOKENS' scripts/optimize_seo_ads_v1.py
           grep -q 'portal-number-compare' site-v2/portal-v3.css
           grep -q 'portal-history-codes' site-v2/portal-v3.css
           ! grep -q 'portal-consent' site-v2/portal-v3.css

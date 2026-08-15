@@ -2,8 +2,8 @@
 """Apply conversion rendering and route every purchase CTA to the live checkout.
 
 The paid report and the optional public-method feed have separate readiness
-states.  A public-safe paid-report manifest (dates and status only, never paid
-codes) is the authoritative payment gate.  Every purchase CTA uses one simple
+states. A public-safe paid-report manifest (dates and status only, never paid
+codes) is the authoritative payment gate. Every purchase CTA uses one simple
 label and opens the checkout immediately.
 """
 from __future__ import annotations
@@ -58,13 +58,24 @@ FLOATING_CTA = '''
 def paid_report_is_ready() -> bool:
     try:
         payload = json.loads(READY_MANIFEST.read_text(encoding="utf-8"))
-        today = datetime.now(VN).date()
+        now = datetime.now(VN)
+        today = now.date()
+        report_date = payload.get("report_date")
+        data_lock = payload.get("data_lock")
+        same_day = (
+            report_date == today.isoformat()
+            and data_lock == (today - timedelta(days=1)).isoformat()
+        )
+        post_draw_next_day = (
+            now.hour >= 19
+            and report_date == (today + timedelta(days=1)).isoformat()
+            and data_lock == today.isoformat()
+        )
         return (
             payload.get("schema_version") == "MB_PAID_REPORT_READINESS_V1"
             and payload.get("status") == "PUBLISHED_PASS_PRIVATE"
             and payload.get("outcome_known_at_selection") is False
-            and payload.get("report_date") == today.isoformat()
-            and payload.get("data_lock") == (today - timedelta(days=1)).isoformat()
+            and (same_day or post_draw_next_day)
         )
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return False

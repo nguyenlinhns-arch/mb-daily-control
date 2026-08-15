@@ -1,37 +1,39 @@
-name: Enforce ACCESSTRADE-only monetization
+name: Guard ACCESSTRADE-only monetization
 
-# ACCESSTRADE-only policy is active for the public site.
 on:
   push:
     branches: ["main"]
     paths:
       - '.github/workflows/accesstrade-only-monetization.yml'
-      - 'scripts/enforce_accesstrade_only.py'
+      - 'scripts/apply_portal_v3_assets.py'
+      - 'scripts/optimize_monetization_placement.py'
+      - 'site-v2/checkout-enhance.js'
+      - 'site-v2/finance-banner.js'
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'scripts/apply_portal_v3_assets.py'
+      - 'scripts/optimize_monetization_placement.py'
+      - 'site-v2/checkout-enhance.js'
+      - 'site-v2/finance-banner.js'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  clean:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
-      - name: Remove all non-ACCESSTRADE ads
-        run: python scripts/enforce_accesstrade_only.py
-      - name: Verify portal asset self-test
-        run: python scripts/apply_portal_v3_assets.py --self-test
-      - name: Verify ACCESSTRADE links remain
+      - name: Verify ACCESSTRADE-only contract
         run: |
+          set -euo pipefail
+          python scripts/apply_portal_v3_assets.py --self-test
+          python scripts/optimize_monetization_placement.py --self-test
           grep -q 'go.isclix.com/deep_link' site-v2/checkout-enhance.js
           grep -q 'go.isclix.com/deep_link' site-v2/finance-banner.js
-      - name: Commit cleanup
-        run: |
-          if git diff --quiet -- scripts/apply_portal_v3_assets.py ai-methods/index.html; then exit 0; fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add scripts/apply_portal_v3_assets.py ai-methods/index.html
-          git commit -m 'Keep ACCESSTRADE-only monetization'
-          git push origin HEAD:main
+          grep -q 'Vay tiền nhanh online' site-v2/finance-banner.js
+          ! grep -q 'Phê duyệt và hồ sơ bổ sung' site-v2/finance-banner.js
+          ! grep -Eiq 'effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|adsterra-native|adsterra-banner' scripts/apply_portal_v3_assets.py scripts/optimize_monetization_placement.py
+          echo ACCESSTRADE_ONLY_OK

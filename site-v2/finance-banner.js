@@ -122,15 +122,19 @@
     style.id = "lm-finance-return-style";
     style.textContent = `
       body.lm-finance-return-open{overflow:hidden}
-      .lm-finance-return{position:fixed;inset:0;z-index:140;display:grid;place-items:center;padding:18px;background:rgba(7,27,43,.66);backdrop-filter:blur(4px)}
-      .lm-finance-return-card{position:relative;width:min(100%,430px);overflow:hidden;border:1px solid rgba(255,255,255,.22);border-radius:22px;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.28)}
-      .lm-finance-return-head{padding:22px 20px 18px;background:linear-gradient(135deg,#123f32,#0b2f28);color:#fff}
-      .lm-finance-return-label{display:block;padding-right:74px;color:#c7ded5;font-size:9px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
-      .lm-finance-return-head strong{display:block;margin-top:6px;font-size:24px;line-height:1.18;color:#fff}.lm-finance-return-rate{display:block;margin-top:8px;color:#fff;font-size:14px;font-weight:900;line-height:1.45}
-      .lm-finance-return-body{padding:16px 20px 20px}.lm-finance-return-body p{margin:0 0 12px;color:#61727b;font-size:11px;line-height:1.55}
-      .lm-finance-return-cta{min-height:52px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:#123f32;color:#fff!important;text-decoration:none!important;font-size:14px;font-weight:900}
-      .lm-finance-return-close{position:absolute;top:12px;right:12px;z-index:2;min-width:58px;height:34px;padding:0 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:800;cursor:pointer}
-      @media(max-width:700px){.lm-finance-return{padding:14px}.lm-finance-return-card{border-radius:18px}.lm-finance-return-head{padding:20px 17px 16px}.lm-finance-return-head strong{font-size:21px}.lm-finance-return-rate{font-size:13px}.lm-finance-return-body{padding:14px 17px 17px}.lm-finance-return-cta{min-height:50px;font-size:13px}}
+      .lm-finance-return{position:fixed;inset:0;z-index:140;display:grid;place-items:center;padding:16px;background:rgba(5,20,33,.72);backdrop-filter:blur(5px)}
+      .lm-finance-return-card{position:relative;width:min(100%,440px);overflow:hidden;border:1px solid rgba(255,255,255,.2);border-radius:24px;background:#fff;box-shadow:0 28px 80px rgba(0,0,0,.34)}
+      .lm-finance-return-head{position:relative;padding:20px 20px 22px;background:linear-gradient(135deg,#005f4b 0%,#00886a 58%,#00a884 100%);color:#fff}
+      .lm-finance-return-head:after{content:"₫";position:absolute;right:18px;bottom:-12px;width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:44px;font-weight:900}
+      .lm-finance-return-label{display:block;padding-right:74px;color:#d8fff4;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+      .lm-finance-return-title{display:block;margin-top:7px;font-size:20px;line-height:1.15;color:#fff}
+      .lm-finance-return-limit{display:block;margin-top:8px;color:#fff;font-size:36px;font-weight:1000;line-height:1;letter-spacing:-.03em}.lm-finance-return-limit small{display:block;margin-bottom:4px;color:#caffef;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+      .lm-finance-return-body{padding:15px 18px 19px}
+      .lm-finance-return-benefits{display:grid;gap:7px;margin:0 0 13px;padding:0;list-style:none}.lm-finance-return-benefits li{display:flex;align-items:center;gap:8px;min-height:34px;padding:7px 9px;border-radius:10px;background:#f4f8f6;color:#263b35;font-size:12px;font-weight:800}.lm-finance-return-benefits li:before{content:"✓";display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;border-radius:50%;background:#dff6ed;color:#00775d;font-size:12px;font-weight:1000}
+      .lm-finance-return-cta{min-height:54px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:linear-gradient(135deg,#ff7a00,#ff9500);color:#fff!important;text-decoration:none!important;font-size:15px;font-weight:1000;box-shadow:0 10px 22px rgba(255,122,0,.28)}
+      .lm-finance-return-close{position:absolute;top:11px;right:11px;z-index:2;min-width:58px;height:34px;padding:0 10px;border:1px solid rgba(255,255,255,.4);border-radius:999px;background:rgba(0,0,0,.16);color:#fff;font-size:11px;font-weight:900;cursor:pointer}
+      .lm-finance-return-sponsored{display:block;margin-top:8px;text-align:center;color:#8a9791;font-size:8px}
+      @media(max-width:700px){.lm-finance-return{padding:12px}.lm-finance-return-card{border-radius:19px}.lm-finance-return-head{padding:18px 16px 20px}.lm-finance-return-title{font-size:18px}.lm-finance-return-limit{font-size:33px}.lm-finance-return-body{padding:13px 15px 16px}.lm-finance-return-benefits{gap:6px}.lm-finance-return-benefits li{font-size:11.5px}.lm-finance-return-cta{min-height:52px;font-size:14px}}
       @media(prefers-reduced-motion:reduce){.lm-finance-return{backdrop-filter:none}}
     `;
     document.head.appendChild(style);
@@ -177,13 +181,18 @@
       <div class="lm-finance-return-card">
         <button class="lm-finance-return-close" type="button" aria-label="Đóng quảng cáo">Đóng</button>
         <div class="lm-finance-return-head">
-          <span class="lm-finance-return-label">Liên kết tài trợ · ACCESSTRADE</span>
-          <strong id="lm-finance-return-title">Vay online VPBank</strong>
-          <span class="lm-finance-return-rate">Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân</span>
+          <span class="lm-finance-return-label">VPBank · Vay nhanh online</span>
+          <strong class="lm-finance-return-title" id="lm-finance-return-title">Cần thêm tiền cho chi tiêu?</strong>
+          <span class="lm-finance-return-limit"><small>Hạn mức vay</small>ĐẾN 200 TRIỆU</span>
         </div>
         <div class="lm-finance-return-body">
-          <p>Thông tin chi tiết và điều kiện được hiển thị trên trang đăng ký của VPBank.</p>
-          <a class="lm-finance-return-cta" href="${OFFER.url}" target="_blank" rel="sponsored nofollow noopener noreferrer">Vay tiền nhanh online →</a>
+          <ul class="lm-finance-return-benefits">
+            <li>Không cần tài sản đảm bảo</li>
+            <li>Lãi suất chỉ từ 1,2%/tháng</li>
+            <li>Phê duyệt hồ sơ trong vài phút</li>
+          </ul>
+          <a class="lm-finance-return-cta" href="${OFFER.url}" target="_blank" rel="sponsored nofollow noopener noreferrer">VAY TIỀN NHANH ONLINE →</a>
+          <span class="lm-finance-return-sponsored">Liên kết tài trợ qua ACCESSTRADE · điều kiện thực tế theo VPBank</span>
         </div>
       </div>`;
 
@@ -239,13 +248,13 @@
     const style = document.createElement("style");
     style.id = "lm-finance-top-style";
     style.textContent = `
-      .lm-finance-top{width:100%;padding:7px 0;background:#f4f7f6;border-bottom:1px solid #dfe7e3}
+      .lm-finance-top{width:100%;padding:7px 0;background:#f3f7f5;border-bottom:1px solid #dfe7e3}
       .lm-finance-top-inner{width:min(calc(100% - 28px),1180px);margin:auto}
-      .lm-finance-top-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:12px 15px;border-radius:14px;background:linear-gradient(135deg,#123f32,#0b2f28);color:#fff;text-decoration:none!important;box-shadow:0 5px 16px rgba(15,50,40,.16)}
-      .lm-finance-top-label{display:block;margin-bottom:3px;color:#c7ded5;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-      .lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.25;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:13px;font-weight:900}
-      .lm-finance-top-cta{min-height:42px;padding:0 14px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff;color:#143f32!important;font-size:12px;font-weight:900;white-space:nowrap}
-      @media(max-width:700px){.lm-finance-top{padding:5px 0}.lm-finance-top-inner{width:calc(100% - 20px)}.lm-finance-top-card{grid-template-columns:1fr;padding:10px 11px;gap:7px}.lm-finance-top-copy strong{font-size:15px}.lm-finance-top-rate{font-size:12.5px}.lm-finance-top-cta{min-height:42px;width:100%}}
+      .lm-finance-top-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:13px;align-items:center;padding:11px 14px;border-radius:15px;background:linear-gradient(135deg,#00634e,#008b6b);color:#fff;text-decoration:none!important;box-shadow:0 6px 18px rgba(0,95,75,.18)}
+      .lm-finance-top-money{display:grid;place-items:center;width:58px;height:58px;border-radius:14px;background:rgba(255,255,255,.13);color:#fff;font-size:12px;font-weight:900;line-height:1.05;text-align:center}.lm-finance-top-money b{display:block;font-size:18px}
+      .lm-finance-top-label{display:block;margin-bottom:2px;color:#d5fff4;font-size:8.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.2;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:11.5px;font-weight:800}
+      .lm-finance-top-cta{min-height:44px;padding:0 14px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#ff8500;color:#fff!important;font-size:12px;font-weight:1000;white-space:nowrap;box-shadow:0 7px 16px rgba(255,133,0,.26)}
+      @media(max-width:700px){.lm-finance-top{padding:5px 0}.lm-finance-top-inner{width:calc(100% - 18px)}.lm-finance-top-card{grid-template-columns:50px minmax(0,1fr);padding:9px 10px;gap:9px}.lm-finance-top-money{width:50px;height:50px;border-radius:12px;font-size:10px}.lm-finance-top-money b{font-size:16px}.lm-finance-top-copy strong{font-size:14px}.lm-finance-top-rate{font-size:10.5px;line-height:1.35}.lm-finance-top-cta{grid-column:1/-1;min-height:43px;width:100%}}
     `;
     document.head.appendChild(style);
 
@@ -256,10 +265,11 @@
     section.innerHTML = `
       <div class="lm-finance-top-inner">
         <a class="lm-finance-top-card" href="${OFFER.url}" target="_blank" rel="sponsored nofollow noopener noreferrer">
+          <span class="lm-finance-top-money">ĐẾN<b>200TR</b></span>
           <div class="lm-finance-top-copy">
-            <span class="lm-finance-top-label">Liên kết tài trợ · ACCESSTRADE</span>
-            <strong>Vay online VPBank</strong>
-            <span class="lm-finance-top-rate">Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân</span>
+            <span class="lm-finance-top-label">VPBank · Vay nhanh online</span>
+            <strong>Không cần tài sản đảm bảo</strong>
+            <span class="lm-finance-top-rate">Lãi từ 1,2%/tháng · Phê duyệt hồ sơ trong vài phút</span>
           </div>
           <span class="lm-finance-top-cta">Vay tiền nhanh online →</span>
         </a>

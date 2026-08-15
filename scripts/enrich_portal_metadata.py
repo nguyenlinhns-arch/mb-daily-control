@@ -54,6 +54,10 @@ def normalize_existing_consent(text:str)->str:
     pattern=re.compile(r"gtag\('consent','default',\{[^;]*?analytics_storage\s*:\s*'denied'[^;]*?\}\);",re.I|re.S)
     if pattern.search(text):
         return pattern.sub(consent_default_js(),text,count=1)
+    if CONSENT_KEY not in text:
+        js_call=re.search(r"gtag\('js',\s*new Date\(\)\);",text,re.I)
+        if js_call:
+            text=text[:js_call.start()]+consent_default_js()+text[js_call.start():]
     return text
 
 
@@ -96,6 +100,8 @@ def apply(root:Path)->dict[str,int]:
         text=path.read_text(encoding='utf-8')
         if GA4 in text:ga4+=1
         if CONSENT_KEY in text:consent+=1
+    if consent!=ga4:
+        raise ValueError(f'GA4 consent coverage mismatch: ga4={ga4} consent={consent}')
     return {'pages':pages,'changed':changed,'ga4_pages':ga4,'consent_pages':consent}
 
 
@@ -105,10 +111,12 @@ def self_test()->None:
         root=Path(td); (root/'phuong-phap-cong-khai').mkdir()
         p=root/'phuong-phap-cong-khai/index.html';p.write_text('<html><head><title>Tiêu đề cũ rất dài</title><meta name="description" content="Mô tả thử đủ dài để kiểm tra metadata"><meta name="robots" content="index,follow"><meta property="og:image" content="https://example.test/a.png"></head><body></body></html>',encoding='utf-8')
         home=root/'index.html';home.write_text("<html><head><title>Home</title><meta name=\"description\" content=\"Mô tả\"><meta name=\"robots\" content=\"index,follow\"><script>window.dataLayer=[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});gtag('js',new Date());gtag('config','G-R9TBYP97BC');</script></head><body></body></html>",encoding='utf-8')
-        result=apply(root);t=p.read_text(encoding='utf-8');h=home.read_text(encoding='utf-8')
-        assert result['pages']==2 and GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
+        legacy=root/'legacy.html';legacy.write_text("<html><head><title>Legacy</title><meta name=\"description\" content=\"Mô tả\"><meta name=\"robots\" content=\"index,follow\"><script>window.dataLayer=[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-R9TBYP97BC');</script></head><body></body></html>",encoding='utf-8')
+        result=apply(root);t=p.read_text(encoding='utf-8');h=home.read_text(encoding='utf-8');l=legacy.read_text(encoding='utf-8')
+        assert result['pages']==3 and result['ga4_pages']==result['consent_pages']==3
+        assert GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
         assert 'twitter:card" content="summary_large_image' in t and '6 phương pháp XSMB công khai hôm nay' in t
-        assert CONSENT_KEY in t and CONSENT_KEY in h and "analytics_storage:lmAnalyticsConsent" in h
+        assert CONSENT_KEY in t and CONSENT_KEY in h and CONSENT_KEY in l and "analytics_storage:lmAnalyticsConsent" in h
     print('PORTAL_METADATA_SELF_TEST_OK')
 
 

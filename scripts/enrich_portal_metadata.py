@@ -43,10 +43,12 @@ def enrich(path:Path,root:Path)->bool:
     robots=re.search(r'<meta\s+name="robots"\s+content="([^"]+)"',text,re.I)
     noindex=bool(robots and 'noindex' in robots.group(1).lower())
     if not noindex:
+        has_og_image=bool(re.search(r'<meta\s+property="og:image"\s+content="[^"]+"',text,re.I))
+        twitter_card='summary_large_image' if has_og_image else 'summary'
         for attr,key,value in (
             ('property','og:locale','vi_VN'),('property','og:type','website'),('property','og:url',url),
             ('property','og:title',title),('property','og:description',desc),
-            ('name','twitter:card','summary'),('name','twitter:title',title),('name','twitter:description',desc),
+            ('name','twitter:card',twitter_card),('name','twitter:title',title),('name','twitter:description',desc),
         ):
             text=upsert_meta(text,attr,key,value)
     if GA4 not in text and not noindex:
@@ -68,9 +70,10 @@ def self_test()->None:
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         root=Path(td); root.mkdir(exist_ok=True)
-        p=root/'index.html';p.write_text('<html><head><title>Trang thử</title><meta name="description" content="Mô tả thử"><meta name="robots" content="index,follow"></head><body></body></html>',encoding='utf-8')
+        p=root/'index.html';p.write_text('<html><head><title>Trang thử</title><meta name="description" content="Mô tả thử"><meta name="robots" content="index,follow"><meta property="og:image" content="https://example.test/a.png"></head><body></body></html>',encoding='utf-8')
         result=apply(root);t=p.read_text(encoding='utf-8')
         assert result['pages']==1 and GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
+        assert 'twitter:card" content="summary_large_image' in t
     print('PORTAL_METADATA_SELF_TEST_OK')
 
 

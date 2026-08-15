@@ -59,8 +59,10 @@ def process_page(path: Path, root: Path, cache: dict[tuple[str, ...], str]) -> t
     before = len(matches)
     if before <= 1:
         return False, before, before
-    name = bundle_for(root, [href for _, href in matches], cache)
-    replacement = f'<link rel="stylesheet" href="/{name}?v={VERSION}">'
+    hrefs = [href for _, href in matches]
+    name = bundle_for(root, hrefs, cache)
+    manifest = ' '.join(hrefs).replace('--', '—')
+    replacement = f'<link rel="stylesheet" href="/{name}?v={VERSION}"><!-- css-bundle-sources: {manifest} -->'
     parts: list[str] = []
     cursor = 0
     for idx, (match, _) in enumerate(matches):
@@ -88,6 +90,8 @@ def validate(root: Path) -> dict[str, int]:
         max_local_css = max(max_local_css, local)
         if local > 1:
             raise ValueError(f'More than one local stylesheet remains: {path.relative_to(root)} ({local})')
+        if 'css-bundle-sources:' in text and not re.search(r'<link\b[^>]+href="/portal-css-[a-f0-9]{12}\.css\?v=', text, re.I):
+            raise ValueError(f'CSS bundle manifest without bundle: {path.relative_to(root)}')
     return {'pages': pages, 'max_local_stylesheets': max_local_css}
 
 
@@ -122,8 +126,8 @@ def self_test() -> None:
         result = apply(root)
         text = (root / 'index.html').read_text(encoding='utf-8')
         assert result['pages_bundled'] == 1 and result['css_requests_before'] == 2 and result['css_requests_after'] == 1
-        assert text.count('rel="stylesheet"') == 1 and 'portal-css-' in text
-        assert len(list(root.glob('portal-css-*.css'))) == 1
+        assert text.count('rel="stylesheet"') == 1 and 'portal-css-' in text and '/a.css?v=1' in text and '/b.css' in text
+        assert 'css-bundle-sources:' in text and len(list(root.glob('portal-css-*.css'))) == 1
     print('PORTAL_CSS_BUNDLE_SELF_TEST_OK')
 
 

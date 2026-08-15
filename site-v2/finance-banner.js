@@ -70,28 +70,27 @@
   function applyHomeCopy() {
     if (window.location.pathname !== "/") return;
 
-    const headings = [...document.querySelectorAll(".portal-section-title h2, h2")];
-    const statsHeading = headings.find((node) => /^(?:Công cụ|Trung tâm) thống kê XSMB$/i.test((node.textContent || "").trim()));
-    if (statsHeading) statsHeading.textContent = STATS_HEADING;
+    const heroTitle = document.querySelector(".portal-hero h1");
+    if (heroTitle) heroTitle.textContent = STATS_HEADING;
 
     const heroLead = document.querySelector(".portal-hero .portal-lead");
     if (heroLead) {
       heroLead.innerHTML = 'Phân tích dữ liệu kỳ gần nhất, tần suất, lô gan, 45 cặp đảo, tra cứu lịch sử và các phương pháp chọn số bằng hệ thống AI với hơn 15 nghìn lượt tính toán mỗi ngày và <strong>nhận gợi ý số ngày hôm nay</strong>';
     }
 
-    const datedCta = `Nhận gợi ý số ngày hôm nay (${reportDateLabel()})`;
+    const datedTitle = `Nhận gợi ý số ngày hôm nay (${reportDateLabel()})`;
     const paidCard = document.querySelector(".portal-paid-card");
     if (paidCard) {
       const kicker = paidCard.querySelector(":scope > small");
       if (kicker) kicker.remove();
       const title = paidCard.querySelector("h2");
-      if (title) title.textContent = datedCta;
+      if (title) title.textContent = datedTitle;
+      const button = paidCard.querySelector("[data-open-checkout]");
+      if (button) {
+        button.textContent = "NHẬN GỢI Ý SỐ";
+        button.setAttribute("aria-label", datedTitle);
+      }
     }
-
-    document.querySelectorAll("[data-open-checkout]").forEach((node) => {
-      node.textContent = datedCta;
-      node.setAttribute("aria-label", datedCta);
-    });
   }
 
   function findStatisticsAnchor() {

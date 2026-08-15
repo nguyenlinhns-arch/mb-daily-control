@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       draw_date:
-        description: "Ngày đã công bố YYYY-MM-DD; để trống dùng ngày hiện tại tại Việt Nam"
+        description: "Ngày đã công bố YYYY-MM-DD; để trống dùng kỳ gần nhất đã hoàn tất"
         required: false
         type: string
 
@@ -55,7 +55,12 @@ jobs:
             [[ "$MANUAL_DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || exit 2
             target="$MANUAL_DATE"
           else
-            target="$(date +%F)"
+            hour="$(date +%H)"
+            if ((10#$hour < 19)); then
+              target="$(date -d 'yesterday' +%F)"
+            else
+              target="$(date +%F)"
+            fi
           fi
           echo "DRAW_DATE=$target" >> "$GITHUB_ENV"
 

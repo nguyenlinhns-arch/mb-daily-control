@@ -131,7 +131,7 @@ jobs:
           python scripts/apply_conversion_v2.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260815-2#g'
           python scripts/build_statistics_site.py --output-root _site
-          python scripts/apply_home_portal.py --output-root _site
+          python scripts/apply_home_portal_safe.py --output-root _site
 
       - name: Validate public portal and privacy gates
         env:

@@ -89,7 +89,6 @@ def _replace_today_words(text: str, label: str) -> tuple[str, int]:
 
     text = re.sub(r"\bngày\s+hôm\s+nay\b", replace_full, text, flags=re.I)
     text = re.sub(r"\bhôm\s+nay\b", lambda m: _dated_word(m.group(0), label), text, flags=re.I)
-    # Count the second pass separately because it cannot overlap the first pass anymore.
     total += len(re.findall(r"\bhôm\s+nay\b", text, flags=re.I))
     return text, total
 
@@ -110,7 +109,6 @@ def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[st
     for page in root.rglob("*.html"):
         text = page.read_text(encoding="utf-8")
         before = text
-        # Replace the longer phrase first so "ngày hôm nay" never becomes "ngày ngày ...".
         count_before = len(re.findall(r"\bngày\s+hôm\s+nay\b", text, flags=re.I))
         text = re.sub(
             r"\bngày\s+hôm\s+nay\b",
@@ -130,8 +128,6 @@ def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[st
             changed_pages += 1
             page.write_text(text, encoding="utf-8")
 
-    # Keep two historical CI grep markers invisible until the workflow validation is
-    # migrated to the explicit-date wording. They are comments only, never rendered.
     home = root / "index.html"
     if home.is_file():
         text = home.read_text(encoding="utf-8")
@@ -160,7 +156,7 @@ def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[st
 def write_llms(root: Path, stats: dict[str, Any], ready: dict[str, Any]) -> None:
     updated = stats["updated_through"]
     target = ready.get("report_date") or ""
-    text = f'''# Lê Miền Bắc\n\n> Cổng dữ liệu và thống kê XSMB. Dữ liệu công khai cập nhật đến {updated}; báo cáo ngày {target} dùng khóa dữ liệu T−1.\n\n## Công cụ công khai\n\n- [Trung tâm thống kê XSMB]({BASE}/thong-ke-xsmb/): hồ sơ 00–99 và thống kê nhiều cửa sổ.\n- [Tần suất 00–99]({BASE}/tan-suat-xsmb/): số ngày xuất hiện và tổng nháy.\n- [Lô gan]({BASE}/lo-gan-xsmb/): khoảng vắng hiện tại, cực đại và lần gần nhất.\n- [45 cặp đảo]({BASE}/cap-dao-xsmb/): thống kê lịch sử các cặp đảo.\n- [Đầu/đuôi 0–9]({BASE}/thong-ke-dau-duoi-xsmb/): phân bố chữ số hàng chục và hàng đơn vị.\n- [Theo tổng 0–9]({BASE}/thong-ke-tong-xsmb/): phân bố tổng hai chữ số.\n- [Theo thứ]({BASE}/thong-ke-theo-thu-xsmb/): tần suất 00–99 theo ngày trong tuần.\n- [Tra cứu bộ số]({BASE}/tra-cuu-xsmb/): dò bộ số trong lịch sử 30–365 kỳ.\n- [Phương pháp công khai]({BASE}/phuong-phap-cong-khai/): A1, 2SO/X2, X3, F01, F06 và KÉP.\n\n## 4SO\n\n4SO là lớp phân tích riêng. Website chỉ công khai trạng thái khóa dữ liệu và hiệu quả lịch sử tổng hợp; đầu ra và logic nội bộ được giữ kín.\n\n## Nguyên tắc dữ liệu\n\n- Mỗi ngày lịch sử phải đủ 27/27 mã hai chữ số.\n- Thống kê công khai chỉ mô tả dữ liệu đã công bố.\n- Không suy diễn rằng số đang gan hoặc xuất hiện nhiều có nghĩa vụ xuất hiện ở kỳ tiếp theo.\n- Tỷ lệ lịch sử không phải xác suất hay cam kết kết quả.\n'''
+    text = f'''# Lê Miền Bắc\n\n> Cổng dữ liệu và thống kê XSMB. Dữ liệu công khai cập nhật đến {updated}; báo cáo ngày {target} dùng khóa dữ liệu T−1.\n\n## Công cụ công khai\n\n- [Trung tâm thống kê XSMB]({BASE}/thong-ke-xsmb/): hồ sơ 00–99 và thống kê nhiều cửa sổ.\n- [XSMB 30 ngày]({BASE}/xsmb-30-ngay/): 30 kỳ đã hoàn tất, đủ 27 mã mỗi kỳ.\n- [Nguồn dữ liệu & cách tính]({BASE}/nguon-du-lieu-xsmb/): nguồn đối chiếu và định nghĩa các chỉ số.\n- [Tần suất 00–99]({BASE}/tan-suat-xsmb/): số ngày xuất hiện và tổng nháy.\n- [Lô gan]({BASE}/lo-gan-xsmb/): khoảng vắng hiện tại, cực đại và lần gần nhất.\n- [45 cặp đảo]({BASE}/cap-dao-xsmb/): thống kê lịch sử các cặp đảo.\n- [Đầu/đuôi 0–9]({BASE}/thong-ke-dau-duoi-xsmb/): phân bố chữ số hàng chục và hàng đơn vị.\n- [Theo tổng 0–9]({BASE}/thong-ke-tong-xsmb/): phân bố tổng hai chữ số.\n- [Theo thứ]({BASE}/thong-ke-theo-thu-xsmb/): tần suất 00–99 theo ngày trong tuần.\n- [Tra cứu bộ số]({BASE}/tra-cuu-xsmb/): dò bộ số trong lịch sử 30–365 kỳ.\n- [Phương pháp công khai]({BASE}/phuong-phap-cong-khai/): A1, 2SO/X2, X3, F01, F06 và KÉP.\n\n## 4SO\n\n4SO là lớp phân tích riêng. Website chỉ công khai trạng thái khóa dữ liệu và hiệu quả lịch sử tổng hợp; đầu ra và logic nội bộ được giữ kín.\n\n## Nguyên tắc dữ liệu\n\n- Mỗi ngày lịch sử phải đủ 27/27 mã hai chữ số.\n- Thống kê công khai chỉ mô tả dữ liệu đã công bố.\n- Không suy diễn rằng số đang gan hoặc xuất hiện nhiều có nghĩa vụ xuất hiện ở kỳ tiếp theo.\n- Tỷ lệ lịch sử không phải xác suất hay cam kết kết quả.\n'''
     (root / "llms.txt").write_text(text, encoding="utf-8")
 
 
@@ -228,7 +224,7 @@ def validate_privacy(root: Path) -> None:
             raise ValueError(f"4SO detail in llms.txt: {phrase}")
 
 
-def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], ready: dict[str, Any], links: dict[str, int], sitemap: dict[str, int], indexnow: dict[str, Any], labels: dict[str, Any]) -> None:
+def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], ready: dict[str, Any], links: dict[str, int], sitemap: dict[str, int], indexnow: dict[str, Any], labels: dict[str, Any], seo_ads: dict[str, Any] | None = None) -> None:
     status = {
         "schema": "LM_PUBLIC_SITE_STATUS_V1",
         "status": "HEALTHY",
@@ -247,6 +243,8 @@ def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], read
         "sitemap_urls": sitemap["urls"],
         "indexnow_status": indexnow.get("status"),
         "indexnow_urls": indexnow.get("urls"),
+        "seo_ads_cluster": (seo_ads or {}).get("status", "SKIP"),
+        "google_ads_statistics_landing": (seo_ads or {}).get("ads_landing"),
     }
     (root / "site-status.json").write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -266,6 +264,18 @@ def apply(root: Path) -> dict[str, Any]:
     date.fromisoformat(report_date)
     if updated != str(source.get("history_end")) or updated != str(ready.get("data_lock")):
         raise ValueError("Public status locks do not match")
+
+    seo_ads: dict[str, Any] = {"status": "SKIP"}
+    metadata_result: dict[str, Any] | None = None
+    schema_result: dict[str, Any] | None = None
+    if (root / "thong-ke-xsmb/index.html").is_file():
+        import optimize_seo_ads_v1 as seo_ads_module
+        import enrich_portal_metadata as metadata
+        import normalize_portal_schema as schema
+        seo_ads = seo_ads_module.apply(root)
+        metadata_result = metadata.apply(root)
+        schema_result = schema.apply(root)
+
     labels = materialize_report_date_labels(root, ready)
     canonical_fixed = 0
     for page in root.rglob("*.html"):
@@ -275,7 +285,7 @@ def apply(root: Path) -> dict[str, Any]:
     validate_privacy(root)
     links = validate_internal_links(root)
     indexnow = prepare_indexnow(root)
-    write_status(root, stats, source, ready, links, sitemap, indexnow, labels)
+    write_status(root, stats, source, ready, links, sitemap, indexnow, labels, seo_ads)
     return {
         "status":"PASS",
         "canonical_fixed":canonical_fixed,
@@ -283,6 +293,9 @@ def apply(root: Path) -> dict[str, Any]:
         **sitemap,
         "updated_through":updated,
         "report_date_labels":labels,
+        "seo_ads":seo_ads,
+        "metadata_after_seo":metadata_result,
+        "schema_after_seo":schema_result,
         "indexnow":indexnow,
     }
 
@@ -312,6 +325,7 @@ def self_test() -> None:
         assert 'Báo cáo ngày 16/08/2026' in home and 'Nhận báo cáo AI ngày 16/08/2026' in home
         assert '/cho-so-mien-bac-hom-nay/' in home
         assert "hôm nay" not in _visible_text(home).lower()
+        assert result['seo_ads']['status']=='SKIP'
         assert result['indexnow']['status']=='READY' and result['indexnow']['urls']==1
         key_file=root/result['indexnow']['key_file']; assert key_file.is_file() and key_file.read_text().strip()
     print('PORTAL_V4_SELF_TEST_OK')

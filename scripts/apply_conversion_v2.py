@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import argparse
 import re
+import shutil
 from datetime import date
 from pathlib import Path
 
+from optimize_google_ads_landing import optimize as optimize_google_ads_landing
 
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260815-1">'
 SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260815-1"></script>'
 
@@ -142,6 +146,17 @@ def validate(root: Path) -> None:
 def apply(root: Path) -> None:
     apply_home(root / "index.html")
     validate(root)
+
+    # The Ads funnel tracker is intentionally copied by this build step so the
+    # workflow keeps its original file-copy structure.
+    tracking_source = REPO_ROOT / "site-v2" / "ads-tracking.js"
+    if not tracking_source.exists():
+        raise FileNotFoundError(f"Missing Ads tracker source: {tracking_source}")
+    shutil.copy2(tracking_source, root / "ads-tracking.js")
+
+    # Product-first copy, neutral evidence labels and policy/trust disclosures
+    # are applied last so earlier conversion scripts can keep their own checks.
+    optimize_google_ads_landing(root)
 
 
 def main() -> None:

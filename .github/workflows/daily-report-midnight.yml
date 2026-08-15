@@ -1,6 +1,9 @@
 name: Publish website after private 00:05 pipeline
 
 on:
+  schedule:
+    # GitHub cron uses UTC. 17:05 UTC = 00:05 Asia/Ho_Chi_Minh.
+    - cron: "5 17 * * *"
   push:
     branches: ["main"]
     paths:

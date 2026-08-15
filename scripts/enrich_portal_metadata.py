@@ -14,6 +14,16 @@ CONSENT_KEY='lm_analytics_consent_v1'
 TITLE_OVERRIDES={
     '/phuong-phap-cong-khai/':'6 phương pháp XSMB công khai hôm nay | Lê Miền Bắc',
 }
+H1_OVERRIDES={
+    '/thong-ke-xsmb/':'Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99',
+    '/tan-suat-xsmb/':'Tần suất XSMB 00–99 theo 7–365 kỳ',
+    '/lo-gan-xsmb/':'Lô gan XSMB 00–99: khoảng vắng hiện tại',
+    '/cap-dao-xsmb/':'Thống kê 45 cặp đảo XSMB',
+    '/thong-ke-dau-duoi-xsmb/':'Thống kê đầu đuôi XSMB 0–9',
+    '/thong-ke-tong-xsmb/':'Thống kê tổng XSMB 0–9',
+    '/thong-ke-theo-thu-xsmb/':'Thống kê XSMB theo thứ trong tuần',
+    '/tra-cuu-xsmb/':'Tra cứu XSMB theo bộ số 00–99',
+}
 
 
 def route_for(path:Path,root:Path)->str:
@@ -39,6 +49,14 @@ def upsert_meta(text:str,attr:str,key:str,value:str)->str:
     tag=f'<meta {attr}="{key}" content="{value}">'
     if pattern.search(text):return pattern.sub(tag,text,count=1)
     return text.replace('</head>',tag+'</head>',1)
+
+
+def set_first_h1(text:str,value:str)->str:
+    escaped=html.escape(value)
+    pattern=re.compile(r'(<h1\b[^>]*>).*?(</h1>)',re.I|re.S)
+    if pattern.search(text):
+        return pattern.sub(lambda m:m.group(1)+escaped+m.group(2),text,count=1)
+    return text
 
 
 def consent_default_js()->str:
@@ -68,6 +86,8 @@ def enrich(path:Path,root:Path)->bool:
         title_tag='<title>'+html.escape(TITLE_OVERRIDES[route])+'</title>'
         if re.search(r'<title>.*?</title>',text,re.I|re.S):text=re.sub(r'<title>.*?</title>',title_tag,text,count=1,flags=re.I|re.S)
         else:text=text.replace('</head>',title_tag+'</head>',1)
+    if route in H1_OVERRIDES:
+        text=set_first_h1(text,H1_OVERRIDES[route])
     title=get_title(text); desc=get_desc(text); url=BASE+route
     robots=re.search(r'<meta\s+name="robots"\s+content="([^"]+)"',text,re.I)
     noindex=bool(robots and 'noindex' in robots.group(1).lower())
@@ -102,21 +122,31 @@ def apply(root:Path)->dict[str,int]:
         if CONSENT_KEY in text:consent+=1
     if consent!=ga4:
         raise ValueError(f'GA4 consent coverage mismatch: ga4={ga4} consent={consent}')
+    for route,expected in H1_OVERRIDES.items():
+        rel='index.html' if route=='/' else route.strip('/')+'/index.html'
+        path=root/rel
+        if path.is_file():
+            text=path.read_text(encoding='utf-8')
+            m=re.search(r'<h1\b[^>]*>(.*?)</h1>',text,re.I|re.S)
+            value=html.unescape(re.sub(r'<[^>]+>','',m.group(1)).strip()) if m else ''
+            if value!=expected:raise ValueError(f'H1 intent mismatch: {route} / {value}')
     return {'pages':pages,'changed':changed,'ga4_pages':ga4,'consent_pages':consent}
 
 
 def self_test()->None:
     import tempfile
     with tempfile.TemporaryDirectory() as td:
-        root=Path(td); (root/'phuong-phap-cong-khai').mkdir()
+        root=Path(td); (root/'phuong-phap-cong-khai').mkdir(); (root/'thong-ke-xsmb').mkdir()
         p=root/'phuong-phap-cong-khai/index.html';p.write_text('<html><head><title>Tiêu đề cũ rất dài</title><meta name="description" content="Mô tả thử đủ dài để kiểm tra metadata"><meta name="robots" content="index,follow"><meta property="og:image" content="https://example.test/a.png"></head><body></body></html>',encoding='utf-8')
         home=root/'index.html';home.write_text("<html><head><title>Home</title><meta name=\"description\" content=\"Mô tả\"><meta name=\"robots\" content=\"index,follow\"><script>window.dataLayer=[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});gtag('js',new Date());gtag('config','G-R9TBYP97BC');</script></head><body></body></html>",encoding='utf-8')
         legacy=root/'legacy.html';legacy.write_text("<html><head><title>Legacy</title><meta name=\"description\" content=\"Mô tả\"><meta name=\"robots\" content=\"index,follow\"><script>window.dataLayer=[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-R9TBYP97BC');</script></head><body></body></html>",encoding='utf-8')
-        result=apply(root);t=p.read_text(encoding='utf-8');h=home.read_text(encoding='utf-8');l=legacy.read_text(encoding='utf-8')
-        assert result['pages']==3 and result['ga4_pages']==result['consent_pages']==3
+        stats=root/'thong-ke-xsmb/index.html';stats.write_text('<html><head><title>Stats</title><meta name="description" content="Stats"><meta name="robots" content="index,follow"></head><body><h1>Tra cứu cũ</h1></body></html>',encoding='utf-8')
+        result=apply(root);t=p.read_text(encoding='utf-8');h=home.read_text(encoding='utf-8');l=legacy.read_text(encoding='utf-8');s=stats.read_text(encoding='utf-8')
+        assert result['pages']==4 and result['ga4_pages']==result['consent_pages']==4
         assert GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
         assert 'twitter:card" content="summary_large_image' in t and '6 phương pháp XSMB công khai hôm nay' in t
         assert CONSENT_KEY in t and CONSENT_KEY in h and CONSENT_KEY in l and "analytics_storage:lmAnalyticsConsent" in h
+        assert '<h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>' in s
     print('PORTAL_METADATA_SELF_TEST_OK')
 
 

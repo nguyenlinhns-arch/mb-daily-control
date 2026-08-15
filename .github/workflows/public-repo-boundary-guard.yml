@@ -40,6 +40,7 @@ jobs:
           python scripts/finalize_portal_v4.py --self-test
           python scripts/indexnow_submit.py --self-test
           node --check site-v2/portal-v2.js
+          node --check site-v2/ads-tracking.js
           node --check site-v2/checkout-entry.js
           grep -q 'xsmb_lookup_compare' site-v2/portal-v2.js
           grep -q 'web_vitals_summary' site-v2/portal-v2.js
@@ -50,6 +51,13 @@ jobs:
           grep -q 'const dataRoutes=' site-v2/portal-v2.js
           grep -q 'data-google-ads-landing' scripts/optimize_seo_ads_v1.py
           grep -q 'MONETIZATION_TOKENS' scripts/optimize_seo_ads_v1.py
+          grep -q 'data-lm-native-ad-src' scripts/optimize_monetization_placement.py
+          grep -q 'data-seo-discovery-links' scripts/optimize_monetization_placement.py
+          grep -q 'affiliate_evergreen' scripts/optimize_monetization_placement.py
+          grep -q 'IntersectionObserver' site-v2/ads-tracking.js
+          grep -q 'affiliate_click' site-v2/ads-tracking.js
+          grep -q 'ad_slot_view' site-v2/ads-tracking.js
+          grep -q 'ad_slot_load' site-v2/ads-tracking.js
           grep -q 'portal-number-compare' site-v2/portal-v3.css
           grep -q 'portal-history-codes' site-v2/portal-v3.css
           ! grep -q 'portal-consent' site-v2/portal-v3.css

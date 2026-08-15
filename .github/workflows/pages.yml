@@ -43,6 +43,8 @@ jobs:
           python scripts/apply_home_portal.py --self-test
           python scripts/apply_portal_subpages.py --self-test
           python scripts/optimize_portal_v2.py --self-test
+          python scripts/optimize_portal_v3.py --self-test
+          python scripts/apply_portal_v3_assets.py --self-test
           python scripts/sync_statistics_history.py --self-test
 
       - name: Setup Pages
@@ -98,6 +100,7 @@ jobs:
           cp site-v2/portal-subpages.css _site/
           cp site-v2/portal-v2.css _site/
           cp site-v2/portal-v2.js _site/
+          cp site-v2/portal-v3.css _site/
           cp site-v2/checkout-entry.js _site/
           cp site-v2/checkout-enhance.js _site/
           cp site-v2/app.js _site/
@@ -139,6 +142,8 @@ jobs:
           python scripts/apply_home_portal_safe.py --output-root _site
           python scripts/apply_portal_subpages.py --output-root _site
           python scripts/optimize_portal_v2_run.py --output-root _site
+          python scripts/optimize_portal_v3.py --output-root _site
+          python scripts/apply_portal_v3_assets.py --output-root _site
 
       - name: Validate public portal privacy UX and SEO gates
         env:
@@ -150,6 +155,7 @@ jobs:
             _site/portal-subpages.css \
             _site/portal-v2.css \
             _site/portal-v2.js \
+            _site/portal-v3.css \
             _site/xsmb-stats.css \
             _site/xsmb-stats.js \
             _site/statistics-data.json \
@@ -158,6 +164,8 @@ jobs:
             _site/lo-gan-xsmb/index.html \
             _site/cap-dao-xsmb/index.html \
             _site/thong-ke-dau-duoi-xsmb/index.html \
+            _site/thong-ke-tong-xsmb/index.html \
+            _site/thong-ke-theo-thu-xsmb/index.html \
             _site/tra-cuu-xsmb/index.html \
             _site/phuong-phap-cong-khai/index.html \
             _site/cho-so-mien-bac-hom-nay/index.html \
@@ -185,7 +193,9 @@ jobs:
           grep -q 'Xổ số Miền Bắc (XSMB): thống kê 00–99' _site/index.html
           grep -q 'portal-quick-search' _site/index.html
           grep -q 'portal-consensus' _site/index.html
-          grep -q 'Đầu / đuôi 0–9' _site/index.html
+          grep -q 'portal-headtail-latest' _site/index.html
+          grep -q 'Theo tổng 0–9' _site/index.html
+          grep -q 'Thống kê theo thứ' _site/index.html
           grep -q 'Phương pháp công khai hôm nay' _site/index.html
           grep -q 'A1' _site/index.html
           grep -q '2SO / X2' _site/index.html
@@ -196,14 +206,14 @@ jobs:
           grep -q 'TOP 1' _site/index.html
           grep -q '•• — ••' _site/index.html
           grep -q 'Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay' _site/index.html
-          grep -q '45 cặp đảo' _site/index.html
-          grep -q 'Tra cứu bộ số' _site/index.html
 
+          grep -q 'Thống kê tổng hai chữ số XSMB' _site/thong-ke-tong-xsmb/index.html
+          grep -q 'Tần suất 00–99 theo ngày trong tuần' _site/thong-ke-theo-thu-xsmb/index.html
           grep -q 'Tần suất đầu và đuôi XSMB' _site/thong-ke-dau-duoi-xsmb/index.html
           grep -q '6 phương pháp XSMB công khai' _site/phuong-phap-cong-khai/index.html
           grep -q 'Không công khai 4SO' _site/phuong-phap-cong-khai/index.html
-          grep -q 'https://lemienbac.com/thong-ke-dau-duoi-xsmb/' _site/sitemap.xml
-          grep -q 'https://lemienbac.com/phuong-phap-cong-khai/' _site/sitemap.xml
+          grep -q 'https://lemienbac.com/thong-ke-tong-xsmb/' _site/sitemap.xml
+          grep -q 'https://lemienbac.com/thong-ke-theo-thu-xsmb/' _site/sitemap.xml
 
           for page in \
             _site/thong-ke-xsmb/index.html \
@@ -225,17 +235,34 @@ jobs:
             _site/tan-suat-xsmb/index.html \
             _site/lo-gan-xsmb/index.html \
             _site/cap-dao-xsmb/index.html \
+            _site/thong-ke-dau-duoi-xsmb/index.html \
+            _site/thong-ke-tong-xsmb/index.html \
+            _site/thong-ke-theo-thu-xsmb/index.html \
             _site/tra-cuu-xsmb/index.html \
+            _site/phuong-phap-cong-khai/index.html \
             _site/mau-bao-cao.html \
             _site/legal.html \
             _site/404.html; do
             grep -q 'data-portal-shell="v1"' "$page"
             grep -q 'portal-subpages.css?v=20260815-1' "$page"
-            grep -q 'portal-v2.css?v=20260815-2' "$page"
+            grep -q 'portal-v2.css?v=20260815-3' "$page"
             grep -q 'portal-v2.js?v=20260815-2' "$page"
+            grep -q 'portal-v3.css?v=20260815-1' "$page"
             grep -q 'LÊ MIỀN BẮC' "$page"
-            grep -q '/thong-ke-dau-duoi-xsmb/' "$page"
-            grep -q '/phuong-phap-cong-khai/' "$page"
+          done
+
+          for page in \
+            _site/thong-ke-xsmb/index.html \
+            _site/tan-suat-xsmb/index.html \
+            _site/lo-gan-xsmb/index.html \
+            _site/cap-dao-xsmb/index.html \
+            _site/thong-ke-dau-duoi-xsmb/index.html \
+            _site/thong-ke-tong-xsmb/index.html \
+            _site/thong-ke-theo-thu-xsmb/index.html \
+            _site/tra-cuu-xsmb/index.html; do
+            grep -q 'portal-breadcrumbs' "$page"
+            grep -q '"@type":"Dataset"' "$page"
+            grep -q '"@type":"BreadcrumbList"' "$page"
           done
 
           python - <<'PY'
@@ -273,7 +300,7 @@ jobs:
           for rel in ('phuong-phap-4so/index.html','lich-su-doi-chieu/index.html','phuong-phap-cong-khai/index.html'):
               text = (site/rel).read_text(encoding='utf-8')
               assert not re.search(r'4SO[^<]{0,180}\b\d{2}\b\s*[-–—]\s*\b\d{2}\b', text, flags=re.I)
-          print('PORTAL_V2_PRIVACY_UX_SEO_GATES_OK', stats['row_count'], stats['updated_through'])
+          print('PORTAL_V3_PRIVACY_UX_SEO_GATES_OK', stats['row_count'], stats['updated_through'])
           PY
 
           grep -q 'NGUYEN TU LINH' _site/checkout-enhance.js

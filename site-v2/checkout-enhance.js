@@ -5,6 +5,7 @@
   const ACCOUNT_NUMBER = "1128091987";
   const BANK_ID = "VPB";
   const AMOUNT = 30000;
+  let checkoutEnhanced = false;
 
   function isGoogleAdsVisit(url) {
     const paidMedium = /^(cpc|ppc|paid|paidsearch|paid-search)$/i.test(url.searchParams.get("utm_medium") || "");
@@ -87,15 +88,27 @@
   }
 
   function enhanceCheckout() {
+    if (checkoutEnhanced) return;
     const paymentCard = document.querySelector(".payment-card");
     const memoNode = document.getElementById("payment-memo");
     if (!paymentCard || !memoNode) return;
+    checkoutEnhanced = true;
     addAccountHolder(paymentCard);
     addVietQr(paymentCard, memoNode);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     addAdsLandingMode();
-    enhanceCheckout();
+
+    // VietQR is created only when the user opens checkout. This avoids an
+    // unnecessary third-party image request on the Google Ads landing view.
+    document.querySelectorAll("[data-open-checkout]").forEach((button) => {
+      button.addEventListener("click", enhanceCheckout, { once: true });
+    });
+
+    // checkout-entry.js may have opened the modal earlier in the same
+    // DOMContentLoaded cycle for a /?checkout=1 route.
+    const checkout = document.getElementById("checkout");
+    if (checkout && checkout.hidden === false) enhanceCheckout();
   }, { once: true });
 })();

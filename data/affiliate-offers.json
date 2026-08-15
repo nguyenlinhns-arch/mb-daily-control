@@ -1,0 +1,35 @@
+{
+  "schema_version": "MB_SHOPEE_AFFILIATE_PLACEMENTS_V1",
+  "enabled": false,
+  "disclosure": "Liên kết tiếp thị: website có thể nhận hoa hồng khi bạn mua hàng qua liên kết này; giá của bạn không tăng vì việc đó.",
+  "notes": "Chỉ bật sau khi URL đã được chuyển đổi bằng Shopee Affiliate > Custom Link. Không dùng link Shopee thường và không tự chế affiliate_id.",
+  "offers": [
+    {
+      "id": "shopee-deal-1",
+      "enabled": false,
+      "title": "Deal Shopee đáng chú ý",
+      "description": "Ưu tiên sản phẩm có hoa hồng đang hoạt động trong Shopee Affiliate.",
+      "cta": "Xem ưu đãi",
+      "url": "",
+      "zones": ["stats-hub", "frequency", "gap", "pairs", "lookup"]
+    },
+    {
+      "id": "shopee-deal-2",
+      "enabled": false,
+      "title": "Ưu đãi Shopee",
+      "description": "Vị trí số 2 để thử nghiệm CTR và doanh thu affiliate.",
+      "cta": "Mở trên Shopee",
+      "url": "",
+      "zones": ["stats-hub", "frequency", "gap", "pairs"]
+    },
+    {
+      "id": "shopee-deal-3",
+      "enabled": false,
+      "title": "Mua sắm trên Shopee",
+      "description": "Vị trí số 3; chỉ hiển thị khi có link Affiliate hợp lệ.",
+      "cta": "Xem ngay",
+      "url": "",
+      "zones": ["stats-hub", "lookup"]
+    }
+  ]
+}

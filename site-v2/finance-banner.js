@@ -8,6 +8,7 @@
   };
 
   const GATE_SESSION_KEY = "lm_finance_stats_gate_v2";
+  const STATS_HEADING = "Thống kê XSMB lô tô và phân tích bằng hệ thống AI";
   let previousFocus = null;
   let observer = null;
 
@@ -48,22 +49,60 @@
     return Boolean(checkout && checkout.hidden === false);
   }
 
+  function reportDateLabel() {
+    const bodyDate = String(document.body?.dataset?.reportDate || "").trim();
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(bodyDate)) return bodyDate;
+
+    const text = document.body?.textContent || "";
+    const target = text.match(/\bTarget\s+(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/BÁO CÁO\s+4SO\s+NGÀY\s+(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/BÁO CÁO\s+NGÀY\s+(\d{2}\/\d{2}\/\d{4})/i);
+    if (target) return target[1];
+
+    return new Intl.DateTimeFormat("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    }).format(new Date());
+  }
+
+  function applyHomeCopy() {
+    if (window.location.pathname !== "/") return;
+
+    const headings = [...document.querySelectorAll(".portal-section-title h2, h2")];
+    const statsHeading = headings.find((node) => /^(?:Công cụ|Trung tâm) thống kê XSMB$/i.test((node.textContent || "").trim()));
+    if (statsHeading) statsHeading.textContent = STATS_HEADING;
+
+    const datedCta = `Nhận gợi ý số ngày hôm nay – ${reportDateLabel()}`;
+    document.querySelectorAll("[data-open-checkout]").forEach((node) => {
+      node.textContent = datedCta;
+      node.setAttribute("aria-label", datedCta);
+    });
+  }
+
   function findStatisticsAnchor() {
+    const statsSection = [...document.querySelectorAll(".portal-section")].find((section) => {
+      const heading = section.querySelector(".portal-section-title h2, h2");
+      return heading && /(?:Thống kê XSMB lô tô và phân tích bằng hệ thống AI|Công cụ thống kê XSMB|Trung tâm thống kê XSMB)/i.test(heading.textContent || "");
+    });
+    if (statsSection) return statsSection;
+
     const selectors = [
       "details.history-disclosure",
       ".history-disclosure",
+      ".portal-quick-grid",
       ".portal-proof",
       ".portal-result-card"
     ];
     for (const selector of selectors) {
       const node = document.querySelector(selector);
-      if (node) return node;
+      if (node) return node.closest(".portal-section") || node;
     }
 
     const candidates = [...document.querySelectorAll("section,details")];
     return candidates.find((node) => /Lịch sử đối chiếu trong tháng này/i.test(node.textContent || ""))
       || candidates.find((node) => /Kết quả thực tế/i.test(node.textContent || ""))
-      || candidates.find((node) => /Công cụ thống kê XSMB/i.test(node.textContent || ""))
       || null;
   }
 
@@ -199,5 +238,8 @@
     observer.observe(sentinel);
   }
 
-  document.addEventListener("DOMContentLoaded", installGateAfterStatistics, { once: true });
+  document.addEventListener("DOMContentLoaded", () => {
+    applyHomeCopy();
+    installGateAfterStatistics();
+  }, { once: true });
 })();

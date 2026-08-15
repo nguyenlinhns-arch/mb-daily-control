@@ -1,75 +1,19 @@
 {
   "schema_version": "MB_PUBLIC_METHOD_OUTPUTS_V2_TODAY_ONLY",
   "recommendation_scope": "TODAY_ONLY",
-  "target_date": "2026-08-14",
-  "data_lock": "2026-08-13",
-  "generated_at": "2026-08-14T00:10:50+07:00",
+  "target_date": "2026-08-16",
+  "data_lock": "2026-08-15",
+  "generated_at": "2026-08-15T20:03:00+07:00",
   "source_status": "LOCKED_27_OF_27",
-  "source_row_count": 2367,
-  "source_sha256": "803c627b889371ce0646cf9c3a88c5eb15bb3e64f095d67ea48ff4bd96396295",
+  "source_row_count": 2369,
+  "source_sha256": "95d11631fdbe4bbf52912cb9fd9b0085898f761a11b5bee0be32e67b5ec21ef5",
   "outcome_known_at_selection": false,
   "methods": [
-    {
-      "id": "A1",
-      "name": "A1",
-      "numbers": [
-        "37",
-        "70",
-        "65",
-        "74"
-      ]
-    },
-    {
-      "id": "X2_RBK",
-      "name": "2SO / X2",
-      "numbers": [
-        "60",
-        "06"
-      ]
-    },
-    {
-      "id": "X3_GROWTH",
-      "name": "X3 GROWTH",
-      "numbers": [
-        "02",
-        "10",
-        "05"
-      ]
-    },
-    {
-      "id": "F01_FREQUENCY60",
-      "name": "F01 TẦN SUẤT",
-      "numbers": [
-        "50",
-        "83",
-        "60",
-        "95",
-        "06",
-        "19",
-        "32"
-      ]
-    },
-    {
-      "id": "F06_TRANSITION180",
-      "name": "F06 CHUYỂN TIẾP",
-      "numbers": [
-        "13",
-        "91",
-        "83",
-        "52",
-        "92",
-        "95",
-        "50"
-      ]
-    },
-    {
-      "id": "MB_KEP_V1",
-      "name": "KÉP V1",
-      "numbers": [
-        "33",
-        "11",
-        "00"
-      ]
-    }
+    {"id":"A1","name":"A1","numbers":["71","37","65","74"]},
+    {"id":"X2_RBK","name":"2SO / X2","numbers":["60","06"]},
+    {"id":"X3_GROWTH","name":"X3 GROWTH","numbers":["02","20","10"]},
+    {"id":"F01_FREQUENCY60","name":"F01 TẦN SUẤT","numbers":["50","83","95","60","06","61","90"]},
+    {"id":"F06_TRANSITION180","name":"F06 CHUYỂN TIẾP","numbers":["91","83","52","13","09","95","90"]},
+    {"id":"MB_KEP_V1","name":"KÉP V1","numbers":["99","11","33"]}
   ]
 }

@@ -46,8 +46,38 @@ jobs:
       - name: Build static artifact
         run: |
           set -euo pipefail
+
+          # Allow the next draw report to publish immediately after the current
+          # draw is fully cross-checked. Other stale/future dates still fail closed.
+          REPORT_DATE="$(python - <<'PY'
+          import json
+          from datetime import date, datetime, timedelta
+          from zoneinfo import ZoneInfo
+
+          public = json.load(open("ai-methods/public-methods.json", encoding="utf-8"))
+          proof = json.load(open("ai-methods/yesterday-proof.json", encoding="utf-8"))
+          calendar = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).date()
+          target = date.fromisoformat(str(public["target_date"]))
+          lock = date.fromisoformat(str(public["data_lock"]))
+          if lock != target - timedelta(days=1):
+              raise SystemExit("Public report data_lock is not T-1")
+          same_day = target == calendar and lock == calendar - timedelta(days=1)
+          post_draw_next = (
+              target == calendar + timedelta(days=1)
+              and lock == calendar
+              and proof.get("date") == calendar.isoformat()
+          )
+          if not (same_day or post_draw_next):
+              raise SystemExit(
+                  f"Fail closed: calendar={calendar} target={target} lock={lock} proof={proof.get('date')}"
+              )
+          print(target.isoformat())
+          PY
+          )"
+          echo "Rendering website for report date ${REPORT_DATE}"
+
           python scripts/build_public_methods.py --self-test
-          python scripts/build_seo_pages.py --self-test
+          python scripts/build_seo_pages.py --self-test --today "$REPORT_DATE"
           rm -rf _site
           mkdir -p _site/ai-methods
           cp site-v2/styles.css _site/
@@ -70,7 +100,7 @@ jobs:
           cp data/source-access.json _site/
           cp data/public-historical-proof.json _site/historical-proof.json
           cp data/paid-report-ready.json _site/report-readiness.json
-          python scripts/build_seo_pages.py --output-root _site
+          python scripts/build_seo_pages.py --output-root _site --today "$REPORT_DATE"
 
           # The simplifier reads the legacy hero template. Normalize only the
           # temporary build artifact so it can parse the button; the final paid
@@ -133,8 +163,21 @@ jobs:
           ! grep -R 'href="/#buy"' _site --include='*.html'
           ! grep -R 'href="/#pricing"' _site --include='*.html'
 
-          grep -q '73%' _site/index.html
-          grep -q '22/30 ngày' _site/index.html
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          proof = json.loads(Path("ai-methods/yesterday-proof.json").read_text(encoding="utf-8"))
+          validation = proof["historical_validation"]
+          content = Path("_site/index.html").read_text(encoding="utf-8")
+          for token in (
+              f'{validation["rate_pct"]}%',
+              f'{validation["hit_days"]}/{validation["total_days"]} ngày',
+          ):
+              if token not in content:
+                  raise SystemExit(f"Missing audited historical token: {token}")
+          PY
+
           grep -q 'có ít nhất một số trong báo cáo xuất hiện' _site/index.html
           grep -q '4 số trong báo cáo' _site/index.html
           grep -q 'Kết quả thực tế' _site/index.html

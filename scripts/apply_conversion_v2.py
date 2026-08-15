@@ -90,6 +90,7 @@ def validate(root: Path) -> None:
         if marker not in content:
             raise AssertionError(f"Missing final conversion marker: {marker}")
 
+    # Historical rate is data, not a design constant.
     metric = re.search(
         r'<div class="historical-rate">\s*<p>.*?</p>\s*'
         r'<strong>(\d+)%</strong>\s*<span>\s*(\d+)\s*/\s*(\d+)\s+ngày',

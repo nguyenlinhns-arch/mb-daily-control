@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Apply the final paid-traffic and checkout enhancements to the built site."""
+"""Apply final paid-traffic and checkout enhancements to the built site."""
 from __future__ import annotations
 
 import argparse
 import re
+from datetime import date
 from pathlib import Path
 
 
@@ -17,6 +18,20 @@ def inject_before_head_end(content: str, tag: str) -> str:
     if "</head>" not in content:
         raise AssertionError("HTML page is missing </head>")
     return content.replace("</head>", f"  {tag}\n</head>", 1)
+
+
+def parse_vi_date(content: str, attribute: str) -> date:
+    match = re.search(
+        rf'{re.escape(attribute)}="(?P<day>\d{{2}})/(?P<month>\d{{2}})/(?P<year>\d{{4}})"',
+        content,
+    )
+    if not match:
+        raise AssertionError(f"Missing {attribute}")
+    return date(
+        int(match.group("year")),
+        int(match.group("month")),
+        int(match.group("day")),
+    )
 
 
 def apply_home(home: Path) -> None:
@@ -37,7 +52,7 @@ def apply_home(home: Path) -> None:
     for old, new in replacements:
         content = content.replace(old, new)
 
-    # The evidence table must be visible without an extra click.
+    # The current-month evidence table must be visible without an extra click.
     content = re.sub(
         r'<details\b(?=[^>]*\bclass="history-disclosure")'
         r'(?![^>]*\bopen\b)([^>]*)>',
@@ -65,14 +80,30 @@ def validate(root: Path) -> None:
         "Kết quả thực tế",
         "Có cả ngày trúng và không trúng",
         "có ít nhất một số trong báo cáo xuất hiện",
+        "Lịch sử đối chiếu trong tháng này",
     )
     for marker in required:
         if marker not in content:
             raise AssertionError(f"Missing final conversion marker: {marker}")
 
-    rows = len(re.findall(r'class="history-day-row"', content))
-    if rows != 30:
-        raise AssertionError(f"Expected 30 completed history rows, found {rows}")
+    report_day = parse_vi_date(content, "data-report-date")
+    lock_day = parse_vi_date(content, "data-lock-date")
+    row_dates = [
+        date.fromisoformat(value)
+        for value in re.findall(
+            r'class="history-day-row"[^>]*>\s*<time datetime="(\d{4}-\d{2}-\d{2})"',
+            content,
+            flags=re.IGNORECASE,
+        )
+    ]
+    if any((value.year, value.month) != (report_day.year, report_day.month) for value in row_dates):
+        raise AssertionError("History contains a day outside the report month")
+
+    expected_rows = lock_day.day if (lock_day.year, lock_day.month) == (report_day.year, report_day.month) else 0
+    if len(row_dates) != expected_rows:
+        raise AssertionError(
+            f"Expected {expected_rows} completed rows for the report month, found {len(row_dates)}"
+        )
 
     checkout_buttons = re.findall(
         r'<button\b[^>]*\bdata-open-checkout\b[^>]*>',
@@ -91,7 +122,7 @@ def validate(root: Path) -> None:
         content,
         flags=re.IGNORECASE,
     ):
-        raise AssertionError("The 30-day history is not expanded by default")
+        raise AssertionError("The current-month history is not expanded by default")
 
     forbidden = (
         "83% trong 30 ngày",

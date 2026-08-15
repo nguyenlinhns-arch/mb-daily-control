@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Thin finalizer around apply_home_portal that counts real button tags only."""
+"""Finalize the portal homepage and sanitize all public 4SO surfaces."""
 from __future__ import annotations
 
 import argparse
@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 
 import apply_home_portal as portal
+import sanitize_public_4so as fourso_privacy
 
 
 def apply(output_root: Path) -> dict[str, object]:
@@ -32,7 +33,25 @@ def apply(output_root: Path) -> dict[str, object]:
         raise ValueError("Potential current 4SO pair leaked in homepage")
 
     page.write_text(result, encoding="utf-8")
-    return {"status":"PASS","homepage":"portal-v1","checkout_buttons":2}
+    privacy = fourso_privacy.sanitize(output_root)
+
+    # Final fail-closed scan of the public proof surfaces.
+    for rel in ("historical-proof.json", "ai-methods/yesterday-proof.json"):
+        text = (output_root / rel).read_text(encoding="utf-8").lower()
+        for token in ("recommended_numbers", '"outputs"', '"observed"', "canonical_codes", "canonical_pairs", "final_codes", "final_pairs"):
+            if token.lower() in text:
+                raise ValueError(f"4SO public proof leak after sanitization: {rel} / {token}")
+    history = (output_root / "lich-su-doi-chieu" / "index.html").read_text(encoding="utf-8")
+    method = (output_root / "phuong-phap-4so" / "index.html").read_text(encoding="utf-8")
+    if 'data-4so-sanitized="true"' not in history or 'data-4so-sanitized="true"' not in method:
+        raise ValueError("4SO sanitized page marker missing")
+
+    return {
+        "status": "PASS",
+        "homepage": "portal-v1",
+        "checkout_buttons": 2,
+        "fourso_public_mode": privacy["mode"],
+    }
 
 
 def main() -> None:

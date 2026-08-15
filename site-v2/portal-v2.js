@@ -2,7 +2,10 @@
   'use strict';
   const path=location.pathname;
   const CONSENT_KEY='lm_analytics_consent_v1';
-  const routes=[['/','⌂','Home'],['/thong-ke-xsmb/','▦','Thống kê'],['/lo-gan-xsmb/','↕','Lô gan'],['/tra-cuu-xsmb/','⌕','Tra cứu'],['/phuong-phap-cong-khai/','AI','Phương pháp']];
+  const dataPaths=new Set(['/thong-ke-xsmb/','/xsmb-30-ngay/','/tan-suat-xsmb/','/lo-gan-xsmb/','/cap-dao-xsmb/','/thong-ke-dau-duoi-xsmb/','/thong-ke-tong-xsmb/','/thong-ke-theo-thu-xsmb/','/tra-cuu-xsmb/','/nguon-du-lieu-xsmb/']);
+  const defaultRoutes=[['/','⌂','Home'],['/thong-ke-xsmb/','▦','Thống kê'],['/lo-gan-xsmb/','↕','Lô gan'],['/tra-cuu-xsmb/','⌕','Tra cứu'],['/phuong-phap-cong-khai/','AI','Phương pháp']];
+  const dataRoutes=[['/thong-ke-xsmb/','▦','Thống kê'],['/xsmb-30-ngay/','30','30 ngày'],['/lo-gan-xsmb/','↕','Lô gan'],['/tra-cuu-xsmb/','⌕','Tra cứu'],['/nguon-du-lieu-xsmb/','i','Nguồn']];
+  const routes=dataPaths.has(path)?dataRoutes:defaultRoutes;
 
   const gtag=(...args)=>{
     window.dataLayer=window.dataLayer||[];

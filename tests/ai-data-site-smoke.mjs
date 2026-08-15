@@ -76,30 +76,36 @@ const isoNextDay = (iso) => {
   date.setUTCDate(date.getUTCDate() + 1);
   return date.toISOString().slice(0, 10);
 };
+const isoPreviousDay = (iso) => {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().slice(0, 10);
+};
 const isoDistanceDays = (start, end) => (
   (Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000
 );
 
-// The public evidence source remains a complete, internally consistent 30-day window.
+// The public evidence source remains a complete, internally consistent rolling window.
 assert.equal(publicProof.schema_version, "MB_PUBLIC_HISTORICAL_PROOF_V1_COMPLETED_ONLY");
 assert.equal(publicProof.status, "COMPLETED_DATES_ONLY");
 assert.equal(publicProof.validation.total_days, 30);
-assert.equal(publicProof.validation.hit_days, 22);
-assert.equal(publicProof.validation.rate_pct, 73);
 assert.equal(isoDistanceDays(publicProof.validation.window_start, publicProof.validation.window_end), 29);
 assert.equal(sourceAccess.history_end, publicProof.validation.window_end);
-assert.equal(publicProof.recent_period.period_start, publicProof.validation.window_start);
-assert.equal(publicProof.recent_period.period_end, publicProof.validation.window_end);
-assert.equal(publicProof.recent_period.total_days, 30);
-assert.equal(publicProof.recent_period.hit_days, 22);
-assert.equal(publicProof.recent_period.days.length, 30);
-assert.equal(
-  publicProof.recent_period.days.filter((day) => day.observed.length > 0).length,
-  publicProof.recent_period.hit_days
-);
 assert.equal(
   Math.round(publicProof.validation.hit_days * 100 / publicProof.validation.total_days),
   publicProof.validation.rate_pct
+);
+
+// The visible detailed period may be the current month rather than the full rolling window.
+assert.equal(publicProof.recent_period.period_end, sourceAccess.history_end);
+assert.equal(
+  isoDistanceDays(publicProof.recent_period.period_start, publicProof.recent_period.period_end) + 1,
+  publicProof.recent_period.total_days
+);
+assert.equal(publicProof.recent_period.days.length, publicProof.recent_period.total_days);
+assert.equal(
+  publicProof.recent_period.days.filter((day) => day.observed.length > 0).length,
+  publicProof.recent_period.hit_days
 );
 
 for (let index = 0; index < publicProof.recent_period.days.length; index += 1) {
@@ -120,9 +126,19 @@ assert.deepEqual(yesterdayProof.historical_validation, {
   total_days: publicProof.validation.total_days,
   rate_pct: publicProof.validation.rate_pct
 });
-assert.equal(yesterdayProof.month_summary.daily_records.length, 30);
-assert.equal(yesterdayProof.month_summary.win_days, 22);
-assert.equal(yesterdayProof.month_summary.miss_days, 8);
+assert.equal(yesterdayProof.month_summary.period_end, sourceAccess.history_end);
+assert.equal(
+  yesterdayProof.month_summary.daily_records.length,
+  yesterdayProof.month_summary.observed_days
+);
+assert.equal(
+  yesterdayProof.month_summary.win_days + yesterdayProof.month_summary.miss_days,
+  yesterdayProof.month_summary.observed_days
+);
+assert.equal(
+  yesterdayProof.month_summary.daily_records.filter((record) => record.hits.length > 0).length,
+  yesterdayProof.month_summary.win_days
+);
 assert.deepEqual(
   yesterdayProof.month_summary.daily_records.map((record) => ({
     date: record.date,
@@ -138,8 +154,10 @@ assert.equal(paidReady.schema_version, "MB_PAID_REPORT_READINESS_V1");
 assert.equal(paidReady.report_date, isoNextDay(paidReady.data_lock));
 assert.equal(paidReady.data_lock, sourceAccess.history_end);
 assert.equal(paidReady.outcome_known_at_selection, false);
-assert.equal(publicProof.method_snapshot.target_date, paidReady.report_date);
-assert.equal(publicProof.method_snapshot.data_lock, paidReady.data_lock);
+assert.equal(publicProof.method_snapshot.target_date, sourceAccess.history_end);
+assert.equal(publicProof.method_snapshot.data_lock, isoPreviousDay(publicProof.method_snapshot.target_date));
+assert.equal(publicProof.method_snapshot.layers.length, 7);
+assert.deepEqual(publicProof.method_snapshot.layers.map((layer) => layer.index), [1, 2, 3, 4, 5, 6, 7]);
 assert.equal(publicProof.method_snapshot.paid_output_hidden, true);
 assert.doesNotMatch(publicProofRaw, /"final_(?:codes|pairs)"|"top1"|"top2"/i);
 assert.doesNotMatch(paidReadyRaw, /19\s*[-–—]\s*91|05\s*[-–—]\s*50/);
@@ -205,8 +223,8 @@ assert.match(workflow, /python scripts\/apply_conversion_v2\.py --output-root _s
 assert.match(workflow, /Expected exactly 2 home checkout buttons|len\(buttons\) != 2/);
 assert.match(applyConversionV2, /History contains a day outside the report month/);
 assert.match(applyConversionV2, /completed rows for the report month/);
-assert.match(applyConversionV2, /22\/30 ngày/);
-assert.match(applyConversionV2, /73%/);
+assert.match(applyConversionV2, /Historical rate is data/);
+assert.match(applyConversionV2, /round\(hit_days \* 100 \/ total_days\)/);
 assert.match(simplifyPurchaseCta, /filter_history_to_report_month/);
 assert.match(simplifyPurchaseCta, /Lịch sử đối chiếu trong tháng này/);
 assert.match(simplifyPurchaseCta, /exactly two checkout buttons/i);

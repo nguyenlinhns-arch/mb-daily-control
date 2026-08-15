@@ -25,7 +25,8 @@ def apply(root:Path)->dict[str,object]:
             t=t.replace('</head>',CSS+'</head>',1)
         p.write_text(t,encoding='utf-8')
         n+=1
-    result:dict[str,object]={'pages':n,'sensitive_schema_removed':stripped}
+    import enrich_portal_metadata as metadata
+    result:dict[str,object]={'pages':n,'sensitive_schema_removed':stripped,'metadata':metadata.apply(root)}
     required=('statistics-data.json','source-access.json','report-readiness.json','sitemap.xml','llms.txt')
     if all((root/name).exists() for name in required):
         import finalize_portal_v4 as v4
@@ -37,10 +38,10 @@ def self_test()->None:
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         r=Path(td); (r/'phuong-phap-cong-khai').mkdir();
-        (r/'phuong-phap-cong-khai/index.html').write_text('<html><head><script type="application/ld+json">{"@id":"https://lemienbac.com/#portal-v3","name":"Không công khai 4SO","dateModified":"2026-08-15"}</script></head><body></body></html>',encoding='utf-8')
+        (r/'phuong-phap-cong-khai/index.html').write_text('<html><head><title>Phương pháp công khai</title><meta name="description" content="Mô tả"><meta name="robots" content="index,follow"><script type="application/ld+json">{"@id":"https://lemienbac.com/#portal-v3","name":"Không công khai 4SO","dateModified":"2026-08-15"}</script></head><body></body></html>',encoding='utf-8')
         result=apply(r); text=(r/'phuong-phap-cong-khai/index.html').read_text(encoding='utf-8')
         assert result['pages']==1 and result['sensitive_schema_removed']==1 and 'portal-v3.css' in text and '#portal-v3' not in text
-        assert 'quality_gate' not in result
+        assert 'quality_gate' not in result and 'G-R9TBYP97BC' in text and 'og:title' in text
     print('PORTAL_V3_ASSETS_SELF_TEST_OK')
 
 def main()->None:

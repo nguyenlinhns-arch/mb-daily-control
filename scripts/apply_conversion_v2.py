@@ -15,7 +15,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260815-1">'
 SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260816-1"></script>'
 FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260816-3"></script>'
-STATS_HEADING = "Thống kê XSMB lô tô và phân tích bằng hệ thống AI"
 
 
 def inject_before_head_end(content: str, tag: str) -> str:
@@ -40,15 +39,8 @@ def parse_vi_date(content: str, attribute: str) -> date:
     )
 
 
-def dmy(value: date) -> str:
-    return value.strftime("%d/%m/%Y")
-
-
 def apply_home(home: Path) -> None:
     content = home.read_text(encoding="utf-8")
-    report_day = parse_vi_date(content, "data-report-date")
-    suggestion_cta = f"Nhận gợi ý số ngày hôm nay – {dmy(report_day)}"
-
     content = inject_before_head_end(content, STYLE_TAG)
     content = inject_before_head_end(content, SCRIPT_TAG)
     content = inject_before_head_end(content, FINANCE_SCRIPT_TAG)
@@ -58,8 +50,6 @@ def apply_home(home: Path) -> None:
         ("4 đầu ra đã lưu", "4 số trong báo cáo"),
         ("Đối chiếu thực tế", "Kết quả thực tế"),
         ("Không xuất hiện", "Không trúng"),
-        ("Công cụ thống kê XSMB", STATS_HEADING),
-        ("Trung tâm thống kê XSMB", STATS_HEADING),
         (
             "Một ngày được ghi nhận khi có số trong báo cáo xuất hiện trong 27 mã kết quả đã công bố.",
             "Một ngày được ghi nhận khi có ít nhất một số trong báo cáo xuất hiện trong 27 mã kết quả đã công bố.",
@@ -67,13 +57,6 @@ def apply_home(home: Path) -> None:
     )
     for old, new in replacements:
         content = content.replace(old, new)
-
-    content = re.sub(
-        r'(<button\b[^>]*\bdata-open-checkout\b[^>]*>)(.*?)(</button>)',
-        lambda match: f"{match.group(1)}{suggestion_cta}{match.group(3)}",
-        content,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
 
     content = re.sub(
         r'<details\b(?=[^>]*\bclass="history-disclosure")'
@@ -102,13 +85,11 @@ def validate(root: Path) -> None:
         "Có cả ngày trúng và không trúng",
         "có ít nhất một số trong báo cáo xuất hiện",
         "Lịch sử đối chiếu trong tháng này",
-        STATS_HEADING,
     )
     for marker in required:
         if marker not in content:
             raise AssertionError(f"Missing final conversion marker: {marker}")
 
-    # Historical rate is data, not a design constant.
     metric = re.search(
         r'<div class="historical-rate">\s*<p>.*?</p>\s*'
         r'<strong>(\d+)%</strong>\s*<span>\s*(\d+)\s*/\s*(\d+)\s+ngày',
@@ -127,12 +108,6 @@ def validate(root: Path) -> None:
 
     report_day = parse_vi_date(content, "data-report-date")
     lock_day = parse_vi_date(content, "data-lock-date")
-    expected_cta = f"Nhận gợi ý số ngày hôm nay – {dmy(report_day)}"
-    if content.count(expected_cta) != 2:
-        raise AssertionError(
-            f"Expected exactly two dated suggestion CTAs, found {content.count(expected_cta)}"
-        )
-
     row_dates = [
         date.fromisoformat(value)
         for value in re.findall(

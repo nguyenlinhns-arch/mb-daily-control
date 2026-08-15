@@ -22,26 +22,10 @@
       ad_user_data:'denied',
       ad_personalization:'denied'
     });
-    try{localStorage.setItem(CONSENT_KEY,state)}catch{}
   };
-  const showConsent=()=>{
-    if(typeof window.gtag!=='function'||storedConsent()||document.querySelector('.portal-consent'))return;
-    const box=document.createElement('aside');
-    box.className='portal-consent';
-    box.setAttribute('aria-label','Tùy chọn đo lường website');
-    box.innerHTML='<div><b>Đo lường để cải thiện website</b><span>Lê Miền Bắc chỉ dùng cookie phân tích hiệu năng và cách sử dụng công cụ; không bật cá nhân hóa quảng cáo.</span></div><div class="portal-consent-actions"><button type="button" data-consent="denied">Không</button><button type="button" class="is-primary" data-consent="granted">Đồng ý</button></div>';
-    box.addEventListener('click',e=>{
-      const button=e.target.closest('[data-consent]'); if(!button)return;
-      const state=button.dataset.consent;
-      setConsent(state);
-      box.remove();
-      if(state==='granted')emit('analytics_consent_granted');
-    });
-    document.body.appendChild(box);
-  };
-  const existing=storedConsent();
-  if(existing)setConsent(existing);
-  else requestAnimationFrame(showConsent);
+  // No visible consent banner. New visitors stay privacy-safe with analytics denied.
+  // Existing visitors who explicitly granted analytics in the past keep that choice.
+  setConsent(storedConsent()==='granted'?'granted':'denied');
 
   if(!document.querySelector('.portal-mobile-nav')){
     const nav=document.createElement('nav');

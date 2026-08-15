@@ -42,6 +42,6 @@ jobs:
           grep -q 'lm_analytics_consent_v1' site-v2/portal-v2.js
           grep -q 'xsmb_history_date_open' site-v2/portal-v2.js
           grep -q 'portal-number-compare' site-v2/portal-v3.css
-          grep -q 'portal-history-browser' site-v2/portal-v3.css
+          grep -q 'portal-history-codes' site-v2/portal-v3.css
           ! grep -q 'portal-consent' site-v2/portal-v3.css
           ! grep -q 'statistics-data.json' site-v2/checkout-entry.js

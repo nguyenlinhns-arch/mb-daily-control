@@ -37,11 +37,15 @@ def ensure_ad_style(text:str)->tuple[str,bool]:
 def ensure_native(text:str)->tuple[str,bool]:
     if NATIVE_ID in text:return text,False
     methods=section_bounds(text,'<h2>Phương pháp công khai')
-    if not methods:
-        methods=section_bounds(text,'portal-methods')
-    if not methods:raise ValueError('Cannot find public methods section for native ad')
-    insert=methods[1]
-    return text[:insert]+'\n'+NATIVE_HTML+'\n'+text[insert:],True
+    if not methods:methods=section_bounds(text,'portal-methods')
+    if methods:
+        insert=methods[1]
+        return text[:insert]+'\n'+NATIVE_HTML+'\n'+text[insert:],True
+    buy=section_bounds(text,BUY_MARKER)
+    if buy:
+        insert=buy[0]
+        return text[:insert]+NATIVE_HTML+'\n'+text[insert:],True
+    raise ValueError('Cannot find safe native ad placement')
 
 
 def ensure_banner_after_buy(text:str)->tuple[str,bool,str]:
@@ -101,7 +105,6 @@ def apply(root:Path)->dict[str,object]:
     path=root/'index.html'
     if not path.is_file():return {'status':'SKIP','reason':'missing_home'}
     text=path.read_text(encoding='utf-8')
-
     text,style_changed=ensure_ad_style(text)
     text,native_injected=ensure_native(text)
     text,native_converted=convert_existing_native_to_lazy(text)
@@ -109,7 +112,6 @@ def apply(root:Path)->dict[str,object]:
     text,seo_changed=ensure_static_seo_links(text)
     text,affiliate_changed=normalize_affiliate_copy(text)
     path.write_text(text,encoding='utf-8')
-
     if text.find(BANNER_ID)<text.find(BUY_MARKER):raise ValueError('Banner placement invariant failed')
     if text.count(NATIVE_ID)!=1 or text.count(BANNER_ID)!=1:raise ValueError('Ad slot uniqueness failed')
     if 'data-lm-native-ad-src=' not in text or NATIVE_SRC not in text:raise ValueError('Native lazy-load marker missing')
@@ -117,17 +119,7 @@ def apply(root:Path)->dict[str,object]:
     if BANNER_SRC not in text:raise ValueError('300x250 banner source missing')
     if SEO_LINKS_MARKER not in text or '/xsmb-30-ngay/' not in text or '/nguon-du-lieu-xsmb/' not in text:raise ValueError('Static SEO discovery links missing')
     if re.search(r'Ưu đãi mua sắm Shopee\s+ngày\s+\d{2}/\d{2}/\d{4}',text):raise ValueError('Affiliate copy is incorrectly tied to report date')
-
-    return {
-        'status':'PASS',
-        'changed':any((style_changed,native_injected,native_converted,banner_changed,seo_changed,affiliate_changed)),
-        'placement':placement,
-        'static_seo_links':True,
-        'affiliate_evergreen':True,
-        'native_lazy':True,
-        'adsterra_native':True,
-        'adsterra_banner_300':True,
-    }
+    return {'status':'PASS','changed':any((style_changed,native_injected,native_converted,banner_changed,seo_changed,affiliate_changed)),'placement':placement,'static_seo_links':True,'affiliate_evergreen':True,'native_lazy':True,'adsterra_native':True,'adsterra_banner_300':True}
 
 
 def self_test()->None:

@@ -1,0 +1,116 @@
+name: Enforce ACCESSTRADE-only monetization
+
+on:
+  push:
+    paths:
+      - '.github/workflows/accesstrade-only-monetization.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Remove non-ACCESSTRADE ad sources
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          # Homepage builder: keep ACCESSTRADE affiliate placement only.
+          p = Path('scripts/apply_portal_v3_assets.py')
+          s = p.read_text(encoding='utf-8')
+          s, n = re.subn(
+              r"\nNATIVE_AD='''.*?'''\n\nBANNER_300='''.*?'''\nMOBILE_320_MARKER='[^']*'\n",
+              "\n# Monetization policy: ACCESSTRADE only.\n",
+              s,
+              count=1,
+              flags=re.S,
+          )
+          if n != 1:
+              raise SystemExit(f'Could not remove Adsterra constants: {n}')
+
+          old_inject = '''    methods=section_around(text,'<h2>Phương pháp công khai hôm nay</h2>')
+    if methods and 'id="lm-adsterra-native"' not in text:
+        _,end=methods; text=text[:end]+NATIVE_AD+text[end:]; changed=True
+    buy=text.find('<section class="buy-simple portal-buy"')
+    if buy>=0 and 'id="lm-adsterra-300x250"' not in text:
+        text=text[:buy]+BANNER_300+MOBILE_320_MARKER+'\\n'+text[buy:]; changed=True
+'''
+          if old_inject not in s:
+              raise SystemExit('Could not find homepage Adsterra injection block')
+          s = s.replace(old_inject, '')
+
+          old_return = "    return {'status':'PASS','changed':changed,'affiliate':'affiliate-shopee-smartlink' in text,'native':'lm-adsterra-native' in text,'banner_300':'lm-adsterra-300x250' in text,'mobile_320_slot':MOBILE_320_MARKER in text}"
+          new_return = "    return {'status':'PASS','changed':changed,'affiliate':'affiliate-shopee-smartlink' in text,'native':False,'banner_300':False,'mobile_320_slot':False}"
+          if old_return not in s:
+              raise SystemExit('Could not update monetization result contract')
+          s = s.replace(old_return, new_return)
+
+          old_assert = "        assert m['affiliate'] and m['native'] and m['banner_300'] and MOBILE_320_MARKER in t"
+          new_assert = "        assert m['affiliate'] and not m['native'] and not m['banner_300'] and 'lm-adsterra' not in t"
+          if old_assert not in s:
+              raise SystemExit('Could not update monetization self-test')
+          s = s.replace(old_assert, new_assert)
+          p.write_text(s, encoding='utf-8')
+
+          # Legacy AI landing: remove previously embedded Adsterra display units.
+          p = Path('ai-methods/index.html')
+          s = p.read_text(encoding='utf-8')
+          s = re.sub(r'\n\s*/\* Adsterra display monetization v1 \*/.*?(?=\n\s*</style>)', '', s, count=1, flags=re.S)
+          s = re.sub(r'\s*<section class="ad-slot"[^>]*>.*?id="adsterra-native-1".*?</section>\s*', '\n', s, count=1, flags=re.S)
+          s = re.sub(r'\s*<section class="ad-slot"[^>]*>.*?id="adsterra-banner-300x250".*?</section>\s*', '\n', s, count=1, flags=re.S)
+          p.write_text(s, encoding='utf-8')
+
+          # Prevent the old maintenance workflow from re-inserting Adsterra later.
+          p = Path('.github/workflows/clarify-xsmb-statistics.yml')
+          s = p.read_text(encoding='utf-8')
+          s, n = re.subn(
+              r'\n      - name: Deploy Adsterra units\n.*?(?=\n      - name: Commit\n)',
+              '',
+              s,
+              count=1,
+              flags=re.S,
+          )
+          if n != 1:
+              raise SystemExit(f'Could not remove legacy Adsterra workflow block: {n}')
+          s = s.replace(
+              "if git diff --quiet -- ai-methods/landing-v3.html ai-methods/index.html; then exit 0; fi",
+              "if git diff --quiet -- ai-methods/landing-v3.html; then exit 0; fi",
+          )
+          s = s.replace(
+              "git add ai-methods/landing-v3.html ai-methods/index.html",
+              "git add ai-methods/landing-v3.html",
+          )
+          s = s.replace(
+              "git commit -m 'Add Adsterra native and display ads'",
+              "git commit -m 'Clarify XSMB statistics wording'",
+          )
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Verify ACCESSTRADE-only active monetization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/apply_portal_v3_assets.py --self-test
+          ! grep -Eiq 'effectivecpmnetwork\.com|highperformanceformat\.com|id="lm-adsterra|id="adsterra-' scripts/apply_portal_v3_assets.py ai-methods/index.html .github/workflows/clarify-xsmb-statistics.yml
+          grep -q 'affiliate-shopee-smartlink' scripts/apply_portal_v3_assets.py
+          grep -q 'go.isclix.com/deep_link' site-v2/checkout-enhance.js
+          grep -q 'go.isclix.com/deep_link' site-v2/finance-banner.js
+
+      - name: Commit cleanup
+        shell: bash
+        run: |
+          if git diff --quiet -- scripts/apply_portal_v3_assets.py ai-methods/index.html .github/workflows/clarify-xsmb-statistics.yml; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/apply_portal_v3_assets.py ai-methods/index.html .github/workflows/clarify-xsmb-statistics.yml
+          git commit -m 'Keep ACCESSTRADE-only monetization'
+          git push origin HEAD:main

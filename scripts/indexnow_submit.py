@@ -46,11 +46,15 @@ def payload_for(urls:list[str])->dict[str,object]:
 
 
 def prepare(root:Path)->dict[str,object]:
+    # Final-release housekeeping: keep monetization below the paid-report CTA
+    # before the public artifact is declared ready and submitted for discovery.
+    import optimize_monetization_placement as monetization
+    placement=monetization.apply(root)
     urls=sitemap_urls(root/'sitemap.xml')
     key_file=root/f'{KEY}.txt';key_file.write_text(KEY,encoding='utf-8')
     payload=payload_for(urls)
     (root/'indexnow-payload.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    return {'status':'READY','urls':len(urls),'key_file':key_file.name}
+    return {'status':'READY','urls':len(urls),'key_file':key_file.name,'monetization_placement':placement}
 
 
 def fetch_live(url:str)->bytes:
@@ -104,6 +108,7 @@ def self_test()->None:
         assert result['urls']==2 and (root/f'{KEY}.txt').read_text()==KEY
         assert payload['host']==HOST and payload['keyLocation'].endswith(f'/{KEY}.txt') and len(payload['urlList'])==2
         assert sitemap_urls_bytes((root/'sitemap.xml').read_bytes())==payload['urlList']
+        assert result['monetization_placement']['status']=='SKIP'
     print('INDEXNOW_SELF_TEST_OK')
 
 

@@ -1,7 +1,48 @@
 (()=>{
   'use strict';
   const path=location.pathname;
+  const CONSENT_KEY='lm_analytics_consent_v1';
   const routes=[['/','⌂','Home'],['/thong-ke-xsmb/','▦','Thống kê'],['/lo-gan-xsmb/','↕','Lô gan'],['/tra-cuu-xsmb/','⌕','Tra cứu'],['/phuong-phap-cong-khai/','AI','Phương pháp']];
+
+  const gtag=(...args)=>{
+    window.dataLayer=window.dataLayer||[];
+    if(typeof window.gtag==='function')window.gtag(...args);
+    else window.dataLayer.push(args);
+  };
+  const emit=(name,params={})=>gtag('event',name,{page_path:path,...params});
+
+  const storedConsent=()=>{
+    try{return localStorage.getItem(CONSENT_KEY)||''}catch{return ''}
+  };
+  const setConsent=state=>{
+    const analytics=state==='granted'?'granted':'denied';
+    gtag('consent','update',{
+      analytics_storage:analytics,
+      ad_storage:'denied',
+      ad_user_data:'denied',
+      ad_personalization:'denied'
+    });
+    try{localStorage.setItem(CONSENT_KEY,state)}catch{}
+  };
+  const showConsent=()=>{
+    if(typeof window.gtag!=='function'||storedConsent()||document.querySelector('.portal-consent'))return;
+    const box=document.createElement('aside');
+    box.className='portal-consent';
+    box.setAttribute('aria-label','Tùy chọn đo lường website');
+    box.innerHTML='<div><b>Đo lường để cải thiện website</b><span>Lê Miền Bắc chỉ dùng cookie phân tích hiệu năng và cách sử dụng công cụ; không bật cá nhân hóa quảng cáo.</span></div><div class="portal-consent-actions"><button type="button" data-consent="denied">Không</button><button type="button" class="is-primary" data-consent="granted">Đồng ý</button></div>';
+    box.addEventListener('click',e=>{
+      const button=e.target.closest('[data-consent]'); if(!button)return;
+      const state=button.dataset.consent;
+      setConsent(state);
+      box.remove();
+      if(state==='granted')emit('analytics_consent_granted');
+    });
+    document.body.appendChild(box);
+  };
+  const existing=storedConsent();
+  if(existing)setConsent(existing);
+  else requestAnimationFrame(showConsent);
+
   if(!document.querySelector('.portal-mobile-nav')){
     const nav=document.createElement('nav');
     nav.className='portal-mobile-nav'; nav.setAttribute('aria-label','Điều hướng nhanh trên điện thoại');
@@ -27,6 +68,9 @@
     }
     if(form){
       form.addEventListener('submit',()=>{
+        const codes=parseCodes(new FormData(form).get('numbers'));
+        const window=String(+new FormData(form).get('days')||60);
+        emit('xsmb_lookup_submit',{number_count:codes.length,window});
         setTimeout(async()=>{
           try{
             const data=await loadStats(); const f=new FormData(form); const codes=parseCodes(f.get('numbers')); const window=String(+f.get('days')||60);
@@ -42,7 +86,7 @@
             section.innerHTML=`<div class="portal-number-compare-head"><div><b>So sánh từng số</b><span>Cửa sổ ${window} kỳ · bấm số để mở hồ sơ chi tiết</span></div><a href="/thong-ke-xsmb/">Ma trận 00–99 →</a></div><div class="portal-number-compare-grid">${rows.map(({code,n,s})=>`<a class="portal-number-compare-card" href="/thong-ke-xsmb/?so=${code}"><strong>${code}</strong><span><b>${s.days_seen}/${s.window}</b> ngày có mặt</span><span><b>${s.hits}</b> nháy</span><span>Gan <b>${n.current_gap}</b> kỳ</span><small>Gần nhất ${fmt(n.last_seen)}</small></a>`).join('')}</div>`;
             out.prepend(section);
             const q=new URLSearchParams(); q.set('numbers',codes.join(',')); q.set('days',window); history.replaceState({},'',`${location.pathname}?${q}`);
-            window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'xsmb_lookup_compare',page_path:path,numbers:codes.join('-'),window});
+            emit('xsmb_lookup_compare',{number_count:codes.length,window});
           }catch{}
         },0);
       });
@@ -55,6 +99,7 @@
       const c=parseCodes(value)[0]; if(!c)return;
       const button=document.querySelector(`[data-number="${c}"]`); if(!button)return;
       button.click();
+      emit('xsmb_profile_open',{code:c,source:'deep_link'});
       setTimeout(()=>document.querySelector('#profile')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'}),30);
     };
     if(code)requestAnimationFrame(()=>openCode(code));
@@ -62,10 +107,42 @@
       const button=e.target.closest('[data-number]'); if(!button)return;
       const c=button.dataset.number; if(!/^\d{2}$/.test(c||''))return;
       const q=new URLSearchParams(location.search); q.set('so',c); history.replaceState({},'',`${location.pathname}?${q}`);
+      emit('xsmb_profile_open',{code:c,source:'matrix'});
     });
   }
 
-  document.querySelectorAll('[data-portal-track]').forEach(a=>a.addEventListener('click',()=>{
-    window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'portal_internal_click',page_path:path,target:a.getAttribute('href')||'',label:a.dataset.portalTrack||''});
-  }));
+  document.querySelector('.portal-quick-search')?.addEventListener('submit',e=>{
+    const f=new FormData(e.currentTarget); emit('portal_quick_search',{number_count:parseCodes(f.get('numbers')).length,window:String(f.get('days')||60)});
+  });
+
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('a'); if(!a)return;
+    if(a.matches('.portal-tool,.portal-related a,.portal-mobile-nav a,.portal-fast-links a,[data-portal-track],.portal-number-compare-card')){
+      emit('portal_internal_click',{target:a.getAttribute('href')||'',label:a.dataset.portalTrack||a.textContent.trim().slice(0,60)});
+    }
+  });
+
+  const vitals={cls:0,lcp:0,inp:0};
+  let vitalSent=false;
+  const supported=window.PerformanceObserver?.supportedEntryTypes||[];
+  const observe=(type,callback,options={})=>{
+    if(!supported.includes(type))return;
+    try{const po=new PerformanceObserver(list=>callback(list.getEntries()));po.observe({type,buffered:true,...options})}catch{}
+  };
+  observe('layout-shift',entries=>entries.forEach(x=>{if(!x.hadRecentInput)vitals.cls+=x.value}));
+  observe('largest-contentful-paint',entries=>{const x=entries.at(-1);if(x)vitals.lcp=x.startTime});
+  observe('event',entries=>entries.forEach(x=>{if(x.interactionId&&x.duration>vitals.inp)vitals.inp=x.duration}),{durationThreshold:40});
+  const sendVitals=()=>{
+    if(vitalSent)return; vitalSent=true;
+    const nav=performance.getEntriesByType('navigation')[0];
+    emit('web_vitals_summary',{
+      lcp_ms:Math.round(vitals.lcp||0),
+      cls_milli:Math.round((vitals.cls||0)*1000),
+      inp_ms:Math.round(vitals.inp||0),
+      load_ms:Math.round(nav?.loadEventEnd||0),
+      navigation_type:nav?.type||'unknown'
+    });
+  };
+  addEventListener('pagehide',sendVitals,{once:true});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')sendVitals()},{once:true});
 })();

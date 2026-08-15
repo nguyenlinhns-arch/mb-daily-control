@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 BASE='https://lemienbac.com'
 GA4='G-R9TBYP97BC'
+CONSENT_KEY='lm_analytics_consent_v1'
 TITLE_OVERRIDES={
     '/phuong-phap-cong-khai/':'6 phương pháp XSMB công khai hôm nay | Lê Miền Bắc',
 }
@@ -40,6 +41,22 @@ def upsert_meta(text:str,attr:str,key:str,value:str)->str:
     return text.replace('</head>',tag+'</head>',1)
 
 
+def consent_default_js()->str:
+    return (
+        f"let lmAnalyticsConsent='denied';"
+        f"try{{if(localStorage.getItem('{CONSENT_KEY}')==='granted')lmAnalyticsConsent='granted'}}catch(e){{}}"
+        "gtag('consent','default',{analytics_storage:lmAnalyticsConsent,ad_storage:'denied',"
+        "ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});"
+    )
+
+
+def normalize_existing_consent(text:str)->str:
+    pattern=re.compile(r"gtag\('consent','default',\{[^;]*?analytics_storage\s*:\s*'denied'[^;]*?\}\);",re.I|re.S)
+    if pattern.search(text):
+        return pattern.sub(consent_default_js(),text,count=1)
+    return text
+
+
 def enrich(path:Path,root:Path)->bool:
     text=path.read_text(encoding='utf-8'); before=text
     route=route_for(path,root)
@@ -59,19 +76,27 @@ def enrich(path:Path,root:Path)->bool:
             ('name','twitter:card',twitter_card),('name','twitter:title',title),('name','twitter:description',desc),
         ):
             text=upsert_meta(text,attr,key,value)
-    if GA4 not in text and not noindex:
-        block=f'''<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id={GA4}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','{GA4}',{{allow_google_signals:false,allow_ad_personalization_signals:false}});</script>'''
+    if GA4 in text and not noindex:
+        text=normalize_existing_consent(text)
+    elif not noindex:
+        block=(f'<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>'
+               f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA4}"></script>'
+               '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}'
+               +consent_default_js()+
+               f"gtag('js',new Date());gtag('config','{GA4}',{{allow_google_signals:false,allow_ad_personalization_signals:false}});</script>")
         text=text.replace('</head>',block+'</head>',1)
     if text!=before:path.write_text(text,encoding='utf-8')
     return text!=before
 
 
 def apply(root:Path)->dict[str,int]:
-    pages=changed=ga4=0
+    pages=changed=ga4=consent=0
     for path in root.rglob('*.html'):
         pages+=1; changed+=int(enrich(path,root))
-        if GA4 in path.read_text(encoding='utf-8'):ga4+=1
-    return {'pages':pages,'changed':changed,'ga4_pages':ga4}
+        text=path.read_text(encoding='utf-8')
+        if GA4 in text:ga4+=1
+        if CONSENT_KEY in text:consent+=1
+    return {'pages':pages,'changed':changed,'ga4_pages':ga4,'consent_pages':consent}
 
 
 def self_test()->None:
@@ -79,9 +104,11 @@ def self_test()->None:
     with tempfile.TemporaryDirectory() as td:
         root=Path(td); (root/'phuong-phap-cong-khai').mkdir()
         p=root/'phuong-phap-cong-khai/index.html';p.write_text('<html><head><title>Tiêu đề cũ rất dài</title><meta name="description" content="Mô tả thử đủ dài để kiểm tra metadata"><meta name="robots" content="index,follow"><meta property="og:image" content="https://example.test/a.png"></head><body></body></html>',encoding='utf-8')
-        result=apply(root);t=p.read_text(encoding='utf-8')
-        assert result['pages']==1 and GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
+        home=root/'index.html';home.write_text("<html><head><title>Home</title><meta name=\"description\" content=\"Mô tả\"><meta name=\"robots\" content=\"index,follow\"><script>window.dataLayer=[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});gtag('js',new Date());gtag('config','G-R9TBYP97BC');</script></head><body></body></html>",encoding='utf-8')
+        result=apply(root);t=p.read_text(encoding='utf-8');h=home.read_text(encoding='utf-8')
+        assert result['pages']==2 and GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
         assert 'twitter:card" content="summary_large_image' in t and '6 phương pháp XSMB công khai hôm nay' in t
+        assert CONSENT_KEY in t and CONSENT_KEY in h and "analytics_storage:lmAnalyticsConsent" in h
     print('PORTAL_METADATA_SELF_TEST_OK')
 
 

@@ -7,6 +7,11 @@ CSS='<link rel="stylesheet" href="/portal-v3.css?v=20260815-1">'
 SENSITIVE={'phuong-phap-4so/index.html','lich-su-doi-chieu/index.html','phuong-phap-cong-khai/index.html'}
 SCHEMA_RE=re.compile(r'<script type="application/ld\+json">(?:(?!</script>).)*"@id":"https://lemienbac\.com/#portal-v3"(?:(?!</script>).)*</script>',re.S)
 
+def safe_llms(root:Path,stats:dict,ready:dict)->None:
+    updated=stats.get('updated_through',''); target=ready.get('report_date','')
+    text=f'''# Lê Miền Bắc\n\n> Cổng dữ liệu và thống kê XSMB. Dữ liệu công khai cập nhật đến {updated}; báo cáo ngày {target} dùng khóa dữ liệu T−1.\n\n## Công cụ công khai\n\n- [Trung tâm thống kê XSMB](https://lemienbac.com/thong-ke-xsmb/): hồ sơ 00–99 và thống kê nhiều cửa sổ.\n- [Tần suất 00–99](https://lemienbac.com/tan-suat-xsmb/): số ngày xuất hiện và tổng nháy.\n- [Lô gan](https://lemienbac.com/lo-gan-xsmb/): khoảng vắng hiện tại, cực đại và lần gần nhất.\n- [45 cặp đảo](https://lemienbac.com/cap-dao-xsmb/): thống kê lịch sử các cặp đảo.\n- [Đầu/đuôi 0–9](https://lemienbac.com/thong-ke-dau-duoi-xsmb/): phân bố chữ số hàng chục và hàng đơn vị.\n- [Theo tổng 0–9](https://lemienbac.com/thong-ke-tong-xsmb/): phân bố tổng hai chữ số.\n- [Theo thứ](https://lemienbac.com/thong-ke-theo-thu-xsmb/): tần suất 00–99 theo ngày trong tuần.\n- [Tra cứu bộ số](https://lemienbac.com/tra-cuu-xsmb/): dò bộ số trong lịch sử 30–365 kỳ.\n- [Phương pháp công khai](https://lemienbac.com/phuong-phap-cong-khai/): A1, 2SO/X2, X3, F01, F06 và KÉP.\n\n## 4SO\n\n4SO là lớp phân tích riêng. Website chỉ công khai trạng thái khóa dữ liệu và hiệu quả lịch sử tổng hợp; đầu ra và logic nội bộ được giữ kín.\n\n## Nguyên tắc dữ liệu\n\n- Mỗi ngày lịch sử phải đủ 27/27 mã hai chữ số.\n- Thống kê công khai chỉ mô tả dữ liệu đã công bố.\n- Không suy diễn rằng số đang gan hoặc xuất hiện nhiều có nghĩa vụ xuất hiện ở kỳ tiếp theo.\n- Tỷ lệ lịch sử không phải xác suất hay cam kết kết quả.\n'''
+    (root/'llms.txt').write_text(text,encoding='utf-8')
+
 def apply(root:Path)->dict[str,object]:
     n=0; stripped=0
     for p in root.rglob('*.html'):
@@ -24,6 +29,7 @@ def apply(root:Path)->dict[str,object]:
     required=('statistics-data.json','source-access.json','report-readiness.json','sitemap.xml','llms.txt')
     if all((root/name).exists() for name in required):
         import finalize_portal_v4 as v4
+        v4.write_llms=safe_llms
         result['quality_gate']=v4.apply(root)
     return result
 

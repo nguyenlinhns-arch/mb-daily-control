@@ -1,0 +1,73 @@
+name: Sync public XSMB statistics history
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/statistics-history-sync.yml"
+      - "scripts/sync_statistics_history.py"
+  workflow_dispatch:
+  schedule:
+    # 20:10 Vietnam time: after the completed XSMB draw/source lock.
+    - cron: "10 13 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: statistics-history-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate sync engine
+        run: python scripts/sync_statistics_history.py --self-test
+
+      - name: Refresh completed-draw history
+        env:
+          GOOGLE_SHEET_ID: 1iVAfqmS-TvP02U8FtKSM2nr_7Dsd7qi2qEGnWV6IK7w
+        run: python scripts/sync_statistics_history.py
+
+      - name: Verify pack against locked source
+        run: |
+          python - <<'PY'
+          import base64, bz2, hashlib, json
+          from pathlib import Path
+
+          lock = json.loads(Path("data/source-access.json").read_text(encoding="utf-8"))
+          raw = bz2.decompress(base64.b64decode("".join(Path("data/history-27.bz2.b64").read_text().split())))
+          rows = json.loads(raw.decode("utf-8"))
+          assert len(rows) == int(lock["history_rows"]), (len(rows), lock["history_rows"])
+          assert rows[0][0] == lock["history_start"], (rows[0][0], lock["history_start"])
+          assert rows[-1][0] == lock["history_end"], (rows[-1][0], lock["history_end"])
+          assert len(rows[-1][1:]) == 27
+          digest = hashlib.sha256("|".join(rows[-1][1:]).encode()).hexdigest()
+          assert digest == lock["latest_codes_sha256"], (digest, lock["latest_codes_sha256"])
+          print("STATISTICS_HISTORY_LOCK_READBACK_OK", len(rows), rows[-1][0], digest)
+          PY
+
+      - name: Commit only a verified history update
+        run: |
+          if git diff --quiet -- data/history-27.bz2.b64; then
+            echo "Statistics history already matches the locked source."
+            exit 0
+          fi
+          git config user.name "mb-statistics-history-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history-27.bz2.b64
+          git commit -m "data: sync public statistics history $(TZ=Asia/Ho_Chi_Minh date +%F)"
+          git pull --rebase origin main
+          git push origin HEAD:main

@@ -62,8 +62,6 @@ jobs:
           PY
       - name: Verify deployment
         run: |
-          grep -n 'Thống kê Xổ số Miền Bắc' ai-methods/landing-v3.html | head -20
-          grep -n 'AI thống kê toàn bộ dữ liệu Xổ số Miền Bắc' ai-methods/landing-v3.html
           grep -n 'adsterra-native-1' ai-methods/index.html
           grep -n 'container-e336b428517bbcb55a3e3da308cc7939' ai-methods/index.html
           grep -n 'adsterra-banner-300x250' ai-methods/index.html

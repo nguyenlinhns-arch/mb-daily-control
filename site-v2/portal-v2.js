@@ -23,8 +23,8 @@
       ad_personalization:'denied'
     });
   };
-  // No visible consent banner. New visitors stay privacy-safe with analytics denied.
-  // Existing visitors who explicitly granted analytics in the past keep that choice.
+  // No blocking consent UI. New visitors remain privacy-safe with analytics denied;
+  // an existing explicit grant is respected without enabling ad personalization.
   setConsent(storedConsent()==='granted'?'granted':'denied');
 
   if(!document.querySelector('.portal-mobile-nav')){
@@ -40,7 +40,11 @@
   const parseCodes=value=>[...new Set((String(value||'').match(/\d{1,2}/g)||[]).map(x=>String(Number(x)).padStart(2,'0')).filter(x=>+x>=0&&+x<=99))].slice(0,20);
   const fmt=s=>s?s.split('-').reverse().join('/'):'Chưa có';
   let statsPromise;
-  const loadStats=()=>statsPromise||(statsPromise=fetch('/statistics-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('statistics-data');return r.json()}));
+  const loadStats=()=>{
+    if(window.LM_STATS_DATA)return Promise.resolve(window.LM_STATS_DATA);
+    if(typeof window.LM_LOAD_STATS==='function')return window.LM_LOAD_STATS().then(x=>{window.LM_STATS_DATA=x;return x});
+    return statsPromise||(statsPromise=fetch('/statistics-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('statistics-data');return r.json()}).then(x=>{window.LM_STATS_DATA=x;return x}));
+  };
 
   if(path==='/tra-cuu-xsmb/'){
     const params=new URLSearchParams(location.search); const numbers=params.get('numbers'); const days=params.get('days');
@@ -52,8 +56,9 @@
     }
     if(form){
       form.addEventListener('submit',()=>{
-        const codes=parseCodes(new FormData(form).get('numbers'));
-        const window=String(+new FormData(form).get('days')||60);
+        const first=new FormData(form);
+        const codes=parseCodes(first.get('numbers'));
+        const window=String(+first.get('days')||60);
         emit('xsmb_lookup_submit',{number_count:codes.length,window});
         setTimeout(async()=>{
           try{
@@ -78,12 +83,14 @@
   }
 
   if(path==='/thong-ke-xsmb/'){
-    const params=new URLSearchParams(location.search); const code=params.get('so');
+    const params=new URLSearchParams(location.search); const code=params.get('so'); const requestedDay=params.get('ngay');
+    let profileOpenSource='matrix';
     const openCode=value=>{
       const c=parseCodes(value)[0]; if(!c)return;
       const button=document.querySelector(`[data-number="${c}"]`); if(!button)return;
+      profileOpenSource='deep_link';
       button.click();
-      emit('xsmb_profile_open',{code:c,source:'deep_link'});
+      profileOpenSource='matrix';
       setTimeout(()=>document.querySelector('#profile')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'}),30);
     };
     if(code)requestAnimationFrame(()=>openCode(code));
@@ -91,8 +98,47 @@
       const button=e.target.closest('[data-number]'); if(!button)return;
       const c=button.dataset.number; if(!/^\d{2}$/.test(c||''))return;
       const q=new URLSearchParams(location.search); q.set('so',c); history.replaceState({},'',`${location.pathname}?${q}`);
-      emit('xsmb_profile_open',{code:c,source:'matrix'});
+      emit('xsmb_profile_open',{code:c,source:profileOpenSource});
     });
+
+    const anchor=document.querySelector('#profile')?.closest('.panel');
+    if(anchor&&!document.querySelector('.portal-history-browser')){
+      const section=document.createElement('section');
+      section.className='panel portal-history-browser';
+      section.innerHTML='<div class="portal-history-intro"><div><p class="eyebrow">LỊCH SỬ THEO NGÀY</p><h2>Tra 27 mã của 365 kỳ gần nhất</h2><p>Chỉ tải dữ liệu khi bạn mở công cụ này.</p></div><button type="button" class="portal-history-open">Mở lịch sử</button></div><div class="portal-history-body" hidden></div>';
+      anchor.insertAdjacentElement('afterend',section);
+      const body=section.querySelector('.portal-history-body');
+      const open=section.querySelector('.portal-history-open');
+      const renderDay=(data,day)=>{
+        const row=(data.recent_history||[]).find(r=>r[0]===day)||(data.recent_history||[]).at(-1);
+        if(!row)return;
+        const [date,...codes]=row; const counts=new Map(); codes.forEach(x=>counts.set(x,(counts.get(x)||0)+1));
+        const repeated=[...counts.entries()].filter(([,n])=>n>1).reduce((s,[,n])=>s+n-1,0);
+        const out=body.querySelector('.portal-history-result');
+        out.innerHTML=`<div class="portal-history-summary"><b>${fmt(date)}</b><span>27 mã · ${counts.size} mã khác nhau${repeated?` · ${repeated} nháy lặp`:''}</span></div><div class="portal-history-codes">${codes.map((c,i)=>`<span title="Vị trí ${i+1}">${c}</span>`).join('')}</div>`;
+        const q=new URLSearchParams(location.search); q.set('ngay',date); history.replaceState({},'',`${location.pathname}?${q}`);
+        emit('xsmb_history_date_open',{date,unique_codes:counts.size,repeated_hits:repeated});
+      };
+      const activate=async preferred=>{
+        if(body.dataset.ready==='true'){
+          const select=body.querySelector('select'); if(preferred&&[...select.options].some(o=>o.value===preferred))select.value=preferred;
+          renderDay(window.LM_STATS_DATA,select.value); return;
+        }
+        open.disabled=true; open.textContent='Đang tải…';
+        try{
+          const data=await loadStats(); const rows=(data.recent_history||[]).slice().reverse();
+          const chosen=rows.some(r=>r[0]===preferred)?preferred:(rows[0]?.[0]||'');
+          body.innerHTML=`<div class="portal-history-controls"><label>Chọn ngày <select>${rows.map(r=>`<option value="${r[0]}"${r[0]===chosen?' selected':''}>${fmt(r[0])}</option>`).join('')}</select></label><a href="/tra-cuu-xsmb/">Dò bộ số trong lịch sử →</a></div><div class="portal-history-result"></div>`;
+          body.hidden=false; body.dataset.ready='true'; open.textContent='Đã mở'; open.hidden=true;
+          const select=body.querySelector('select'); select.addEventListener('change',()=>renderDay(data,select.value));
+          renderDay(data,chosen);
+        }catch{
+          open.disabled=false; open.textContent='Thử lại';
+        }
+      };
+      open.addEventListener('click',()=>activate(requestedDay));
+      if(requestedDay)requestAnimationFrame(()=>activate(requestedDay));
+    }
   }
 
   document.querySelector('.portal-quick-search')?.addEventListener('submit',e=>{

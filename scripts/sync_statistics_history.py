@@ -30,7 +30,7 @@ SHEET_GID = "2026070407"
 
 
 def code2(value: object) -> str:
-    text = "".join(ch for ch in str(value or "") if ch.isdigit())
+    text = "".join(ch for ch in str("" if value is None else value) if ch.isdigit())
     if not text:
         raise ValueError(f"Mã không hợp lệ: {value!r}")
     return text[-2:].zfill(2)
@@ -118,7 +118,7 @@ def fetch_csv(sheet_id: str) -> tuple[list[tuple[date, list[str]]], str]:
             if len(history) < 60:
                 raise RuntimeError(f"CSV chỉ có {len(history)} kỳ")
             return history, url
-        except Exception as exc:  # fail over to the second official export URL
+        except Exception as exc:
             errors.append(f"{url}: {type(exc).__name__}: {exc}")
     raise RuntimeError("Không đọc được MB_History_27: " + " | ".join(errors))
 

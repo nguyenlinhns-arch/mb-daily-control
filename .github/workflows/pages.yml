@@ -39,6 +39,7 @@ jobs:
           python scripts/simplify_public_site.py --self-test
           python scripts/replace_public_analysis_wording.py --self-test
           python scripts/optimize_conversion_site.py --self-test
+          python scripts/build_statistics_site.py --self-test
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -127,6 +128,7 @@ jobs:
           python scripts/simplify_purchase_cta.py --output-root _site
           python scripts/apply_conversion_v2.py --output-root _site
           find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260815-1#g'
+          python scripts/build_statistics_site.py --output-root _site
 
           test -s _site/red-white-theme.css
           test -s _site/conversion-accent.css
@@ -142,8 +144,20 @@ jobs:
           test -s _site/lich-su-doi-chieu/index.html
           test -s _site/thong-ke-lo-to-mien-bac-bang-ai/index.html
           test -s _site/gioi-thieu/index.html
+          test -s _site/thong-ke-xsmb/index.html
+          test -s _site/tan-suat-xsmb/index.html
+          test -s _site/lo-gan-xsmb/index.html
+          test -s _site/cap-dao-xsmb/index.html
+          test -s _site/tra-cuu-xsmb/index.html
+          test -s _site/statistics-data.json
           test -s _site/sitemap.xml
           test -s _site/llms.txt
+
+          grep -q 'data-xsmb-stats="v1"' _site/thong-ke-xsmb/index.html
+          grep -q '45 cặp đảo' _site/cap-dao-xsmb/index.html
+          grep -q 'Dò một bộ số' _site/tra-cuu-xsmb/index.html
+          grep -q 'https://lemienbac.com/thong-ke-xsmb/' _site/sitemap.xml
+          ! grep -E -q '(canonical|final)[_-]?(codes|pairs)' _site/statistics-data.json
 
           grep -q 'data-public-ready="true"' _site/index.html
           grep -q 'data-paid-report-ready="true"' _site/index.html

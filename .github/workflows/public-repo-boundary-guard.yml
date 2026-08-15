@@ -32,6 +32,7 @@ jobs:
           python scripts/public_repo_boundary_guard.py --self-test
           python scripts/public_repo_boundary_guard.py
           python scripts/bundle_portal_css.py --self-test
+          python scripts/fingerprint_portal_assets.py --self-test
           python scripts/enrich_portal_metadata.py --self-test
           node --check site-v2/portal-v2.js
           node --check site-v2/checkout-entry.js

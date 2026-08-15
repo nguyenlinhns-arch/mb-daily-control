@@ -14,6 +14,7 @@ from optimize_google_ads_landing import optimize as optimize_google_ads_landing
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260815-1">'
 SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260815-3"></script>'
+FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260815-1"></script>'
 
 
 def inject_before_head_end(content: str, tag: str) -> str:
@@ -42,6 +43,7 @@ def apply_home(home: Path) -> None:
     content = home.read_text(encoding="utf-8")
     content = inject_before_head_end(content, STYLE_TAG)
     content = inject_before_head_end(content, SCRIPT_TAG)
+    content = inject_before_head_end(content, FINANCE_SCRIPT_TAG)
 
     replacements = (
         ("Có cả ngày xuất hiện và không xuất hiện", "Có cả ngày trúng và không trúng"),
@@ -78,6 +80,7 @@ def validate(root: Path) -> None:
     required = (
         STYLE_TAG,
         SCRIPT_TAG,
+        FINANCE_SCRIPT_TAG,
         "4 số trong báo cáo",
         "Kết quả thực tế",
         "Có cả ngày trúng và không trúng",
@@ -169,6 +172,11 @@ def apply(root: Path) -> None:
     if not tracking_source.exists():
         raise FileNotFoundError(f"Missing Ads tracker source: {tracking_source}")
     shutil.copy2(tracking_source, root / "ads-tracking.js")
+
+    finance_source = REPO_ROOT / "site-v2" / "finance-banner.js"
+    if not finance_source.exists():
+        raise FileNotFoundError(f"Missing finance banner source: {finance_source}")
+    shutil.copy2(finance_source, root / "finance-banner.js")
 
     # Product-first copy, neutral evidence labels and policy/trust disclosures
     # are applied last so earlier conversion scripts can keep their own checks.

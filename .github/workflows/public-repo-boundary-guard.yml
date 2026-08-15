@@ -1,0 +1,29 @@
+name: Guard public repository boundary
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout with previous commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate public/private boundary
+        run: |
+          set -euo pipefail
+          python scripts/public_repo_boundary_guard.py --self-test
+          python scripts/public_repo_boundary_guard.py

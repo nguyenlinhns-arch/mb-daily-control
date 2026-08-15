@@ -5,6 +5,9 @@
   const ACCOUNT_NUMBER = "1128091987";
   const BANK_ID = "VPB";
   const AMOUNT = 30000;
+  const SHOPEE_NUDGE_SESSION_KEY = "lm_shopee_nudge_v1";
+  const SHOPEE_NUDGE_DELAY_MS = 35000;
+  const SHOPEE_NUDGE_SCROLL_RATIO = 0.55;
   const SHOPEE_PRODUCTS = [
     {
       name: "Tông đơ Philips MG3911/15 7in1",
@@ -28,6 +31,7 @@
     }
   ];
   let checkoutEnhanced = false;
+  let shopeeNudgeConsumed = false;
 
   function isGoogleAdsVisit(url) {
     const paidMedium = /^(cpc|ppc|paid|paidsearch|paid-search)$/i.test(url.searchParams.get("utm_medium") || "");
@@ -42,12 +46,17 @@
     }
   }
 
-  function emitAffiliateClick(product, index) {
+  function pushEvent(payload) {
     window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
+    window.dataLayer.push(payload);
+  }
+
+  function emitAffiliateClick(product, index, placement = "product_grid") {
+    pushEvent({
       event: "affiliate_product_click",
       affiliate_network: "ACCESSTRADE",
       merchant: "Shopee",
+      placement,
       product_index: index + 1,
       product_name: product.name
     });
@@ -97,6 +106,114 @@
     }
     const toolsSection = [...document.querySelectorAll("section")].find((node) => /Công cụ thống kê XSMB/i.test(node.textContent || ""));
     if (toolsSection) toolsSection.insertAdjacentElement("afterend", section);
+  }
+
+  function nudgeWasShownThisSession() {
+    if (shopeeNudgeConsumed) return true;
+    try {
+      return sessionStorage.getItem(SHOPEE_NUDGE_SESSION_KEY) === "shown";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function markNudgeShown() {
+    shopeeNudgeConsumed = true;
+    try {
+      sessionStorage.setItem(SHOPEE_NUDGE_SESSION_KEY, "shown");
+    } catch (_) {
+      // Session storage can be unavailable in strict privacy modes.
+    }
+  }
+
+  function nudgeProductIndex() {
+    return Math.max(0, (new Date().getDate() - 1) % SHOPEE_PRODUCTS.length);
+  }
+
+  function showShopeeNudge(trigger) {
+    if (window.location.pathname !== "/" || nudgeWasShownThisSession() || document.getElementById("lm-shopee-nudge")) return;
+    const index = nudgeProductIndex();
+    const product = SHOPEE_PRODUCTS[index];
+    markNudgeShown();
+
+    if (!document.getElementById("lm-shopee-nudge-style")) {
+      const style = document.createElement("style");
+      style.id = "lm-shopee-nudge-style";
+      style.textContent = `
+        .lm-shopee-nudge{position:fixed;left:50%;bottom:14px;z-index:86;width:min(calc(100% - 24px),560px);transform:translate(-50%,18px);opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease}
+        .lm-shopee-nudge.is-visible{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+        .lm-shopee-nudge-card{display:grid;grid-template-columns:minmax(0,1fr) auto 32px;gap:8px;align-items:center;padding:9px 9px 9px 12px;border:1px solid #f2c8bb;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(30,38,44,.2)}
+        .lm-shopee-nudge-copy{min-width:0}.lm-shopee-nudge-kicker{display:block;color:#ee4d2d;font-size:9px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}.lm-shopee-nudge-copy strong{display:block;overflow:hidden;margin-top:1px;color:#263946;font-size:12px;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
+        .lm-shopee-nudge-cta{min-height:40px;padding:0 11px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#ee4d2d;color:#fff!important;text-decoration:none!important;font-size:11px;font-weight:900;white-space:nowrap}
+        .lm-shopee-nudge-close{width:32px;height:32px;border:0;border-radius:50%;background:#f1f3f5;color:#5b6870;font-size:19px;line-height:1;cursor:pointer}
+        @media(max-width:700px){.lm-shopee-nudge{left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom,0px));width:auto;transform:translateY(18px)}.lm-shopee-nudge.is-visible{transform:translateY(0)}.lm-shopee-nudge-card{grid-template-columns:minmax(0,1fr) auto 30px;gap:6px;padding:8px 7px 8px 10px;border-radius:12px}.lm-shopee-nudge-kicker{font-size:8.5px}.lm-shopee-nudge-copy strong{font-size:11px}.lm-shopee-nudge-cta{min-height:38px;padding:0 9px;font-size:10.5px}.lm-shopee-nudge-close{width:30px;height:30px}}
+      `;
+      document.head.appendChild(style);
+    }
+
+    const nudge = document.createElement("aside");
+    nudge.id = "lm-shopee-nudge";
+    nudge.className = "lm-shopee-nudge";
+    nudge.setAttribute("aria-label", "Deal Shopee qua ACCESSTRADE");
+    nudge.innerHTML = `
+      <div class="lm-shopee-nudge-card">
+        <div class="lm-shopee-nudge-copy"><span class="lm-shopee-nudge-kicker">🔥 Deal Shopee hôm nay</span><strong>${product.name}</strong></div>
+        <a class="lm-shopee-nudge-cta" href="${product.url}" target="_blank" rel="sponsored noopener noreferrer">Xem deal →</a>
+        <button class="lm-shopee-nudge-close" type="button" aria-label="Đóng deal Shopee">×</button>
+      </div>`;
+
+    nudge.querySelector(".lm-shopee-nudge-cta")?.addEventListener("click", () => {
+      emitAffiliateClick(product, index, "scroll_nudge");
+    });
+    nudge.querySelector(".lm-shopee-nudge-close")?.addEventListener("click", () => {
+      pushEvent({
+        event: "affiliate_shopee_nudge_close",
+        affiliate_network: "ACCESSTRADE",
+        merchant: "Shopee",
+        trigger,
+        product_index: index + 1,
+        product_name: product.name
+      });
+      nudge.classList.remove("is-visible");
+      window.setTimeout(() => nudge.remove(), 220);
+    });
+
+    document.body.appendChild(nudge);
+    requestAnimationFrame(() => nudge.classList.add("is-visible"));
+    pushEvent({
+      event: "affiliate_shopee_nudge_impression",
+      affiliate_network: "ACCESSTRADE",
+      merchant: "Shopee",
+      trigger,
+      product_index: index + 1,
+      product_name: product.name
+    });
+  }
+
+  function setupShopeeNudge() {
+    if (window.location.pathname !== "/" || nudgeWasShownThisSession()) return;
+    let finished = false;
+    let timer = 0;
+
+    const cleanup = () => {
+      if (timer) window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+    const trigger = (reason) => {
+      if (finished) return;
+      finished = true;
+      cleanup();
+      showShopeeNudge(reason);
+    };
+    const onScroll = () => {
+      const height = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      const depth = height > 0 ? (window.scrollY + window.innerHeight) / height : 0;
+      if (depth >= SHOPEE_NUDGE_SCROLL_RATIO) trigger("scroll_55");
+    };
+
+    timer = window.setTimeout(() => trigger("time_35s"), SHOPEE_NUDGE_DELAY_MS);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
   }
 
   function addAccountHolder(paymentCard) {
@@ -179,6 +296,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     addAdsLandingMode();
     addDirectShopeeDeals();
+    setupShopeeNudge();
 
     document.querySelectorAll("[data-open-checkout]").forEach((button) => {
       button.addEventListener("click", enhanceCheckout, { once: true });

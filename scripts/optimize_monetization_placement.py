@@ -14,7 +14,7 @@ MOBILE_MARKER='<!-- LM_ADSTERRA_320X50_SLOT_PENDING -->'
 def section_bounds(text:str,needle:str)->tuple[int,int]|None:
     pos=text.find(needle)
     if pos<0:return None
-    start=text.rfind('<section',0,pos)
+    start=pos if text.startswith('<section',pos) else text.rfind('<section',0,pos)
     end=text.find('</section>',pos)
     if start<0 or end<0:return None
     return start,end+len('</section>')

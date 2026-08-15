@@ -7,24 +7,24 @@
   const AMOUNT = 30000;
   const SHOPEE_PRODUCTS = [
     {
-      name: "Kem chống nắng L’Oréal Paris Invisible Resist SPF50+",
-      image: "https://statics-cdn5.affgrow.com/accesslanding/images/landingPage/5262998f_5043_4921_bcc7_ae2c1dd683e9_Screenshot%202025-09-08%20151214.png",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773387&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vUyVFMSVCQiVBRmEtQ2glRTElQkIlOTFuZy1OJUUxJUJBJUFGbmctUGglRTElQkIlOTUtUiVFMSVCQiU5OW5nLVYlQzMlQjQtSCVDMyVBQ25oLVRobyVDMyVBMW5nLURhLUtoJUMzJUExbmctTSVFMSVCQiU4RGktVCVDMyVBMWMtJUM0JTkwJUUxJUJCJTk5bmctVVYtSW52aXNpYmxlLVJlc2lzdC1TUEYtNTAtUEEtTCVFMiU4MCU5OU9yJUMzJUE5YWwtUGFyaXMtNTBtbC1pLjM3MjUxOTMzLjgxNDM1NDU4MjA=&redirect_302=1"
+      name: "Tông đơ Philips MG3911/15 7in1",
+      image: "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mp1ohea3di4g9e",
+      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773390&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vVCVDMyVCNG5nLSVDNCU5MSVDNiVBMS1QaGlsaXBzLU1HMzkxMS0xNS1NdWx0aWdyb29tLTMwMDAtN2luMS1jJUUxJUJBJUFGdC10JUUxJUJCJTg5YS1yJUMzJUEydS10JUMzJUIzYy0lQzQlOTFhLW4lQzQlODNuZy1zJUUxJUJCJUFELWQlRTElQkIlQTVuZy10JUUxJUJBJUExaS1uaCVDMyVBMC1pLjQ2MzYwMDA2MS40OTUxMTM1NzAxNw==&redirect_302=1"
     },
     {
-      name: "Nước tẩy trang L’Oréal Paris Micellar Water 400ml",
-      image: "https://statics-cdn5.affgrow.com/accesslanding/images/landingPage/74af060b_8dec_4722_8070_1eba690a0817_Screenshot%202025-09-08%20151319.png",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773386&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTiVDNiVCMCVFMSVCQiU5QmMtdCVFMSVCQSVBOXktdHJhbmctZ2klQzMlQkFwLWwlQzMlQTBtLXMlRTElQkElQTFjaC1zJUMzJUEydS1sbyVFMSVCQSVBMWktYiVFMSVCQiU4Ri1iJUUxJUJCJUE1aS1iJUUxJUJBJUE5bi12JUMzJUEwLWwlRTElQkIlOUJwLXRyYW5nLSVDNCU5MWklRTElQkIlODNtLTMtaW4tMS1MJ09yZWFsLVBhcmlzLU1pY2VsbGFyLVdhdGVyLTQwMG1sLWkuMzcyNTE5MzMuNTkxOTg5Mzk5&redirect_302=1"
+      name: "Sạc dự phòng Anker Zolo 20.000mAh 22.5W",
+      image: "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mlnj4c7kwkjp03",
+      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773391&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vUyVFMSVCQSVBMWMtZCVFMSVCQiVCMS1waCVDMyVCMm5nLUFua2VyLVpvbG8tQTExMEQtMjAwMDBtQWgtY2h1JUUxJUJBJUE5bi0zQy1UcnVuZy1RdSVFMSVCQiU5MWMtYyVDMyVBMXAtVVNCLUMtdCVDMyVBRGNoLWglRTElQkIlQTNwLXMlRTElQkElQTFjLW5oYW5oLTIyLjVXLWkuMTIwMjg4OTY3OC40NTU1NDAxNDY3NQ==&redirect_302=1"
     },
     {
-      name: "Serum L’Oréal Glycolic Melasyl 8% dưỡng sáng da 30ml",
-      image: "https://statics-cdn5.affgrow.com/accesslanding/images/landingPage/3ee5b627_3ed6_4012_9dc0_cc1ce30bfffa_Screenshot%202025-09-08%20151438.png",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773385&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vU2VydW0tR2x5Y29saWMtTWVsYXN5bC04LU1lbGFzeWwtR2x5Y29saWMtTmlhY2luYW1pZGUtZCVDNiVCMCVFMSVCQiVBMW5nLXMlQzMlQTFuZy1kYS1tJUUxJUJCJTlELXRoJUMzJUEybS1tJUUxJUJCJUE1bi1uJUMzJUExbS1Mb3JlYWwtUGFyaXMtMzBtbC1pLjM3MjUxOTMzLjE1MTE4NjAwMDEw&redirect_302=1"
+      name: "Máy vặn vít pin Bosch GO 3",
+      image: "https://down-vn.img.susercontent.com/file/sg-11134201-8259d-mrbyk5d9m3gs2c",
+      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773392&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktdiVFMSVCQSVCN24tdiVDMyVBRHQtcGluLUJvc2NoLUdvLTMtaS43NTgxMDI0OS4yNTUxNDU2ODgyOQ==&redirect_302=1"
     },
     {
-      name: "Son Rom&nd Juicy Lasting Tint 5.5g",
-      image: "https://statics-cdn5.affgrow.com/accesslanding/images/landingPage/7ee832d9_3e55_46e7_8140_bcb894c7f7a9_Screenshot%202025-09-08%20151827.png",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773383&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vLVJvbS1uZC1Tb24tVGludC1sJUMzJUFDLWNoby1tJUMzJUI0aS1jJUM0JTgzbmctbSVFMSVCQiU4RG5nLUglQzMlQTBuLVF1JUUxJUJCJTkxYy1Sb21hbmQtSnVpY3ktTGFzdGluZy1UaW50LTUuNWctaS41OTA0MjcyMzAuMTQ2MTM5MjAzNzU=&redirect_302=1"
+      name: "Máy hút bụi cầm tay Deerma DX118C 600W",
+      image: "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m83aax7f0sasfe",
+      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773393&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktSCVDMyVCQXQtQiVFMSVCQiVBNWktQyVFMSVCQSVBN20tVGF5LURlZXJtYS1EWDExOEMtJTI4QiVFMSVCQSVBMk4tTSVFMSVCQiU5QUktNjAwVyUyOS1DaCVDMyVBRG5oLWglQzMlQTNuZy1EZWVybWEtaS4yODE0MzI4NC4yNzQ1Nzg2MDQwNA==&redirect_302=1"
     }
   ];
   let checkoutEnhanced = false;
@@ -70,10 +70,10 @@
 
     const section = document.createElement("section");
     section.className = "lm-product-deals";
-    section.setAttribute("aria-label", "Deal Shopee hôm nay");
+    section.setAttribute("aria-label", "Đồ nam và gia dụng Shopee");
     section.innerHTML = `
       <div class="lm-product-deals-inner">
-        <div class="lm-product-deals-head"><div><span class="lm-product-deals-kicker">Deal Shopee hôm nay</span><h2>Bấm là mở đúng sản phẩm</h2></div><small>Liên kết đối tác ACCESSTRADE</small></div>
+        <div class="lm-product-deals-head"><div><span class="lm-product-deals-kicker">Đồ nam & gia dụng</span><h2>Dễ dùng · dễ mua · mở đúng sản phẩm</h2></div><small>Liên kết đối tác ACCESSTRADE</small></div>
         <div class="lm-product-deals-grid"></div>
         <p class="lm-product-disclosure">Liên kết đối tác · giá và ưu đãi xem trực tiếp trên Shopee.</p>
       </div>`;

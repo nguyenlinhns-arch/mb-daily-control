@@ -7,15 +7,28 @@
     url: "https://go.isclix.com/deep_link/v6/6342443575996511342/6822308958202075636?sub4=oneatweb&url_enc=aHR0cHM6Ly92YXlvbmxpbmUudnBiYW5rLmNvbS52bi8%3D"
   };
 
-  function emitClick() {
+  function emit(event, extra = {}) {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      event: "affiliate_finance_click",
+      event,
       affiliate_network: "ACCESSTRADE",
       affiliate_offer_id: OFFER.id,
       merchant: OFFER.merchant,
-      placement: "home_top"
+      placement: "after_core_monetization",
+      ...extra
     });
+  }
+
+  function trackView(section) {
+    if (!("IntersectionObserver" in window)) return;
+    let sent = false;
+    const observer = new IntersectionObserver((entries) => {
+      if (sent || !entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= 0.5)) return;
+      sent = true;
+      emit("affiliate_finance_view");
+      observer.disconnect();
+    }, { threshold: [0.5] });
+    observer.observe(section);
   }
 
   function mount() {
@@ -24,11 +37,11 @@
     const style = document.createElement("style");
     style.id = "lm-finance-top-style";
     style.textContent = `
-      .lm-finance-top{width:100%;padding:8px 0;background:#f4f7f6;border-bottom:1px solid #dfe7e3}
+      .lm-finance-top{width:100%;padding:8px 0;background:#f4f7f6;border-top:1px solid #dfe7e3}
       .lm-finance-top-inner{width:min(calc(100% - 28px),1180px);margin:auto}
       .lm-finance-top-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:13px 15px;border-radius:14px;background:linear-gradient(135deg,#123f32,#0b2f28);color:#fff;text-decoration:none!important;box-shadow:0 5px 16px rgba(15,50,40,.16)}
       .lm-finance-top-label{display:block;margin-bottom:3px;color:#c7ded5;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-      .lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.25;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:13px;font-weight:800}.lm-finance-top-detail{display:block;margin-top:2px;color:#d7e7e1;font-size:10px;line-height:1.4}
+      .lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.25;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:13px;font-weight:800}.lm-finance-top-detail{display:block;margin-top:3px;color:#d7e7e1;font-size:10px;line-height:1.45}
       .lm-finance-top-cta{min-height:42px;padding:0 14px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff;color:#143f32!important;font-size:12px;font-weight:900;white-space:nowrap}
       @media(max-width:700px){.lm-finance-top{padding:6px 0}.lm-finance-top-inner{width:calc(100% - 20px)}.lm-finance-top-card{grid-template-columns:1fr;padding:11px 12px;gap:8px}.lm-finance-top-copy strong{font-size:15px}.lm-finance-top-rate{font-size:12.5px}.lm-finance-top-detail{font-size:9.5px}.lm-finance-top-cta{min-height:42px;width:100%}}
     `;
@@ -37,24 +50,29 @@
     const section = document.createElement("section");
     section.id = "lm-finance-top";
     section.className = "lm-finance-top";
-    section.setAttribute("aria-label", "Quảng cáo vay online VPBank qua ACCESSTRADE");
+    section.setAttribute("aria-label", "Liên kết tài trợ vay online VPBank qua ACCESSTRADE");
     section.innerHTML = `
       <div class="lm-finance-top-inner">
         <a class="lm-finance-top-card" href="${OFFER.url}" target="_blank" rel="sponsored nofollow noopener noreferrer">
           <div class="lm-finance-top-copy">
-            <span class="lm-finance-top-label">Quảng cáo tài chính · ACCESSTRADE</span>
+            <span class="lm-finance-top-label">Liên kết tài trợ · ACCESSTRADE</span>
             <strong>Vay online VPBank</strong>
-            <span class="lm-finance-top-rate">Lãi suất từ 1,2%/tháng · Kỳ hạn 12–60 tháng</span>
-            <span class="lm-finance-top-detail">Mức cụ thể tùy hồ sơ và gói vay.</span>
+            <span class="lm-finance-top-rate">Từ 1,2%/tháng · Kỳ hạn 12–60 tháng</span>
+            <span class="lm-finance-top-detail">Lãi suất thực tế tùy hồ sơ và khoản vay; VPBank công bố mức tối đa có thể tới 59%/năm.</span>
           </div>
-          <span class="lm-finance-top-cta">Kiểm tra điều kiện vay →</span>
+          <span class="lm-finance-top-cta">Xem điều kiện tại VPBank →</span>
         </a>
       </div>`;
 
-    section.querySelector("a")?.addEventListener("click", emitClick);
-    const anchor = document.querySelector(".portal-topline") || document.querySelector(".portal-header") || document.querySelector("header");
-    if (anchor) anchor.insertAdjacentElement("afterend", section);
-    else document.body.prepend(section);
+    section.querySelector("a")?.addEventListener("click", () => emit("affiliate_finance_click"));
+
+    const banner = document.getElementById("lm-adsterra-300x250")?.closest(".lm-ad-slot");
+    const footer = document.querySelector("footer");
+    if (banner) banner.insertAdjacentElement("afterend", section);
+    else if (footer) footer.insertAdjacentElement("beforebegin", section);
+    else document.body.appendChild(section);
+
+    trackView(section);
   }
 
   document.addEventListener("DOMContentLoaded", mount, { once: true });

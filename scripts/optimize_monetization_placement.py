@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SEO_LINKS_MARKER = 'data-seo-discovery-links="true"'
 SEO_LINKS = '''<div class="portal-fast-links" data-seo-discovery-links="true" aria-label="Dữ liệu XSMB chuyên sâu"><a href="/xsmb-30-ngay/">XSMB 30 ngày</a><a href="/nguon-du-lieu-xsmb/">Nguồn dữ liệu &amp; cách tính</a></div>'''
 VPBANK_URL = 'https://go.isclix.com/deep_link/v6/6342443575996511342/6822308958202075636?sub4=oneatweb&url_enc=aHR0cHM6Ly92YXlvbmxpbmUudnBiYW5rLmNvbS52bi8%3D'
-VPBANK_STYLE = '''<style id="lm-finance-top-style">.lm-finance-top{width:100%;padding:7px 0;background:#f4f7f6;border-bottom:1px solid #dfe7e3}.lm-finance-top-inner{width:min(calc(100% - 28px),1180px);margin:auto}.lm-finance-top-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:12px 15px;border-radius:14px;background:linear-gradient(135deg,#123f32,#0b2f28);color:#fff;text-decoration:none!important;box-shadow:0 5px 16px rgba(15,50,40,.16)}.lm-finance-top-label{display:block;margin-bottom:3px;color:#c7ded5;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.25;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:13px;font-weight:900}.lm-finance-top-cta{min-height:42px;padding:0 14px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff;color:#143f32!important;font-size:12px;font-weight:900;white-space:nowrap}@media(max-width:700px){.lm-finance-top{padding:5px 0}.lm-finance-top-inner{width:calc(100% - 20px)}.lm-finance-top-card{grid-template-columns:1fr;padding:10px 11px;gap:7px}.lm-finance-top-copy strong{font-size:15px}.lm-finance-top-rate{font-size:12.5px}.lm-finance-top-cta{min-height:42px;width:100%}}</style>'''
-VPBANK_HTML = f'''<section id="lm-finance-top" class="lm-finance-top" data-static-finance-banner="true" aria-label="Liên kết tài trợ vay online VPBank qua ACCESSTRADE"><div class="lm-finance-top-inner"><a class="lm-finance-top-card" href="{VPBANK_URL}" target="_blank" rel="sponsored nofollow noopener noreferrer"><div class="lm-finance-top-copy"><span class="lm-finance-top-label">Liên kết tài trợ · ACCESSTRADE</span><strong>Vay online VPBank</strong><span class="lm-finance-top-rate">Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân</span></div><span class="lm-finance-top-cta">Vay tiền nhanh online →</span></a></div></section>'''
+VPBANK_STYLE = '''<style id="lm-finance-top-style">.lm-finance-top{width:100%;padding:7px 0;background:#f3f7f5;border-bottom:1px solid #dfe7e3}.lm-finance-top-inner{width:min(calc(100% - 28px),1180px);margin:auto}.lm-finance-top-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:13px;align-items:center;padding:11px 14px;border-radius:15px;background:linear-gradient(135deg,#00634e,#008b6b);color:#fff;text-decoration:none!important;box-shadow:0 6px 18px rgba(0,95,75,.18)}.lm-finance-top-money{display:grid;place-items:center;width:58px;height:58px;border-radius:14px;background:rgba(255,255,255,.13);color:#fff;font-size:12px;font-weight:900;line-height:1.05;text-align:center}.lm-finance-top-money b{display:block;font-size:18px}.lm-finance-top-label{display:block;margin-bottom:2px;color:#d5fff4;font-size:8.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.2;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:11.5px;font-weight:800}.lm-finance-top-cta{min-height:44px;padding:0 14px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#ff8500;color:#fff!important;font-size:12px;font-weight:1000;white-space:nowrap;box-shadow:0 7px 16px rgba(255,133,0,.26)}@media(max-width:700px){.lm-finance-top{padding:5px 0}.lm-finance-top-inner{width:calc(100% - 18px)}.lm-finance-top-card{grid-template-columns:50px minmax(0,1fr);padding:9px 10px;gap:9px}.lm-finance-top-money{width:50px;height:50px;border-radius:12px;font-size:10px}.lm-finance-top-money b{font-size:16px}.lm-finance-top-copy strong{font-size:14px}.lm-finance-top-rate{font-size:10.5px;line-height:1.35}.lm-finance-top-cta{grid-column:1/-1;min-height:43px;width:100%}}</style>'''
+VPBANK_HTML = f'''<section id="lm-finance-top" class="lm-finance-top" data-static-finance-banner="true" aria-label="Liên kết tài trợ vay online VPBank qua ACCESSTRADE"><div class="lm-finance-top-inner"><a class="lm-finance-top-card" href="{VPBANK_URL}" target="_blank" rel="sponsored nofollow noopener noreferrer"><span class="lm-finance-top-money">ĐẾN<b>200TR</b></span><div class="lm-finance-top-copy"><span class="lm-finance-top-label">VPBank · Vay nhanh online</span><strong>Không cần tài sản đảm bảo</strong><span class="lm-finance-top-rate">Lãi từ 1,2%/tháng · Phê duyệt hồ sơ trong vài phút</span></div><span class="lm-finance-top-cta">Vay tiền nhanh online →</span></a></div></section>'''
 FORBIDDEN_AD_DOMAINS = ('effectivecpmnetwork.com','highperformanceformat.com')
 FORBIDDEN_AD_IDS = ('lm-adsterra-native','lm-adsterra-300x250','adsterra-native-1','adsterra-banner-300x250')
 
@@ -66,16 +66,12 @@ def normalize_affiliate_copy(text: str) -> tuple[str, bool]:
 
 
 def ensure_static_vpbank(text: str) -> tuple[str, bool]:
-    if 'id="lm-finance-top"' in text:
-        changed = False
-        if 'data-static-finance-banner="true"' not in text:
-            text = text.replace('id="lm-finance-top"','id="lm-finance-top" data-static-finance-banner="true"',1)
-            changed = True
-        if 'id="lm-finance-top-style"' not in text:
-            if '</head>' not in text:raise ValueError('Missing head for finance style')
-            text = text.replace('</head>',VPBANK_STYLE+'</head>',1)
-            changed = True
-        return text, changed
+    before = text
+    existing = section_bounds(text, 'id="lm-finance-top"')
+    if existing:
+        start, end = existing
+        text = text[:start] + text[end:]
+    text = re.sub(r'<style\b[^>]*id="lm-finance-top-style"[^>]*>.*?</style>','',text,flags=re.I|re.S)
     if '</head>' not in text:raise ValueError('Missing head for finance style')
     text = text.replace('</head>',VPBANK_STYLE+'</head>',1)
     insert = text.find('<section class="portal-hero"')
@@ -85,7 +81,7 @@ def ensure_static_vpbank(text: str) -> tuple[str, bool]:
         if not body:raise ValueError('Missing body for finance banner')
         insert = body.end()
     text = text[:insert] + VPBANK_HTML + '\n' + text[insert:]
-    return text, True
+    return text, text != before
 
 
 def apply(root: Path) -> dict[str, object]:
@@ -103,7 +99,9 @@ def apply(root: Path) -> dict[str, object]:
     for marker in FORBIDDEN_AD_IDS:
         if marker in text:raise ValueError(f'Forbidden ad slot remains: {marker}')
     if re.search(r'Ưu đãi mua sắm Shopee\s+ngày\s+\d{2}/\d{2}/\d{4}',text):raise ValueError('Affiliate copy is incorrectly tied to report date')
-    if 'data-static-finance-banner="true"' not in text or 'Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân' not in text:raise ValueError('Static VPBank banner missing')
+    required = ('data-static-finance-banner="true"','ĐẾN<b>200TR</b>','Không cần tài sản đảm bảo','Lãi từ 1,2%/tháng','Phê duyệt hồ sơ trong vài phút','Vay tiền nhanh online')
+    for marker in required:
+        if marker not in text:raise ValueError(f'Static VPBank banner missing marker: {marker}')
     return {'status':'PASS','changed':any((ads_removed,seo_changed,affiliate_changed,finance_changed)),'placement':'accesstrade_only','static_seo_links':SEO_LINKS_MARKER in text,'affiliate_evergreen':True,'vpbank_static_top':True,'adsterra_native':False,'adsterra_banner_300':False}
 
 
@@ -117,7 +115,7 @@ def self_test() -> None:
         assert 'effectivecpmnetwork.com' not in text and 'highperformanceformat.com' not in text and 'lm-adsterra' not in text
         assert result['static_seo_links'] and 'Liên kết tài trợ ACCESSTRADE' in text
         assert text.find('id="lm-finance-top"') < text.find('<section class="portal-hero"')
-        assert 'Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân' in text
+        assert 'ĐẾN<b>200TR</b>' in text and 'Không cần tài sản đảm bảo' in text and 'Phê duyệt hồ sơ trong vài phút' in text
         assert 'Ưu đãi mua sắm Shopee ngày' not in text
         missing = Path(td)/'missing'; missing.mkdir(); assert apply(missing)['status']=='SKIP'
     print('MONETIZATION_PLACEMENT_SELF_TEST_OK')

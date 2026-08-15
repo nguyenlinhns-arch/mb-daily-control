@@ -14,7 +14,7 @@ from optimize_google_ads_landing import optimize as optimize_google_ads_landing
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260815-1">'
 SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260815-3"></script>'
-FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260815-1"></script>'
+FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260815-2"></script>'
 
 
 def inject_before_head_end(content: str, tag: str) -> str:
@@ -58,7 +58,6 @@ def apply_home(home: Path) -> None:
     for old, new in replacements:
         content = content.replace(old, new)
 
-    # The current-month evidence table must be visible without an extra click.
     content = re.sub(
         r'<details\b(?=[^>]*\bclass="history-disclosure")'
         r'(?![^>]*\bopen\b)([^>]*)>',
@@ -91,8 +90,6 @@ def validate(root: Path) -> None:
         if marker not in content:
             raise AssertionError(f"Missing final conversion marker: {marker}")
 
-    # Historical rate is data, not a design constant. Validate the rendered
-    # numbers against each other instead of pinning yesterday's 73% / 22-of-30.
     metric = re.search(
         r'<div class="historical-rate">\s*<p>.*?</p>\s*'
         r'<strong>(\d+)%</strong>\s*<span>\s*(\d+)\s*/\s*(\d+)\s+ngày',
@@ -157,7 +154,6 @@ def validate(root: Path) -> None:
         if phrase in content:
             raise AssertionError(f"Outdated public claim remains: {phrase}")
 
-    # The current paid numbers must remain absent from the public page.
     if re.search(r'19\s*[-–—]\s*91[\s\S]{0,120}05\s*[-–—]\s*50', content):
         raise AssertionError("Current paid report pairs leaked into public HTML")
 
@@ -166,8 +162,6 @@ def apply(root: Path) -> None:
     apply_home(root / "index.html")
     validate(root)
 
-    # The Ads funnel tracker is intentionally copied by this build step so the
-    # workflow keeps its original file-copy structure.
     tracking_source = REPO_ROOT / "site-v2" / "ads-tracking.js"
     if not tracking_source.exists():
         raise FileNotFoundError(f"Missing Ads tracker source: {tracking_source}")
@@ -178,8 +172,6 @@ def apply(root: Path) -> None:
         raise FileNotFoundError(f"Missing finance banner source: {finance_source}")
     shutil.copy2(finance_source, root / "finance-banner.js")
 
-    # Product-first copy, neutral evidence labels and policy/trust disclosures
-    # are applied last so earlier conversion scripts can keep their own checks.
     optimize_google_ads_landing(root)
 
 

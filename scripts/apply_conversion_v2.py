@@ -78,8 +78,6 @@ def validate(root: Path) -> None:
     required = (
         STYLE_TAG,
         SCRIPT_TAG,
-        "73%",
-        "22/30 ngày",
         "4 số trong báo cáo",
         "Kết quả thực tế",
         "Có cả ngày trúng và không trúng",
@@ -89,6 +87,24 @@ def validate(root: Path) -> None:
     for marker in required:
         if marker not in content:
             raise AssertionError(f"Missing final conversion marker: {marker}")
+
+    # Historical rate is data, not a design constant. Validate the rendered
+    # numbers against each other instead of pinning yesterday's 73% / 22-of-30.
+    metric = re.search(
+        r'<div class="historical-rate">\s*<p>.*?</p>\s*'
+        r'<strong>(\d+)%</strong>\s*<span>\s*(\d+)\s*/\s*(\d+)\s+ngày',
+        content,
+        flags=re.DOTALL,
+    )
+    if not metric:
+        raise AssertionError("Historical rate block is missing")
+    rate_pct, hit_days, total_days = map(int, metric.groups())
+    if total_days != 30:
+        raise AssertionError(f"Historical validation must cover 30 days, found {total_days}")
+    if round(hit_days * 100 / total_days) != rate_pct:
+        raise AssertionError(
+            f"Historical rate mismatch: {hit_days}/{total_days} does not round to {rate_pct}%"
+        )
 
     report_day = parse_vi_date(content, "data-report-date")
     lock_day = parse_vi_date(content, "data-lock-date")

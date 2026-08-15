@@ -80,7 +80,7 @@ const isoDistanceDays = (start, end) => (
   (Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000
 );
 
-// The public evidence must be a complete, internally consistent 30-day window.
+// The public evidence source remains a complete, internally consistent 30-day window.
 assert.equal(publicProof.schema_version, "MB_PUBLIC_HISTORICAL_PROOF_V1_COMPLETED_ONLY");
 assert.equal(publicProof.status, "COMPLETED_DATES_ONLY");
 assert.equal(publicProof.validation.total_days, 30);
@@ -203,9 +203,12 @@ assert.match(workflow, /cp site-v2\/conversion-v2\.css _site\//);
 assert.match(workflow, /cp site-v2\/checkout-enhance\.js _site\//);
 assert.match(workflow, /python scripts\/apply_conversion_v2\.py --output-root _site/);
 assert.match(workflow, /Expected exactly 2 home checkout buttons|len\(buttons\) != 2/);
-assert.match(applyConversionV2, /Expected 30 completed history rows/);
+assert.match(applyConversionV2, /History contains a day outside the report month/);
+assert.match(applyConversionV2, /completed rows for the report month/);
 assert.match(applyConversionV2, /22\/30 ngày/);
 assert.match(applyConversionV2, /73%/);
+assert.match(simplifyPurchaseCta, /filter_history_to_report_month/);
+assert.match(simplifyPurchaseCta, /Lịch sử đối chiếu trong tháng này/);
 assert.match(simplifyPurchaseCta, /exactly two checkout buttons/i);
 
 // Approval credentials remain server-side and the deployed artifact excludes them.

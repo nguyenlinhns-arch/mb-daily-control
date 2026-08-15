@@ -41,17 +41,40 @@ jobs:
               s=s.replace('.lead{margin:16px 0 0;color:#50636f;font-size:17px}', '.date-headline{margin:12px 0 0;color:#536873;font-size:16px}.date-headline strong{color:var(--orange);font-size:19px}.lead{margin:14px 0 0;color:#50636f;font-size:17px}')
           p.write_text(s,encoding='utf-8')
           PY
-      - name: Verify wording
+      - name: Deploy Adsterra units
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ai-methods/index.html')
+          s=p.read_text(encoding='utf-8')
+          css='''\n    /* Adsterra display monetization v1 */\n    .ad-slot{padding:34px 0}.ad-slot-inner{width:min(calc(100% - 30px),1080px);margin-inline:auto;text-align:center}.ad-label{margin:0 0 9px;color:#84939a;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.ad-frame{min-height:90px;display:flex;align-items:center;justify-content:center;overflow:hidden}.ad-frame--300{min-height:250px}.ad-frame iframe{max-width:100%}@media(max-width:420px){.ad-slot{padding:26px 0}.ad-slot-inner{width:calc(100% - 22px)}}\n'''
+          if 'Adsterra display monetization v1' not in s:
+              s=s.replace('</style>', css+'  </style>', 1)
+          native='''\n    <section class="ad-slot" aria-label="Quảng cáo">\n      <div class="ad-slot-inner">\n        <p class="ad-label">Quảng cáo</p>\n        <div class="ad-frame" id="adsterra-native-1">\n          <script async="async" data-cfasync="false" src="https://pl30863058.effectivecpmnetwork.com/e336b428517bbcb55a3e3da308cc7939/invoke.js"></script>\n          <div id="container-e336b428517bbcb55a3e3da308cc7939"></div>\n        </div>\n      </div>\n    </section>\n'''
+          marker1='    <section class="section section-dark" id="phuong-phap">'
+          if 'id="adsterra-native-1"' not in s and marker1 in s:
+              s=s.replace(marker1, native+'\n'+marker1, 1)
+          banner='''\n    <section class="ad-slot" aria-label="Quảng cáo">\n      <div class="ad-slot-inner">\n        <p class="ad-label">Quảng cáo</p>\n        <div class="ad-frame ad-frame--300" id="adsterra-banner-300x250">\n          <script>\n            atOptions = {\n              'key' : 'b3caa39744fc30610e7756cf4ccb98cd',\n              'format' : 'iframe',\n              'height' : 250,\n              'width' : 300,\n              'params' : {}\n            };\n          </script>\n          <script src="https://www.highperformanceformat.com/b3caa39744fc30610e7756cf4ccb98cd/invoke.js"></script>\n        </div>\n      </div>\n    </section>\n'''
+          marker2='    <section class="section section-soft" id="an-toan">'
+          if 'id="adsterra-banner-300x250"' not in s and marker2 in s:
+              s=s.replace(marker2, banner+'\n'+marker2, 1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify deployment
         run: |
           grep -n 'Thống kê Xổ số Miền Bắc' ai-methods/landing-v3.html | head -20
           grep -n 'AI thống kê toàn bộ dữ liệu Xổ số Miền Bắc' ai-methods/landing-v3.html
+          grep -n 'adsterra-native-1' ai-methods/index.html
+          grep -n 'container-e336b428517bbcb55a3e3da308cc7939' ai-methods/index.html
+          grep -n 'adsterra-banner-300x250' ai-methods/index.html
+          grep -n 'b3caa39744fc30610e7756cf4ccb98cd' ai-methods/index.html
       - name: Commit
         run: |
-          if git diff --quiet -- ai-methods/landing-v3.html; then exit 0; fi
+          if git diff --quiet -- ai-methods/landing-v3.html ai-methods/index.html; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ai-methods/landing-v3.html
-          git commit -m 'Clarify Xổ số Miền Bắc statistics positioning'
+          git add ai-methods/landing-v3.html ai-methods/index.html
+          git commit -m 'Add Adsterra native and display ads'
           git push origin HEAD:main
 
 # retrigger

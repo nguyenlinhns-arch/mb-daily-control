@@ -67,17 +67,24 @@ def normalize_affiliate_copy(text: str) -> tuple[str, bool]:
 
 def ensure_static_vpbank(text: str) -> tuple[str, bool]:
     if 'id="lm-finance-top"' in text:
+        changed = False
         if 'data-static-finance-banner="true"' not in text:
             text = text.replace('id="lm-finance-top"','id="lm-finance-top" data-static-finance-banner="true"',1)
+            changed = True
         if 'id="lm-finance-top-style"' not in text:
+            if '</head>' not in text:raise ValueError('Missing head for finance style')
             text = text.replace('</head>',VPBANK_STYLE+'</head>',1)
-        return text, True
+            changed = True
+        return text, changed
     if '</head>' not in text:raise ValueError('Missing head for finance style')
     text = text.replace('</head>',VPBANK_STYLE+'</head>',1)
-    hero = text.find('<section class="portal-hero"')
-    if hero < 0:hero = text.find('<main')
-    if hero < 0:return text, False
-    text = text[:hero] + VPBANK_HTML + '\n' + text[hero:]
+    insert = text.find('<section class="portal-hero"')
+    if insert < 0:insert = text.find('<main')
+    if insert < 0:
+        body = re.search(r'<body\b[^>]*>', text, flags=re.I)
+        if not body:raise ValueError('Missing body for finance banner')
+        insert = body.end()
+    text = text[:insert] + VPBANK_HTML + '\n' + text[insert:]
     return text, True
 
 

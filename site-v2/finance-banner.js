@@ -74,7 +74,15 @@
     const statsHeading = headings.find((node) => /^(?:Công cụ|Trung tâm) thống kê XSMB$/i.test((node.textContent || "").trim()));
     if (statsHeading) statsHeading.textContent = STATS_HEADING;
 
-    const datedCta = `Nhận gợi ý số ngày hôm nay – ${reportDateLabel()}`;
+    const datedCta = `Nhận gợi ý số ngày hôm nay (${reportDateLabel()})`;
+    const paidCard = document.querySelector(".portal-paid-card");
+    if (paidCard) {
+      const kicker = paidCard.querySelector(":scope > small");
+      if (kicker) kicker.remove();
+      const title = paidCard.querySelector("h2");
+      if (title) title.textContent = datedCta;
+    }
+
     document.querySelectorAll("[data-open-checkout]").forEach((node) => {
       node.textContent = datedCta;
       node.setAttribute("aria-label", datedCta);

@@ -2,17 +2,27 @@
   'use strict';
   const path=location.pathname;
   const CONSENT_KEY='lm_analytics_consent_v1';
+  const ADS_SESSION_KEY='lm_google_ads_visit_v1';
   const dataPaths=new Set(['/thong-ke-xsmb/','/xsmb-30-ngay/','/tan-suat-xsmb/','/lo-gan-xsmb/','/cap-dao-xsmb/','/thong-ke-dau-duoi-xsmb/','/thong-ke-tong-xsmb/','/thong-ke-theo-thu-xsmb/','/tra-cuu-xsmb/','/nguon-du-lieu-xsmb/']);
   const defaultRoutes=[['/','⌂','Home'],['/thong-ke-xsmb/','▦','Thống kê'],['/lo-gan-xsmb/','↕','Lô gan'],['/tra-cuu-xsmb/','⌕','Tra cứu'],['/phuong-phap-cong-khai/','AI','Phương pháp']];
   const dataRoutes=[['/thong-ke-xsmb/','▦','Thống kê'],['/xsmb-30-ngay/','30','30 ngày'],['/lo-gan-xsmb/','↕','Lô gan'],['/tra-cuu-xsmb/','⌕','Tra cứu'],['/nguon-du-lieu-xsmb/','i','Nguồn']];
   const routes=dataPaths.has(path)?dataRoutes:defaultRoutes;
+
+  const isGoogleAdsVisit=url=>{
+    const paidMedium=/^(cpc|ppc|paid|paidsearch|paid-search)$/i.test(url.searchParams.get('utm_medium')||'');
+    const googleSource=/^(google|googleads|google-ads)$/i.test(url.searchParams.get('utm_source')||'');
+    return ['gclid','gbraid','wbraid'].some(key=>url.searchParams.has(key))||(googleSource&&paidMedium);
+  };
+  const directPaidVisit=isGoogleAdsVisit(new URL(location.href));
+  if(directPaidVisit){try{sessionStorage.setItem(ADS_SESSION_KEY,'1')}catch{}}
+  const paidSession=(()=>{try{return directPaidVisit||sessionStorage.getItem(ADS_SESSION_KEY)==='1'}catch{return directPaidVisit}})();
 
   const gtag=(...args)=>{
     window.dataLayer=window.dataLayer||[];
     if(typeof window.gtag==='function')window.gtag(...args);
     else window.dataLayer.push(args);
   };
-  const emit=(name,params={})=>gtag('event',name,{page_path:path,...params});
+  const emit=(name,params={})=>gtag('event',name,{page_path:path,traffic_type:paidSession?'google_ads':'other',...params});
 
   const storedConsent=()=>{
     try{return localStorage.getItem(CONSENT_KEY)||''}catch{return ''}
@@ -29,6 +39,7 @@
   // No blocking consent UI. New visitors remain privacy-safe with analytics denied;
   // an existing explicit grant is respected without enabling ad personalization.
   setConsent(storedConsent()==='granted'?'granted':'denied');
+  if(directPaidVisit&&dataPaths.has(path))emit('google_ads_landing_view',{landing_group:'statistics'});
 
   if(!document.querySelector('.portal-mobile-nav')){
     const nav=document.createElement('nav');
@@ -39,6 +50,20 @@
   document.querySelectorAll('.portal-fast-links a,.portal-mobile-nav a').forEach(a=>{
     if(a.getAttribute('href')===path)a.classList.add('is-active');
   });
+
+  // Give the two substantive SEO resources a direct path from the homepage without
+  // adding another heavy content block. These are normal public links for all users.
+  if(path==='/'&&!document.querySelector('[data-seo-discovery-links]')){
+    const tools=document.querySelector('.portal-tools');
+    if(tools){
+      const links=document.createElement('div');
+      links.className='portal-fast-links';
+      links.dataset.seoDiscoveryLinks='true';
+      links.setAttribute('aria-label','Dữ liệu XSMB chuyên sâu');
+      links.innerHTML='<a href="/xsmb-30-ngay/">XSMB 30 ngày</a><a href="/nguon-du-lieu-xsmb/">Nguồn dữ liệu & cách tính</a>';
+      tools.insertAdjacentElement('afterend',links);
+    }
+  }
 
   const parseCodes=value=>[...new Set((String(value||'').match(/\d{1,2}/g)||[]).map(x=>String(Number(x)).padStart(2,'0')).filter(x=>+x>=0&&+x<=99))].slice(0,20);
   const fmt=s=>s?s.split('-').reverse().join('/'):'Chưa có';

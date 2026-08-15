@@ -111,8 +111,6 @@ jobs:
 
           python scripts/build_seo_pages.py --output-root _site --today "$REPORT_DATE"
 
-          # Normalize only the temporary artifact so the legacy simplifier can
-          # parse it; the protected paid gate is reapplied before the portal is built.
           python - <<'PY'
           from pathlib import Path
           import re
@@ -204,11 +202,11 @@ jobs:
           assert f"{proof['validation']['hit_days']}/{proof['validation']['total_days']}" in home
 
           buttons = re.findall(r'<button\b[^>]*\bdata-open-checkout\b[^>]*>', home, flags=re.I)
-          assert len(buttons) == 2, len(buttons)
+          if len(buttons) != 2:
+              raise SystemExit(f"Expected exactly 2 home checkout buttons, found {len(buttons)}")
           header = re.search(r'<header\b[^>]*class="[^"]*site-header[^"]*"[^>]*>.*?</header>', home, flags=re.I|re.S)
           assert header and 'data-open-checkout' not in header.group(0)
 
-          # The six public methods may show their numbers. Current 4SO may not.
           for forbidden in ('canonical_codes','canonical_pairs','final_codes','final_pairs'):
               assert forbidden not in home.lower()
           assert not re.search(r'4SO[^<]{0,180}\b\d{2}\b\s*[-–—]\s*\b\d{2}\b', home, flags=re.I)

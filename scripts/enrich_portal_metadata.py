@@ -10,6 +10,9 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 BASE='https://lemienbac.com'
 GA4='G-R9TBYP97BC'
+TITLE_OVERRIDES={
+    '/phuong-phap-cong-khai/':'6 phương pháp XSMB công khai hôm nay | Lê Miền Bắc',
+}
 
 
 def route_for(path:Path,root:Path)->str:
@@ -39,7 +42,12 @@ def upsert_meta(text:str,attr:str,key:str,value:str)->str:
 
 def enrich(path:Path,root:Path)->bool:
     text=path.read_text(encoding='utf-8'); before=text
-    route=route_for(path,root); title=get_title(text); desc=get_desc(text); url=BASE+route
+    route=route_for(path,root)
+    if route in TITLE_OVERRIDES:
+        title_tag='<title>'+html.escape(TITLE_OVERRIDES[route])+'</title>'
+        if re.search(r'<title>.*?</title>',text,re.I|re.S):text=re.sub(r'<title>.*?</title>',title_tag,text,count=1,flags=re.I|re.S)
+        else:text=text.replace('</head>',title_tag+'</head>',1)
+    title=get_title(text); desc=get_desc(text); url=BASE+route
     robots=re.search(r'<meta\s+name="robots"\s+content="([^"]+)"',text,re.I)
     noindex=bool(robots and 'noindex' in robots.group(1).lower())
     if not noindex:
@@ -69,11 +77,11 @@ def apply(root:Path)->dict[str,int]:
 def self_test()->None:
     import tempfile
     with tempfile.TemporaryDirectory() as td:
-        root=Path(td); root.mkdir(exist_ok=True)
-        p=root/'index.html';p.write_text('<html><head><title>Trang thử</title><meta name="description" content="Mô tả thử"><meta name="robots" content="index,follow"><meta property="og:image" content="https://example.test/a.png"></head><body></body></html>',encoding='utf-8')
+        root=Path(td); (root/'phuong-phap-cong-khai').mkdir()
+        p=root/'phuong-phap-cong-khai/index.html';p.write_text('<html><head><title>Tiêu đề cũ rất dài</title><meta name="description" content="Mô tả thử đủ dài để kiểm tra metadata"><meta name="robots" content="index,follow"><meta property="og:image" content="https://example.test/a.png"></head><body></body></html>',encoding='utf-8')
         result=apply(root);t=p.read_text(encoding='utf-8')
         assert result['pages']==1 and GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
-        assert 'twitter:card" content="summary_large_image' in t
+        assert 'twitter:card" content="summary_large_image' in t and '6 phương pháp XSMB công khai hôm nay' in t
     print('PORTAL_METADATA_SELF_TEST_OK')
 
 

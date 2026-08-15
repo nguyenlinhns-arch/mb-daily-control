@@ -13,8 +13,8 @@ from optimize_google_ads_landing import optimize as optimize_google_ads_landing
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260815-1">'
-SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260815-4"></script>'
-FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260816-1"></script>'
+SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260816-1"></script>'
+FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260816-2"></script>'
 
 
 def inject_before_head_end(content: str, tag: str) -> str:

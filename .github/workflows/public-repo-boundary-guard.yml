@@ -29,6 +29,8 @@ jobs:
       - name: Validate public/private boundary and frontend syntax
         run: |
           set -euo pipefail
+          test ! -e .github/workflows/accesstrade-only-monetization.yml
+          test ! -e scripts/enforce_accesstrade_only.py
           python scripts/public_repo_boundary_guard.py --self-test
           python scripts/public_repo_boundary_guard.py
           python scripts/bundle_portal_css.py --self-test
@@ -53,6 +55,8 @@ jobs:
           grep -q 'data-google-ads-landing' scripts/optimize_seo_ads_v1.py
           grep -q 'MONETIZATION_TOKENS' scripts/optimize_seo_ads_v1.py
           grep -q 'data-lm-native-ad-src' scripts/optimize_monetization_placement.py
+          grep -q 'effectivecpmnetwork.com' scripts/optimize_monetization_placement.py
+          grep -q 'highperformanceformat.com' scripts/optimize_monetization_placement.py
           grep -q 'data-seo-discovery-links' scripts/optimize_monetization_placement.py
           grep -q 'affiliate_evergreen' scripts/optimize_monetization_placement.py
           grep -q 'IntersectionObserver' site-v2/ads-tracking.js

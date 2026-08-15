@@ -7,7 +7,7 @@ CSS='<link rel="stylesheet" href="/portal-v3.css?v=20260815-1">'
 SENSITIVE={'phuong-phap-4so/index.html','lich-su-doi-chieu/index.html','phuong-phap-cong-khai/index.html'}
 SCHEMA_RE=re.compile(r'<script type="application/ld\+json">(?:(?!</script>).)*"@id":"https://lemienbac\.com/#portal-v3"(?:(?!</script>).)*</script>',re.S)
 
-def apply(root:Path)->dict[str,int]:
+def apply(root:Path)->dict[str,object]:
     n=0; stripped=0
     for p in root.rglob('*.html'):
         t=p.read_text(encoding='utf-8')
@@ -20,7 +20,12 @@ def apply(root:Path)->dict[str,int]:
             t=t.replace('</head>',CSS+'</head>',1)
         p.write_text(t,encoding='utf-8')
         n+=1
-    return {'pages':n,'sensitive_schema_removed':stripped}
+    result:dict[str,object]={'pages':n,'sensitive_schema_removed':stripped}
+    required=('statistics-data.json','source-access.json','report-readiness.json','sitemap.xml','llms.txt')
+    if all((root/name).exists() for name in required):
+        import finalize_portal_v4 as v4
+        result['quality_gate']=v4.apply(root)
+    return result
 
 def self_test()->None:
     import tempfile
@@ -29,10 +34,11 @@ def self_test()->None:
         (r/'phuong-phap-cong-khai/index.html').write_text('<html><head><script type="application/ld+json">{"@id":"https://lemienbac.com/#portal-v3","name":"Không công khai 4SO","dateModified":"2026-08-15"}</script></head><body></body></html>',encoding='utf-8')
         result=apply(r); text=(r/'phuong-phap-cong-khai/index.html').read_text(encoding='utf-8')
         assert result['pages']==1 and result['sensitive_schema_removed']==1 and 'portal-v3.css' in text and '#portal-v3' not in text
+        assert 'quality_gate' not in result
     print('PORTAL_V3_ASSETS_SELF_TEST_OK')
 
 def main()->None:
     p=argparse.ArgumentParser();p.add_argument('--output-root',type=Path,default=ROOT/'_site');p.add_argument('--self-test',action='store_true');a=p.parse_args()
     if a.self_test:self_test()
-    else:print(json.dumps(apply(a.output_root)))
+    else:print(json.dumps(apply(a.output_root),ensure_ascii=False))
 if __name__=='__main__':main()

@@ -139,18 +139,45 @@ jobs:
           grep -q '4 số trong báo cáo' _site/index.html
           grep -q 'Kết quả thực tế' _site/index.html
           grep -q '<details class="history-disclosure" open>' _site/index.html
-          grep -q 'Lịch sử đối chiếu từng ngày' _site/index.html
+          grep -q 'Lịch sử đối chiếu trong tháng này' _site/index.html
           ! grep -q 'class="history-cta"' _site/index.html
           ! grep -q 'class="mobile-cta"' _site/index.html
 
           python - <<'PY'
           from pathlib import Path
+          from datetime import date
           import re
 
           content = Path("_site/index.html").read_text(encoding="utf-8")
-          rows = len(re.findall(r'class="history-day-row"', content))
-          if rows != 30:
-              raise SystemExit(f"Expected 30 home history rows, found {rows}")
+
+          def vi_date(attribute):
+              match = re.search(
+                  rf'{attribute}="(\d{{2}})/(\d{{2}})/(\d{{4}})"',
+                  content,
+              )
+              if not match:
+                  raise SystemExit(f"Missing {attribute}")
+              day, month, year = map(int, match.groups())
+              return date(year, month, day)
+
+          report_day = vi_date("data-report-date")
+          lock_day = vi_date("data-lock-date")
+          row_dates = [
+              date.fromisoformat(value)
+              for value in re.findall(
+                  r'class="history-day-row"[^>]*>\s*<time datetime="(\d{4}-\d{2}-\d{2})"',
+                  content,
+                  flags=re.IGNORECASE,
+              )
+          ]
+          expected_rows = lock_day.day if (lock_day.year, lock_day.month) == (report_day.year, report_day.month) else 0
+          if len(row_dates) != expected_rows:
+              raise SystemExit(
+                  f"Expected {expected_rows} current-month history rows, found {len(row_dates)}"
+              )
+          if any((value.year, value.month) != (report_day.year, report_day.month) for value in row_dates):
+              raise SystemExit("A history row from another month remains on the home page")
+
           buttons = re.findall(
               r'<button\b[^>]*\bdata-open-checkout\b[^>]*>',
               content,

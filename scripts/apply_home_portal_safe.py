@@ -19,30 +19,22 @@ def rewrite_purchase_copy(content: str, ready: dict[str, object]) -> str:
 
     # The public purchase flow should describe the thing the visitor wants,
     # while the technical 4SO/report terminology remains internal/audit-facing.
-    content = content.replace(
-        f'<p class="eyebrow">BÁO CÁO 4SO NGÀY {label}</p>',
-        f'<p class="eyebrow">GỢI Ý SỐ NGÀY {label}</p>',
+    replacements = (
+        (f'<p class="eyebrow">BÁO CÁO 4SO NGÀY {label}</p>', f'<p class="eyebrow">GỢI Ý SỐ NGÀY {label}</p>'),
+        (f'Mở đúng một báo cáo 4SO cho ngày {label} sau khi giao dịch được xác nhận.', f'Mở gợi ý số ngày {label} sau khi giao dịch được xác nhận.'),
+        (f'01 báo cáo ngày {label}', f'Gợi ý số ngày {label}'),
+        ('NHẬN BÁO CÁO 4SO – 30.000Đ', 'NHẬN GỢI Ý SỐ – 30.000Đ'),
+        (f'NHẬN BÁO CÁO NGÀY {label}', f'GỢI Ý SỐ NGÀY {label}'),
+        (f'Nhận báo cáo AI ngày {label}', f'Nhận gợi ý số ngày {label}'),
+        ('NHẬN BÁO CÁO NGÀY HÔM NAY', f'GỢI Ý SỐ NGÀY {label}'),
+        ('Nhận báo cáo AI ngày hôm nay', f'Nhận gợi ý số ngày {label}'),
+        ('01 báo cáo ngày hôm nay', f'Gợi ý số ngày {label}'),
+        ('Giao dịch được xác nhận, báo cáo mở trên màn hình', 'Giao dịch được xác nhận, gợi ý số mở trên màn hình'),
+        ('Báo cáo sẽ tự mở trên màn hình khi giao dịch được xác nhận.', 'Gợi ý số sẽ tự mở trên màn hình khi giao dịch được xác nhận.'),
+        ('TÔI ĐÃ CHUYỂN KHOẢN – YÊU CẦU NHẬN BÁO CÁO', 'TÔI ĐÃ CHUYỂN KHOẢN – YÊU CẦU NHẬN GỢI Ý SỐ'),
     )
-    content = content.replace(
-        f'Mở đúng một báo cáo 4SO cho ngày {label} sau khi giao dịch được xác nhận.',
-        f'Mở gợi ý số ngày {label} sau khi giao dịch được xác nhận.',
-    )
-    content = content.replace(
-        f'01 báo cáo ngày {label}',
-        f'Gợi ý số ngày {label}',
-    )
-    content = content.replace(
-        'NHẬN BÁO CÁO 4SO – 30.000Đ',
-        'NHẬN GỢI Ý SỐ – 30.000Đ',
-    )
-    content = content.replace(
-        f'NHẬN BÁO CÁO NGÀY {label}',
-        f'GỢI Ý SỐ NGÀY {label}',
-    )
-    content = content.replace(
-        f'Nhận báo cáo AI ngày {label}',
-        f'Nhận gợi ý số ngày {label}',
-    )
+    for old, new in replacements:
+        content = content.replace(old, new)
 
     # Fail closed: the main purchase card must carry the explicit target date.
     buy = re.search(
@@ -114,14 +106,19 @@ def self_test() -> None:
         '<p class="eyebrow">BÁO CÁO 4SO NGÀY 16/08/2026</p>'
         '<p>Mở đúng một báo cáo 4SO cho ngày 16/08/2026 sau khi giao dịch được xác nhận.</p>'
         '<p>01 báo cáo ngày 16/08/2026</p>'
+        '<p>Giao dịch được xác nhận, báo cáo mở trên màn hình</p>'
         '<button>NHẬN BÁO CÁO 4SO – 30.000Đ</button></section>'
-        '<div><p>NHẬN BÁO CÁO NGÀY 16/08/2026</p>'
-        '<h2>Nhận báo cáo AI ngày 16/08/2026</h2></div></body></html>'
+        '<div><p>NHẬN BÁO CÁO NGÀY HÔM NAY</p>'
+        '<h2>Nhận báo cáo AI ngày hôm nay</h2><span>01 báo cáo ngày hôm nay</span>'
+        '<p>Báo cáo sẽ tự mở trên màn hình khi giao dịch được xác nhận.</p>'
+        '<button>TÔI ĐÃ CHUYỂN KHOẢN – YÊU CẦU NHẬN BÁO CÁO</button></div></body></html>'
     )
     out = rewrite_purchase_copy(sample, ready)
     assert 'GỢI Ý SỐ NGÀY 16/08/2026' in out
     assert 'NHẬN GỢI Ý SỐ – 30.000Đ' in out
     assert 'Nhận gợi ý số ngày 16/08/2026' in out
+    assert 'Gợi ý số sẽ tự mở trên màn hình' in out
+    assert 'YÊU CẦU NHẬN GỢI Ý SỐ' in out
     assert 'BÁO CÁO 4SO NGÀY 16/08/2026' not in out
     print('HOME_PORTAL_SAFE_SELF_TEST_OK')
 

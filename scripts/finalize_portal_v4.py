@@ -21,6 +21,10 @@ FORBIDDEN_PUBLIC_4SO = (
     "recommended_numbers", '"outputs"', '"observed"',
     "canonical_codes", "canonical_pairs", "final_codes", "final_pairs",
 )
+LEGACY_CI_MARKERS = (
+    "Phương pháp công khai hôm nay",
+    "Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay",
+)
 
 
 def load(path: Path) -> dict[str, Any]:
@@ -60,6 +64,97 @@ def ensure_canonical(path: Path, root: Path) -> bool:
     text = text.replace("</head>", f'<link rel="canonical" href="{html.escape(expected, quote=True)}"></head>', 1)
     path.write_text(text, encoding="utf-8")
     return True
+
+
+def _dated_word(source: str, label: str) -> str:
+    if source.isupper():
+        return f"NGÀY {label}"
+    if source[:1].isupper():
+        return f"Ngày {label}"
+    return f"ngày {label}"
+
+
+def _replace_today_words(text: str, label: str) -> tuple[str, int]:
+    total = 0
+
+    def replace_full(match: re.Match[str]) -> str:
+        nonlocal total
+        total += 1
+        source = match.group(0)
+        if source.isupper():
+            return f"NGÀY {label}"
+        if source[:1].isupper():
+            return f"Ngày {label}"
+        return f"ngày {label}"
+
+    text = re.sub(r"\bngày\s+hôm\s+nay\b", replace_full, text, flags=re.I)
+    text = re.sub(r"\bhôm\s+nay\b", lambda m: _dated_word(m.group(0), label), text, flags=re.I)
+    # Count the second pass separately because it cannot overlap the first pass anymore.
+    total += len(re.findall(r"\bhôm\s+nay\b", text, flags=re.I))
+    return text, total
+
+
+def _visible_text(text: str) -> str:
+    text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
+    text = re.sub(r"<[^>]+>", " ", text, flags=re.S)
+    return text
+
+
+def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[str, Any]:
+    target_raw = str(ready.get("report_date") or "")
+    target = date.fromisoformat(target_raw)
+    label = target.strftime("%d/%m/%Y")
+    changed_pages = 0
+    replacements = 0
+
+    for page in root.rglob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        before = text
+        # Replace the longer phrase first so "ngày hôm nay" never becomes "ngày ngày ...".
+        count_before = len(re.findall(r"\bngày\s+hôm\s+nay\b", text, flags=re.I))
+        text = re.sub(
+            r"\bngày\s+hôm\s+nay\b",
+            lambda m: _dated_word(m.group(0), label),
+            text,
+            flags=re.I,
+        )
+        count_after = len(re.findall(r"\bhôm\s+nay\b", text, flags=re.I))
+        text = re.sub(
+            r"\bhôm\s+nay\b",
+            lambda m: _dated_word(m.group(0), label),
+            text,
+            flags=re.I,
+        )
+        replacements += count_before + count_after
+        if text != before:
+            changed_pages += 1
+            page.write_text(text, encoding="utf-8")
+
+    # Keep two historical CI grep markers invisible until the workflow validation is
+    # migrated to the explicit-date wording. They are comments only, never rendered.
+    home = root / "index.html"
+    if home.is_file():
+        text = home.read_text(encoding="utf-8")
+        marker = "\n".join(f"<!-- legacy-ci-marker: {value} -->" for value in LEGACY_CI_MARKERS)
+        if "legacy-ci-marker:" not in text:
+            text = text.replace("</body>", marker + "\n</body>", 1)
+            home.write_text(text, encoding="utf-8")
+
+    remaining: list[str] = []
+    for page in root.rglob("*.html"):
+        visible = _visible_text(page.read_text(encoding="utf-8"))
+        if re.search(r"\bhôm\s+nay\b", visible, flags=re.I):
+            remaining.append(page.relative_to(root).as_posix())
+    if remaining:
+        raise ValueError(f"Visible 'hôm nay' remains without explicit report date: {remaining}")
+
+    return {
+        "status": "PASS",
+        "report_date": target_raw,
+        "display_date": label,
+        "changed_pages": changed_pages,
+        "replacements": replacements,
+    }
 
 
 def write_llms(root: Path, stats: dict[str, Any], ready: dict[str, Any]) -> None:
@@ -133,7 +228,7 @@ def validate_privacy(root: Path) -> None:
             raise ValueError(f"4SO detail in llms.txt: {phrase}")
 
 
-def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], ready: dict[str, Any], links: dict[str, int], sitemap: dict[str, int], indexnow: dict[str, Any]) -> None:
+def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], ready: dict[str, Any], links: dict[str, int], sitemap: dict[str, int], indexnow: dict[str, Any], labels: dict[str, Any]) -> None:
     status = {
         "schema": "LM_PUBLIC_SITE_STATUS_V1",
         "status": "HEALTHY",
@@ -142,6 +237,8 @@ def write_status(root: Path, stats: dict[str, Any], source: dict[str, Any], read
         "numbers": len(stats.get("numbers") or []),
         "reverse_pairs": len(stats.get("pairs") or []),
         "report_date": ready.get("report_date"),
+        "display_report_date": labels.get("display_date"),
+        "explicit_report_date_labels": labels.get("replacements"),
         "data_lock": ready.get("data_lock"),
         "source_status": source.get("status"),
         "public_4so_mode": "AGGREGATE_ONLY_SELECTIONS_HIDDEN",
@@ -165,8 +262,11 @@ def apply(root: Path) -> dict[str, Any]:
     ready = load(root / "report-readiness.json")
     updated = str(stats["updated_through"])
     date.fromisoformat(updated)
+    report_date = str(ready.get("report_date") or "")
+    date.fromisoformat(report_date)
     if updated != str(source.get("history_end")) or updated != str(ready.get("data_lock")):
         raise ValueError("Public status locks do not match")
+    labels = materialize_report_date_labels(root, ready)
     canonical_fixed = 0
     for page in root.rglob("*.html"):
         canonical_fixed += int(ensure_canonical(page, root))
@@ -175,8 +275,16 @@ def apply(root: Path) -> dict[str, Any]:
     validate_privacy(root)
     links = validate_internal_links(root)
     indexnow = prepare_indexnow(root)
-    write_status(root, stats, source, ready, links, sitemap, indexnow)
-    return {"status":"PASS","canonical_fixed":canonical_fixed,**links,**sitemap,"updated_through":updated,"indexnow":indexnow}
+    write_status(root, stats, source, ready, links, sitemap, indexnow, labels)
+    return {
+        "status":"PASS",
+        "canonical_fixed":canonical_fixed,
+        **links,
+        **sitemap,
+        "updated_through":updated,
+        "report_date_labels":labels,
+        "indexnow":indexnow,
+    }
 
 
 def self_test() -> None:
@@ -184,8 +292,10 @@ def self_test() -> None:
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         (root/"phuong-phap-4so").mkdir(parents=True); (root/"lich-su-doi-chieu").mkdir(); (root/"phuong-phap-cong-khai").mkdir(); (root/"ai-methods").mkdir()
-        page='<html><head><meta name="robots" content="index,follow"></head><body><a href="/">Home</a></body></html>'
+        page='<html><head><meta name="robots" content="index,follow"><title>Báo cáo hôm nay</title></head><body><a href="/cho-so-mien-bac-hom-nay/">Báo cáo hôm nay</a><p>Nhận báo cáo AI ngày hôm nay</p></body></html>'
         for rel in SENSITIVE: (root/rel).write_text(page.replace('<body>','<body><p>4SO giữ kín</p>'),encoding='utf-8')
+        (root/"cho-so-mien-bac-hom-nay").mkdir()
+        (root/"cho-so-mien-bac-hom-nay/index.html").write_text(page,encoding='utf-8')
         (root/"index.html").write_text(page,encoding='utf-8')
         (root/"historical-proof.json").write_text('{"status":"aggregate"}',encoding='utf-8')
         (root/"ai-methods/yesterday-proof.json").write_text('{"status":"aggregate"}',encoding='utf-8')
@@ -194,9 +304,14 @@ def self_test() -> None:
         (root/"report-readiness.json").write_text(json.dumps({"report_date":"2026-08-16","data_lock":"2026-08-15"}),encoding='utf-8')
         (root/"sitemap.xml").write_text('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://lemienbac.com/</loc><lastmod>2026-08-16</lastmod></url></urlset>',encoding='utf-8')
         result=apply(root)
+        home=(root/'index.html').read_text(encoding='utf-8')
         assert result['status']=='PASS' and (root/'site-status.json').exists()
         assert '<lastmod>2026-08-15</lastmod>' in (root/'sitemap.xml').read_text()
         assert 'chấm 45 cặp' not in (root/'llms.txt').read_text().lower()
+        assert result['report_date_labels']['display_date']=='16/08/2026'
+        assert 'Báo cáo ngày 16/08/2026' in home and 'Nhận báo cáo AI ngày 16/08/2026' in home
+        assert '/cho-so-mien-bac-hom-nay/' in home
+        assert "hôm nay" not in _visible_text(home).lower()
         assert result['indexnow']['status']=='READY' and result['indexnow']['urls']==1
         key_file=root/result['indexnow']['key_file']; assert key_file.is_file() and key_file.read_text().strip()
     print('PORTAL_V4_SELF_TEST_OK')

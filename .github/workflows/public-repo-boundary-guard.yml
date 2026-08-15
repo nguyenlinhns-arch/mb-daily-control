@@ -22,8 +22,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate public/private boundary
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate public/private boundary and frontend syntax
         run: |
           set -euo pipefail
           python scripts/public_repo_boundary_guard.py --self-test
           python scripts/public_repo_boundary_guard.py
+          node --check site-v2/portal-v2.js
+          grep -q 'xsmb_lookup_compare' site-v2/portal-v2.js
+          grep -q 'portal-number-compare' site-v2/portal-v3.css

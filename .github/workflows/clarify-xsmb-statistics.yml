@@ -41,50 +41,17 @@ jobs:
               s=s.replace('.lead{margin:16px 0 0;color:#50636f;font-size:17px}', '.date-headline{margin:12px 0 0;color:#536873;font-size:16px}.date-headline strong{color:var(--orange);font-size:19px}.lead{margin:14px 0 0;color:#50636f;font-size:17px}')
           p.write_text(s,encoding='utf-8')
           PY
-
-      - name: Add ACCESSTRADE Shopee Smartlink
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('ai-methods/index.html')
-          s=p.read_text(encoding='utf-8')
-
-          css='''\n    /* ACCESSTRADE monetization v1 */\n    .affiliate-strip{padding:0 0 50px}.affiliate-card{position:relative;padding:19px;border:1px solid #eaded7;border-radius:20px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,#fff7f2,#fff);box-shadow:0 14px 34px rgba(7,27,43,.07)}.affiliate-copy{min-width:0}.affiliate-label{display:inline-flex;padding:5px 8px;border-radius:999px;background:#fff0e8;color:#b74022;font-size:10px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}.affiliate-card h2{margin:8px 0 0;color:var(--navy);font-size:21px;line-height:1.23;letter-spacing:-.025em}.affiliate-card p{margin:6px 0 0;color:#5a6d77;font-size:12px;line-height:1.5}.affiliate-cta{min-height:50px;padding:0 15px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#ee4d2d;color:#fff;font-size:13px;font-weight:900;white-space:nowrap}.affiliate-disclosure{margin:8px 4px 0;color:#798991;font-size:10px;line-height:1.45}.affiliate-disclosure strong{color:#5d6d78}@media(max-width:620px){.affiliate-card{grid-template-columns:1fr}.affiliate-cta{width:100%;min-height:52px}.affiliate-strip{padding-bottom:42px}}\n'''
-          if '/* ACCESSTRADE monetization v1 */' not in s:
-              s=s.replace('  </style>',css+'\n  </style>',1)
-
-          block='''    <section class="affiliate-strip" aria-label="Ưu đãi đối tác">\n      <div class="wrap">\n        <a class="affiliate-card" id="affiliate-shopee-smartlink" href="https://nguyenlinhtkv_aul4jx.accesslanding.site" target="_blank" rel="sponsored noopener noreferrer" referrerpolicy="strict-origin-when-cross-origin">\n          <div class="affiliate-copy">\n            <span class="affiliate-label">Liên kết đối tác · ACCESSTRADE</span>\n            <h2>Ưu đãi mua sắm Shopee hôm nay</h2>\n            <p>Mở trang Smartlink để xem sản phẩm và ưu đãi đang được giới thiệu. Không ảnh hưởng nội dung thống kê trên website.</p>\n          </div>\n          <span class="affiliate-cta">Xem ưu đãi →</span>\n        </a>\n        <p class="affiliate-disclosure"><strong>Thông báo tiếp thị liên kết:</strong> nếu bạn mua hàng đủ điều kiện sau khi bấm liên kết, website có thể nhận hoa hồng từ ACCESSTRADE mà không làm tăng giá mua của bạn.</p>\n      </div>\n    </section>\n'''
-          marker='    <section class="sample" id="ban-tin-gom-gi">'
-          if 'id="affiliate-shopee-smartlink"' not in s:
-              if marker not in s:
-                  raise SystemExit('Affiliate insertion marker not found')
-              s=s.replace(marker,block+'\n'+marker,1)
-
-          js_marker="      const recent=document.querySelector('#recent-history');"
-          tracking="""      const affiliateLink=document.querySelector('#affiliate-shopee-smartlink');\n      if(affiliateLink){affiliateLink.addEventListener('click',()=>{track('AffiliateClick',{network:'accesstrade',campaign:'shopee_smartlink',placement:'home_native'});try{if(Array.isArray(window.dataLayer))window.dataLayer.push({event:'affiliate_click',affiliate_network:'accesstrade',affiliate_campaign:'shopee_smartlink',affiliate_placement:'home_native'})}catch{}})}\n"""
-          if "affiliate_campaign:'shopee_smartlink'" not in s:
-              if js_marker not in s:
-                  raise SystemExit('Tracking insertion marker not found')
-              s=s.replace(js_marker,tracking+js_marker,1)
-
-          p.write_text(s,encoding='utf-8')
-          PY
-
-      - name: Verify wording and monetization
+      - name: Verify wording
         run: |
           grep -n 'Thống kê Xổ số Miền Bắc' ai-methods/landing-v3.html | head -20
-          grep -n 'affiliate-shopee-smartlink' ai-methods/index.html
-          grep -n 'nguyenlinhtkv_aul4jx.accesslanding.site' ai-methods/index.html
-          grep -n "affiliate_campaign:'shopee_smartlink'" ai-methods/index.html
-          grep -n 'Thông báo tiếp thị liên kết' ai-methods/index.html
-
+          grep -n 'AI thống kê toàn bộ dữ liệu Xổ số Miền Bắc' ai-methods/landing-v3.html
       - name: Commit
         run: |
-          if git diff --quiet -- ai-methods/landing-v3.html ai-methods/index.html; then exit 0; fi
+          if git diff --quiet -- ai-methods/landing-v3.html; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ai-methods/landing-v3.html ai-methods/index.html
-          git commit -m 'Add ACCESSTRADE Shopee Smartlink monetization'
+          git add ai-methods/landing-v3.html
+          git commit -m 'Clarify Xổ số Miền Bắc statistics positioning'
           git push origin HEAD:main
 
-# retrigger affiliate monetization
+# retrigger

@@ -21,7 +21,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: completed-draw-report-pipeline
+  group: daily-report-midnight
   cancel-in-progress: true
 
 jobs:

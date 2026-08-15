@@ -6,10 +6,14 @@ on:
     paths:
       - ".github/workflows/statistics-history-sync.yml"
       - "scripts/sync_statistics_history.py"
+      - "data/source-access.json"
   workflow_dispatch:
   schedule:
-    # 20:10 Vietnam time: after the completed XSMB draw/source lock.
+    # Vietnam time: 20:10, 21:10, and a final 00:20 retry.
+    # Each run is fail-closed against the locked source manifest.
     - cron: "10 13 * * *"
+    - cron: "10 14 * * *"
+    - cron: "20 17 * * *"
 
 permissions:
   contents: write

@@ -41,6 +41,7 @@ jobs:
           python scripts/indexnow_submit.py --self-test
           node --check site-v2/portal-v2.js
           node --check site-v2/ads-tracking.js
+          node --check site-v2/finance-banner.js
           node --check site-v2/checkout-entry.js
           grep -q 'xsmb_lookup_compare' site-v2/portal-v2.js
           grep -q 'web_vitals_summary' site-v2/portal-v2.js
@@ -58,6 +59,11 @@ jobs:
           grep -q 'affiliate_click' site-v2/ads-tracking.js
           grep -q 'ad_slot_view' site-v2/ads-tracking.js
           grep -q 'ad_slot_load' site-v2/ads-tracking.js
+          grep -q 'after_core_monetization' site-v2/finance-banner.js
+          grep -q 'affiliate_finance_view' site-v2/finance-banner.js
+          grep -q '59%/năm' site-v2/finance-banner.js
+          grep -q 'Xem điều kiện tại VPBank' site-v2/finance-banner.js
+          ! grep -q 'placement: "home_top"' site-v2/finance-banner.js
           grep -q 'portal-number-compare' site-v2/portal-v3.css
           grep -q 'portal-history-codes' site-v2/portal-v3.css
           ! grep -q 'portal-consent' site-v2/portal-v3.css

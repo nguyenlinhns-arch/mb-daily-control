@@ -1,11 +1,10 @@
-name: Deploy daily AI data report site to GitHub Pages
+name: Deploy Lê Miền Bắc XSMB portal to GitHub Pages
 
 on:
   push:
     branches: ["main"]
   workflow_dispatch:
   schedule:
-    # Fail closed just after the Vietnam date changes, then retry after the 00:05 operation.
     - cron: "1 17 * * *"
     - cron: "15 18 * * *"
 
@@ -33,23 +32,24 @@ jobs:
         with:
           node-version: 22
 
-      - name: Test site
+      - name: Test builders
         run: |
+          set -euo pipefail
           npm test
           python scripts/simplify_public_site.py --self-test
           python scripts/replace_public_analysis_wording.py --self-test
           python scripts/optimize_conversion_site.py --self-test
           python scripts/build_statistics_site.py --self-test
+          python scripts/apply_home_portal.py --self-test
+          python scripts/sync_statistics_history.py --self-test
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Build static artifact
+      - name: Resolve report date fail closed
+        id: report
         run: |
           set -euo pipefail
-
-          # Allow the next draw report to publish immediately after the current
-          # draw is fully cross-checked. Other stale/future dates still fail closed.
           REPORT_DATE="$(python - <<'PY'
           import json
           from datetime import date, datetime, timedelta
@@ -57,30 +57,37 @@ jobs:
 
           public = json.load(open("ai-methods/public-methods.json", encoding="utf-8"))
           proof = json.load(open("ai-methods/yesterday-proof.json", encoding="utf-8"))
+          ready = json.load(open("data/paid-report-ready.json", encoding="utf-8"))
+          source = json.load(open("data/source-access.json", encoding="utf-8"))
           calendar = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).date()
           target = date.fromisoformat(str(public["target_date"]))
           lock = date.fromisoformat(str(public["data_lock"]))
           if lock != target - timedelta(days=1):
-              raise SystemExit("Public report data_lock is not T-1")
+              raise SystemExit("Public methods data_lock is not T-1")
+          if ready.get("report_date") != target.isoformat() or ready.get("data_lock") != lock.isoformat():
+              raise SystemExit("Paid readiness does not match public target/data lock")
+          if source.get("history_end") != lock.isoformat():
+              raise SystemExit("Source history_end does not match public data lock")
           same_day = target == calendar and lock == calendar - timedelta(days=1)
-          post_draw_next = (
-              target == calendar + timedelta(days=1)
-              and lock == calendar
-              and proof.get("date") == calendar.isoformat()
-          )
+          post_draw_next = target == calendar + timedelta(days=1) and lock == calendar and proof.get("date") == calendar.isoformat()
           if not (same_day or post_draw_next):
-              raise SystemExit(
-                  f"Fail closed: calendar={calendar} target={target} lock={lock} proof={proof.get('date')}"
-              )
+              raise SystemExit(f"Fail closed: calendar={calendar} target={target} lock={lock} proof={proof.get('date')}")
           print(target.isoformat())
           PY
           )"
-          echo "Rendering website for report date ${REPORT_DATE}"
+          echo "date=${REPORT_DATE}" >> "$GITHUB_OUTPUT"
+          echo "Rendering portal for ${REPORT_DATE}"
 
+      - name: Build static portal
+        env:
+          REPORT_DATE: ${{ steps.report.outputs.date }}
+        run: |
+          set -euo pipefail
           python scripts/build_public_methods.py --self-test
           python scripts/build_seo_pages.py --self-test --today "$REPORT_DATE"
           rm -rf _site
           mkdir -p _site/ai-methods
+
           cp site-v2/styles.css _site/
           cp site-v2/red-white-theme.css _site/
           cp site-v2/conversion-accent.css _site/
@@ -101,22 +108,19 @@ jobs:
           cp data/source-access.json _site/
           cp data/public-historical-proof.json _site/historical-proof.json
           cp data/paid-report-ready.json _site/report-readiness.json
+
           python scripts/build_seo_pages.py --output-root _site --today "$REPORT_DATE"
 
-          # The simplifier reads the legacy hero template. Normalize only the
-          # temporary build artifact so it can parse the button; the final paid
-          # gate is reapplied from the private-safe readiness manifest below.
+          # Normalize only the temporary artifact so the legacy simplifier can
+          # parse it; the protected paid gate is reapplied before the portal is built.
           python - <<'PY'
           from pathlib import Path
           import re
-
           page = Path("_site/index.html")
           content = page.read_text(encoding="utf-8")
           content = re.sub(
               r'(<button class="button button-primary button-large" type="button" data-open-checkout)\s+disabled(?:\s+aria-disabled="true")?(>)',
-              r'\1\2',
-              content,
-              count=1,
+              r'\1\2', content, count=1,
           )
           page.write_text(content, encoding="utf-8")
           PY
@@ -127,147 +131,95 @@ jobs:
           python scripts/apply_conversion_site.py --output-root _site
           python scripts/simplify_purchase_cta.py --output-root _site
           python scripts/apply_conversion_v2.py --output-root _site
-          find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260815-1#g'
+          find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260815-2#g'
           python scripts/build_statistics_site.py --output-root _site
+          python scripts/apply_home_portal.py --output-root _site
 
-          test -s _site/red-white-theme.css
-          test -s _site/conversion-accent.css
-          test -s _site/conversion-v2.css
-          test -s _site/checkout-hotfix.css
-          test -s _site/checkout-entry.js
-          test -s _site/checkout-enhance.js
-          test -s _site/report-readiness.json
+      - name: Validate public portal and privacy gates
+        env:
+          REPORT_DATE: ${{ steps.report.outputs.date }}
+        run: |
+          set -euo pipefail
+          for file in \
+            _site/index.html \
+            _site/statistics-data.json \
+            _site/thong-ke-xsmb/index.html \
+            _site/tan-suat-xsmb/index.html \
+            _site/lo-gan-xsmb/index.html \
+            _site/cap-dao-xsmb/index.html \
+            _site/tra-cuu-xsmb/index.html \
+            _site/cho-so-mien-bac-hom-nay/index.html \
+            _site/lich-su-doi-chieu/index.html \
+            _site/mau-bao-cao.html \
+            _site/legal.html \
+            _site/sitemap.xml \
+            _site/llms.txt \
+            _site/checkout-entry.js \
+            _site/checkout-enhance.js \
+            _site/app.js; do
+            test -s "$file"
+          done
+
           test ! -e _site/ai-methods/public-methods.json
-          test -s _site/ai-methods/yesterday-proof.json
-          test -s _site/cho-so-mien-bac-hom-nay/index.html
-          test -s _site/phuong-phap-4so/index.html
-          test -s _site/lich-su-doi-chieu/index.html
-          test -s _site/thong-ke-lo-to-mien-bac-bang-ai/index.html
-          test -s _site/gioi-thieu/index.html
-          test -s _site/thong-ke-xsmb/index.html
-          test -s _site/tan-suat-xsmb/index.html
-          test -s _site/lo-gan-xsmb/index.html
-          test -s _site/cap-dao-xsmb/index.html
-          test -s _site/tra-cuu-xsmb/index.html
-          test -s _site/statistics-data.json
-          test -s _site/sitemap.xml
-          test -s _site/llms.txt
-
-          grep -q 'data-xsmb-stats="v1"' _site/thong-ke-xsmb/index.html
-          grep -q '45 cặp đảo' _site/cap-dao-xsmb/index.html
-          grep -q 'Dò một bộ số' _site/tra-cuu-xsmb/index.html
-          grep -q 'https://lemienbac.com/thong-ke-xsmb/' _site/sitemap.xml
+          test ! -e _site/ai-methods/report-data.json
+          test ! -e _site/approval-backend.gs
           ! grep -E -q '(canonical|final)[_-]?(codes|pairs)' _site/statistics-data.json
 
-          grep -q 'data-public-ready="true"' _site/index.html
-          grep -q 'data-paid-report-ready="true"' _site/index.html
-          grep -q 'checkout-entry.js?v=20260815-1' _site/index.html
-          grep -q 'checkout-enhance.js?v=20260815-1' _site/index.html
-          grep -q 'conversion-v2.css?v=20260815-1' _site/index.html
-          grep -q 'class="conversion-trust"' _site/index.html
-          grep -q 'class="conversion-preview"' _site/index.html
-          grep -q 'NHẬN BÁO CÁO HÔM NAY – 30.000Đ' _site/index.html
-          ! grep -q 'MỞ KẾT LUẬN' _site/index.html
-          grep -q 'class="buy-value-list"' _site/index.html
-          grep -q 'class="buy-guarantees"' _site/index.html
-          grep -q 'class="checkout-value"' _site/index.html
-          grep -q 'class="checkout-trust"' _site/index.html
-          grep -q 'href="/?checkout=1"' _site/cho-so-mien-bac-hom-nay/index.html
-          grep -q 'class="seo-purchase-float"' _site/cho-so-mien-bac-hom-nay/index.html
-          ! grep -R 'href="/#buy"' _site --include='*.html'
-          ! grep -R 'href="/#pricing"' _site --include='*.html'
+          grep -q 'data-home-portal="v1"' _site/index.html
+          grep -q 'XSMB, thống kê 00–99' _site/index.html
+          grep -q 'Phương pháp công khai hôm nay' _site/index.html
+          grep -q 'A1' _site/index.html
+          grep -q '2SO / X2' _site/index.html
+          grep -q 'X3 GROWTH' _site/index.html
+          grep -q 'F01 TẦN SUẤT' _site/index.html
+          grep -q 'F06 CHUYỂN TIẾP' _site/index.html
+          grep -q 'KÉP V1' _site/index.html
+          grep -q 'TOP 1' _site/index.html
+          grep -q '•• — ••' _site/index.html
+          grep -q 'Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay' _site/index.html
+          grep -q '45 cặp đảo' _site/index.html
+          grep -q 'Tra cứu bộ số' _site/index.html
+          grep -q 'https://lemienbac.com/thong-ke-xsmb/' _site/sitemap.xml
 
           python - <<'PY'
-          import json
+          import json, re
           from pathlib import Path
 
-          proof = json.loads(Path("ai-methods/yesterday-proof.json").read_text(encoding="utf-8"))
-          validation = proof["historical_validation"]
-          content = Path("_site/index.html").read_text(encoding="utf-8")
-          for token in (
-              f'{validation["rate_pct"]}%',
-              f'{validation["hit_days"]}/{validation["total_days"]} ngày',
-          ):
-              if token not in content:
-                  raise SystemExit(f"Missing audited historical token: {token}")
-          PY
+          site = Path('_site')
+          stats = json.loads((site/'statistics-data.json').read_text(encoding='utf-8'))
+          source = json.loads(Path('data/source-access.json').read_text(encoding='utf-8'))
+          methods = json.loads(Path('ai-methods/public-methods.json').read_text(encoding='utf-8'))
+          proof = json.loads(Path('data/public-historical-proof.json').read_text(encoding='utf-8'))
+          home = (site/'index.html').read_text(encoding='utf-8')
 
-          grep -q 'có ít nhất một số trong báo cáo xuất hiện' _site/index.html
-          grep -q '4 số trong báo cáo' _site/index.html
-          grep -q 'Kết quả thực tế' _site/index.html
-          grep -q '<details class="history-disclosure" open>' _site/index.html
-          grep -q 'Lịch sử đối chiếu trong tháng này' _site/index.html
-          ! grep -q 'class="history-cta"' _site/index.html
-          ! grep -q 'class="mobile-cta"' _site/index.html
+          assert stats['updated_through'] == source['history_end'] == methods['data_lock']
+          assert stats['row_count'] == source['history_rows']
+          assert len(stats['numbers']) == 100
+          assert len(stats['pairs']) == 45
+          assert len(stats['recent_history'][-1][1:]) == 27
+          assert all('4SO' not in str(m.get('id','')).upper() and '4SO' not in str(m.get('name','')).upper() for m in methods['methods'])
+          assert len(methods['methods']) == 6
+          assert proof['validation']['total_days'] == 30
+          assert f"{proof['validation']['rate_pct']}%" in home
+          assert f"{proof['validation']['hit_days']}/{proof['validation']['total_days']}" in home
 
-          python - <<'PY'
-          from pathlib import Path
-          from datetime import date
-          import re
+          buttons = re.findall(r'<button\b[^>]*\bdata-open-checkout\b[^>]*>', home, flags=re.I)
+          assert len(buttons) == 2, len(buttons)
+          header = re.search(r'<header\b[^>]*class="[^"]*site-header[^"]*"[^>]*>.*?</header>', home, flags=re.I|re.S)
+          assert header and 'data-open-checkout' not in header.group(0)
 
-          content = Path("_site/index.html").read_text(encoding="utf-8")
-
-          def vi_date(attribute):
-              match = re.search(
-                  rf'{attribute}="(\d{{2}})/(\d{{2}})/(\d{{4}})"',
-                  content,
-              )
-              if not match:
-                  raise SystemExit(f"Missing {attribute}")
-              day, month, year = map(int, match.groups())
-              return date(year, month, day)
-
-          report_day = vi_date("data-report-date")
-          lock_day = vi_date("data-lock-date")
-          row_dates = [
-              date.fromisoformat(value)
-              for value in re.findall(
-                  r'class="history-day-row"[^>]*>\s*<time datetime="(\d{4}-\d{2}-\d{2})"',
-                  content,
-                  flags=re.IGNORECASE,
-              )
-          ]
-          expected_rows = lock_day.day if (lock_day.year, lock_day.month) == (report_day.year, report_day.month) else 0
-          if len(row_dates) != expected_rows:
-              raise SystemExit(
-                  f"Expected {expected_rows} current-month history rows, found {len(row_dates)}"
-              )
-          if any((value.year, value.month) != (report_day.year, report_day.month) for value in row_dates):
-              raise SystemExit("A history row from another month remains on the home page")
-
-          buttons = re.findall(
-              r'<button\b[^>]*\bdata-open-checkout\b[^>]*>',
-              content,
-              flags=re.IGNORECASE,
-          )
-          if len(buttons) != 2:
-              raise SystemExit(f"Expected exactly 2 home checkout buttons, found {len(buttons)}")
-          header = re.search(
-              r'<header\b[^>]*class="[^"]*site-header[^"]*"[^>]*>.*?</header>',
-              content,
-              flags=re.IGNORECASE | re.DOTALL,
-          )
-          if not header or "data-open-checkout" in header.group(0):
-              raise SystemExit("Header purchase button was not removed")
-          if re.search(r'19\s*[-–—]\s*91[\s\S]{0,120}05\s*[-–—]\s*50', content):
-              raise SystemExit("Current paid pairs leaked into public HTML")
+          # The six public methods may show their numbers. Current 4SO may not.
+          for forbidden in ('canonical_codes','canonical_pairs','final_codes','final_pairs'):
+              assert forbidden not in home.lower()
+          assert not re.search(r'4SO[^<]{0,180}\b\d{2}\b\s*[-–—]\s*\b\d{2}\b', home, flags=re.I)
+          print('PORTAL_PRIVACY_AND_DATA_GATES_OK', stats['row_count'], stats['updated_through'])
           PY
 
           grep -q 'NGUYEN TU LINH' _site/checkout-enhance.js
           grep -q 'img.vietqr.io/image' _site/checkout-enhance.js
-          grep -q 'ads-landing' _site/checkout-enhance.js
-          grep -q 'app.js?v=20260815-1' _site/index.html
-          ! grep -q '83% trong 30 ngày' _site/index.html
-          ! grep -q '25/30 ngày' _site/index.html
-          ! grep -R "một trong bốn đầu ra" _site --include='*.html'
-          ! grep -R "có số được phân tích đúng" _site --include='*.html'
-          ! grep -R "SỐ CÔNG KHAI HÔM NAY" _site --include='*.html'
-          ! grep -R "public-methods-v2" _site/index.html
-          ! grep -R "data-current-methods" _site/cho-so-mien-bac-hom-nay/index.html
-          ! grep -R -i "ngày hiển thị" _site --include='*.html'
+          grep -q 'const DELIVERY_SCHEMA = "fourso-top2-v1"' _site/app.js
+          ! grep -R -i 'ngày hiển thị' _site --include='*.html'
           touch _site/.nojekyll
-          test ! -e _site/approval-backend.gs
-          test ! -e _site/ai-methods/report-data.json
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

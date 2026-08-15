@@ -25,8 +25,14 @@ def apply(root:Path)->dict[str,object]:
             t=t.replace('</head>',CSS+'</head>',1)
         p.write_text(t,encoding='utf-8')
         n+=1
+    import normalize_portal_schema as schema
     import enrich_portal_metadata as metadata
-    result:dict[str,object]={'pages':n,'sensitive_schema_removed':stripped,'metadata':metadata.apply(root)}
+    result:dict[str,object]={
+        'pages':n,
+        'sensitive_schema_removed':stripped,
+        'schema':schema.apply(root),
+        'metadata':metadata.apply(root),
+    }
     required=('statistics-data.json','source-access.json','report-readiness.json','sitemap.xml','llms.txt')
     if all((root/name).exists() for name in required):
         import finalize_portal_v4 as v4

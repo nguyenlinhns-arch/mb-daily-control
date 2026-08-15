@@ -14,8 +14,10 @@ NAV = [
     ('/tan-suat-xsmb/', 'Tần suất'),
     ('/lo-gan-xsmb/', 'Lô gan'),
     ('/cap-dao-xsmb/', 'Cặp đảo'),
+    ('/thong-ke-dau-duoi-xsmb/', 'Đầu/đuôi'),
     ('/tra-cuu-xsmb/', 'Tra cứu'),
-    ('/thong-ke-lo-to-mien-bac-bang-ai/', 'Phương pháp'),
+    ('/phuong-phap-cong-khai/', 'Phương pháp'),
+    ('/thong-ke-lo-to-mien-bac-bang-ai/', 'AI'),
 ]
 
 FOOT = [
@@ -23,7 +25,9 @@ FOOT = [
     ('/tan-suat-xsmb/', 'Tần suất 00–99'),
     ('/lo-gan-xsmb/', 'Lô gan XSMB'),
     ('/cap-dao-xsmb/', '45 cặp đảo'),
+    ('/thong-ke-dau-duoi-xsmb/', 'Đầu/đuôi 0–9'),
     ('/tra-cuu-xsmb/', 'Tra cứu bộ số'),
+    ('/phuong-phap-cong-khai/', 'Phương pháp công khai'),
     ('/cho-so-mien-bac-hom-nay/', 'Phương pháp hôm nay'),
     ('/phuong-phap-4so/', 'Giới thiệu 4SO'),
     ('/lich-su-doi-chieu/', 'Lịch sử đối chiếu'),
@@ -150,6 +154,7 @@ def self_test() -> None:
         sample = (root / 'thong-ke-xsmb/index.html').read_text(encoding='utf-8')
         assert 'portal-subpage' in sample and 'portal-subpages.css' in sample
         assert 'portal-site-header' in sample and 'portal-site-footer' in sample
+        assert '/thong-ke-dau-duoi-xsmb/' in sample and '/phuong-phap-cong-khai/' in sample
         assert 'is-active' in sample
     print('PORTAL_SUBPAGES_SELF_TEST_OK')
 

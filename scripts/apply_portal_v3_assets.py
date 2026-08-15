@@ -4,7 +4,7 @@ import argparse, json, re
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 CSS='<link rel="stylesheet" href="/portal-v3.css?v=20260815-1">'
-SENSITIVE={'phuong-phap-4so/index.html','lich-su-doi-chieu/index.html'}
+SENSITIVE={'phuong-phap-4so/index.html','lich-su-doi-chieu/index.html','phuong-phap-cong-khai/index.html'}
 SCHEMA_RE=re.compile(r'<script type="application/ld\+json">(?:(?!</script>).)*"@id":"https://lemienbac\.com/#portal-v3"(?:(?!</script>).)*</script>',re.S)
 
 def apply(root:Path)->dict[str,int]:
@@ -25,9 +25,9 @@ def apply(root:Path)->dict[str,int]:
 def self_test()->None:
     import tempfile
     with tempfile.TemporaryDirectory() as td:
-        r=Path(td); (r/'phuong-phap-4so').mkdir();
-        (r/'phuong-phap-4so/index.html').write_text('<html><head><script type="application/ld+json">{"@id":"https://lemienbac.com/#portal-v3","name":"4SO","dateModified":"2026-08-15"}</script></head><body></body></html>',encoding='utf-8')
-        result=apply(r); text=(r/'phuong-phap-4so/index.html').read_text(encoding='utf-8')
+        r=Path(td); (r/'phuong-phap-cong-khai').mkdir();
+        (r/'phuong-phap-cong-khai/index.html').write_text('<html><head><script type="application/ld+json">{"@id":"https://lemienbac.com/#portal-v3","name":"Không công khai 4SO","dateModified":"2026-08-15"}</script></head><body></body></html>',encoding='utf-8')
+        result=apply(r); text=(r/'phuong-phap-cong-khai/index.html').read_text(encoding='utf-8')
         assert result['pages']==1 and result['sensitive_schema_removed']==1 and 'portal-v3.css' in text and '#portal-v3' not in text
     print('PORTAL_V3_ASSETS_SELF_TEST_OK')
 

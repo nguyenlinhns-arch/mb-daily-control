@@ -41,9 +41,9 @@
       .lm-finance-top-inner{width:min(calc(100% - 28px),1180px);margin:auto}
       .lm-finance-top-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:12px 15px;border-radius:14px;background:linear-gradient(135deg,#123f32,#0b2f28);color:#fff;text-decoration:none!important;box-shadow:0 5px 16px rgba(15,50,40,.16)}
       .lm-finance-top-label{display:block;margin-bottom:3px;color:#c7ded5;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-      .lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.25;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:13px;font-weight:900}.lm-finance-top-detail{display:block;margin-top:3px;color:#d7e7e1;font-size:10px;line-height:1.45}
+      .lm-finance-top-copy strong{display:block;font-size:16px;line-height:1.25;color:#fff}.lm-finance-top-rate{display:block;margin-top:4px;color:#fff;font-size:13px;font-weight:900}
       .lm-finance-top-cta{min-height:42px;padding:0 14px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff;color:#143f32!important;font-size:12px;font-weight:900;white-space:nowrap}
-      @media(max-width:700px){.lm-finance-top{padding:5px 0}.lm-finance-top-inner{width:calc(100% - 20px)}.lm-finance-top-card{grid-template-columns:1fr;padding:10px 11px;gap:7px}.lm-finance-top-copy strong{font-size:15px}.lm-finance-top-rate{font-size:12.5px}.lm-finance-top-detail{font-size:9.5px}.lm-finance-top-cta{min-height:42px;width:100%}}
+      @media(max-width:700px){.lm-finance-top{padding:5px 0}.lm-finance-top-inner{width:calc(100% - 20px)}.lm-finance-top-card{grid-template-columns:1fr;padding:10px 11px;gap:7px}.lm-finance-top-copy strong{font-size:15px}.lm-finance-top-rate{font-size:12.5px}.lm-finance-top-cta{min-height:42px;width:100%}}
     `;
     document.head.appendChild(style);
 
@@ -58,9 +58,8 @@
             <span class="lm-finance-top-label">Liên kết tài trợ · ACCESSTRADE</span>
             <strong>Vay online VPBank</strong>
             <span class="lm-finance-top-rate">Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân</span>
-            <span class="lm-finance-top-detail">Phê duyệt và hồ sơ bổ sung thực hiện theo quy định của VPBank.</span>
           </div>
-          <span class="lm-finance-top-cta">Đăng ký vay online →</span>
+          <span class="lm-finance-top-cta">Vay tiền nhanh online →</span>
         </a>
       </div>`;
 

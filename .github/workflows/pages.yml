@@ -138,7 +138,7 @@ jobs:
           python scripts/build_statistics_site.py --output-root _site
           python scripts/apply_home_portal_safe.py --output-root _site
           python scripts/apply_portal_subpages.py --output-root _site
-          python scripts/optimize_portal_v2.py --output-root _site
+          python scripts/optimize_portal_v2_run.py --output-root _site
 
       - name: Validate public portal privacy UX and SEO gates
         env:

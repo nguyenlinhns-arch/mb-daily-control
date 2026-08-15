@@ -59,11 +59,12 @@ jobs:
           grep -q 'affiliate_click' site-v2/ads-tracking.js
           grep -q 'ad_slot_view' site-v2/ads-tracking.js
           grep -q 'ad_slot_load' site-v2/ads-tracking.js
-          grep -q 'after_core_monetization' site-v2/finance-banner.js
+          grep -q 'home_upper_after_header' site-v2/finance-banner.js
           grep -q 'affiliate_finance_view' site-v2/finance-banner.js
-          grep -q '59%/năm' site-v2/finance-banner.js
-          grep -q 'Xem điều kiện tại VPBank' site-v2/finance-banner.js
-          ! grep -q 'placement: "home_top"' site-v2/finance-banner.js
+          grep -q 'Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân' site-v2/finance-banner.js
+          grep -q 'Đăng ký vay online' site-v2/finance-banner.js
+          grep -q 'portal-topline' site-v2/finance-banner.js
+          ! grep -q '59%/năm' site-v2/finance-banner.js
           grep -q 'portal-number-compare' site-v2/portal-v3.css
           grep -q 'portal-history-codes' site-v2/portal-v3.css
           ! grep -q 'portal-consent' site-v2/portal-v3.css

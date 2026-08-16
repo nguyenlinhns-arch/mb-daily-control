@@ -50,6 +50,10 @@ assert.match(commerce, /ai_checkout_intent/);
 assert.match(commerce, /ai_checkout_open/);
 assert.match(commerce, /ai_payment_qr_view/);
 assert.match(commerce, /ai_payment_claim_submit/);
+assert.match(commerce, /Gợi ý số cho ngày hôm nay/);
+assert.match(commerce, /chỉ với 30\.000đ/);
+assert.doesNotMatch(commerce, /Khi cần phần kết luận riêng cho ngày/);
+assert.doesNotMatch(commerce, /mở bản phân tích AI một lần 30\.000đ/);
 
 const checkout = read('site-v2/checkout-enhance.js');
 assert.match(checkout, /affiliate_product_click/);

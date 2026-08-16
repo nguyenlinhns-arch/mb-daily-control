@@ -87,6 +87,8 @@ def apply(root:Path)->dict[str,object]:
         if 'portal-v3.css' not in t:t=t.replace('</head>',CSS+'</head>',1)
         if 'mobile-v1.css' not in t:t=t.replace('</head>',MOBILE_CSS_LINK+'</head>',1)
         p.write_text(t,encoding='utf-8'); n+=1
+    import inject_yesterday_public_methods as yesterday_public
+    yesterday_result=yesterday_public.apply(root)
     monetization_result=inject_home_monetization(root)
     import enrich_portal_metadata as metadata
     import normalize_portal_schema as schema
@@ -94,7 +96,7 @@ def apply(root:Path)->dict[str,object]:
     import share_statistics_loader as shared_stats
     import fingerprint_portal_assets as fingerprint
     metadata_result=metadata.apply(root); schema_result=schema.apply(root); bundle_result=bundle.apply(root); shared_stats_result=shared_stats.apply(root); fingerprint_result=fingerprint.apply(root)
-    result:dict[str,object]={'pages':n,'sensitive_schema_removed':stripped,'mobile_css':{'status':'PASS','bytes':(root/'mobile-v1.css').stat().st_size},'monetization':monetization_result,'metadata':metadata_result,'schema':schema_result,'css_bundle':bundle_result,'shared_statistics_loader':shared_stats_result,'asset_fingerprint':fingerprint_result}
+    result:dict[str,object]={'pages':n,'sensitive_schema_removed':stripped,'mobile_css':{'status':'PASS','bytes':(root/'mobile-v1.css').stat().st_size},'yesterday_public_methods':yesterday_result,'monetization':monetization_result,'metadata':metadata_result,'schema':schema_result,'css_bundle':bundle_result,'shared_statistics_loader':shared_stats_result,'asset_fingerprint':fingerprint_result}
     required=('statistics-data.json','source-access.json','report-readiness.json','sitemap.xml','llms.txt')
     if all((root/name).exists() for name in required):
         import finalize_portal_v4 as v4

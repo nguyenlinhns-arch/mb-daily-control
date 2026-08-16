@@ -3,16 +3,8 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const read = path => readFileSync(path, 'utf8');
 
-assert.equal(
-  existsSync('site-v2/finance-gate.js'),
-  true,
-  'Secondary finance affiliate source must exist'
-);
-assert.equal(
-  existsSync('site-v2/affiliate-visibility.js'),
-  true,
-  'Visible AI-safe affiliate strip source must exist'
-);
+assert.equal(existsSync('site-v2/finance-gate.js'), true, 'Finance affiliate source must exist');
+assert.equal(existsSync('site-v2/affiliate-visibility.js'), true, 'Visible ACCESSTRADE strip source must exist');
 
 const conversion = read('scripts/apply_conversion_v2.py');
 assert.match(conversion, /finance-gate\.js/);
@@ -23,18 +15,17 @@ assert.match(conversion, /AFFILIATE_VISIBILITY_SCRIPT_TAG/);
 assert.match(conversion, /affiliate-visibility\.js\?v=20260816-2/);
 
 const primaryAffiliate = read('site-v2/affiliate-visibility.js');
-assert.match(primaryAffiliate, /after_tools_visible/);
+assert.match(primaryAffiliate, /after_results_visible/);
 assert.match(primaryAffiliate, /affiliate_shopee_strip_view/);
 assert.match(primaryAffiliate, /affiliate_shopee_strip_click/);
-assert.match(primaryAffiliate, /lemienbac_purchase_/);
-assert.match(primaryAffiliate, /lm_ai_purchase_intent_v1/);
 assert.match(primaryAffiliate, /lm_affiliate_intent_v1/);
 assert.match(primaryAffiliate, /primaryAffiliateStrip|data-primary-affiliate-strip/);
-assert.match(primaryAffiliate, /data-open-checkout/);
-assert.match(primaryAffiliate, /data-ai-sticky-cta/);
+assert.match(primaryAffiliate, /portal-result-card|27 mã kỳ gần nhất/);
+assert.match(primaryAffiliate, /checkoutIsOpen/);
 assert.match(primaryAffiliate, /Gợi ý số ngày hôm nay/);
 assert.match(primaryAffiliate, /dailyRecommendationHeading/);
 assert.match(primaryAffiliate, /reportDateLabel/);
+assert.doesNotMatch(primaryAffiliate, /lemienbac_purchase_/);
 assert.doesNotMatch(primaryAffiliate, /position\s*:\s*fixed/i);
 assert.doesNotMatch(primaryAffiliate, /effectivecpmnetwork|highperformanceformat|adsterra/i);
 
@@ -64,13 +55,19 @@ assert.match(checkout, /Máy hút bụi cầm tay Deerma DX118C 600W/);
 assert.match(checkout, /lm-product-deals/);
 
 const finance = read('site-v2/finance-gate.js');
-assert.match(finance, /deep_engagement_secondary_offer/);
+assert.match(finance, /early_finance_banner/);
 assert.match(finance, /affiliate_finance_view/);
 assert.match(finance, /affiliate_finance_click/);
-assert.match(finance, /MIN_DELAY_MS = 60000/);
-assert.match(finance, /MIN_SCROLL_RATIO = 0\.72/);
-assert.match(finance, /COOLDOWN_MS = 7 \* 24 \* 60 \* 60 \* 1000/);
-assert.match(finance, /isPaidAcquisitionVisit/);
+assert.match(finance, /MIN_DELAY_MS = 8000/);
+assert.match(finance, /MIN_SCROLL_RATIO = 0\.18/);
+assert.match(finance, /COOLDOWN_MS = 24 \* 60 \* 60 \* 1000/);
+assert.match(finance, /early_8s/);
+assert.match(finance, /early_scroll_18/);
+assert.match(finance, /lm-finance-secondary-x/);
+assert.match(finance, /Đóng quảng cáo/);
+assert.match(finance, /Vay tiền online/);
+assert.match(finance, /Tài trợ · ACCESSTRADE · VPBank/);
+assert.match(finance, /XEM NGAY/);
 assert.match(finance, /hasAiIntent/);
 assert.match(finance, /AI_INTENT_KEY/);
 assert.match(finance, /AFFILIATE_INTENT_KEY/);
@@ -78,7 +75,8 @@ assert.match(finance, /LAST_SHOWN_KEY/);
 assert.match(finance, /data-open-checkout/);
 assert.match(finance, /data-ai-sticky-cta/);
 assert.match(finance, /role", "complementary/);
-assert.doesNotMatch(finance, /body\.lm-finance-gate-open|position:fixed;inset:0|EARLY_DELAY_MS = 12000|EARLY_SCROLL_PX = 120/);
+assert.doesNotMatch(finance, /lm-finance-secondary-close/);
+assert.doesNotMatch(finance, /body\.lm-finance-gate-open|position:fixed;inset:0|MIN_DELAY_MS = 60000|MIN_SCROLL_RATIO = 0\.72/);
 
 const homeBuilder = read('scripts/apply_home_portal_safe.py');
 assert.match(homeBuilder, /data-ai-commerce-trust/);

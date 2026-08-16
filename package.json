@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --check site-v2/app.js && node -e \"new Function(require('fs').readFileSync('site-v2/approval-backend.gs','utf8'))\" && node tests/ai-data-site-smoke.mjs"
+    "test": "node --check site-v2/app.js && node -e \"new Function(require('fs').readFileSync('site-v2/approval-backend.gs','utf8'))\" && node tests/ai-data-site-smoke.mjs && node tests/commerce-policy-smoke.mjs"
   }
 }

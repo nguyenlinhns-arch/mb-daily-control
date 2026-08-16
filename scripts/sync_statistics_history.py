@@ -159,7 +159,10 @@ def compare_sources(one: list[tuple[date, list[str]]], two: list[tuple[date, lis
 
 
 def encode_pack(history: list[tuple[date, list[str]]]) -> str:
-    payload = [[day.isoformat(), *codes] for day, codes in history]
+    # Canonical container is an object with a rows array. Keep decode_pack
+    # backwards-compatible with legacy raw lists, but never write a raw list
+    # again so every downstream consumer sees the same stable schema.
+    payload = {"rows": [[day.isoformat(), *codes] for day, codes in history]}
     raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     return base64.b64encode(bz2.compress(raw, compresslevel=9)).decode("ascii") + "\n"
 
@@ -228,6 +231,12 @@ def self_test() -> None:
     assert code2(0) == "00" and code2("004") == "04"
     assert parse_day("2026-08-15") == date(2026, 8, 15)
     assert source_ref({"name":"lucdz/xsmb","url":"https://github.com/lucdz/xsmb/commit/686eda641c99018cbeb5c16a038e60af6a54ef7a"}) == ("lucdz","xsmb","686eda641c99018cbeb5c16a038e60af6a54ef7a")
+    with __import__("tempfile").TemporaryDirectory() as tmp:
+        pack = Path(tmp) / "history.b64"
+        sample = [(date(2025, 1, 1), [f"{i:02d}" for i in range(27)])]
+        pack.write_text(encode_pack(sample), encoding="utf-8")
+        decoded = json.loads(bz2.decompress(base64.b64decode(pack.read_text().strip())).decode())
+        assert isinstance(decoded, dict) and isinstance(decoded.get("rows"), list)
     print("STATISTICS_HISTORY_SYNC_SELF_TEST_OK")
 
 

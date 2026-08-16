@@ -215,7 +215,6 @@ jobs:
           grep -q '•• — ••' _site/index.html
           grep -q 'Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay' _site/index.html
 
-          # ACCESSTRADE canonical layout: no top Shopee banner; four products live lower on every public page.
           python - <<'PY'
           from pathlib import Path
           site = Path('_site')
@@ -229,7 +228,7 @@ jobs:
               assert 'data-sitewide-affiliate="true"' not in text, page
               assert 'data-primary-affiliate-strip="sitewide-v4"' not in text, page
           home = (site/'index.html').read_text(encoding='utf-8')
-          assert home.count('data-sitewide-products="true"') == 1
+          assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
           print('LOWER_FOUR_PRODUCT_ACCESSTRADE_OK', len(pages))
           PY
 

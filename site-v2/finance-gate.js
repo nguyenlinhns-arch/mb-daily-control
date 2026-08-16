@@ -167,7 +167,7 @@
       <div class="lm-finance-secondary-head">
         <span class="lm-finance-secondary-badge">Tài trợ · VPBank</span>
         <h2>Vay tiền mặt online</h2>
-        <p>Đăng ký online, xét duyệt theo hồ sơ. Chỉ hiển thị sau khi bạn đã xem sâu nội dung.</p>
+        <p>Đăng ký online, xét duyệt theo hồ sơ.</p>
       </div>
       <div class="lm-finance-secondary-body">
         <div class="lm-finance-secondary-rate"><strong>1,2%</strong><span>lãi suất từ / tháng</span></div>

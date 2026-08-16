@@ -34,6 +34,7 @@ jobs:
           set -euo pipefail
           test ! -e .github/workflows/accesstrade-only-monetization.yml
           test ! -e scripts/enforce_accesstrade_only.py
+          test ! -e site-v2/finance-gate.js
           python scripts/public_repo_boundary_guard.py --self-test
           python scripts/public_repo_boundary_guard.py
           python scripts/apply_home_portal_safe.py --self-test
@@ -52,7 +53,6 @@ jobs:
           node --check site-v2/portal-v2.js
           node --check site-v2/ads-tracking.js
           node --check site-v2/finance-banner.js
-          node --check site-v2/finance-gate.js
           node --check site-v2/checkout-entry.js
 
       - name: Statistics and SEO runtime contract
@@ -72,46 +72,25 @@ jobs:
           ! grep -Fq 'portal-consent' site-v2/portal-v3.css
           ! grep -Fq 'statistics-data.json' site-v2/checkout-entry.js
 
-      - name: Monetization source contract
+      - name: Affiliate merchandising contract
         run: |
           set -euo pipefail
-          grep -Fq 'FORBIDDEN_AD_DOMAINS' scripts/optimize_monetization_placement.py
-          grep -Fq 'FORBIDDEN_AD_IDS' scripts/optimize_monetization_placement.py
-          grep -Fq 'effectivecpmnetwork.com' scripts/optimize_monetization_placement.py
-          grep -Fq 'highperformanceformat.com' scripts/optimize_monetization_placement.py
-          grep -Fq 'data-seo-discovery-links' scripts/optimize_monetization_placement.py
-          grep -Fq 'affiliate_evergreen' scripts/optimize_monetization_placement.py
-          grep -Fq 'accesstrade_after_statistics_runtime_gate' scripts/optimize_monetization_placement.py
-          grep -Fq "'vpbank_static_top': False" scripts/optimize_monetization_placement.py
-          grep -Fq 'IntersectionObserver' site-v2/ads-tracking.js
-          grep -Fq 'affiliate_click' site-v2/ads-tracking.js
-          grep -Fq 'ad_slot_view' site-v2/ads-tracking.js
-          grep -Fq 'ad_slot_load' site-v2/ads-tracking.js
+          grep -Fq 'affiliate_product_click' site-v2/checkout-enhance.js
+          grep -Fq 'Tông đơ Philips MG3911/15 7in1' site-v2/checkout-enhance.js
+          grep -Fq 'Sạc dự phòng Anker Zolo 20.000mAh 22.5W' site-v2/checkout-enhance.js
+          grep -Fq 'Máy vặn vít pin Bosch GO 3' site-v2/checkout-enhance.js
+          grep -Fq 'Máy hút bụi cầm tay Deerma DX118C 600W' site-v2/checkout-enhance.js
+          grep -Fq 'lm-product-deals' site-v2/checkout-enhance.js
+          grep -Fq '.lm-shopee-nudge{display:none!important}' site-v2/finance-banner.js
+          grep -Fq 'document.querySelector(".lm-product-deals")' site-v2/finance-banner.js
 
       - name: AI-first commerce runtime contract
         run: |
           set -euo pipefail
           grep -Fq 'affiliate-shopee-smartlink' site-v2/finance-banner.js
-          grep -Fq 'affiliate_shopee_view' site-v2/finance-banner.js
-          grep -Fq 'affiliate_shopee_click' site-v2/finance-banner.js
           grep -Fq 'ai_checkout_intent' site-v2/finance-banner.js
           grep -Fq 'MỞ BẢN PHÂN TÍCH AI' site-v2/finance-banner.js
           grep -Fq '30.000đ' site-v2/finance-banner.js
           ! grep -Eiq 'lm-finance-gate|VAY TIỀN NHANH|vay online|lãi suất từ 1,2%|position:fixed;inset:0' site-v2/finance-banner.js
-          echo AI_FIRST_COMMERCE_GUARD_OK
-
-      - name: Mobile finance affiliate gate contract
-        run: |
-          set -euo pipefail
-          grep -Fq 'after_latest_results_gate' site-v2/finance-gate.js
-          grep -Fq 'affiliate_finance_gate_view' site-v2/finance-gate.js
-          grep -Fq 'affiliate_finance_click' site-v2/finance-gate.js
-          grep -Fq 'Vay tiền mặt online nhanh' site-v2/finance-gate.js
-          grep -Fq 'Lãi suất từ' site-v2/finance-gate.js
-          grep -Fq 'VAY TIỀN NHANH ONLINE' site-v2/finance-gate.js
-          grep -Fq 'Đóng để xem tiếp' site-v2/finance-gate.js
-          grep -Fq 'align-items:flex-end' site-v2/finance-gate.js
-          grep -Fq 'max-height:88svh' site-v2/finance-gate.js
-          grep -Fq 'EARLY_DELAY_MS = 12000' site-v2/finance-gate.js
-          grep -Fq 'EARLY_SCROLL_PX = 120' site-v2/finance-gate.js
-          echo MOBILE_FINANCE_GATE_GUARD_OK
+          ! grep -Eiq 'FINANCE_GATE_SCRIPT_TAG|finance_gate_source' scripts/apply_conversion_v2.py
+          echo AI_FIRST_AFFILIATE_COMMERCE_GUARD_OK

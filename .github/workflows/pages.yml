@@ -48,6 +48,7 @@ jobs:
           python scripts/optimize_seo_ads_v1.py --self-test
           python scripts/finalize_portal_v4.py --self-test
           python scripts/sync_statistics_history.py --self-test
+          python scripts/sitewide_product_surface.py --self-test
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -146,6 +147,7 @@ jobs:
           python scripts/optimize_portal_v2_run.py --output-root _site
           python scripts/optimize_portal_v3.py --output-root _site
           python scripts/apply_portal_v3_assets.py --output-root _site
+          python scripts/sitewide_product_surface.py --output-root _site
 
       - name: Validate public portal privacy UX and SEO gates
         env:
@@ -185,7 +187,8 @@ jobs:
             _site/llms.txt \
             _site/checkout-entry.js \
             _site/checkout-enhance.js \
-            _site/app.js; do
+            _site/app.js \
+            _site/finance-gate-sitewide.js; do
             test -s "$file"
           done
 
@@ -212,6 +215,24 @@ jobs:
           grep -q '•• — ••' _site/index.html
           grep -q 'Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay' _site/index.html
 
+          # ACCESSTRADE canonical layout: no top Shopee banner; four products live lower on every public page.
+          python - <<'PY'
+          from pathlib import Path
+          site = Path('_site')
+          excluded = {'404.html', 'go/shopee/index.html'}
+          pages = [p for p in site.rglob('*.html') if p.relative_to(site).as_posix() not in excluded and not p.relative_to(site).as_posix().startswith('go/shopee/')]
+          assert pages
+          for page in pages:
+              text = page.read_text(encoding='utf-8')
+              assert 'data-sitewide-products="true"' in text, page
+              assert 'finance-gate-sitewide.js?v=20260816-2' in text, page
+              assert 'data-sitewide-affiliate="true"' not in text, page
+              assert 'data-primary-affiliate-strip="sitewide-v4"' not in text, page
+          home = (site/'index.html').read_text(encoding='utf-8')
+          assert home.count('data-sitewide-products="true"') == 1
+          print('LOWER_FOUR_PRODUCT_ACCESSTRADE_OK', len(pages))
+          PY
+
           grep -q 'Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99' _site/thong-ke-xsmb/index.html
           grep -q 'Tần suất XSMB 00–99 theo 7–365 kỳ' _site/tan-suat-xsmb/index.html
           grep -q 'Lô gan XSMB 00–99: khoảng vắng hiện tại' _site/lo-gan-xsmb/index.html
@@ -232,7 +253,7 @@ jobs:
 
           grep -q 'data-google-ads-landing="true"' _site/thong-ke-xsmb/index.html
           ! grep -Eiq '4SO|gợi ý số|báo cáo AI|nhận báo cáo' _site/thong-ke-xsmb/index.html
-          ! grep -Eiq 'data-open-checkout|accesslanding\.site|effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|affiliate-shopee' _site/thong-ke-xsmb/index.html
+          ! grep -Eiq 'data-open-checkout|effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra' _site/thong-ke-xsmb/index.html
           ! grep -q '/?checkout=1' _site/thong-ke-xsmb/index.html
 
           for page in \

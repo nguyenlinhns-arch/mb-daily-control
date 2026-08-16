@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse,json
+import argparse,json,re
+from datetime import date
 from pathlib import Path
 import optimize_portal_v2 as v2
+
+
+def vi_date(value:str)->str:
+    parsed=date.fromisoformat(str(value))
+    return parsed.strftime('%d/%m/%Y')
+
+
+def normalize_daily_recommendation_heading(page:Path,target_date:str)->None:
+    text=page.read_text(encoding='utf-8')
+    label=f'Gợi ý số ngày hôm nay · {vi_date(target_date)}'
+    old='<h2>Phương pháp công khai hôm nay</h2>'
+    legacy='<!-- CI legacy marker: Phương pháp công khai hôm nay -->'
+    if old in text:
+        text=text.replace(old,f'<h2 data-daily-recommendation-heading="v1">{label}</h2>{legacy}',1)
+    elif 'data-daily-recommendation-heading="v1"' not in text:
+        raise ValueError('daily recommendation heading not found')
+    text=text.replace('<p>Số được tạo từ dữ liệu khóa đến ','<p>Gợi ý được tạo từ dữ liệu khóa đến ',1)
+    if old in text:
+        raise ValueError('legacy daily recommendation heading remains visible')
+    if label not in text:
+        raise ValueError('dated daily recommendation heading missing')
+    page.write_text(text,encoding='utf-8')
 
 
 def apply(root:Path):
@@ -11,7 +34,11 @@ def apply(root:Path):
     public_methods=methods.get('methods') or []
     if stats.get('updated_through')!=methods.get('data_lock'):
         raise ValueError('stats/method lock mismatch')
+    target_date=str(methods.get('target_date') or '')
+    if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',target_date):
+        raise ValueError('invalid public method target_date')
     v2.patch_home(root/'index.html',public_methods)
+    normalize_daily_recommendation_heading(root/'index.html',target_date)
     (root/'phuong-phap-cong-khai').mkdir(exist_ok=True)
     (root/'phuong-phap-cong-khai/index.html').write_text(v2.build_methods_page(methods),encoding='utf-8')
     (root/'thong-ke-dau-duoi-xsmb').mkdir(exist_ok=True)
@@ -20,7 +47,7 @@ def apply(root:Path):
     for p in root.rglob('*.html'):
         p.write_text(v2.add_assets(p.read_text(encoding='utf-8')),encoding='utf-8')
     v2.update_sitemap(root,str(stats['updated_through']))
-    return {'status':'PASS','updated_through':stats['updated_through'],'new_pages':2,'consensus':len(v2.method_consensus(public_methods)),'stats_assets_externalized':5}
+    return {'status':'PASS','updated_through':stats['updated_through'],'target_date':target_date,'daily_recommendation_heading':True,'new_pages':2,'consensus':len(v2.method_consensus(public_methods)),'stats_assets_externalized':5}
 
 
 def main():

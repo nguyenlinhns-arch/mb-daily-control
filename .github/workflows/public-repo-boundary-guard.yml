@@ -34,6 +34,7 @@ jobs:
           set -euo pipefail
           test ! -e .github/workflows/accesstrade-only-monetization.yml
           test ! -e scripts/enforce_accesstrade_only.py
+          test ! -e site-v2/finance-gate.js
           python scripts/public_repo_boundary_guard.py --self-test
           python scripts/public_repo_boundary_guard.py
           python scripts/apply_home_portal_safe.py --self-test
@@ -52,7 +53,6 @@ jobs:
           node --check site-v2/portal-v2.js
           node --check site-v2/ads-tracking.js
           node --check site-v2/finance-banner.js
-          node --check site-v2/finance-gate.js
           node --check site-v2/checkout-entry.js
 
       - name: Statistics and SEO runtime contract
@@ -99,19 +99,3 @@ jobs:
           grep -Fq '30.000đ' site-v2/finance-banner.js
           ! grep -Eiq 'lm-finance-gate|VAY TIỀN NHANH|vay online|lãi suất từ 1,2%|position:fixed;inset:0' site-v2/finance-banner.js
           echo AI_FIRST_COMMERCE_GUARD_OK
-
-      - name: Mobile finance affiliate gate contract
-        run: |
-          set -euo pipefail
-          grep -Fq 'after_latest_results_gate' site-v2/finance-gate.js
-          grep -Fq 'affiliate_finance_gate_view' site-v2/finance-gate.js
-          grep -Fq 'affiliate_finance_click' site-v2/finance-gate.js
-          grep -Fq 'Vay tiền mặt online nhanh' site-v2/finance-gate.js
-          grep -Fq 'Lãi suất từ' site-v2/finance-gate.js
-          grep -Fq 'VAY TIỀN NHANH ONLINE' site-v2/finance-gate.js
-          grep -Fq 'Đóng để xem tiếp' site-v2/finance-gate.js
-          grep -Fq 'align-items:flex-end' site-v2/finance-gate.js
-          grep -Fq 'max-height:88svh' site-v2/finance-gate.js
-          grep -Fq 'EARLY_DELAY_MS = 12000' site-v2/finance-gate.js
-          grep -Fq 'EARLY_SCROLL_PX = 120' site-v2/finance-gate.js
-          echo MOBILE_FINANCE_GATE_GUARD_OK

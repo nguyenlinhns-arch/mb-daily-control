@@ -148,6 +148,7 @@ jobs:
           python scripts/optimize_portal_v3.py --output-root _site
           python scripts/apply_portal_v3_assets.py --output-root _site
           python scripts/sitewide_product_surface.py --output-root _site
+          find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's#finance-gate-sitewide.js?v=20260816-2#finance-gate-sitewide.js?v=20260816-3#g'
 
       - name: Validate public portal privacy UX and SEO gates
         env:
@@ -224,13 +225,20 @@ jobs:
           for page in pages:
               text = page.read_text(encoding='utf-8')
               assert 'data-sitewide-products="true"' in text, page
-              assert 'finance-gate-sitewide.js?v=20260816-2' in text, page
+              assert 'finance-gate-sitewide.js?v=20260816-3' in text, page
               assert 'data-sitewide-affiliate="true"' not in text, page
               assert 'data-primary-affiliate-strip="sitewide-v4"' not in text, page
           home = (site/'index.html').read_text(encoding='utf-8')
           assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
           print('LOWER_FOUR_PRODUCT_ACCESSTRADE_OK', len(pages))
           PY
+
+          grep -q 'MIN_DELAY_MS = 3000' _site/finance-gate-sitewide.js
+          grep -q 'MIN_SCROLL_RATIO = 0.08' _site/finance-gate-sitewide.js
+          grep -q 'lm_vpbank_banner_closed_v3' _site/finance-gate-sitewide.js
+          grep -q 'Vay tiền online' _site/finance-gate-sitewide.js
+          grep -q 'Đóng quảng cáo' _site/finance-gate-sitewide.js
+          ! grep -q 'COOLDOWN_MS' _site/finance-gate-sitewide.js
 
           grep -q 'Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99' _site/thong-ke-xsmb/index.html
           grep -q 'Tần suất XSMB 00–99 theo 7–365 kỳ' _site/tan-suat-xsmb/index.html

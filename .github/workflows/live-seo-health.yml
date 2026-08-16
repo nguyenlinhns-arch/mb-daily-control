@@ -1,6 +1,10 @@
 name: Live SEO and indexability health
 
 on:
+  push:
+    branches: ["main"]
+    paths:
+      - '.github/workflows/live-seo-health.yml'
   schedule:
     # 00:30 UTC = 07:30 Asia/Ho_Chi_Minh
     - cron: "30 0 * * *"

@@ -50,8 +50,7 @@ def prepare(root:Path)->dict[str,object]:
     import optimize_monetization_placement as monetization
     placement=monetization.apply(root)
 
-    # Last HTML mutation before artifact readiness. Synthetic self-test roots
-    # intentionally omit the commerce block and therefore skip this stage.
+    # Last homepage revenue mutation before sitewide affiliate injection.
     surface={'status':'SKIP','reason':'missing_real_home_commerce_surface'}
     home=root/'index.html'
     if home.is_file() and (root/'report-readiness.json').is_file():
@@ -60,11 +59,26 @@ def prepare(root:Path)->dict[str,object]:
             import final_revenue_surface as revenue_surface
             surface=revenue_surface.apply(root)
 
+    # Canonical ACCESSTRADE layer: every public HTML page receives a static
+    # Shopee strip and the early VPBank floating runtime. Synthetic self-test
+    # roots without HTML skip cleanly.
+    sitewide={'status':'SKIP','reason':'no_public_html'}
+    if any(root.rglob('*.html')):
+        import sitewide_affiliate_surface
+        sitewide=sitewide_affiliate_surface.apply(root)
+
     urls=sitemap_urls(root/'sitemap.xml')
     key_file=root/f'{KEY}.txt';key_file.write_text(KEY,encoding='utf-8')
     payload=payload_for(urls)
     (root/'indexnow-payload.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    return {'status':'READY','urls':len(urls),'key_file':key_file.name,'monetization_placement':placement,'final_revenue_surface':surface}
+    return {
+        'status':'READY',
+        'urls':len(urls),
+        'key_file':key_file.name,
+        'monetization_placement':placement,
+        'final_revenue_surface':surface,
+        'sitewide_affiliate_surface':sitewide,
+    }
 
 
 def fetch_live(url:str)->bytes:
@@ -120,6 +134,7 @@ def self_test()->None:
         assert sitemap_urls_bytes((root/'sitemap.xml').read_bytes())==payload['urlList']
         assert result['monetization_placement']['status']=='SKIP'
         assert result['final_revenue_surface']['status']=='SKIP'
+        assert result['sitewide_affiliate_surface']['status']=='SKIP'
     print('INDEXNOW_SELF_TEST_OK')
 
 

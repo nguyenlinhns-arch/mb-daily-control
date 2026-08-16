@@ -50,14 +50,15 @@ def prepare(root:Path)->dict[str,object]:
     import optimize_monetization_placement as monetization
     placement=monetization.apply(root)
 
-    # This is the last HTML mutation before the artifact is declared ready.
-    # It makes the lower purchase block match the hero "GỢI Ý SỐ HÔM NAY"
-    # card and materializes ACCESSTRADE placements in static HTML so visitors
-    # do not depend on retention/runtime timing to see monetization.
-    surface={'status':'SKIP','reason':'missing_home_or_readiness'}
-    if (root/'index.html').is_file() and (root/'report-readiness.json').is_file():
-        import final_revenue_surface as revenue_surface
-        surface=revenue_surface.apply(root)
+    # Last HTML mutation before artifact readiness. Synthetic self-test roots
+    # intentionally omit the commerce block and therefore skip this stage.
+    surface={'status':'SKIP','reason':'missing_real_home_commerce_surface'}
+    home=root/'index.html'
+    if home.is_file() and (root/'report-readiness.json').is_file():
+        home_text=home.read_text(encoding='utf-8')
+        if 'buy-simple portal-buy' in home_text:
+            import final_revenue_surface as revenue_surface
+            surface=revenue_surface.apply(root)
 
     urls=sitemap_urls(root/'sitemap.xml')
     key_file=root/f'{KEY}.txt';key_file.write_text(KEY,encoding='utf-8')

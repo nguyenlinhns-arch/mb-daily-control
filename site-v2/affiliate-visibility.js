@@ -6,9 +6,7 @@
     merchant: "Shopee",
     url: "https://nguyenlinhtkv_aul4jx.accesslanding.site"
   };
-  const AI_INTENT_KEY = "lm_ai_purchase_intent_v1";
   const AFFILIATE_INTENT_KEY = "lm_affiliate_intent_v1";
-  const PURCHASE_PREFIX = "lemienbac_purchase_";
   let viewed = false;
   let observer = null;
 
@@ -19,13 +17,9 @@
       page_path: window.location.pathname,
       affiliate_network: "ACCESSTRADE",
       merchant: SHOPEE.merchant,
-      placement: "after_tools_visible",
+      placement: "after_results_visible",
       ...extra
     });
-  }
-
-  function sessionGet(key) {
-    try { return sessionStorage.getItem(key); } catch (_) { return null; }
   }
 
   function sessionSet(key, value) {
@@ -36,44 +30,33 @@
     const bodyDate = String(document.body?.dataset?.reportDate || "").trim();
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(bodyDate)) return bodyDate;
     const text = document.body?.textContent || "";
-    const match = text.match(/BẢN\s+PHÂN\s+TÍCH\s+AI\s+NGÀY\s+(\d{2}\/\d{2}\/\d{4})/i)
-      || text.match(/Target\s+(\d{2}\/\d{2}\/\d{4})/i);
+    const match = text.match(/Gợi ý\s+số\s+cho\s+ngày\s+hôm\s+nay\s+(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/Target\s+(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/LÊ\s+MIỀN\s+BẮC\s+NGÀY\s+(\d{2}\/\d{2}\/\d{4})/i);
     return match ? match[1] : "";
   }
 
   function normalizeDailyRecommendationHeading() {
-    if (window.location.pathname !== "/") return;
+    if (location.pathname !== "/") return;
     const date = reportDateLabel();
     const heading = [...document.querySelectorAll(".portal-section-title h2")]
-      .find((node) => /^(Phương pháp công khai hôm nay|Gợi ý số ngày hôm nay)/i.test((node.textContent || "").trim()));
+      .find(node => /^(Phương pháp công khai hôm nay|Gợi ý số ngày hôm nay)/i.test((node.textContent || "").trim()));
     if (!heading) return;
     heading.textContent = date ? `Gợi ý số ngày hôm nay · ${date}` : "Gợi ý số ngày hôm nay";
-    heading.dataset.dailyRecommendationHeading = "v1";
+    heading.dataset.dailyRecommendationHeading = "v2";
     const subtitle = heading.parentElement?.querySelector("p");
-    if (subtitle) {
-      subtitle.textContent = subtitle.textContent.replace(/^Số được tạo/i, "Gợi ý được tạo");
-    }
+    if (subtitle) subtitle.textContent = (subtitle.textContent || "").replace(/^Số được tạo/i, "Gợi ý được tạo");
   }
 
   function normalizeHeroRecommendationCopy() {
-    if (window.location.pathname !== "/") return;
+    if (location.pathname !== "/") return;
     const lead = document.querySelector(".portal-hero .portal-lead");
     if (!lead) return;
     const date = reportDateLabel();
     lead.innerHTML = date
-      ? `Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`
-      : "Gợi ý số cho ngày hôm nay chỉ với 30.000đ.";
-    lead.dataset.dailyRecommendationCopy = "v1";
-  }
-
-  function hasPurchaseMarker() {
-    try {
-      for (let index = 0; index < localStorage.length; index += 1) {
-        const key = localStorage.key(index) || "";
-        if (key.startsWith(PURCHASE_PREFIX)) return true;
-      }
-    } catch (_) {}
-    return false;
+      ? `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`
+      : "Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số cho ngày hôm nay chỉ với 30.000đ.";
+    lead.dataset.dailyRecommendationCopy = "v2";
   }
 
   function checkoutIsOpen() {
@@ -81,28 +64,12 @@
     return Boolean(checkout && checkout.hidden === false);
   }
 
-  function shouldSuppress() {
-    return hasPurchaseMarker()
-      || document.body?.dataset?.returningAiBuyer === "true"
-      || sessionGet(AI_INTENT_KEY) === "1"
-      || checkoutIsOpen();
-  }
-
-  function toolsAnchor() {
-    return [...document.querySelectorAll("section")].find((section) => /Công cụ thống kê XSMB/i.test(section.textContent || ""))
+  function resultsAnchor() {
+    const card = document.querySelector(".portal-result-card");
+    if (card) return card.closest("section") || card;
+    return [...document.querySelectorAll("section")].find(section => /27 mã kỳ gần nhất|kết quả xsmb/i.test(section.textContent || ""))
       || document.querySelector(".portal-tools")?.closest("section")
       || null;
-  }
-
-  function removeStrip(reason = "suppressed") {
-    const strip = document.querySelector("[data-primary-affiliate-strip]");
-    if (!strip) return;
-    strip.remove();
-    if (observer) {
-      observer.disconnect();
-      observer = null;
-    }
-    if (viewed) emit("affiliate_shopee_strip_hide", { reason });
   }
 
   function installStyle() {
@@ -120,37 +87,34 @@
 
   function trackView(strip) {
     const fire = () => {
-      if (viewed || !strip.isConnected || shouldSuppress()) return;
+      if (viewed || !strip.isConnected || checkoutIsOpen()) return;
       viewed = true;
       emit("affiliate_shopee_strip_view", { affiliate_offer_id: SHOPEE.id });
     };
-    if (!("IntersectionObserver" in window)) {
-      fire();
-      return;
-    }
-    observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= 0.5)) return;
+    if (!("IntersectionObserver" in window)) return fire();
+    observer = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.45)) return;
       fire();
       observer?.disconnect();
       observer = null;
-    }, { threshold: [0.5] });
+    }, { threshold: [0.45] });
     observer.observe(strip);
   }
 
   function installStrip() {
-    if (window.location.pathname !== "/" || shouldSuppress() || document.querySelector("[data-primary-affiliate-strip]")) return;
-    const anchor = toolsAnchor();
+    if (location.pathname !== "/" || checkoutIsOpen() || document.querySelector("[data-primary-affiliate-strip]")) return;
+    const anchor = resultsAnchor();
     if (!anchor) return;
     installStyle();
 
     const section = document.createElement("section");
     section.className = "lm-primary-affiliate-strip";
-    section.dataset.primaryAffiliateStrip = "v1";
+    section.dataset.primaryAffiliateStrip = "v2";
     section.setAttribute("aria-label", "Ưu đãi mua sắm tài trợ");
     section.innerHTML = `
       <div class="lm-primary-affiliate-inner">
         <a class="lm-primary-affiliate-card" href="${SHOPEE.url}" target="_blank" rel="sponsored nofollow noopener noreferrer" data-primary-shopee-link>
-          <div><span class="lm-primary-affiliate-badge">Tài trợ · ACCESSTRADE</span><strong>Shopee · xem ưu đãi mua sắm hôm nay</strong><small>Mở Shopee để xem sản phẩm và ưu đãi đang có. Không ảnh hưởng giá mua của bạn.</small></div>
+          <div><span class="lm-primary-affiliate-badge">Tài trợ · ACCESSTRADE</span><strong>Shopee · xem ưu đãi mua sắm hôm nay</strong><small>Mở Shopee để xem sản phẩm và ưu đãi đang có. Giá mua không tăng vì liên kết này.</small></div>
           <span class="lm-primary-affiliate-cta">XEM ƯU ĐÃI →</span>
         </a>
         <p class="lm-primary-affiliate-note">Website có thể nhận hoa hồng khi phát sinh giao dịch đủ điều kiện.</p>
@@ -164,27 +128,26 @@
     trackView(section);
   }
 
-  function installSuppressionWatch() {
-    document.addEventListener("click", (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      if (!target?.closest("[data-open-checkout], [data-ai-sticky-cta]")) return;
-      sessionSet(AI_INTENT_KEY, "1");
-      removeStrip("ai_intent");
-    }, true);
+  function hideDuringCheckout() {
+    const strip = document.querySelector("[data-primary-affiliate-strip]");
+    if (!strip) return;
+    strip.style.display = checkoutIsOpen() ? "none" : "";
+  }
 
-    if (document.body && "MutationObserver" in window) {
-      new MutationObserver(() => {
-        if (shouldSuppress()) removeStrip("buyer_or_checkout");
-      }).observe(document.body, { attributes: true, attributeFilter: ["data-returning-ai-buyer"], childList: true, subtree: true });
-    }
+  function installCheckoutWatch() {
+    if (!document.body || !("MutationObserver" in window)) return;
+    new MutationObserver(() => {
+      hideDuringCheckout();
+      if (!checkoutIsOpen() && !document.querySelector("[data-primary-affiliate-strip]")) installStrip();
+    }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
   }
 
   function boot() {
-    if (window.location.pathname !== "/") return;
+    if (location.pathname !== "/") return;
     normalizeDailyRecommendationHeading();
     normalizeHeroRecommendationCopy();
-    installSuppressionWatch();
-    window.setTimeout(installStrip, 0);
+    installStrip();
+    installCheckoutWatch();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });

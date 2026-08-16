@@ -5,6 +5,7 @@ import argparse
 import html
 import json
 import re
+import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,7 +18,8 @@ HOME_DESC = (
     "45 cặp đảo, đầu đuôi, theo tổng và tra cứu lịch sử bằng hệ thống AI."
 )
 HOME_H1 = "Thống kê XSMB lô tô và phân tích bằng hệ thống AI"
-HOME_IMAGE = f"{BASE}/og-seo.svg"
+HOME_IMAGE_PATH = "/og-seo.svg"
+HOME_IMAGE = f"{BASE}{HOME_IMAGE_PATH}"
 HOME_IMAGE_ALT = "Lê Miền Bắc - Thống kê XSMB lô tô, tần suất, lô gan và phân tích AI"
 
 TITLE_OVERRIDES = {
@@ -137,7 +139,14 @@ def enrich(path: Path, root: Path) -> bool:
     return text != before
 
 
+def publish_home_image(root: Path) -> None:
+    source = ROOT / "site-v2" / "og-seo.svg"
+    if not source.is_file(): raise FileNotFoundError(source)
+    shutil.copy2(source, root / "og-seo.svg")
+
+
 def apply(root: Path) -> dict[str, int]:
+    publish_home_image(root)
     pages = changed = ga4 = consent = 0
     for path in root.rglob("*.html"):
         pages += 1; changed += int(enrich(path, root))
@@ -159,6 +168,7 @@ def apply(root: Path) -> dict[str, int]:
         if get_title(text) != HOME_TITLE or get_desc(text) != HOME_DESC: raise ValueError("Homepage SEO mismatch")
         for marker in (HOME_IMAGE, 'content="1200"', 'content="630"', 'name="twitter:card" content="summary_large_image"'):
             if marker not in text: raise ValueError(f"Homepage social metadata missing: {marker}")
+        if not (root / "og-seo.svg").is_file(): raise ValueError("Homepage SEO image not published")
     return {"pages": pages, "changed": changed, "ga4_pages": ga4, "consent_pages": consent}
 
 
@@ -173,6 +183,7 @@ def self_test() -> None:
         result = apply(root); h = home.read_text(encoding="utf-8")
         assert result["pages"] == 3 and result["ga4_pages"] == result["consent_pages"] == 3
         assert HOME_TITLE in h and HOME_DESC in h and HOME_IMAGE in h and f'<h1>{HOME_H1}</h1>' in h
+        assert (root / "og-seo.svg").is_file()
         assert '<h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>' in s.read_text(encoding="utf-8")
     print("PORTAL_METADATA_SELF_TEST_OK")
 

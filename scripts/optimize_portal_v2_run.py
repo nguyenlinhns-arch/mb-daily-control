@@ -31,6 +31,29 @@ def normalize_daily_recommendation_heading(page:Path,target_date:str)->None:
     page.write_text(text,encoding='utf-8')
 
 
+def normalize_paid_card_copy(page:Path,target_date:str)->None:
+    text=page.read_text(encoding='utf-8')
+    label=vi_date(target_date)
+    match=re.search(r'<aside class="portal-paid-card"[^>]*>.*?</aside>',text,flags=re.I|re.S)
+    if not match:
+        raise ValueError('portal paid card not found')
+    block=match.group(0)
+    block=re.sub(r'<aside class="portal-paid-card"[^>]*>', '<aside class="portal-paid-card" data-daily-offer-static="v1">', block, count=1, flags=re.I)
+    block=re.sub(r'<small>[^<]*</small>', '<small>GỢI Ý SỐ HÔM NAY</small>', block, count=1, flags=re.I)
+    block=re.sub(r'<h2>.*?</h2>',f'<h2>Gợi ý số ngày hôm nay · {label}</h2>',block,count=1,flags=re.I|re.S)
+    block=re.sub(
+        r'(<button\b[^>]*\bdata-open-checkout\b[^>]*>).*?(</button>)',
+        r'\1MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ\2',
+        block,count=1,flags=re.I|re.S,
+    )
+    if 'GỢI Ý SỐ HÔM NAY' not in block or f'Gợi ý số ngày hôm nay · {label}' not in block or 'MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ' not in block:
+        raise ValueError('daily suggestion paid-card copy missing')
+    if re.search(r'BẠN ĐÃ TỪNG MỞ BẢN AI|Bản phân tích AI ngày|MỞ BẢN PHÂN TÍCH AI|Kết luận ngày|4SO AI · BÁO CÁO RIÊNG',block,flags=re.I):
+        raise ValueError('legacy AI-analysis wording remains in paid card')
+    text=text[:match.start()]+block+text[match.end():]
+    page.write_text(text,encoding='utf-8')
+
+
 def install_copy_lock(root:Path)->None:
     if not COPY_LOCK_SOURCE.is_file():
         raise FileNotFoundError('copy-lock.js source missing')
@@ -55,6 +78,7 @@ def apply(root:Path):
         raise ValueError('invalid public method target_date')
     v2.patch_home(root/'index.html',public_methods)
     normalize_daily_recommendation_heading(root/'index.html',target_date)
+    normalize_paid_card_copy(root/'index.html',target_date)
     (root/'phuong-phap-cong-khai').mkdir(exist_ok=True)
     (root/'phuong-phap-cong-khai/index.html').write_text(v2.build_methods_page(methods),encoding='utf-8')
     (root/'thong-ke-dau-duoi-xsmb').mkdir(exist_ok=True)
@@ -64,7 +88,7 @@ def apply(root:Path):
         p.write_text(v2.add_assets(p.read_text(encoding='utf-8')),encoding='utf-8')
     install_copy_lock(root)
     v2.update_sitemap(root,str(stats['updated_through']))
-    return {'status':'PASS','updated_through':stats['updated_through'],'target_date':target_date,'daily_recommendation_heading':True,'copy_lock':True,'new_pages':2,'consensus':len(v2.method_consensus(public_methods)),'stats_assets_externalized':5}
+    return {'status':'PASS','updated_through':stats['updated_through'],'target_date':target_date,'daily_recommendation_heading':True,'daily_offer_static':True,'copy_lock':True,'new_pages':2,'consensus':len(v2.method_consensus(public_methods)),'stats_assets_externalized':5}
 
 
 def main():

@@ -94,10 +94,13 @@ jobs:
 
       - name: Validate fail-closed public boundary
         run: |
-          python scripts/update_completed_draw_report.py --self-test
+          set -euo pipefail
+          python -m py_compile scripts/update_completed_draw_report.py scripts/build_public_snapshot.py scripts/normalize_history_pack.py
+          python scripts/normalize_history_pack.py --self-test
           npm test
           ! grep -niE 'hôm nay đánh|chốt số|số đẹp|bao lô|xiên|cam kết trúng|mở kết luận|15\.000' \
             site-v2/index.html site-v2/mau-bao-cao.html
+          ! grep -R -Ei '(canonical|final)[_-]?(codes|pairs)' site-v2 ai-methods data/public-historical-proof.json --include='*.html' --include='*.json'
           git diff --check
 
       - name: Publish audited completed-draw update

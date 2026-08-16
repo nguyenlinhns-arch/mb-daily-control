@@ -72,8 +72,8 @@
       "unique_code_count": 23
     }
   },
-  "latest_completed_draw": "2026-08-15",
+  "latest_completed_draw": "2026-08-16",
   "policy": "POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL",
   "schema_version": "MB_COMPLETED_DRAW_AUDIT_V1",
-  "updated_at": "2026-08-16T20:51:56+07:00"
+  "updated_at": "2026-08-16T20:57:47+07:00"
 }

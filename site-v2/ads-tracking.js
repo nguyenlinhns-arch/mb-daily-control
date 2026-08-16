@@ -29,58 +29,10 @@
     });
   }
 
-  function loadNativeAd() {
-    const slot = document.getElementById("lm-adsterra-native");
-    const marker = slot?.querySelector("[data-lm-native-ad-src]");
-    if (!slot || !marker || slot.dataset.lmAdLoaded === "true") return;
-    const src = marker.getAttribute("data-lm-native-ad-src") || "";
-    if (!src.startsWith("https://")) return;
-    const script = document.createElement("script");
-    script.async = true;
-    script.dataset.cfasync = "false";
-    script.src = src;
-    slot.dataset.lmAdLoaded = "true";
-    marker.replaceWith(script);
-    emit("ad_slot_load", { slot: "native" });
-  }
-
-  function setupNativeLazyLoad() {
-    const slot = document.getElementById("lm-adsterra-native");
-    if (!slot?.querySelector("[data-lm-native-ad-src]")) return;
-    if (!("IntersectionObserver" in window)) {
-      loadNativeAd();
-      return;
-    }
-    const saveData = Boolean(navigator.connection?.saveData);
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      loadNativeAd();
-    }, { rootMargin: saveData ? "0px" : "600px 0px" });
-    observer.observe(slot);
-  }
-
-  function trackSlotViews() {
-    if (!("IntersectionObserver" in window)) return;
-    const seen = new WeakSet();
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting || entry.intersectionRatio < 0.5 || seen.has(entry.target)) return;
-        seen.add(entry.target);
-        emit("ad_slot_view", { slot: entry.target.dataset.lmAdSlot || "unknown" });
-        observer.unobserve(entry.target);
-      });
-    }, { threshold: [0.5] });
-    document.querySelectorAll("[data-lm-ad-slot]").forEach((slot) => observer.observe(slot));
-  }
-
   document.addEventListener("DOMContentLoaded", () => {
     const directPaidVisit = isGoogleAdsVisit(new URL(window.location.href));
     paidSession();
     if (directPaidVisit) emit("google_ads_landing_view", { page_path: window.location.pathname });
-
-    setupNativeLazyLoad();
-    trackSlotViews();
 
     const affiliate = document.getElementById("affiliate-shopee-smartlink");
     if (affiliate) {

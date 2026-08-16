@@ -1,10 +1,10 @@
 {
   "schema_version": "MB_PAID_REPORT_READINESS_V1",
-  "report_date": "2026-08-16",
-  "data_lock": "2026-08-15",
+  "report_date": "2026-08-17",
+  "data_lock": "2026-08-16",
   "status": "PUBLISHED_PASS_PRIVATE",
   "outcome_known_at_selection": false,
-  "updated_at": "2026-08-15T20:03:00+07:00",
+  "updated_at": "2026-08-16T22:40:00+07:00",
   "source": "Paid_Report",
   "note": "Public readiness only. Paid TOP1/TOP2 codes are intentionally excluded."
 }

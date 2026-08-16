@@ -16,6 +16,7 @@ STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260816-2">'
 SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260816-1"></script>'
 FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260816-6"></script>'
 FINANCE_GATE_SCRIPT_TAG = '<script defer src="/finance-gate.js?v=20260816-3"></script>'
+AFFILIATE_VISIBILITY_SCRIPT_TAG = '<script defer src="/affiliate-visibility.js?v=20260816-1"></script>'
 
 
 def inject_before_head_end(content: str, tag: str) -> str:
@@ -46,6 +47,7 @@ def apply_home(home: Path) -> None:
     content = inject_before_head_end(content, SCRIPT_TAG)
     content = inject_before_head_end(content, FINANCE_SCRIPT_TAG)
     content = inject_before_head_end(content, FINANCE_GATE_SCRIPT_TAG)
+    content = inject_before_head_end(content, AFFILIATE_VISIBILITY_SCRIPT_TAG)
 
     replacements = (
         ("Có cả ngày xuất hiện và không xuất hiện", "Có cả ngày trúng và không trúng"),
@@ -83,6 +85,7 @@ def validate(root: Path) -> None:
         SCRIPT_TAG,
         FINANCE_SCRIPT_TAG,
         FINANCE_GATE_SCRIPT_TAG,
+        AFFILIATE_VISIBILITY_SCRIPT_TAG,
         "4 số trong báo cáo",
         "Kết quả thực tế",
         "Có cả ngày trúng và không trúng",
@@ -180,6 +183,11 @@ def apply(root: Path) -> None:
     if not finance_gate_source.exists():
         raise FileNotFoundError(f"Missing finance gate source: {finance_gate_source}")
     shutil.copy2(finance_gate_source, root / "finance-gate.js")
+
+    affiliate_visibility_source = REPO_ROOT / "site-v2" / "affiliate-visibility.js"
+    if not affiliate_visibility_source.exists():
+        raise FileNotFoundError(f"Missing affiliate visibility source: {affiliate_visibility_source}")
+    shutil.copy2(affiliate_visibility_source, root / "affiliate-visibility.js")
 
     optimize_google_ads_landing(root)
 

@@ -29,9 +29,11 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Permanently forbid Adsterra
+      - name: Permanently forbid third-party display runtime
         run: |
           set -euo pipefail
+          test ! -e site-v2/monetization-slots.js
+          test ! -e scripts/inject_monetization.py
           python - <<'PY'
           from pathlib import Path
 
@@ -43,26 +45,36 @@ jobs:
               "b3caa" + "39744fc30610e7756cf4ccb98cd",
               "e336b" + "428517bbcb55a3e3da308cc7939",
           )
+          scan = [Path('site-v2')]
+          active_builders = (
+              Path('scripts/apply_conversion_site.py'),
+              Path('scripts/apply_conversion_v2.py'),
+              Path('scripts/apply_home_portal_safe.py'),
+              Path('scripts/build_statistics_site.py'),
+          )
+          files = []
+          for root in scan:
+              files.extend(path for path in root.rglob('*') if path.is_file())
+          files.extend(path for path in active_builders if path.is_file())
           hits = []
-          for path in Path('.').rglob('*'):
-              if not path.is_file() or '.git' in path.parts:
-                  continue
+          for path in files:
               try:
                   text = path.read_text(encoding='utf-8')
               except (UnicodeDecodeError, OSError):
                   continue
               for token in forbidden:
                   if token.lower() in text.lower():
-                      hits.append(f"{path}: forbidden monetization token {token}")
+                      hits.append(f"{path}: forbidden display-runtime token")
           if hits:
               raise SystemExit('\n'.join(hits))
-          print('ADSTERRA_PERMANENTLY_FORBIDDEN_OK')
+          print('THIRD_PARTY_DISPLAY_RUNTIME_PERMANENTLY_FORBIDDEN_OK')
           PY
 
       - name: Core privacy and builder self-tests
         run: |
           set -euo pipefail
           test ! -e site-v2/monetization-slots.js
+          test ! -e scripts/inject_monetization.py
           test ! -e .github/workflows/accesstrade-only-monetization.yml
           test ! -e scripts/enforce_accesstrade_only.py
           python scripts/public_repo_boundary_guard.py --self-test

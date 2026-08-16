@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse,json,re
+import argparse,json,re,shutil
 from datetime import date
 from pathlib import Path
 import optimize_portal_v2 as v2
+
+COPY_LOCK_TAG='<script defer src="/copy-lock.js?v=20260816-1"></script>'
+COPY_LOCK_SOURCE=v2.ROOT/'site-v2'/'copy-lock.js'
 
 
 def vi_date(value:str)->str:
@@ -28,6 +31,19 @@ def normalize_daily_recommendation_heading(page:Path,target_date:str)->None:
     page.write_text(text,encoding='utf-8')
 
 
+def install_copy_lock(root:Path)->None:
+    if not COPY_LOCK_SOURCE.is_file():
+        raise FileNotFoundError('copy-lock.js source missing')
+    shutil.copy2(COPY_LOCK_SOURCE,root/'copy-lock.js')
+    page=root/'index.html'
+    text=page.read_text(encoding='utf-8')
+    if COPY_LOCK_TAG not in text:
+        if '</body>' not in text:
+            raise ValueError('homepage body end missing for copy lock')
+        text=text.replace('</body>',COPY_LOCK_TAG+'</body>',1)
+    page.write_text(text,encoding='utf-8')
+
+
 def apply(root:Path):
     stats=v2.load(root/'statistics-data.json')
     methods=v2.load(v2.METHODS_PATH)
@@ -46,8 +62,9 @@ def apply(root:Path):
     v2.externalize_stats(root)
     for p in root.rglob('*.html'):
         p.write_text(v2.add_assets(p.read_text(encoding='utf-8')),encoding='utf-8')
+    install_copy_lock(root)
     v2.update_sitemap(root,str(stats['updated_through']))
-    return {'status':'PASS','updated_through':stats['updated_through'],'target_date':target_date,'daily_recommendation_heading':True,'new_pages':2,'consensus':len(v2.method_consensus(public_methods)),'stats_assets_externalized':5}
+    return {'status':'PASS','updated_through':stats['updated_through'],'target_date':target_date,'daily_recommendation_heading':True,'copy_lock':True,'new_pages':2,'consensus':len(v2.method_consensus(public_methods)),'stats_assets_externalized':5}
 
 
 def main():

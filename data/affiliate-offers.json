@@ -1,35 +1,71 @@
 {
-  "schema_version": "MB_SHOPEE_AFFILIATE_PLACEMENTS_V1",
-  "enabled": false,
-  "disclosure": "Liên kết tiếp thị: website có thể nhận hoa hồng khi bạn mua hàng qua liên kết này; giá của bạn không tăng vì việc đó.",
-  "notes": "Chỉ bật sau khi URL đã được chuyển đổi bằng Shopee Affiliate > Custom Link. Không dùng link Shopee thường và không tự chế affiliate_id.",
-  "offers": [
+  "schema_version": "LM_ACCESSTRADE_PLACEMENTS_V2",
+  "enabled": true,
+  "network": "ACCESSTRADE",
+  "disclosure": "Liên kết tiếp thị: website có thể nhận hoa hồng khi bạn mua hàng hoặc đăng ký qua liên kết đối tác; giá mua của bạn không tăng vì việc đó. Điều kiện dịch vụ tài chính do đơn vị cung cấp quyết định.",
+  "policy": {
+    "adsterra_display": false,
+    "hide_affiliate_only_while_ai_checkout_open": true,
+    "returning_buyer_affiliate_visible": true
+  },
+  "placements": [
     {
-      "id": "shopee-deal-1",
-      "enabled": false,
-      "title": "Deal Shopee đáng chú ý",
-      "description": "Ưu tiên sản phẩm có hoa hồng đang hoạt động trong Shopee Affiliate.",
-      "cta": "Xem ưu đãi",
-      "url": "",
-      "zones": ["stats-hub", "frequency", "gap", "pairs", "lookup"]
+      "id": "shopee-early-strip",
+      "enabled": true,
+      "merchant": "Shopee",
+      "type": "smartlink_strip",
+      "placement": "home_after_results",
+      "url": "https://nguyenlinhtkv_aul4jx.accesslanding.site",
+      "runtime": [
+        "site-v2/affiliate-visibility.js",
+        "site-v2/affiliate-restore.js"
+      ],
+      "events": [
+        "affiliate_shopee_strip_view",
+        "affiliate_shopee_strip_click"
+      ]
     },
     {
-      "id": "shopee-deal-2",
-      "enabled": false,
-      "title": "Ưu đãi Shopee",
-      "description": "Vị trí số 2 để thử nghiệm CTR và doanh thu affiliate.",
-      "cta": "Mở trên Shopee",
-      "url": "",
-      "zones": ["stats-hub", "frequency", "gap", "pairs"]
+      "id": "shopee-product-grid",
+      "enabled": true,
+      "merchant": "Shopee",
+      "type": "direct_product_grid",
+      "placement": "home_after_content",
+      "runtime": [
+        "site-v2/checkout-enhance.js",
+        "site-v2/affiliate-restore.js"
+      ],
+      "product_count": 4,
+      "products": [
+        "Tông đơ Philips MG3911/15 7in1",
+        "Sạc dự phòng Anker Zolo 20.000mAh 22.5W",
+        "Máy vặn vít pin Bosch GO 3",
+        "Máy hút bụi cầm tay Deerma DX118C 600W"
+      ],
+      "events": [
+        "affiliate_product_grid_view",
+        "affiliate_product_click"
+      ]
     },
     {
-      "id": "shopee-deal-3",
-      "enabled": false,
-      "title": "Mua sắm trên Shopee",
-      "description": "Vị trí số 3; chỉ hiển thị khi có link Affiliate hợp lệ.",
-      "cta": "Xem ngay",
-      "url": "",
-      "zones": ["stats-hub", "lookup"]
+      "id": "vpbank-vay-online",
+      "enabled": true,
+      "merchant": "VPBank",
+      "type": "early_floating_banner",
+      "placement": "early_finance_banner",
+      "url": "https://go.isclix.com/deep_link/v6/6342443575996511342/6822308958202075636?sub4=oneatweb&url_enc=aHR0cHM6Ly92YXlvbmxpbmUudnBiYW5rLmNvbS52bi8%3D",
+      "runtime": [
+        "site-v2/finance-gate.js"
+      ],
+      "delay_ms": 8000,
+      "min_scroll_ratio": 0.18,
+      "cooldown_hours": 24,
+      "close_control": "small_x",
+      "events": [
+        "affiliate_finance_view",
+        "affiliate_finance_click",
+        "affiliate_finance_close"
+      ]
     }
   ]
 }

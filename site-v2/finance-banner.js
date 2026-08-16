@@ -9,8 +9,11 @@
 
   const GATE_SESSION_KEY = "lm_finance_stats_gate_v2";
   const STATS_HEADING = "Thống kê XSMB lô tô và phân tích bằng hệ thống AI";
+  const EARLY_DELAY_MS = 12000;
+  const EARLY_SCROLL_PX = 120;
   let previousFocus = null;
   let observer = null;
+  let earlyTimer = null;
 
   function emit(event, extra = {}) {
     window.dataLayer = window.dataLayer || [];
@@ -19,7 +22,7 @@
       affiliate_network: "ACCESSTRADE",
       affiliate_offer_id: OFFER.id,
       merchant: OFFER.merchant,
-      placement: "after_statistics_gate",
+      placement: "after_latest_results_gate",
       ...extra
     });
   }
@@ -93,29 +96,23 @@
     }
   }
 
-  function findStatisticsAnchor() {
+  function findEarlyResultsAnchor() {
+    const resultCard = document.querySelector(".portal-result-card");
+    if (resultCard) return resultCard.closest(".portal-section") || resultCard;
+
+    const resultSection = [...document.querySelectorAll(".portal-section")].find((section) => {
+      const heading = section.querySelector(".portal-section-title h2, h2");
+      return heading && /27\s+mã\s+kỳ\s+gần\s+nhất/i.test(heading.textContent || "");
+    });
+    if (resultSection) return resultSection;
+
     const statsSection = [...document.querySelectorAll(".portal-section")].find((section) => {
       const heading = section.querySelector(".portal-section-title h2, h2");
-      return heading && /(?:Thống kê XSMB lô tô và phân tích bằng hệ thống AI|Công cụ thống kê XSMB|Trung tâm thống kê XSMB)/i.test(heading.textContent || "");
+      return heading && /(?:Công cụ thống kê XSMB|Trung tâm thống kê XSMB)/i.test(heading.textContent || "");
     });
     if (statsSection) return statsSection;
 
-    const selectors = [
-      "details.history-disclosure",
-      ".history-disclosure",
-      ".portal-quick-grid",
-      ".portal-proof",
-      ".portal-result-card"
-    ];
-    for (const selector of selectors) {
-      const node = document.querySelector(selector);
-      if (node) return node.closest(".portal-section") || node;
-    }
-
-    const candidates = [...document.querySelectorAll("section,details")];
-    return candidates.find((node) => /Lịch sử đối chiếu trong tháng này/i.test(node.textContent || ""))
-      || candidates.find((node) => /Kết quả thực tế/i.test(node.textContent || ""))
-      || null;
+    return document.querySelector(".portal-hero") || null;
   }
 
   function addGateStyle() {
@@ -148,6 +145,15 @@
     document.head.appendChild(style);
   }
 
+  function stopEarlyTriggers() {
+    observer?.disconnect();
+    observer = null;
+    if (earlyTimer) {
+      window.clearTimeout(earlyTimer);
+      earlyTimer = null;
+    }
+  }
+
   function closeGate(reason, track = true) {
     const gate = document.getElementById("lm-finance-gate");
     if (!gate) return;
@@ -173,6 +179,7 @@
       || document.visibilityState !== "visible"
     ) return;
 
+    stopEarlyTriggers();
     sessionSet(GATE_SESSION_KEY, "shown");
     addGateStyle();
     previousFocus = document.activeElement;
@@ -217,9 +224,9 @@
     emit("affiliate_finance_gate_view", { trigger });
   }
 
-  function installGateAfterStatistics() {
+  function installEarlyFinanceGate() {
     if (window.location.pathname !== "/" || gateConsumed()) return;
-    const anchor = findStatisticsAnchor();
+    const anchor = findEarlyResultsAnchor();
     if (!anchor) return;
 
     addGateStyle();
@@ -228,12 +235,19 @@
     sentinel.setAttribute("aria-hidden", "true");
     anchor.insertAdjacentElement("afterend", sentinel);
 
+    const timeoutCheck = () => {
+      if (!gateConsumed() && window.scrollY >= EARLY_SCROLL_PX && document.visibilityState === "visible") {
+        showGate("engaged_12s");
+      }
+    };
+    earlyTimer = window.setTimeout(timeoutCheck, EARLY_DELAY_MS);
+
     if (!("IntersectionObserver" in window)) {
       const fallback = () => {
         const rect = sentinel.getBoundingClientRect();
-        if (rect.top <= window.innerHeight * 0.78) {
+        if (rect.top <= window.innerHeight * 0.92) {
           window.removeEventListener("scroll", fallback);
-          showGate("after_statistics_scroll");
+          showGate("after_latest_results_scroll");
         }
       };
       window.addEventListener("scroll", fallback, { passive: true });
@@ -243,15 +257,13 @@
 
     observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer?.disconnect();
-      observer = null;
-      window.setTimeout(() => showGate("after_statistics"), 180);
-    }, { rootMargin: "0px 0px -18% 0px", threshold: 0 });
+      showGate("after_latest_results");
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
     observer.observe(sentinel);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     applyHomeCopy();
-    installGateAfterStatistics();
+    installEarlyFinanceGate();
   }, { once: true });
 })();

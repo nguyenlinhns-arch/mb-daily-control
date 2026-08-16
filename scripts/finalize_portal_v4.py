@@ -94,8 +94,24 @@ def _replace_today_words(text: str, label: str) -> tuple[str, int]:
 
 
 def _visible_text(text: str) -> str:
+    text = re.sub(r"<script\b.*?</script>", " ", text, flags=re.I | re.S)
+    text = re.sub(r"<style\b.*?</style>", " ", text, flags=re.I | re.S)
     text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
     text = re.sub(r"<[^>]+>", " ", text, flags=re.S)
+    return text
+
+
+def _stash_blocks(text: str, pattern: str, prefix: str) -> tuple[str, list[str]]:
+    blocks: list[str] = []
+    def repl(match: re.Match[str]) -> str:
+        blocks.append(match.group(0))
+        return f"__LM_{prefix}_{len(blocks)-1}__"
+    return re.sub(pattern, repl, text, flags=re.I | re.S), blocks
+
+
+def _restore_blocks(text: str, blocks: list[str], prefix: str) -> str:
+    for index, block in enumerate(blocks):
+        text = text.replace(f"__LM_{prefix}_{index}__", block)
     return text
 
 
@@ -106,9 +122,29 @@ def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[st
     changed_pages = 0
     replacements = 0
 
+    approved_visible = (
+        f"Gợi ý số ngày hôm nay - {label}",
+        "GỢI Ý SỐ HÔM NAY",
+        "MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ",
+        f"Gợi ý số cho ngày hôm nay <strong>{label}</strong>",
+        f"Gợi ý số cho ngày hôm nay {label}",
+    )
+
     for page in root.rglob("*.html"):
         text = page.read_text(encoding="utf-8")
         before = text
+
+        text, scripts = _stash_blocks(text, r"<script\b.*?</script>", "SCRIPT")
+        text, styles = _stash_blocks(text, r"<style\b.*?</style>", "STYLE")
+        text, comments = _stash_blocks(text, r"<!--.*?-->", "COMMENT")
+
+        approved: list[str] = []
+        for token in approved_visible:
+            if token in text:
+                placeholder = f"__LM_APPROVED_{len(approved)}__"
+                approved.append(token)
+                text = text.replace(token, placeholder)
+
         count_before = len(re.findall(r"\bngày\s+hôm\s+nay\b", text, flags=re.I))
         text = re.sub(
             r"\bngày\s+hôm\s+nay\b",
@@ -124,6 +160,13 @@ def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[st
             flags=re.I,
         )
         replacements += count_before + count_after
+
+        for index, token in enumerate(approved):
+            text = text.replace(f"__LM_APPROVED_{index}__", token)
+        text = _restore_blocks(text, comments, "COMMENT")
+        text = _restore_blocks(text, styles, "STYLE")
+        text = _restore_blocks(text, scripts, "SCRIPT")
+
         if text != before:
             changed_pages += 1
             page.write_text(text, encoding="utf-8")
@@ -139,7 +182,15 @@ def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[st
     remaining: list[str] = []
     for page in root.rglob("*.html"):
         visible = _visible_text(page.read_text(encoding="utf-8"))
-        if re.search(r"\bhôm\s+nay\b", visible, flags=re.I):
+        allowed_text = visible
+        for token in (
+            f"Gợi ý số ngày hôm nay - {label}",
+            "GỢI Ý SỐ HÔM NAY",
+            "MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ",
+            f"Gợi ý số cho ngày hôm nay {label}",
+        ):
+            allowed_text = allowed_text.replace(token, " ")
+        if re.search(r"\bhôm\s+nay\b", allowed_text, flags=re.I):
             remaining.append(page.relative_to(root).as_posix())
     if remaining:
         raise ValueError(f"Visible 'hôm nay' remains without explicit report date: {remaining}")
@@ -150,6 +201,7 @@ def materialize_report_date_labels(root: Path, ready: dict[str, Any]) -> dict[st
         "display_date": label,
         "changed_pages": changed_pages,
         "replacements": replacements,
+        "approved_today_copy_preserved": True,
     }
 
 
@@ -328,6 +380,23 @@ def self_test() -> None:
         assert result['seo_ads']['status']=='SKIP'
         assert result['indexnow']['status']=='READY' and result['indexnow']['urls']==1
         key_file=root/result['indexnow']['key_file']; assert key_file.is_file() and key_file.read_text().strip()
+
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        target='16/08/2026'
+        approved=(
+            '<h2>Gợi ý số ngày hôm nay - 16/08/2026</h2>'
+            '<p>Gợi ý được tạo từ dữ liệu khóa đến ngày hôm qua (15/08/2026). Kết luận các số cuối cùng không nằm trong danh sách công khai này.</p>'
+            '<script>const x="Bản hôm nay";</script>'
+        )
+        (root/'index.html').write_text(approved,encoding='utf-8')
+        result=materialize_report_date_labels(root,{"report_date":"2026-08-16"})
+        output=(root/'index.html').read_text(encoding='utf-8')
+        assert result['approved_today_copy_preserved'] is True
+        assert f'Gợi ý số ngày hôm nay - {target}' in output
+        assert 'ngày hôm qua (15/08/2026)' in output
+        assert 'const x="Bản hôm nay"' in output
+        assert f'{target} - {target}' not in output
     print('PORTAL_V4_SELF_TEST_OK')
 
 

@@ -74,11 +74,14 @@ jobs:
       - name: Monetization source contract
         run: |
           set -euo pipefail
-          grep -Fq 'data-lm-native-ad-src' scripts/optimize_monetization_placement.py
+          grep -Fq 'FORBIDDEN_AD_DOMAINS' scripts/optimize_monetization_placement.py
+          grep -Fq 'FORBIDDEN_AD_IDS' scripts/optimize_monetization_placement.py
           grep -Fq 'effectivecpmnetwork.com' scripts/optimize_monetization_placement.py
           grep -Fq 'highperformanceformat.com' scripts/optimize_monetization_placement.py
           grep -Fq 'data-seo-discovery-links' scripts/optimize_monetization_placement.py
           grep -Fq 'affiliate_evergreen' scripts/optimize_monetization_placement.py
+          grep -Fq 'accesstrade_after_statistics_runtime_gate' scripts/optimize_monetization_placement.py
+          grep -Fq "'vpbank_static_top': False" scripts/optimize_monetization_placement.py
           grep -Fq 'IntersectionObserver' site-v2/ads-tracking.js
           grep -Fq 'affiliate_click' site-v2/ads-tracking.js
           grep -Fq 'ad_slot_view' site-v2/ads-tracking.js

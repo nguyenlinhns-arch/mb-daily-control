@@ -52,7 +52,9 @@ jobs:
 
           lock = json.loads(Path("data/source-access.json").read_text(encoding="utf-8"))
           raw = bz2.decompress(base64.b64decode("".join(Path("data/history-27.bz2.b64").read_text().split())))
-          rows = json.loads(raw.decode("utf-8"))
+          payload = json.loads(raw.decode("utf-8"))
+          rows = payload.get("rows") if isinstance(payload, dict) else payload
+          assert isinstance(rows, list), type(rows)
           assert len(rows) == int(lock["history_rows"]), (len(rows), lock["history_rows"])
           assert rows[0][0] == lock["history_start"], (rows[0][0], lock["history_start"])
           assert rows[-1][0] == lock["history_end"], (rows[-1][0], lock["history_end"])

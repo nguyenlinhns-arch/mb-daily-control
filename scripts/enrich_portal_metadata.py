@@ -169,8 +169,20 @@ def publish_home_image(root: Path) -> None:
     shutil.copy2(source, root / "og-seo.svg")
 
 
+def publish_app_manifest(root: Path) -> None:
+    source = ROOT / "site-v2" / "manifest.webmanifest"
+    if not source.is_file(): raise FileNotFoundError(source)
+    target = root / "manifest.webmanifest"
+    shutil.copy2(source, target)
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    required = ("name", "short_name", "id", "start_url", "display", "theme_color", "icons")
+    if any(not payload.get(key) for key in required): raise ValueError("Manifest missing required metadata")
+    if payload.get("id") != "/" or payload.get("start_url") != "/": raise ValueError("Manifest app identity mismatch")
+
+
 def apply(root: Path) -> dict[str, int]:
     publish_home_image(root)
+    publish_app_manifest(root)
     pages = changed = ga4 = consent = app_metadata = 0
     for path in root.rglob("*.html"):
         pages += 1; changed += int(enrich(path, root))
@@ -182,6 +194,7 @@ def apply(root: Path) -> dict[str, int]:
         if MANIFEST_HREF not in text: raise ValueError(f"Manifest missing: {path}")
     if consent != ga4: raise ValueError(f"GA4 consent coverage mismatch: ga4={ga4} consent={consent}")
     if app_metadata != pages: raise ValueError(f"App metadata coverage mismatch: pages={pages} app_metadata={app_metadata}")
+    if not (root / "manifest.webmanifest").is_file(): raise ValueError("Manifest not published")
     for route, expected in H1_OVERRIDES.items():
         rel = route.strip("/") + "/index.html"
         path = root / rel
@@ -213,7 +226,7 @@ def self_test() -> None:
         assert get_title(h) == HOME_TITLE and get_desc(h) == HOME_DESC and HOME_IMAGE in h and FAVICON_HREF in h and MANIFEST_HREF in h
         assert 'name="theme-color" content="#071f33"' in h and 'apple-mobile-web-app-capable' in h
         assert "/favicon.svg?v=old" not in h
-        assert (root / "og-seo.svg").is_file()
+        assert (root / "og-seo.svg").is_file() and (root / "manifest.webmanifest").is_file()
         assert '<h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>' in s.read_text(encoding="utf-8")
     print("PORTAL_METADATA_SELF_TEST_OK")
 

@@ -32,6 +32,29 @@
     try { sessionStorage.setItem(key, value); } catch (_) {}
   }
 
+  function reportDateLabel() {
+    const bodyDate = String(document.body?.dataset?.reportDate || "").trim();
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(bodyDate)) return bodyDate;
+    const text = document.body?.textContent || "";
+    const match = text.match(/BẢN\s+PHÂN\s+TÍCH\s+AI\s+NGÀY\s+(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/Target\s+(\d{2}\/\d{2}\/\d{4})/i);
+    return match ? match[1] : "";
+  }
+
+  function normalizeDailyRecommendationHeading() {
+    if (window.location.pathname !== "/") return;
+    const date = reportDateLabel();
+    const heading = [...document.querySelectorAll(".portal-section-title h2")]
+      .find((node) => /^(Phương pháp công khai hôm nay|Gợi ý số ngày hôm nay)/i.test((node.textContent || "").trim()));
+    if (!heading) return;
+    heading.textContent = date ? `Gợi ý số ngày hôm nay · ${date}` : "Gợi ý số ngày hôm nay";
+    heading.dataset.dailyRecommendationHeading = "v1";
+    const subtitle = heading.parentElement?.querySelector("p");
+    if (subtitle) {
+      subtitle.textContent = subtitle.textContent.replace(/^Số được tạo/i, "Gợi ý được tạo");
+    }
+  }
+
   function hasPurchaseMarker() {
     try {
       for (let index = 0; index < localStorage.length; index += 1) {
@@ -147,6 +170,7 @@
 
   function boot() {
     if (window.location.pathname !== "/") return;
+    normalizeDailyRecommendationHeading();
     installSuppressionWatch();
     window.setTimeout(installStrip, 0);
   }

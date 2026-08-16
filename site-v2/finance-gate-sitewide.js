@@ -218,8 +218,8 @@
   let scrollHandler = null;
   let reopenTimer = 0;
 
-  // Retire old suppression state so users who saw the previous 24h-cooldown
-  // version are immediately eligible for the new banner.
+  // Retire suppression state from older banner versions so prior viewers
+  // are immediately eligible for the current sitewide banner.
   try {
     sessionStorage.removeItem("lm_finance_sitewide_banner_v1");
     localStorage.removeItem("lm_finance_sitewide_last_shown_v1");

@@ -6,15 +6,23 @@
     merchant: "Shopee",
     url: "https://nguyenlinhtkv_aul4jx.accesslanding.site"
   };
+  const AI_INTENT_KEY = "lm_ai_purchase_intent_v1";
+  let productGridViewed = false;
+  let checkoutOpened = false;
+  let qrViewed = false;
+  let claimSubmitted = false;
 
   function emit(event, extra = {}) {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event,
       page_path: window.location.pathname,
-      affiliate_network: "ACCESSTRADE",
       ...extra
     });
+  }
+
+  function sessionSet(key, value) {
+    try { sessionStorage.setItem(key, value); } catch (_) {}
   }
 
   function reportDateLabel() {
@@ -37,15 +45,9 @@
     const style = document.createElement("style");
     style.id = "lm-commerce-runtime-style";
     style.textContent = `
-      .lm-affiliate-section{margin:4px 0 14px!important}
-      .lm-affiliate-card{position:relative;overflow:hidden;border-color:#e8dfd8!important;background:linear-gradient(135deg,#fffaf7,#fff)!important;box-shadow:0 4px 18px rgba(39,29,24,.05)!important}
-      .lm-affiliate-card:before{content:"TÀI TRỢ";position:absolute;top:9px;right:10px;padding:3px 6px;border-radius:999px;background:#fff1e8;color:#b84b16;font-size:8px;font-weight:1000;letter-spacing:.08em}
-      .lm-affiliate-card b{padding-right:56px;color:#263744!important;font-size:14px!important}
-      .lm-affiliate-card .lm-affiliate-cta{background:#ee4d2d!important;box-shadow:none!important}
-      .lm-affiliate-note{color:#8b9298!important}
-      .lm-ai-runtime-kicker{display:block;margin-top:6px;color:#8a4d51;font-size:10px;font-weight:900;letter-spacing:.05em}
-      .lm-shopee-nudge{display:none!important}
-      @media(max-width:700px){.lm-affiliate-card:before{top:8px;right:8px}.lm-affiliate-card b{padding-right:54px}}
+      .lm-affiliate-section{margin:14px 0!important}.lm-affiliate-card{position:relative;overflow:hidden;border-color:#e8dfd8!important;background:linear-gradient(135deg,#fffaf7,#fff)!important;box-shadow:0 4px 18px rgba(39,29,24,.05)!important}.lm-affiliate-card:before{content:"TÀI TRỢ";position:absolute;top:9px;right:10px;padding:3px 6px;border-radius:999px;background:#fff1e8;color:#b84b16;font-size:8px;font-weight:1000;letter-spacing:.08em}.lm-affiliate-card b{padding-right:56px;color:#263744!important;font-size:14px!important}.lm-affiliate-card .lm-affiliate-cta{background:#ee4d2d!important;box-shadow:none!important}.lm-affiliate-note{color:#8b9298!important}
+      .lm-ai-runtime-kicker{display:block;margin-top:7px;color:#79575a;font-size:10px;font-weight:850;line-height:1.4}.lm-product-deals{margin-top:16px!important;border-top:1px solid #edf0f2;padding-top:18px!important}.lm-product-deals-head h2:after{content:" · khu tài trợ";color:#9a7770;font-size:10px;font-weight:700}.lm-shopee-nudge{display:none!important}
+      @media(max-width:700px){.lm-affiliate-card:before{top:8px;right:8px}.lm-affiliate-card b{padding-right:54px}.lm-product-deals{margin-top:12px!important;padding-top:14px!important}}
     `;
     document.head.appendChild(style);
   }
@@ -58,7 +60,7 @@
 
     const heroLead = document.querySelector(".portal-hero .portal-lead");
     if (heroLead) {
-      heroLead.innerHTML = `Theo dõi 27 mã kỳ gần nhất, tần suất, lô gan, 45 cặp đảo và các phương pháp công khai. Khi cần phần kết luận riêng cho ngày <strong>${date}</strong>, bạn có thể mở bản phân tích AI một lần 30.000đ.`;
+      heroLead.innerHTML = `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Khi cần phần kết luận riêng cho ngày <strong>${date}</strong>, mở bản phân tích AI một lần 30.000đ.`;
     }
 
     const paidCard = document.querySelector(".portal-paid-card");
@@ -73,7 +75,7 @@
       if (!paidCard.querySelector(".lm-ai-runtime-kicker")) {
         const kicker = document.createElement("span");
         kicker.className = "lm-ai-runtime-kicker";
-        kicker.textContent = "Thanh toán một lần · Không tự gia hạn · Không cam kết kết quả";
+        kicker.textContent = "Thanh toán một lần · Không tự gia hạn · Dữ liệu lịch sử không phải cam kết kết quả";
         button?.insertAdjacentElement("afterend", kicker);
       }
     }
@@ -84,80 +86,144 @@
       <section class="lm-affiliate-section" aria-label="Liên kết tài trợ" data-affiliate-commerce="true">
         <div class="lm-affiliate-inner">
           <a class="lm-affiliate-card" id="affiliate-shopee-smartlink" href="${SHOPEE.url}" target="_blank" rel="sponsored nofollow noopener noreferrer" data-affiliate="${SHOPEE.id}">
-            <div><b>Shopee · xem sản phẩm và ưu đãi đang có</b><span>Khu vực tài trợ qua ACCESSTRADE. Mở Shopee để tham khảo sản phẩm phù hợp với nhu cầu của bạn.</span></div>
+            <div><b>Shopee · xem sản phẩm và ưu đãi đang có</b><span>Khu vực tài trợ qua ACCESSTRADE. Mở Shopee để tham khảo sản phẩm phù hợp.</span></div>
             <span class="lm-affiliate-cta">Xem trên Shopee →</span>
           </a>
-          <p class="lm-affiliate-note">Website có thể nhận hoa hồng từ giao dịch đủ điều kiện; giá mua của bạn không tăng vì liên kết này.</p>
+          <p class="lm-affiliate-note">Website có thể nhận hoa hồng từ giao dịch đủ điều kiện; giá mua không tăng vì liên kết này.</p>
         </div>
       </section>`;
   }
 
-  function installAffiliate() {
-    if (window.location.pathname !== "/") return;
+  function proofAnchor() {
+    const proof = document.querySelector(".portal-proof");
+    if (proof) return proof.closest(".portal-section") || proof;
+    const history = [...document.querySelectorAll("section")].find(section => /Lịch sử đối chiếu|hiệu quả lịch sử|đối chiếu lịch sử/i.test(section.textContent || ""));
+    if (history) return history;
+    const methods = [...document.querySelectorAll("section")].find(section => /Phương pháp công khai/i.test(section.textContent || ""));
+    if (methods) return methods;
+    return document.querySelector(".portal-tools")?.closest(".portal-section") || null;
+  }
 
-    // checkout-enhance.js builds a richer direct-product carousel. When it is
-    // present, do not inject a second generic SmartLink card underneath it.
-    if (document.querySelector(".lm-product-deals")) {
-      document.querySelector(".lm-affiliate-section")?.remove();
+  function moveAffiliateAfterProof() {
+    if (window.location.pathname !== "/") return;
+    const anchor = proofAnchor();
+    if (!anchor) return;
+    const products = document.querySelector(".lm-product-deals");
+    const generic = document.querySelector(".lm-affiliate-section");
+    if (products) {
+      if (generic) generic.remove();
+      if (anchor.nextElementSibling !== products) anchor.insertAdjacentElement("afterend", products);
       return;
     }
+    if (generic && anchor.nextElementSibling !== generic) anchor.insertAdjacentElement("afterend", generic);
+  }
 
+  function installAffiliateFallback() {
+    if (window.location.pathname !== "/" || document.querySelector(".lm-product-deals")) return;
     let card = document.getElementById("affiliate-shopee-smartlink");
     if (!card) {
-      const tools = document.querySelector(".portal-tools")?.closest(".portal-section") || document.querySelector(".portal-tools");
-      if (tools) {
-        tools.insertAdjacentHTML("afterend", affiliateMarkup());
+      const anchor = proofAnchor();
+      if (anchor) {
+        anchor.insertAdjacentHTML("afterend", affiliateMarkup());
         card = document.getElementById("affiliate-shopee-smartlink");
       }
     }
     if (!card) return;
-
     card.href = SHOPEE.url;
     card.setAttribute("rel", "sponsored nofollow noopener noreferrer");
-    card.dataset.affiliate = SHOPEE.id;
-    const title = card.querySelector("b");
-    const desc = card.querySelector("span:not(.lm-affiliate-cta)");
-    const cta = card.querySelector(".lm-affiliate-cta");
-    if (title) title.textContent = "Shopee · xem sản phẩm và ưu đãi đang có";
-    if (desc) desc.textContent = "Khu vực tài trợ qua ACCESSTRADE. Mở Shopee để tham khảo sản phẩm phù hợp với nhu cầu của bạn.";
-    if (cta) cta.textContent = "Xem trên Shopee →";
-
-    let viewed = false;
-    if ("IntersectionObserver" in window) {
-      const observer = new IntersectionObserver(entries => {
-        if (viewed || !entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.45)) return;
-        viewed = true;
-        emit("affiliate_shopee_view", { affiliate_offer_id: SHOPEE.id, merchant: SHOPEE.merchant, placement: "after_free_tools" });
-        observer.disconnect();
-      }, { threshold: [0.45] });
-      observer.observe(card);
-    }
     card.addEventListener("click", () => emit("affiliate_shopee_click", {
+      affiliate_network: "ACCESSTRADE",
       affiliate_offer_id: SHOPEE.id,
       merchant: SHOPEE.merchant,
-      placement: "after_free_tools"
+      placement: "after_proof"
     }));
   }
 
-  function installAiTracking() {
+  function trackProductGridView() {
+    const grid = document.querySelector(".lm-product-deals");
+    if (!grid || productGridViewed) return;
+    const fire = () => {
+      if (productGridViewed) return;
+      productGridViewed = true;
+      emit("affiliate_product_grid_view", {
+        affiliate_network: "ACCESSTRADE",
+        merchant: "Shopee",
+        placement: "after_proof"
+      });
+    };
+    if (!("IntersectionObserver" in window)) return fire();
+    const observer = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.4)) return;
+      fire();
+      observer.disconnect();
+    }, { threshold: [0.4] });
+    observer.observe(grid);
+  }
+
+  function paymentQrVisible() {
+    return Boolean(document.querySelector(".vietqr-panel img, .vietqr-panel, img[src*='vietqr.io']"));
+  }
+
+  function checkoutVisible() {
+    const checkout = document.getElementById("checkout");
+    return Boolean(checkout && checkout.hidden === false);
+  }
+
+  function markQrView() {
+    if (qrViewed || !checkoutVisible() || !paymentQrVisible()) return;
+    qrViewed = true;
+    emit("ai_payment_qr_view", { product: "daily_ai_analysis", price_vnd: 30000 });
+  }
+
+  function installAiFunnelTracking() {
     document.addEventListener("click", event => {
-      const checkout = event.target.closest("[data-open-checkout]");
-      if (checkout) {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+      const checkoutButton = target.closest("[data-open-checkout], [data-ai-sticky-cta]");
+      if (checkoutButton) {
+        sessionSet(AI_INTENT_KEY, "1");
         emit("ai_checkout_intent", {
           product: "daily_ai_analysis",
           price_vnd: 30000,
-          placement: checkout.closest(".portal-paid-card") ? "hero" : "purchase"
+          placement: checkoutButton.closest(".portal-paid-card") ? "hero" : checkoutButton.hasAttribute("data-ai-sticky-cta") ? "sticky" : "purchase"
         });
+        window.setTimeout(() => {
+          if (!checkoutOpened && checkoutVisible()) {
+            checkoutOpened = true;
+            emit("ai_checkout_open", { product: "daily_ai_analysis", price_vnd: 30000 });
+          }
+          markQrView();
+        }, 0);
       }
-      const sticky = event.target.closest("[data-ai-sticky-cta]");
-      if (sticky) emit("ai_sticky_click", { product: "daily_ai_analysis", price_vnd: 30000 });
+
+      const claim = target.closest("button, a");
+      if (claim && !claimSubmitted && /đã\s+chuyển\s+khoản|xác\s+nhận\s+thanh\s+toán|yêu\s+cầu\s+nhận/i.test(claim.textContent || "")) {
+        claimSubmitted = true;
+        sessionSet(AI_INTENT_KEY, "1");
+        emit("ai_payment_claim_submit", { product: "daily_ai_analysis", price_vnd: 30000 });
+      }
+    }, true);
+
+    const observer = new MutationObserver(() => {
+      if (!checkoutOpened && checkoutVisible()) {
+        checkoutOpened = true;
+        emit("ai_checkout_open", { product: "daily_ai_analysis", price_vnd: 30000, source: "mutation" });
+      }
+      markQrView();
+      moveAffiliateAfterProof();
+      trackProductGridView();
+      document.querySelectorAll("#lm-shopee-nudge, #lm-shopee-gate").forEach(node => node.remove());
+      document.body.classList.remove("lm-shopee-gate-open");
     });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     addRuntimeStyle();
     polishHomeCopy();
-    installAffiliate();
-    installAiTracking();
+    moveAffiliateAfterProof();
+    installAffiliateFallback();
+    trackProductGridView();
+    installAiFunnelTracking();
   }, { once: true });
 })();

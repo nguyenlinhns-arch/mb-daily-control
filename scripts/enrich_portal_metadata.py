@@ -7,152 +7,268 @@ import json
 import re
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]
-BASE='https://lemienbac.com'
-GA4='G-R9TBYP97BC'
-CONSENT_KEY='lm_analytics_consent_v1'
-TITLE_OVERRIDES={
-    '/phuong-phap-cong-khai/':'6 phương pháp XSMB công khai hôm nay | Lê Miền Bắc',
+ROOT = Path(__file__).resolve().parents[1]
+BASE = "https://lemienbac.com"
+GA4 = "G-R9TBYP97BC"
+CONSENT_KEY = "lm_analytics_consent_v1"
+HOME_TITLE = "Thống kê XSMB lô tô, lô gan & AI | Lê Miền Bắc"
+HOME_DESC = (
+    "Thống kê XSMB lô tô từ dữ liệu 27 mã mỗi kỳ: tần suất 00–99, lô gan, "
+    "45 cặp đảo, đầu đuôi, theo tổng và tra cứu lịch sử bằng hệ thống AI."
+)
+HOME_H1 = "Thống kê XSMB lô tô và phân tích bằng hệ thống AI"
+HOME_IMAGE = f"{BASE}/og.png"
+HOME_IMAGE_ALT = "Lê Miền Bắc - Thống kê XSMB lô tô, tần suất, lô gan và phân tích AI"
+
+TITLE_OVERRIDES = {
+    "/": HOME_TITLE,
+    "/phuong-phap-cong-khai/": "6 phương pháp XSMB công khai hôm nay | Lê Miền Bắc",
 }
-H1_OVERRIDES={
-    '/thong-ke-xsmb/':'Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99',
-    '/tan-suat-xsmb/':'Tần suất XSMB 00–99 theo 7–365 kỳ',
-    '/lo-gan-xsmb/':'Lô gan XSMB 00–99: khoảng vắng hiện tại',
-    '/cap-dao-xsmb/':'Thống kê 45 cặp đảo XSMB',
-    '/thong-ke-dau-duoi-xsmb/':'Thống kê đầu đuôi XSMB 0–9',
-    '/thong-ke-tong-xsmb/':'Thống kê tổng XSMB 0–9',
-    '/thong-ke-theo-thu-xsmb/':'Thống kê XSMB theo thứ trong tuần',
-    '/tra-cuu-xsmb/':'Tra cứu XSMB theo bộ số 00–99',
+DESC_OVERRIDES = {
+    "/": HOME_DESC,
+}
+H1_OVERRIDES = {
+    "/": HOME_H1,
+    "/thong-ke-xsmb/": "Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99",
+    "/tan-suat-xsmb/": "Tần suất XSMB 00–99 theo 7–365 kỳ",
+    "/lo-gan-xsmb/": "Lô gan XSMB 00–99: khoảng vắng hiện tại",
+    "/cap-dao-xsmb/": "Thống kê 45 cặp đảo XSMB",
+    "/thong-ke-dau-duoi-xsmb/": "Thống kê đầu đuôi XSMB 0–9",
+    "/thong-ke-tong-xsmb/": "Thống kê tổng XSMB 0–9",
+    "/thong-ke-theo-thu-xsmb/": "Thống kê XSMB theo thứ trong tuần",
+    "/tra-cuu-xsmb/": "Tra cứu XSMB theo bộ số 00–99",
 }
 
 
-def route_for(path:Path,root:Path)->str:
-    rel=path.relative_to(root).as_posix()
-    if rel=='index.html':return '/'
-    if rel.endswith('/index.html'):return '/'+rel[:-10]
-    return '/'+rel
+def route_for(path: Path, root: Path) -> str:
+    rel = path.relative_to(root).as_posix()
+    if rel == "index.html":
+        return "/"
+    if rel.endswith("/index.html"):
+        return "/" + rel[:-10]
+    return "/" + rel
 
 
-def get_title(text:str)->str:
-    m=re.search(r'<title>(.*?)</title>',text,re.I|re.S)
-    return html.unescape(re.sub(r'<[^>]+>','',m.group(1)).strip()) if m else 'Lê Miền Bắc'
+def get_title(text: str) -> str:
+    match = re.search(r"<title>(.*?)</title>", text, re.I | re.S)
+    if not match:
+        return "Lê Miền Bắc"
+    return html.unescape(re.sub(r"<[^>]+>", "", match.group(1)).strip())
 
 
-def get_desc(text:str)->str:
-    m=re.search(r'<meta\s+name="description"\s+content="([^"]*)"',text,re.I)
-    return html.unescape(m.group(1)).strip() if m else 'Cổng dữ liệu và thống kê XSMB.'
+def get_desc(text: str) -> str:
+    match = re.search(r'<meta\s+name="description"\s+content="([^"]*)"', text, re.I)
+    return html.unescape(match.group(1)).strip() if match else "Cổng dữ liệu và thống kê XSMB."
 
 
-def upsert_meta(text:str,attr:str,key:str,value:str)->str:
-    value=html.escape(value,quote=True)
-    pattern=re.compile(rf'<meta\s+{attr}="{re.escape(key)}"\s+content="[^"]*"\s*/?>',re.I)
-    tag=f'<meta {attr}="{key}" content="{value}">'
-    if pattern.search(text):return pattern.sub(tag,text,count=1)
-    return text.replace('</head>',tag+'</head>',1)
+def set_title(text: str, value: str) -> str:
+    tag = f"<title>{html.escape(value)}</title>"
+    if re.search(r"<title>.*?</title>", text, re.I | re.S):
+        return re.sub(r"<title>.*?</title>", tag, text, count=1, flags=re.I | re.S)
+    return text.replace("</head>", tag + "</head>", 1)
 
 
-def set_first_h1(text:str,value:str)->str:
-    escaped=html.escape(value)
-    pattern=re.compile(r'(<h1\b[^>]*>).*?(</h1>)',re.I|re.S)
+def upsert_meta(text: str, attr: str, key: str, value: str) -> str:
+    safe = html.escape(value, quote=True)
+    pattern = re.compile(
+        rf'<meta\s+{attr}="{re.escape(key)}"\s+content="[^"]*"\s*/?>',
+        re.I,
+    )
+    tag = f'<meta {attr}="{key}" content="{safe}">'
     if pattern.search(text):
-        return pattern.sub(lambda m:m.group(1)+escaped+m.group(2),text,count=1)
+        return pattern.sub(tag, text, count=1)
+    return text.replace("</head>", tag + "</head>", 1)
+
+
+def set_first_h1(text: str, value: str) -> str:
+    safe = html.escape(value)
+    pattern = re.compile(r"(<h1\b[^>]*>).*?(</h1>)", re.I | re.S)
+    if pattern.search(text):
+        return pattern.sub(lambda m: m.group(1) + safe + m.group(2), text, count=1)
     return text
 
 
-def consent_default_js()->str:
+def consent_default_js() -> str:
     return (
-        f"let lmAnalyticsConsent='denied';"
+        "let lmAnalyticsConsent='denied';"
         f"try{{if(localStorage.getItem('{CONSENT_KEY}')==='granted')lmAnalyticsConsent='granted'}}catch(e){{}}"
         "gtag('consent','default',{analytics_storage:lmAnalyticsConsent,ad_storage:'denied',"
         "ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});"
     )
 
 
-def normalize_existing_consent(text:str)->str:
-    pattern=re.compile(r"gtag\('consent','default',\{[^;]*?analytics_storage\s*:\s*'denied'[^;]*?\}\);",re.I|re.S)
+def normalize_existing_consent(text: str) -> str:
+    pattern = re.compile(
+        r"gtag\('consent','default',\{[^;]*?analytics_storage\s*:\s*'denied'[^;]*?\}\);",
+        re.I | re.S,
+    )
     if pattern.search(text):
-        return pattern.sub(consent_default_js(),text,count=1)
+        return pattern.sub(consent_default_js(), text, count=1)
     if CONSENT_KEY not in text:
-        js_call=re.search(r"gtag\('js',\s*new Date\(\)\);",text,re.I)
+        js_call = re.search(r"gtag\('js',\s*new Date\(\)\);", text, re.I)
         if js_call:
-            text=text[:js_call.start()]+consent_default_js()+text[js_call.start():]
+            text = text[: js_call.start()] + consent_default_js() + text[js_call.start() :]
     return text
 
 
-def enrich(path:Path,root:Path)->bool:
-    text=path.read_text(encoding='utf-8'); before=text
-    route=route_for(path,root)
+def enrich(path: Path, root: Path) -> bool:
+    text = path.read_text(encoding="utf-8")
+    before = text
+    route = route_for(path, root)
+
     if route in TITLE_OVERRIDES:
-        title_tag='<title>'+html.escape(TITLE_OVERRIDES[route])+'</title>'
-        if re.search(r'<title>.*?</title>',text,re.I|re.S):text=re.sub(r'<title>.*?</title>',title_tag,text,count=1,flags=re.I|re.S)
-        else:text=text.replace('</head>',title_tag+'</head>',1)
+        text = set_title(text, TITLE_OVERRIDES[route])
+    if route in DESC_OVERRIDES:
+        text = upsert_meta(text, "name", "description", DESC_OVERRIDES[route])
     if route in H1_OVERRIDES:
-        text=set_first_h1(text,H1_OVERRIDES[route])
-    title=get_title(text); desc=get_desc(text); url=BASE+route
-    robots=re.search(r'<meta\s+name="robots"\s+content="([^"]+)"',text,re.I)
-    noindex=bool(robots and 'noindex' in robots.group(1).lower())
+        text = set_first_h1(text, H1_OVERRIDES[route])
+
+    title = get_title(text)
+    desc = get_desc(text)
+    url = BASE + route
+    robots = re.search(r'<meta\s+name="robots"\s+content="([^"]+)"', text, re.I)
+    noindex = bool(robots and "noindex" in robots.group(1).lower())
+
     if not noindex:
-        has_og_image=bool(re.search(r'<meta\s+property="og:image"\s+content="[^"]+"',text,re.I))
-        twitter_card='summary_large_image' if has_og_image else 'summary'
-        for attr,key,value in (
-            ('property','og:locale','vi_VN'),('property','og:type','website'),('property','og:url',url),
-            ('property','og:title',title),('property','og:description',desc),
-            ('name','twitter:card',twitter_card),('name','twitter:title',title),('name','twitter:description',desc),
+        for attr, key, value in (
+            ("property", "og:locale", "vi_VN"),
+            ("property", "og:type", "website"),
+            ("property", "og:site_name", "Lê Miền Bắc"),
+            ("property", "og:url", url),
+            ("property", "og:title", title),
+            ("property", "og:description", desc),
+            ("name", "twitter:title", title),
+            ("name", "twitter:description", desc),
         ):
-            text=upsert_meta(text,attr,key,value)
+            text = upsert_meta(text, attr, key, value)
+
+        if route == "/":
+            for attr, key, value in (
+                ("property", "og:image", HOME_IMAGE),
+                ("property", "og:image:width", "1200"),
+                ("property", "og:image:height", "630"),
+                ("property", "og:image:alt", HOME_IMAGE_ALT),
+                ("name", "twitter:card", "summary_large_image"),
+                ("name", "twitter:image", HOME_IMAGE),
+                ("name", "twitter:image:alt", HOME_IMAGE_ALT),
+            ):
+                text = upsert_meta(text, attr, key, value)
+        else:
+            has_og_image = bool(
+                re.search(r'<meta\s+property="og:image"\s+content="[^"]+"', text, re.I)
+            )
+            text = upsert_meta(
+                text,
+                "name",
+                "twitter:card",
+                "summary_large_image" if has_og_image else "summary",
+            )
+
     if GA4 in text and not noindex:
-        text=normalize_existing_consent(text)
+        text = normalize_existing_consent(text)
     elif not noindex:
-        block=(f'<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>'
-               f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA4}"></script>'
-               '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}'
-               +consent_default_js()+
-               f"gtag('js',new Date());gtag('config','{GA4}',{{allow_google_signals:false,allow_ad_personalization_signals:false}});</script>")
-        text=text.replace('</head>',block+'</head>',1)
-    if text!=before:path.write_text(text,encoding='utf-8')
-    return text!=before
+        block = (
+            '<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>'
+            f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA4}"></script>'
+            '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}'
+            + consent_default_js()
+            + f"gtag('js',new Date());gtag('config','{GA4}',{{allow_google_signals:false,allow_ad_personalization_signals:false}});</script>"
+        )
+        text = text.replace("</head>", block + "</head>", 1)
+
+    if text != before:
+        path.write_text(text, encoding="utf-8")
+    return text != before
 
 
-def apply(root:Path)->dict[str,int]:
-    pages=changed=ga4=consent=0
-    for path in root.rglob('*.html'):
-        pages+=1; changed+=int(enrich(path,root))
-        text=path.read_text(encoding='utf-8')
-        if GA4 in text:ga4+=1
-        if CONSENT_KEY in text:consent+=1
-    if consent!=ga4:
-        raise ValueError(f'GA4 consent coverage mismatch: ga4={ga4} consent={consent}')
-    for route,expected in H1_OVERRIDES.items():
-        rel='index.html' if route=='/' else route.strip('/')+'/index.html'
-        path=root/rel
-        if path.is_file():
-            text=path.read_text(encoding='utf-8')
-            m=re.search(r'<h1\b[^>]*>(.*?)</h1>',text,re.I|re.S)
-            value=html.unescape(re.sub(r'<[^>]+>','',m.group(1)).strip()) if m else ''
-            if value!=expected:raise ValueError(f'H1 intent mismatch: {route} / {value}')
-    return {'pages':pages,'changed':changed,'ga4_pages':ga4,'consent_pages':consent}
+def apply(root: Path) -> dict[str, int]:
+    pages = changed = ga4 = consent = 0
+    for path in root.rglob("*.html"):
+        pages += 1
+        changed += int(enrich(path, root))
+        text = path.read_text(encoding="utf-8")
+        if GA4 in text:
+            ga4 += 1
+        if CONSENT_KEY in text:
+            consent += 1
+
+    if consent != ga4:
+        raise ValueError(f"GA4 consent coverage mismatch: ga4={ga4} consent={consent}")
+
+    for route, expected in H1_OVERRIDES.items():
+        rel = "index.html" if route == "/" else route.strip("/") + "/index.html"
+        path = root / rel
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        match = re.search(r"<h1\b[^>]*>(.*?)</h1>", text, re.I | re.S)
+        value = html.unescape(re.sub(r"<[^>]+>", "", match.group(1)).strip()) if match else ""
+        if value != expected:
+            raise ValueError(f"H1 intent mismatch: {route} / {value}")
+
+    home = root / "index.html"
+    if home.is_file():
+        text = home.read_text(encoding="utf-8")
+        if get_title(text) != HOME_TITLE or get_desc(text) != HOME_DESC:
+            raise ValueError("Homepage SEO title/description mismatch")
+        for marker in (
+            f'content="{HOME_IMAGE}"',
+            'property="og:image:width" content="1200"',
+            'property="og:image:height" content="630"',
+            'name="twitter:card" content="summary_large_image"',
+        ):
+            if marker not in text:
+                raise ValueError(f"Homepage social metadata missing: {marker}")
+
+    return {"pages": pages, "changed": changed, "ga4_pages": ga4, "consent_pages": consent}
 
 
-def self_test()->None:
+def self_test() -> None:
     import tempfile
+
     with tempfile.TemporaryDirectory() as td:
-        root=Path(td); (root/'phuong-phap-cong-khai').mkdir(); (root/'thong-ke-xsmb').mkdir()
-        p=root/'phuong-phap-cong-khai/index.html';p.write_text('<html><head><title>Tiêu đề cũ rất dài</title><meta name="description" content="Mô tả thử đủ dài để kiểm tra metadata"><meta name="robots" content="index,follow"><meta property="og:image" content="https://example.test/a.png"></head><body></body></html>',encoding='utf-8')
-        home=root/'index.html';home.write_text("<html><head><title>Home</title><meta name=\"description\" content=\"Mô tả\"><meta name=\"robots\" content=\"index,follow\"><script>window.dataLayer=[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied'});gtag('js',new Date());gtag('config','G-R9TBYP97BC');</script></head><body></body></html>",encoding='utf-8')
-        legacy=root/'legacy.html';legacy.write_text("<html><head><title>Legacy</title><meta name=\"description\" content=\"Mô tả\"><meta name=\"robots\" content=\"index,follow\"><script>window.dataLayer=[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-R9TBYP97BC');</script></head><body></body></html>",encoding='utf-8')
-        stats=root/'thong-ke-xsmb/index.html';stats.write_text('<html><head><title>Stats</title><meta name="description" content="Stats"><meta name="robots" content="index,follow"></head><body><h1>Tra cứu cũ</h1></body></html>',encoding='utf-8')
-        result=apply(root);t=p.read_text(encoding='utf-8');h=home.read_text(encoding='utf-8');l=legacy.read_text(encoding='utf-8');s=stats.read_text(encoding='utf-8')
-        assert result['pages']==4 and result['ga4_pages']==result['consent_pages']==4
-        assert GA4 in t and 'og:title' in t and 'og:url' in t and 'twitter:description' in t
-        assert 'twitter:card" content="summary_large_image' in t and '6 phương pháp XSMB công khai hôm nay' in t
-        assert CONSENT_KEY in t and CONSENT_KEY in h and CONSENT_KEY in l and "analytics_storage:lmAnalyticsConsent" in h
-        assert '<h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>' in s
-    print('PORTAL_METADATA_SELF_TEST_OK')
+        root = Path(td)
+        (root / "phuong-phap-cong-khai").mkdir()
+        (root / "thong-ke-xsmb").mkdir()
+        home = root / "index.html"
+        home.write_text(
+            '<html><head><title>Tiêu đề cũ</title><meta name="description" content="Mô tả cũ">'
+            '<meta name="robots" content="index,follow"><meta property="og:image" content="https://old.test/old.png">'
+            '</head><body><h1>Tiêu đề cũ</h1></body></html>',
+            encoding="utf-8",
+        )
+        p = root / "phuong-phap-cong-khai/index.html"
+        p.write_text(
+            '<html><head><title>Tiêu đề cũ</title><meta name="description" content="Mô tả thử">'
+            '<meta name="robots" content="index,follow"></head><body><h1>Methods</h1></body></html>',
+            encoding="utf-8",
+        )
+        s = root / "thong-ke-xsmb/index.html"
+        s.write_text(
+            '<html><head><title>Stats</title><meta name="description" content="Stats">'
+            '<meta name="robots" content="index,follow"></head><body><h1>Tra cứu cũ</h1></body></html>',
+            encoding="utf-8",
+        )
+        result = apply(root)
+        h = home.read_text(encoding="utf-8")
+        assert result["pages"] == 3 and result["ga4_pages"] == result["consent_pages"] == 3
+        assert HOME_TITLE in h and HOME_DESC.replace("&", "&amp;") not in h
+        assert HOME_IMAGE in h and 'content="1200"' in h and 'content="630"' in h
+        assert f'<h1>{HOME_H1}</h1>' in h
+        assert '<h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>' in s.read_text(encoding="utf-8")
+    print("PORTAL_METADATA_SELF_TEST_OK")
 
 
-def main()->None:
-    p=argparse.ArgumentParser();p.add_argument('--output-root',type=Path,default=ROOT/'_site');p.add_argument('--self-test',action='store_true');a=p.parse_args()
-    if a.self_test:self_test()
-    else:print(json.dumps(apply(a.output_root),ensure_ascii=False))
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output-root", type=Path, default=ROOT / "_site")
+    parser.add_argument("--self-test", action="store_true")
+    args = parser.parse_args()
+    if args.self_test:
+        self_test()
+    else:
+        print(json.dumps(apply(args.output_root), ensure_ascii=False))
 
-if __name__=='__main__':main()
+
+if __name__ == "__main__":
+    main()

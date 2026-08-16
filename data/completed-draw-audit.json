@@ -1,12 +1,78 @@
 {
   "draws": {
-    "2026-08-12": {"code_count":27,"codes_sha256":"95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d","repeated_code_count":4,"source_count":3,"sources":["minhngoc","xosodaiphat","xosothienphu"],"status":"LOCKED_CROSSCHECKED_PUBLIC","unique_code_count":22},
-    "2026-08-13": {"code_count":27,"codes_sha256":"03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58","repeated_code_count":4,"source_count":5,"sources":["ketqua","kqxs","minhngoc","xosodaiphat","xosothienphu"],"status":"LOCKED_CROSSCHECKED_PUBLIC","unique_code_count":22},
-    "2026-08-14": {"code_count":27,"codes_sha256":"63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546","repeated_code_count":2,"source_count":5,"sources":["ketqua","kqxs","minhngoc","xosodaiphat","xosothienphu"],"status":"LOCKED_CROSSCHECKED_PUBLIC","unique_code_count":25},
-    "2026-08-15": {"code_count":27,"codes_sha256":"41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024","repeated_code_count":5,"source_count":2,"sources":["lucdz/xsmb","khiemdoan/vietnam-lottery-xsmb-analysis"],"status":"LOCKED_CROSSCHECKED_PUBLIC","unique_code_count":22}
+    "2026-08-12": {
+      "code_count": 27,
+      "codes_sha256": "95cc3b29870936ffa41b140aad7f047fc790d1b023f5acb5bfb8ebc021ed4c5d",
+      "repeated_code_count": 4,
+      "source_count": 3,
+      "sources": [
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 22
+    },
+    "2026-08-13": {
+      "code_count": 27,
+      "codes_sha256": "03ef83969042b6e919bdac6e7382516e2d50dceca05c6b5793d50b9d8d11ff58",
+      "repeated_code_count": 4,
+      "source_count": 5,
+      "sources": [
+        "ketqua",
+        "kqxs",
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 22
+    },
+    "2026-08-14": {
+      "code_count": 27,
+      "codes_sha256": "63cb5479f7be6084f902547f074e7ab2ddf0539806fd4e02c109ce18f6d1a546",
+      "repeated_code_count": 2,
+      "source_count": 5,
+      "sources": [
+        "ketqua",
+        "kqxs",
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 25
+    },
+    "2026-08-15": {
+      "code_count": 27,
+      "codes_sha256": "41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024",
+      "repeated_code_count": 5,
+      "source_count": 2,
+      "sources": [
+        "lucdz/xsmb",
+        "khiemdoan/vietnam-lottery-xsmb-analysis"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 22
+    },
+    "2026-08-16": {
+      "code_count": 27,
+      "codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
+      "repeated_code_count": 3,
+      "source_count": 5,
+      "sources": [
+        "ketqua",
+        "kqxs",
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 23
+    }
   },
-  "latest_completed_draw": "2026-08-15",
+  "latest_completed_draw": "2026-08-16",
   "policy": "POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL",
   "schema_version": "MB_COMPLETED_DRAW_AUDIT_V1",
-  "updated_at": "2026-08-15T20:03:00+07:00"
+  "updated_at": "2026-08-16T20:50:02+07:00"
 }

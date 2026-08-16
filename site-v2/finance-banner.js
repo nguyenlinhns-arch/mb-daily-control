@@ -77,7 +77,7 @@
 
     const heroLead = document.querySelector(".portal-hero .portal-lead");
     if (heroLead) {
-      heroLead.innerHTML = `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Khi cần phần kết luận riêng cho ngày <strong>${date}</strong>, mở bản phân tích AI một lần 30.000đ.`;
+      heroLead.innerHTML = `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`;
     }
 
     const paidCard = document.querySelector(".portal-paid-card");

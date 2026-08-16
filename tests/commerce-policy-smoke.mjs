@@ -8,11 +8,31 @@ assert.equal(
   true,
   'Secondary finance affiliate source must exist'
 );
+assert.equal(
+  existsSync('site-v2/affiliate-visibility.js'),
+  true,
+  'Visible AI-safe affiliate strip source must exist'
+);
 
 const conversion = read('scripts/apply_conversion_v2.py');
 assert.match(conversion, /finance-gate\.js/);
 assert.match(conversion, /FINANCE_GATE_SCRIPT_TAG/);
 assert.match(conversion, /finance-banner\.js/);
+assert.match(conversion, /affiliate-visibility\.js/);
+assert.match(conversion, /AFFILIATE_VISIBILITY_SCRIPT_TAG/);
+
+const primaryAffiliate = read('site-v2/affiliate-visibility.js');
+assert.match(primaryAffiliate, /after_tools_visible/);
+assert.match(primaryAffiliate, /affiliate_shopee_strip_view/);
+assert.match(primaryAffiliate, /affiliate_shopee_strip_click/);
+assert.match(primaryAffiliate, /lemienbac_purchase_/);
+assert.match(primaryAffiliate, /lm_ai_purchase_intent_v1/);
+assert.match(primaryAffiliate, /lm_affiliate_intent_v1/);
+assert.match(primaryAffiliate, /primaryAffiliateStrip|data-primary-affiliate-strip/);
+assert.match(primaryAffiliate, /data-open-checkout/);
+assert.match(primaryAffiliate, /data-ai-sticky-cta/);
+assert.doesNotMatch(primaryAffiliate, /position\s*:\s*fixed/i);
+assert.doesNotMatch(primaryAffiliate, /effectivecpmnetwork|highperformanceformat|adsterra/i);
 
 const commerce = read('site-v2/finance-banner.js');
 assert.match(commerce, /affiliate-shopee-smartlink/);

@@ -1,6 +1,13 @@
 // Public endpoint only. Administrative approval secrets must never be stored here.
 window.ORDER_CONFIRMATION_ENDPOINT = "https://script.google.com/macros/s/AKfycbygWuNvfFPiG9rKbW_tXgbo1LKssBhmqfO9JYxQP7BFLz4iamOHiiMnftEdaH6KeRrV/exec";
 
+// The product grid remains available after useful content, but the legacy
+// floating Shopee nudge is intentionally suppressed before checkout-enhance.js
+// installs its timer. This keeps AI checkout as the primary mobile conversion.
+try {
+  sessionStorage.setItem("lm_shopee_nudge_v1", "shown");
+} catch (_) {}
+
 // Privacy-safe first-party attribution. This random browser identifier contains
 // no name, phone number, email address or device fingerprint. app.js already
 // persists the attribution object with each payment claim, so adding the ID

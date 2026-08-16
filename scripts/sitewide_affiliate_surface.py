@@ -34,7 +34,7 @@ def remove_section(text: str, marker: str) -> str:
 
 
 def strip_markup() -> str:
-    return f'''<section class="lm-sitewide-affiliate" data-sitewide-affiliate="true" data-primary-affiliate-strip="sitewide-v4" aria-label="Ưu đãi Shopee tài trợ ACCESSTRADE"><div class="lm-sitewide-affiliate-inner"><a class="lm-sitewide-affiliate-card" href="{INTERNAL_SHOPEE_PATH}" target="_blank" rel="sponsored nofollow noopener"><div><span class="lm-sitewide-affiliate-badge">Tài trợ · ACCESSTRADE</span><strong>Shopee · xem ưu đãi mua sắm hôm nay</strong><small>Mở Shopee để xem sản phẩm và ưu đãi đang có. Giá mua không tăng vì liên kết này.</small></div><span class="lm-sitewide-affiliate-cta">XEM ƯU ĐÃI →</span></a><p class="lm-sitewide-affiliate-note">Website có thể nhận hoa hồng khi phát sinh giao dịch đủ điều kiện.</p></div></section>'''
+    return f'''<section class="lm-sitewide-affiliate" data-sitewide-affiliate="true" data-primary-affiliate-strip="sitewide-v4" aria-label="Ưu đãi Shopee tài trợ ACCESSTRADE"><div class="lm-sitewide-affiliate-inner"><a class="lm-sitewide-affiliate-card" href="{INTERNAL_SHOPEE_PATH}" target="_blank" rel="sponsored nofollow noopener"><div><span class="lm-sitewide-affiliate-badge">Tài trợ · ACCESSTRADE</span><strong>Shopee · xem ưu đãi mua sắm</strong><small>Mở Shopee để xem sản phẩm và ưu đãi đang có. Giá mua không tăng vì liên kết này.</small></div><span class="lm-sitewide-affiliate-cta">XEM ƯU ĐÃI →</span></a><p class="lm-sitewide-affiliate-note">Website có thể nhận hoa hồng khi phát sinh giao dịch đủ điều kiện.</p></div></section>'''
 
 
 def write_redirect(root: Path) -> None:
@@ -82,7 +82,6 @@ def apply(root: Path) -> dict[str, object]:
             if '</head>' not in text:
                 raise ValueError(f'{rel}: missing </head>')
             text = text.replace('</head>', STYLE + '</head>', 1)
-        # Use exactly one finance runtime everywhere; retire the older homepage-only version.
         text = re.sub(r'<script\s+defer\s+src="/finance-gate\.js\?v=[^"]+"></script>', '', text, flags=re.I)
         text = re.sub(r'<script\s+defer\s+src="/finance-gate-sitewide\.js\?v=[^"]+"></script>', '', text, flags=re.I)
         if '</head>' not in text:
@@ -125,6 +124,7 @@ def self_test() -> None:
             text = p.read_text(encoding='utf-8')
             assert 'data-sitewide-affiliate="true"' in text and 'data-primary-affiliate-strip="sitewide-v4"' in text
             assert '/finance-gate-sitewide.js?v=20260816-1' in text
+            assert 'mua sắm hôm nay' not in text
         assert '/finance-gate.js?v=old' not in (root/'index.html').read_text(encoding='utf-8')
         assert (root/'go/shopee/index.html').is_file()
     print('SITEWIDE_AFFILIATE_SELF_TEST_OK')

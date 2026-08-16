@@ -1,7 +1,7 @@
 {
   "schema_version": "MB_PAID_REPORT_STATUS_V1",
-  "target_date": "2026-08-15",
-  "data_lock": "2026-08-14",
+  "target_date": "2026-08-17",
+  "data_lock": "2026-08-16",
   "report_stage": "PUBLISHED",
   "method_id": "MB_4SO_V1",
   "active_config": "MB_4SO_PRIMARY_V1_20260731",
@@ -9,6 +9,6 @@
   "code_count": 4,
   "paid_delivery_source": "Paid_Report",
   "public_codes_exposed": false,
-  "updated_at": "2026-08-15T00:20:00+07:00",
-  "note": "Trạng thái công khai chỉ xác nhận báo cáo đã sẵn sàng; hai cặp canonical không được đưa vào artifact công khai trước thanh toán."
+  "updated_at": "2026-08-16T22:40:00+07:00",
+  "note": "Trạng thái công khai chỉ xác nhận báo cáo 17/08 đã sẵn sàng; lệnh thực tế đã chốt được lưu riêng trong Paid_Report sau thanh toán, không đưa mã số vào artifact công khai."
 }

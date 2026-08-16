@@ -16,7 +16,7 @@ STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260816-2">'
 SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260816-1"></script>'
 FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260816-6"></script>'
 FINANCE_GATE_SCRIPT_TAG = '<script defer src="/finance-gate.js?v=20260816-3"></script>'
-AFFILIATE_VISIBILITY_SCRIPT_TAG = '<script defer src="/affiliate-visibility.js?v=20260816-1"></script>'
+AFFILIATE_VISIBILITY_SCRIPT_TAG = '<script defer src="/affiliate-visibility.js?v=20260816-2"></script>'
 
 
 def inject_before_head_end(content: str, tag: str) -> str:
@@ -96,7 +96,6 @@ def validate(root: Path) -> None:
         if marker not in content:
             raise AssertionError(f"Missing final conversion marker: {marker}")
 
-    # Historical rate is data, not a design constant.
     metric = re.search(
         r'<div class="historical-rate">\s*<p>.*?</p>\s*'
         r'<strong>(\d+)%</strong>\s*<span>\s*(\d+)\s*/\s*(\d+)\s+ngày',

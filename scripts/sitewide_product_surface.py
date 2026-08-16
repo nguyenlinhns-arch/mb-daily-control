@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import html
 import re
 import shutil
 from pathlib import Path
@@ -9,37 +10,41 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FINANCE_SOURCE = ROOT / "site-v2" / "finance-gate-sitewide.js"
 FINANCE_TAG = '<script defer src="/finance-gate-sitewide.js?v=20260816-2"></script>'
-EXCLUDED = {"404.html", "go/shopee/index.html"}
+EXCLUDED = {"404.html"}
 
 PRODUCTS = [
     {
+        "slug": "1",
         "name": "Tông đơ Philips MG3911/15 7in1",
         "image": "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mp1ohea3di4g9e",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773390&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vVCVDMyVCNG5nLSVDNCU5MSVDNiVBMS1QaGlsaXBzLU1HMzkxMS0xNS1NdWx0aWdyb29tLTMwMDAtN2luMS1jJUUxJUJBJUFGdC10JUUxJUJCJTg5YS1yJUMzJUIzYy0lQzQlOTFhLW4lQzQlODNuZy1zJUUxJUJCJUFELWQlRTElQkIlQTVuZy10JUUxJUJBJUExaS1uaCVDMyVBMC1pLjQ2MzYwMDA2MS40OTUxMTM1NzAxNw==&redirect_302=1",
     },
     {
+        "slug": "2",
         "name": "Sạc dự phòng Anker Zolo 20.000mAh 22.5W",
         "image": "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mlnj4c7kwkjp03",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773391&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vUyVFMSVCQSVBMWMtZCVFMSVCQiVCMS1waCVDMyVCMm5nLUFua2VyLVpvbG8tQTExMEQtMjAwMDBtQWgtY2h1JUUxJUJBJUE5bi0zQy1UcnVuZy1RdSVFMSVCQiU5MWMtYyVDMyVBMXAtVVNCLUMtdCVDMyVBRGNoLWglRTElQkIlQTNwLXMlRTElQkElQTFjLW5oYW5oLTIyLjVXLWkuMTIwMjg4OTY3OC40NTU1NDAxNDY3NQ==&redirect_302=1",
     },
     {
+        "slug": "3",
         "name": "Máy vặn vít pin Bosch GO 3",
         "image": "https://down-vn.img.susercontent.com/file/sg-11134201-8259d-mrbyk5d9m3gs2c",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773392&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktdiVFMSVCQSVCN24tdiVDMyVBRHQtcGluLUJvc2NoLUdvLTMtaS43NTgxMDI0OS4yNTUxNDU2ODgyOQ==&redirect_302=1",
     },
     {
+        "slug": "4",
         "name": "Máy hút bụi cầm tay Deerma DX118C 600W",
         "image": "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m83aax7f0sasfe",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773393&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktSCVDMyVCQXQtQiVFMSVCQiVBNWktQyVFMSVCQSVBN20tVGF5LURlZXJtYS1EWDExOEMtJTI4QiVFMSVCQSVBMk4tTSVFMSVCQiU5QUktNjAwVyUyOS1DaCVDMyVBRG5oLWglQzMlQTNuZy1EZWVybWEtaS4yODE0MzI4NC4yNzQ1Nzg2MDQwNA==&redirect_302=1",
     },
 ]
 
-STYLE = '''<style id="lm-sitewide-products-style">
-.lm-sitewide-products{display:block!important;visibility:visible!important;opacity:1!important;width:100%;padding:18px 0 12px;background:#fff}.lm-sitewide-products-inner{max-width:1180px;margin:auto;padding:0 16px}.lm-sitewide-products-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:10px}.lm-sitewide-products-kicker{display:block;color:#ee4d2d;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.lm-sitewide-products-head h2{margin:2px 0 0;color:#203542;font-size:19px;line-height:1.2}.lm-sitewide-products-head small{color:#84919a;font-size:10px;white-space:nowrap}.lm-sitewide-products-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.lm-sitewide-product-card{display:block!important;min-width:0;overflow:hidden;border:1px solid #e7ebee;border-radius:14px;background:#fff;color:#243542!important;text-decoration:none!important;box-shadow:0 2px 9px rgba(24,42,54,.05)}.lm-sitewide-product-image{aspect-ratio:1/1;background:#f6f7f8;overflow:hidden}.lm-sitewide-product-image img{display:block;width:100%;height:100%;object-fit:cover}.lm-sitewide-product-copy{padding:9px}.lm-sitewide-product-copy strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;min-height:36px;font-size:12px;line-height:1.45;color:#263946}.lm-sitewide-product-copy span{display:flex;align-items:center;justify-content:center;min-height:38px;margin-top:8px;border-radius:9px;background:#ee4d2d;color:#fff;font-size:11px;font-weight:900}.lm-sitewide-products-note{margin:6px 1px 0;color:#929ca3;font-size:8.5px;line-height:1.35}
-@media(max-width:700px){.lm-sitewide-products{padding:14px 0 9px}.lm-sitewide-products-inner{padding:0 10px}.lm-sitewide-products-head h2{font-size:17px}.lm-sitewide-products-head small{display:none}.lm-sitewide-products-grid{display:flex!important;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 1px 4px;scrollbar-width:none}.lm-sitewide-products-grid::-webkit-scrollbar{display:none}.lm-sitewide-product-card{flex:0 0 min(42vw,170px);scroll-snap-align:start}.lm-sitewide-product-copy{padding:8px}.lm-sitewide-product-copy strong{font-size:11.5px;min-height:34px}.lm-sitewide-product-copy span{min-height:40px;font-size:10.5px}}
+STYLE = '''<style id="lm-shop-grid-style-v3">
+.lm-shop-grid{display:block!important;visibility:visible!important;opacity:1!important;width:100%;padding:18px 0 12px;background:#fff}.lm-shop-grid-inner{max-width:1180px;margin:auto;padding:0 16px}.lm-shop-grid-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:10px}.lm-shop-grid-head span{display:block;color:#ee4d2d;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.lm-shop-grid-head h2{margin:2px 0 0;color:#203542;font-size:19px;line-height:1.2}.lm-shop-grid-head small{color:#84919a;font-size:10px;white-space:nowrap}.lm-shop-grid-items{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.lm-shop-item{display:block!important;visibility:visible!important;opacity:1!important;min-width:0;overflow:hidden;border:1px solid #e7ebee;border-radius:14px;background:#fff;color:#243542!important;text-decoration:none!important;box-shadow:0 2px 9px rgba(24,42,54,.05)}.lm-shop-item-media{aspect-ratio:1/1;background:linear-gradient(135deg,#f7f8fa,#edf1f4);overflow:hidden}.lm-shop-item-media img{display:block;width:100%;height:100%;object-fit:cover}.lm-shop-item-copy{padding:9px}.lm-shop-item-copy strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;min-height:36px;font-size:12px;line-height:1.45;color:#263946}.lm-shop-item-copy b{display:flex;align-items:center;justify-content:center;min-height:38px;margin-top:8px;border-radius:9px;background:#ee4d2d;color:#fff;font-size:11px;font-weight:900}.lm-shop-grid-note{margin:6px 1px 0;color:#929ca3;font-size:8.5px;line-height:1.35}
+@media(max-width:700px){.lm-shop-grid{padding:14px 0 9px}.lm-shop-grid-inner{padding:0 10px}.lm-shop-grid-head h2{font-size:17px}.lm-shop-grid-head small{display:none}.lm-shop-grid-items{display:flex!important;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 1px 4px;scrollbar-width:none}.lm-shop-grid-items::-webkit-scrollbar{display:none}.lm-shop-item{flex:0 0 min(42vw,170px);scroll-snap-align:start}.lm-shop-item-copy{padding:8px}.lm-shop-item-copy strong{font-size:11.5px;min-height:34px}.lm-shop-item-copy b{min-height:40px;font-size:10.5px}}
 </style>'''
 
-TRACK = '''<script id="lm-sitewide-products-track">(()=>{const grid=document.querySelector('section[data-sitewide-products="true"]');if(!grid)return;const push=(event,extra={})=>{window.dataLayer=window.dataLayer||[];window.dataLayer.push({event,page_path:location.pathname,affiliate_network:'ACCESSTRADE',merchant:'Shopee',placement:'sitewide_lower_products',...extra})};let fired=false;const fire=()=>{if(fired)return;fired=true;push('affiliate_product_grid_view')};if('IntersectionObserver'in window){const o=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.intersectionRatio>=.35)){fire();o.disconnect()}},{threshold:[.35]});o.observe(grid)}else fire();document.addEventListener('click',e=>{const t=e.target instanceof Element?e.target:null;if(!t)return;const card=t.closest('[data-sitewide-product]');if(card)push('affiliate_product_click',{product_index:Number(card.dataset.sitewideProduct||0),product_name:card.dataset.productName||''})},true)})();</script>'''
+TRACK = '''<script id="lm-shop-grid-track-v3">(()=>{const root=document.querySelector('section[data-sitewide-products="true"]');if(!root)return;const push=(event,extra={})=>{window.dataLayer=window.dataLayer||[];window.dataLayer.push({event,page_path:location.pathname,merchant:'Shopee',affiliate_network:'ACCESSTRADE',placement:'lower_4_cards_v3',...extra})};let seen=false;const fire=()=>{if(seen)return;seen=true;push('affiliate_product_grid_view')};if('IntersectionObserver'in window){const o=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){fire();o.disconnect()}},{threshold:[.2]});o.observe(root)}else fire();root.addEventListener('click',e=>{const a=e.target.closest('[data-shop-item]');if(a)push('affiliate_product_click',{product_index:Number(a.dataset.shopItem||0),product_name:a.dataset.productName||''})})})();</script>'''
 
 
 def remove_section(text: str, marker: str) -> str:
@@ -53,22 +58,37 @@ def remove_section(text: str, marker: str) -> str:
     return text
 
 
-def build_products(home: bool = False) -> str:
+def write_redirects(root: Path) -> None:
+    for product in PRODUCTS:
+        target = root / 'go' / 'sp' / product['slug'] / 'index.html'
+        target.parent.mkdir(parents=True, exist_ok=True)
+        escaped = html.escape(product['url'], quote=True)
+        target.write_text(
+            '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1"><title>Đang mở sản phẩm</title>'
+            f'<meta http-equiv="refresh" content="0;url={escaped}"></head><body><p>Đang mở sản phẩm…</p>'
+            f'<script>location.replace({product["url"]!r});</script></body></html>',
+            encoding='utf-8',
+        )
+
+
+def build_grid(home: bool) -> str:
     placement = ' data-affiliate-static-placement="after_tools"' if home else ''
     cards = []
     for index, product in enumerate(PRODUCTS, start=1):
+        name = html.escape(product['name'])
+        image = html.escape(product['image'], quote=True)
         cards.append(
-            f'<a class="lm-sitewide-product-card" href="{product["url"]}" target="_blank" rel="sponsored nofollow noopener noreferrer" data-sitewide-product="{index}" data-product-name="{product["name"]}">'
-            f'<div class="lm-sitewide-product-image"><img src="{product["image"]}" loading="lazy" decoding="async" alt="{product["name"]}"></div>'
-            f'<div class="lm-sitewide-product-copy"><strong>{product["name"]}</strong><span>Xem trên Shopee →</span></div></a>'
+            f'<a class="lm-shop-item" href="/go/sp/{product["slug"]}/" target="_blank" rel="nofollow noopener" data-shop-item="{index}" data-product-name="{name}">'
+            f'<div class="lm-shop-item-media"><img src="{image}" loading="lazy" decoding="async" alt="{name}"></div>'
+            f'<div class="lm-shop-item-copy"><strong>{name}</strong><b>Xem trên Shopee →</b></div></a>'
         )
     return (
-        f'<section class="lm-sitewide-products"{placement} data-sitewide-products="true" aria-label="4 sản phẩm Shopee qua ACCESSTRADE">'
-        '<div class="lm-sitewide-products-inner"><div class="lm-sitewide-products-head"><div>'
-        '<span class="lm-sitewide-products-kicker">Tài trợ · ACCESSTRADE</span><h2>Sản phẩm Shopee đang giới thiệu</h2>'
-        '</div><small>4 sản phẩm · mở trực tiếp trên Shopee</small></div><div class="lm-sitewide-products-grid">'
-        + ''.join(cards)
-        + '</div><p class="lm-sitewide-products-note">Liên kết đối tác · giá và ưu đãi xem trực tiếp trên Shopee.</p></div></section>'
+        f'<section class="lm-shop-grid"{placement} data-sitewide-products="true">'
+        '<div class="lm-shop-grid-inner"><div class="lm-shop-grid-head"><div><span>Liên kết đối tác</span>'
+        '<h2>Sản phẩm Shopee đang giới thiệu</h2></div><small>4 sản phẩm</small></div>'
+        '<div class="lm-shop-grid-items">' + ''.join(cards) + '</div>'
+        '<p class="lm-shop-grid-note">Website có thể nhận hoa hồng khi phát sinh giao dịch đủ điều kiện.</p></div></section>'
     )
 
 
@@ -83,44 +103,36 @@ def section_end_for_marker(text: str, marker: str) -> int | None:
     return end + len('</section>')
 
 
-def insert_home_grid(text: str) -> str:
-    for marker in ('<h2>Công cụ thống kê XSMB</h2>', 'Công cụ thống kê XSMB', 'portal-tools'):
-        end = section_end_for_marker(text, marker)
-        if end is not None:
-            return text[:end] + build_products(home=True) + text[end:]
-    end = text.lower().rfind('</main>')
-    if end < 0:
-        raise ValueError('Homepage missing </main>')
-    return text[:end] + build_products(home=True) + text[end:]
-
-
-def insert_subpage_grid(text: str) -> str:
+def insert_grid(text: str, home: bool) -> str:
+    if home:
+        for marker in ('<h2>Công cụ thống kê XSMB</h2>', 'Công cụ thống kê XSMB', 'portal-tools'):
+            end = section_end_for_marker(text, marker)
+            if end is not None:
+                return text[:end] + build_grid(True) + text[end:]
     end = text.lower().rfind('</main>')
     if end < 0:
         end = text.lower().rfind('</body>')
     if end < 0:
-        raise ValueError('HTML missing main/body end')
-    return text[:end] + build_products(home=False) + text[end:]
+        raise ValueError('missing main/body end')
+    return text[:end] + build_grid(home) + text[end:]
 
 
 def apply(root: Path) -> dict[str, object]:
-    pages = [
-        p for p in root.rglob('*.html')
-        if p.relative_to(root).as_posix() not in EXCLUDED
-        and not p.relative_to(root).as_posix().startswith('go/shopee/')
-    ]
-    if not pages:
-        return {'status': 'SKIP', 'reason': 'no_public_html', 'pages': 0}
+    write_redirects(root)
     if not FINANCE_SOURCE.is_file():
         raise FileNotFoundError(FINANCE_SOURCE)
-
     shutil.copy2(FINANCE_SOURCE, root / 'finance-gate-sitewide.js')
-    injected = 0
+
+    pages = []
+    for page in root.rglob('*.html'):
+        rel = page.relative_to(root).as_posix()
+        if rel in EXCLUDED or rel.startswith('go/'):
+            continue
+        pages.append(page)
+
     for page in pages:
         rel = page.relative_to(root).as_posix()
         text = page.read_text(encoding='utf-8')
-
-        # Remove every legacy Shopee surface, including the top banner and hidden old grids.
         for marker in (
             'data-sitewide-affiliate="true"',
             'data-primary-affiliate-strip="sitewide-v4"',
@@ -134,45 +146,43 @@ def apply(root: Path) -> dict[str, object]:
             text = remove_section(text, marker)
         text = re.sub(r'<style\s+id="lm-sitewide-affiliate-style">.*?</style>', '', text, flags=re.I | re.S)
         text = re.sub(r'<style\s+id="lm-sitewide-products-style">.*?</style>', '', text, flags=re.I | re.S)
+        text = re.sub(r'<style\s+id="lm-shop-grid-style-v3">.*?</style>', '', text, flags=re.I | re.S)
         text = re.sub(r'<script\s+id="lm-sitewide-affiliate-track">.*?</script>', '', text, flags=re.I | re.S)
         text = re.sub(r'<script\s+id="lm-sitewide-products-track">.*?</script>', '', text, flags=re.I | re.S)
+        text = re.sub(r'<script\s+id="lm-shop-grid-track-v3">.*?</script>', '', text, flags=re.I | re.S)
 
-        # Insert one fresh visible four-product block at the canonical lower position.
-        text = insert_home_grid(text) if rel == 'index.html' else insert_subpage_grid(text)
-
-        if '</head>' not in text:
-            raise ValueError(f'{rel}: missing </head>')
+        text = insert_grid(text, rel == 'index.html')
+        if '</head>' not in text or '</body>' not in text:
+            raise ValueError(rel)
         text = text.replace('</head>', STYLE + '</head>', 1)
-
-        # Keep one VPBank sitewide runtime everywhere.
         text = re.sub(r'<script\s+defer\s+src="/finance-gate\.js\?v=[^"]+"></script>', '', text, flags=re.I)
         text = re.sub(r'<script\s+defer\s+src="/finance-gate-sitewide\.js\?v=[^"]+"></script>', '', text, flags=re.I)
         text = text.replace('</head>', FINANCE_TAG + '</head>', 1)
-
-        if '</body>' not in text:
-            raise ValueError(f'{rel}: missing </body>')
         text = text.replace('</body>', TRACK + '</body>', 1)
 
-        section_count = len(re.findall(r'<section\b[^>]*\bdata-sitewide-products="true"', text, flags=re.I))
-        if section_count != 1:
-            raise ValueError(f'{rel}: expected exactly one product section, found {section_count}')
-        if 'data-sitewide-affiliate="true"' in text or 'sitewide-v4' in text:
-            raise ValueError(f'{rel}: top Shopee banner still present')
+        sections = re.findall(r'<section\b[^>]*\bdata-sitewide-products="true"', text, flags=re.I)
+        if len(sections) != 1:
+            raise ValueError(f'{rel}: product section count={len(sections)}')
+        visible_section = re.search(r'<section\b[^>]*\bdata-sitewide-products="true".*?</section>', text, flags=re.I | re.S)
+        if not visible_section or 'go.isclix.com' in visible_section.group(0):
+            raise ValueError(f'{rel}: visible cards must use internal links')
+        if visible_section.group(0).count('data-shop-item=') != 4:
+            raise ValueError(f'{rel}: expected four cards')
         if FINANCE_TAG not in text:
-            raise ValueError(f'{rel}: finance sitewide runtime missing')
+            raise ValueError(f'{rel}: finance runtime missing')
         page.write_text(text, encoding='utf-8')
-        injected += 1
 
     home = (root / 'index.html').read_text(encoding='utf-8')
     if home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') != 1:
-        raise ValueError('Homepage lower product placement contract missing')
+        raise ValueError('home lower placement missing')
     return {
         'status': 'PASS',
-        'pages': injected,
+        'pages': len(pages),
         'top_banner_removed': True,
         'product_grid_lower': True,
-        'finance_sitewide': True,
         'product_count': 4,
+        'internal_product_links': True,
+        'finance_sitewide': True,
     }
 
 
@@ -181,25 +191,20 @@ def self_test() -> None:
     global FINANCE_SOURCE
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
-        root.joinpath('index.html').write_text(
-            '<html><head></head><body><main><section><h2>Công cụ thống kê XSMB</h2></section></main></body></html>',
-            encoding='utf-8',
-        )
+        root.joinpath('index.html').write_text('<html><head></head><body><main><section><h2>Công cụ thống kê XSMB</h2></section></main></body></html>', encoding='utf-8')
         root.joinpath('stats').mkdir()
         root.joinpath('stats/index.html').write_text('<html><head></head><body><main><h1>Stats</h1></main></body></html>', encoding='utf-8')
-        source = root / 'fake-finance.js'
-        source.write_text('x', encoding='utf-8')
-        old = FINANCE_SOURCE
-        FINANCE_SOURCE = source
+        fake = root / 'finance.js'; fake.write_text('x', encoding='utf-8')
+        old = FINANCE_SOURCE; FINANCE_SOURCE = fake
         try:
             result = apply(root)
         finally:
             FINANCE_SOURCE = old
-        assert result['status'] == 'PASS' and result['pages'] == 2
+        assert result['status'] == 'PASS' and result['product_count'] == 4
         home = (root / 'index.html').read_text(encoding='utf-8')
-        assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
-        assert 'data-sitewide-affiliate="true"' not in home
-        assert home.count('data-sitewide-product=') == 4
+        assert home.count('data-shop-item=') == 4
+        assert '/go/sp/1/' in home and 'go.isclix.com' not in re.search(r'<section class="lm-shop-grid".*?</section>', home, re.S).group(0)
+        assert (root / 'go' / 'sp' / '1' / 'index.html').is_file()
     print('SITEWIDE_PRODUCT_SURFACE_SELF_TEST_OK')
 
 

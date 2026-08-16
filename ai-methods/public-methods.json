@@ -1,19 +1,43 @@
 {
   "schema_version": "MB_PUBLIC_METHOD_OUTPUTS_V2_TODAY_ONLY",
   "recommendation_scope": "TODAY_ONLY",
-  "target_date": "2026-08-16",
-  "data_lock": "2026-08-15",
-  "generated_at": "2026-08-15T20:03:00+07:00",
+  "target_date": "2026-08-17",
+  "data_lock": "2026-08-16",
+  "generated_at": "2026-08-16T22:40:00+07:00",
   "source_status": "LOCKED_27_OF_27",
-  "source_row_count": 2369,
-  "source_sha256": "95d11631fdbe4bbf52912cb9fd9b0085898f761a11b5bee0be32e67b5ec21ef5",
+  "source_row_count": 2370,
+  "source_sha256": "7d6f69c950939a9464325d93c19179a1b81b6ade4ce55dd54c1438bfec3e5523",
   "outcome_known_at_selection": false,
   "methods": [
-    {"id":"A1","name":"A1","numbers":["71","37","65","74"]},
-    {"id":"X2_RBK","name":"2SO / X2","numbers":["60","06"]},
-    {"id":"X3_GROWTH","name":"X3 GROWTH","numbers":["02","20","10"]},
-    {"id":"F01_FREQUENCY60","name":"F01 TẦN SUẤT","numbers":["50","83","95","60","06","61","90"]},
-    {"id":"F06_TRANSITION180","name":"F06 CHUYỂN TIẾP","numbers":["91","83","52","13","09","95","90"]},
-    {"id":"MB_KEP_V1","name":"KÉP V1","numbers":["99","11","33"]}
+    {
+      "id": "A1",
+      "name": "A1",
+      "numbers": ["71","37","65","74"]
+    },
+    {
+      "id": "X2_RBK",
+      "name": "2SO / X2",
+      "numbers": ["60","06"]
+    },
+    {
+      "id": "X3_GROWTH",
+      "name": "X3 GROWTH",
+      "numbers": ["34","02","20"]
+    },
+    {
+      "id": "F01_FREQUENCY60",
+      "name": "F01 TẦN SUẤT",
+      "numbers": ["50","83","06","95","54","60","90"]
+    },
+    {
+      "id": "F06_TRANSITION180",
+      "name": "F06 CHUYỂN TIẾP",
+      "numbers": ["91","52","13","83","09","50","54"]
+    },
+    {
+      "id": "MB_KEP_V1",
+      "name": "KÉP V1",
+      "numbers": ["99","33","00"]
+    }
   ]
 }

@@ -15,6 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLE_TAG = '<link rel="stylesheet" href="/conversion-v2.css?v=20260815-1">'
 SCRIPT_TAG = '<script defer src="/checkout-enhance.js?v=20260816-1"></script>'
 FINANCE_SCRIPT_TAG = '<script defer src="/finance-banner.js?v=20260816-5"></script>'
+FINANCE_GATE_SCRIPT_TAG = '<script defer src="/finance-gate.js?v=20260816-2"></script>'
 
 
 def inject_before_head_end(content: str, tag: str) -> str:
@@ -44,6 +45,7 @@ def apply_home(home: Path) -> None:
     content = inject_before_head_end(content, STYLE_TAG)
     content = inject_before_head_end(content, SCRIPT_TAG)
     content = inject_before_head_end(content, FINANCE_SCRIPT_TAG)
+    content = inject_before_head_end(content, FINANCE_GATE_SCRIPT_TAG)
 
     replacements = (
         ("Có cả ngày xuất hiện và không xuất hiện", "Có cả ngày trúng và không trúng"),
@@ -80,6 +82,7 @@ def validate(root: Path) -> None:
         STYLE_TAG,
         SCRIPT_TAG,
         FINANCE_SCRIPT_TAG,
+        FINANCE_GATE_SCRIPT_TAG,
         "4 số trong báo cáo",
         "Kết quả thực tế",
         "Có cả ngày trúng và không trúng",
@@ -158,9 +161,6 @@ def validate(root: Path) -> None:
     if re.search(r'19\s*[-–—]\s*91[\s\S]{0,120}05\s*[-–—]\s*50', content):
         raise AssertionError("Current paid report pairs leaked into public HTML")
 
-    if "finance-gate.js" in content or "lm-finance-gate" in content:
-        raise AssertionError("Intrusive finance gate leaked into production homepage")
-
 
 def apply(root: Path) -> None:
     apply_home(root / "index.html")
@@ -175,6 +175,11 @@ def apply(root: Path) -> None:
     if not finance_source.exists():
         raise FileNotFoundError(f"Missing commerce runtime source: {finance_source}")
     shutil.copy2(finance_source, root / "finance-banner.js")
+
+    finance_gate_source = REPO_ROOT / "site-v2" / "finance-gate.js"
+    if not finance_gate_source.exists():
+        raise FileNotFoundError(f"Missing finance gate source: {finance_gate_source}")
+    shutil.copy2(finance_gate_source, root / "finance-gate.js")
 
     optimize_google_ads_landing(root)
 

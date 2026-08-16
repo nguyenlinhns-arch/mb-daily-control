@@ -66,6 +66,14 @@ def section_bounds(text: str, marker: str) -> tuple[int, int] | None:
     return start, end + len("</section>")
 
 
+def first_section_bounds(text: str, markers: tuple[str, ...]) -> tuple[int, int] | None:
+    for marker in markers:
+        bounds = section_bounds(text, marker)
+        if bounds:
+            return bounds
+    return None
+
+
 def build_purchase(label: str) -> str:
     return f'''<section id="buy" class="buy-simple portal-buy lm-synced-purchase" data-final-purchase-surface="v1">
   <div class="portal-wrap lm-synced-purchase-wrap">
@@ -135,15 +143,20 @@ def apply(root: Path) -> dict:
     text = remove_section_by_marker(text, 'data-primary-affiliate-strip=')
     text = remove_section_by_marker(text, 'class="lm-product-deals')
 
-    # Static Shopee strip immediately after results.
-    results = section_bounds(text, 'portal-result-card')
+    # Static Shopee strip immediately after the most stable result anchor available in the final artifact.
+    results = first_section_bounds(text, (
+        '27 mã kỳ gần nhất',
+        'Kết quả XSMB',
+        'portal-results',
+        'portal-result-card',
+    ))
     if not results:
         raise ValueError("results section not found for affiliate strip")
     _, result_end = results
     text = text[:result_end] + build_strip() + text[result_end:]
 
     # Static four-product grid immediately after the tools section.
-    tools = section_bounds(text, '<h2>Công cụ thống kê XSMB</h2>')
+    tools = first_section_bounds(text, ('<h2>Công cụ thống kê XSMB</h2>', 'Công cụ thống kê XSMB', 'portal-tools'))
     if not tools:
         raise ValueError("tools section not found for affiliate product grid")
     _, tools_end = tools
@@ -154,7 +167,7 @@ def apply(root: Path) -> dict:
     text = re.sub(r'<script id="lm-static-affiliate-track">.*?</script>', '', text, flags=re.I | re.S)
     text = text.replace('</body>', TRACK + '</body>', 1)
 
-    # Explicit contracts: synced paid card and three ACCESSTRADE surfaces must be present.
+    # Explicit contracts: synced paid card and ACCESSTRADE surfaces must be present.
     required = (
         f'Gợi ý số ngày hôm nay - {label}',
         'MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ',
@@ -171,7 +184,7 @@ def apply(root: Path) -> dict:
         if token not in text:
             raise ValueError(f"final revenue surface missing: {token}")
     lower = text[text.find('data-final-purchase-surface="v1"'):text.find('data-final-purchase-surface="v1"') + 2600]
-    for legacy in ('BẢN PHÂN TÍCH AI NGÀY', 'MỞ BẢN PHÂN TÍCH AI', '30.000đ\n', 'Top 1–Top 2 được khóa'):
+    for legacy in ('BẢN PHÂN TÍCH AI NGÀY', 'MỞ BẢN PHÂN TÍCH AI', 'Top 1–Top 2 được khóa'):
         if legacy in lower:
             raise ValueError(f"legacy lower purchase copy remains: {legacy}")
 

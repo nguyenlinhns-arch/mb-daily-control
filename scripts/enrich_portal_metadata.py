@@ -14,8 +14,8 @@ GA4 = "G-R9TBYP97BC"
 CONSENT_KEY = "lm_analytics_consent_v1"
 HOME_TITLE = "Thống kê XSMB lô tô, lô gan & AI | Lê Miền Bắc"
 HOME_DESC = (
-    "Thống kê XSMB lô tô từ dữ liệu 27 mã mỗi kỳ: tần suất 00–99, lô gan, "
-    "45 cặp đảo, đầu đuôi, theo tổng và tra cứu lịch sử bằng hệ thống AI."
+    "Xổ số Miền Bắc (XSMB): thống kê 00–99, lô gan, 45 cặp đảo, đầu đuôi, "
+    "theo tổng và tra cứu lịch sử từ dữ liệu 27 mã mỗi kỳ bằng hệ thống AI."
 )
 HOME_IMAGE_PATH = "/og-seo.svg"
 HOME_IMAGE = f"{BASE}{HOME_IMAGE_PATH}"

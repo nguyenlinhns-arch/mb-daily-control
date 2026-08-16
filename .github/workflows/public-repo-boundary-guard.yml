@@ -29,9 +29,40 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Permanently forbid Adsterra
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          forbidden = (
+              "effective" + "cpmnetwork.com",
+              "high" + "performanceformat.com",
+              "Ad" + "sterra",
+              "pl308" + "63058",
+              "b3caa" + "39744fc30610e7756cf4ccb98cd",
+              "e336b" + "428517bbcb55a3e3da308cc7939",
+          )
+          hits = []
+          for path in Path('.').rglob('*'):
+              if not path.is_file() or '.git' in path.parts:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              for token in forbidden:
+                  if token.lower() in text.lower():
+                      hits.append(f"{path}: forbidden monetization token {token}")
+          if hits:
+              raise SystemExit('\n'.join(hits))
+          print('ADSTERRA_PERMANENTLY_FORBIDDEN_OK')
+          PY
+
       - name: Core privacy and builder self-tests
         run: |
           set -euo pipefail
+          test ! -e site-v2/monetization-slots.js
           test ! -e .github/workflows/accesstrade-only-monetization.yml
           test ! -e scripts/enforce_accesstrade_only.py
           python scripts/public_repo_boundary_guard.py --self-test

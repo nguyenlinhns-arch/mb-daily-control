@@ -24,6 +24,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "MB_PUBLIC_METHOD_YESTERDAY_SETTLEMENT_V1"
 MARKER = 'data-yesterday-public-methods="true"'
 STYLE_ID = "lm-yesterday-public-methods-style"
+RESULT_HEADING = "<h2>27 mã kỳ gần nhất</h2>"
+TOOLS_HEADING = "<h2>Công cụ thống kê XSMB</h2>"
 FORBIDDEN = re.compile(r"(?:canonical|final)[_-]?(?:codes|pairs)|\b4SO\b", re.I)
 
 
@@ -84,6 +86,8 @@ def build_doc(history: list[tuple[date, list[str]]]) -> dict[str, Any]:
         "method_hit_count": method_hit_count,
         "methods": rows,
     }
+    if len(rows) != 6:
+        raise ValueError(f"Expected 6 public methods, found {len(rows)}")
     if FORBIDDEN.search(json.dumps(payload, ensure_ascii=False)):
         raise ValueError("Forbidden paid/canonical field in yesterday public-method payload")
     return payload
@@ -100,7 +104,7 @@ def render(payload: dict[str, Any]) -> str:
     rec_date = str(payload["recommendation_date"])
     lock_date = str(payload["data_lock"])
     methods = payload.get("methods") or []
-    cards = []
+    cards: list[str] = []
     for method in methods:
         hit_numbers = {str(hit["number"]): int(hit["count"]) for hit in method.get("hits") or []}
         balls = "".join(
@@ -109,9 +113,7 @@ def render(payload: dict[str, Any]) -> str:
         )
         hits = method.get("hits") or []
         if hits:
-            result = "".join(
-                f'<strong>{esc(hit["number"])} × {int(hit["count"])}</strong>' for hit in hits
-            )
+            result = "".join(f'<strong>{esc(hit["number"])} × {int(hit["count"])}</strong>' for hit in hits)
         else:
             result = '<span>Không xuất hiện trong 27 mã.</span>'
         cards.append(
@@ -131,15 +133,22 @@ def render(payload: dict[str, Any]) -> str:
     )
 
 
-def section_around(text: str, needle: str) -> tuple[int, int] | None:
-    pos = text.find(needle)
-    if pos < 0:
+def result_section(text: str) -> tuple[int, int] | None:
+    """Find the latest-result section in BODY, never a CSS class name in HEAD."""
+    body = text.find("<body")
+    if body < 0:
         return None
-    start = text.rfind('<section', 0, pos)
-    end = text.find('</section>', pos)
+    pos = text.find(RESULT_HEADING, body)
+    if pos < 0:
+        match = re.search(r"<h2>\s*27\s+mã\s+kỳ\s+gần\s+nhất\s*</h2>", text[body:], flags=re.I)
+        if not match:
+            return None
+        pos = body + match.start()
+    start = text.rfind("<section", body, pos)
+    end = text.find("</section>", pos)
     if start < 0 or end < 0:
         return None
-    return start, end + len('</section>')
+    return start, end + len("</section>")
 
 
 def inject(root: Path, payload: dict[str, Any]) -> dict[str, Any]:
@@ -157,18 +166,23 @@ def inject(root: Path, payload: dict[str, Any]) -> dict[str, Any]:
     if existing:
         text = text[:existing.start()] + block + text[existing.end():]
     else:
-        result_section = section_around(text, 'portal-result-card')
-        if not result_section:
+        result = result_section(text)
+        if not result:
             raise ValueError("Latest XSMB result section not found")
-        _, end = result_section
+        _, end = result
         text = text[:end] + block + text[end:]
 
-    if text.find(MARKER) < text.find('portal-result-card'):
-        raise ValueError("Yesterday method proof must appear after latest result")
-    if text.find(MARKER) > text.find('<h2>Công cụ thống kê XSMB</h2>'):
-        raise ValueError("Yesterday method proof must appear before statistics tools")
+    body = text.find("<body")
+    result_pos = text.find(RESULT_HEADING, body)
+    marker_pos = text.find(MARKER, body)
+    tools_pos = text.find(TOOLS_HEADING, body)
+    if result_pos < 0 or marker_pos < 0 or tools_pos < 0:
+        raise ValueError("Homepage ordering markers missing after yesterday proof injection")
+    if not (result_pos < marker_pos < tools_pos):
+        raise ValueError("Yesterday method proof is not immediately in the result-to-tools flow")
     if FORBIDDEN.search(block):
         raise ValueError("Forbidden 4SO/canonical content in public yesterday block")
+
     home.write_text(text, encoding="utf-8")
     (root / "yesterday-public-methods.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -205,11 +219,14 @@ def self_test() -> None:
     assert payload["data_lock"] == (history[-1][0] - timedelta(days=1)).isoformat()
     assert payload["outcome_known_at_selection"] is False
     assert "4SO" not in json.dumps(payload, ensure_ascii=False)
+
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
+        # Intentionally place the old class name in HEAD first: the production
+        # locator must anchor to the visible result heading in BODY instead.
         (root / "index.html").write_text(
-            '<html><head></head><body class="portal-home"><main>'
-            '<section class="portal-section"><div class="portal-result-card">latest</div></section>'
+            '<html><head><style>.portal-result-card{padding:10px}</style></head><body class="portal-home"><main>'
+            '<section class="portal-section"><div><h2>27 mã kỳ gần nhất</h2></div><div class="portal-result-card">latest</div></section>'
             '<section class="portal-section"><h2>Công cụ thống kê XSMB</h2></section>'
             '</main></body></html>', encoding="utf-8"
         )
@@ -217,8 +234,8 @@ def self_test() -> None:
         output = (root / "index.html").read_text(encoding="utf-8")
         assert result["methods"] == 6
         assert MARKER in output
-        assert output.find(MARKER) > output.find("portal-result-card")
-        assert output.find(MARKER) < output.find("Công cụ thống kê XSMB")
+        body = output.find("<body")
+        assert output.find(RESULT_HEADING, body) < output.find(MARKER, body) < output.find(TOOLS_HEADING, body)
         assert (root / "yesterday-public-methods.json").is_file()
     print("YESTERDAY_PUBLIC_METHODS_SELF_TEST_OK")
 

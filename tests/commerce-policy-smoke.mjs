@@ -97,6 +97,16 @@ assert.match(finance, /role", "complementary/);
 assert.doesNotMatch(finance, /lm-finance-secondary-close/);
 assert.doesNotMatch(finance, /body\.lm-finance-gate-open|position:fixed;inset:0|MIN_DELAY_MS = 60000|MIN_SCROLL_RATIO = 0\.72/);
 
+const affiliateConfig = JSON.parse(read('data/affiliate-offers.json'));
+assert.equal(affiliateConfig.enabled, true, 'ACCESSTRADE canonical state must be enabled');
+assert.equal(affiliateConfig.network, 'ACCESSTRADE');
+assert.equal(affiliateConfig.policy?.adsterra_display, false);
+assert.equal(affiliateConfig.policy?.returning_buyer_affiliate_visible, true);
+for (const id of ['shopee-early-strip', 'shopee-product-grid', 'vpbank-vay-online']) {
+  const placement = affiliateConfig.placements?.find(item => item.id === id);
+  assert.equal(placement?.enabled, true, `${id} must stay enabled`);
+}
+
 const homeBuilder = read('scripts/apply_home_portal_safe.py');
 assert.match(homeBuilder, /data-ai-commerce-trust/);
 assert.match(homeBuilder, /data-ai-product-proof/);

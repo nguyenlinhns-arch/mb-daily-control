@@ -17,7 +17,6 @@ HOME_DESC = (
     "Thống kê XSMB lô tô từ dữ liệu 27 mã mỗi kỳ: tần suất 00–99, lô gan, "
     "45 cặp đảo, đầu đuôi, theo tổng và tra cứu lịch sử bằng hệ thống AI."
 )
-HOME_H1 = "Thống kê XSMB lô tô và phân tích bằng hệ thống AI"
 HOME_IMAGE_PATH = "/og-seo.svg"
 HOME_IMAGE = f"{BASE}{HOME_IMAGE_PATH}"
 HOME_IMAGE_ALT = "Lê Miền Bắc - Thống kê XSMB lô tô, tần suất, lô gan và phân tích AI"
@@ -28,7 +27,6 @@ TITLE_OVERRIDES = {
 }
 DESC_OVERRIDES = {"/": HOME_DESC}
 H1_OVERRIDES = {
-    "/": HOME_H1,
     "/thong-ke-xsmb/": "Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99",
     "/tan-suat-xsmb/": "Tần suất XSMB 00–99 theo 7–365 kỳ",
     "/lo-gan-xsmb/": "Lô gan XSMB 00–99: khoảng vắng hiện tại",
@@ -155,7 +153,7 @@ def apply(root: Path) -> dict[str, int]:
         if CONSENT_KEY in text: consent += 1
     if consent != ga4: raise ValueError(f"GA4 consent coverage mismatch: ga4={ga4} consent={consent}")
     for route, expected in H1_OVERRIDES.items():
-        rel = "index.html" if route == "/" else route.strip("/") + "/index.html"
+        rel = route.strip("/") + "/index.html"
         path = root / rel
         if not path.is_file(): continue
         text = path.read_text(encoding="utf-8")
@@ -182,7 +180,7 @@ def self_test() -> None:
         s = root / "thong-ke-xsmb/index.html"; s.write_text('<html><head><title>Stats</title><meta name="description" content="Stats"><meta name="robots" content="index,follow"></head><body><h1>Cũ</h1></body></html>', encoding="utf-8")
         result = apply(root); h = home.read_text(encoding="utf-8")
         assert result["pages"] == 3 and result["ga4_pages"] == result["consent_pages"] == 3
-        assert HOME_TITLE in h and HOME_DESC in h and HOME_IMAGE in h and f'<h1>{HOME_H1}</h1>' in h
+        assert get_title(h) == HOME_TITLE and get_desc(h) == HOME_DESC and HOME_IMAGE in h
         assert (root / "og-seo.svg").is_file()
         assert '<h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>' in s.read_text(encoding="utf-8")
     print("PORTAL_METADATA_SELF_TEST_OK")

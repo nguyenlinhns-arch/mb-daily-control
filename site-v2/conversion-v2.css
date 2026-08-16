@@ -22,6 +22,22 @@
 }
 .historical-proof-copy>div strong{font-variant-numeric:tabular-nums}
 
+/* Trust strip: keep each symbol inside its own visual tile. The builder has a
+   generic `.lm-value-item span` rule, so this selector must be more specific. */
+.lm-value-item>.lm-value-icon{
+  width:32px!important;height:32px!important;flex:0 0 32px!important;
+  display:grid!important;place-items:center!important;
+  margin:0!important;border-radius:10px!important;
+  background:#f4e9e9!important;color:#aa1419!important;
+  font-size:10px!important;font-weight:1000!important;line-height:1!important;
+  text-align:center!important;overflow:hidden!important;
+}
+.lm-value-item>div{min-width:0!important}
+.lm-value-item>div>span{
+  display:block!important;margin-top:1px!important;color:#6e7c86!important;
+  font-size:10px!important;line-height:1.35!important;
+}
+
 /* Product-first first screen for better ad-to-landing message match. */
 .hero-simple h1{max-width:920px}
 .ads-policy-note{
@@ -63,6 +79,11 @@
 .ads-landing .conversion-trust-item[href="/mau-bao-cao.html"]{display:grid}
 
 @media(max-width:720px){
+  .lm-value-strip-inner{grid-template-columns:1fr!important;padding:7px 10px!important;gap:6px!important}
+  .lm-value-item{min-height:58px!important;padding:9px 10px!important;gap:10px!important;align-items:center!important}
+  .lm-value-item>.lm-value-icon{width:30px!important;height:30px!important;flex-basis:30px!important;border-radius:9px!important}
+  .lm-value-item b{font-size:12px!important;line-height:1.25!important}
+  .lm-value-item>div>span{font-size:10px!important;line-height:1.3!important}
   .history-day-row{grid-template-columns:88px minmax(0,1fr)!important;gap:7px 9px!important}
   .history-observed{grid-column:2!important;justify-self:start!important}
   .vietqr-panel{grid-template-columns:1fr;text-align:center}
@@ -73,6 +94,8 @@
 }
 
 @media(max-width:420px){
+  .lm-value-strip-inner{padding-left:8px!important;padding-right:8px!important}
+  .lm-value-item{padding:8px 9px!important}
   .history-day-row{grid-template-columns:78px minmax(0,1fr)!important;padding:11px!important}
   .history-outputs{gap:4px!important}
   .history-outputs b{min-width:34px!important;padding:6px 5px!important}

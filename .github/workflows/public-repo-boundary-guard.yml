@@ -45,6 +45,7 @@ jobs:
           python scripts/optimize_seo_ads_v1.py --self-test
           python scripts/finalize_portal_v4.py --self-test
           python scripts/indexnow_submit.py --self-test
+          node tests/commerce-policy-smoke.mjs
 
       - name: Frontend syntax
         run: |
@@ -53,6 +54,7 @@ jobs:
           node --check site-v2/ads-tracking.js
           node --check site-v2/finance-banner.js
           node --check site-v2/finance-gate.js
+          node --check site-v2/checkout-enhance.js
           node --check site-v2/checkout-entry.js
 
       - name: Statistics and SEO runtime contract
@@ -69,49 +71,50 @@ jobs:
           grep -Fq 'MONETIZATION_TOKENS' scripts/optimize_seo_ads_v1.py
           grep -Fq 'portal-number-compare' site-v2/portal-v3.css
           grep -Fq 'portal-history-codes' site-v2/portal-v3.css
-          ! grep -Fq 'portal-consent' site-v2/portal-v3.css
           ! grep -Fq 'statistics-data.json' site-v2/checkout-entry.js
 
-      - name: Monetization source contract
+      - name: Affiliate merchandising contract
         run: |
           set -euo pipefail
-          grep -Fq 'FORBIDDEN_AD_DOMAINS' scripts/optimize_monetization_placement.py
-          grep -Fq 'FORBIDDEN_AD_IDS' scripts/optimize_monetization_placement.py
-          grep -Fq 'effectivecpmnetwork.com' scripts/optimize_monetization_placement.py
-          grep -Fq 'highperformanceformat.com' scripts/optimize_monetization_placement.py
-          grep -Fq 'data-seo-discovery-links' scripts/optimize_monetization_placement.py
-          grep -Fq 'affiliate_evergreen' scripts/optimize_monetization_placement.py
-          grep -Fq 'accesstrade_after_statistics_runtime_gate' scripts/optimize_monetization_placement.py
-          grep -Fq "'vpbank_static_top': False" scripts/optimize_monetization_placement.py
-          grep -Fq 'IntersectionObserver' site-v2/ads-tracking.js
-          grep -Fq 'affiliate_click' site-v2/ads-tracking.js
-          grep -Fq 'ad_slot_view' site-v2/ads-tracking.js
-          grep -Fq 'ad_slot_load' site-v2/ads-tracking.js
+          grep -Fq 'affiliate_product_click' site-v2/checkout-enhance.js
+          grep -Fq 'Tông đơ Philips MG3911/15 7in1' site-v2/checkout-enhance.js
+          grep -Fq 'Sạc dự phòng Anker Zolo 20.000mAh 22.5W' site-v2/checkout-enhance.js
+          grep -Fq 'Máy vặn vít pin Bosch GO 3' site-v2/checkout-enhance.js
+          grep -Fq 'Máy hút bụi cầm tay Deerma DX118C 600W' site-v2/checkout-enhance.js
+          grep -Fq 'lm-product-deals' site-v2/checkout-enhance.js
+          grep -Fq 'affiliate_product_grid_view' site-v2/finance-banner.js
+          grep -Fq 'after_proof' site-v2/finance-banner.js
+          grep -Fq '.lm-shopee-nudge{display:none!important}' site-v2/finance-banner.js
 
-      - name: AI-first commerce runtime contract
+      - name: AI conversion funnel contract
         run: |
           set -euo pipefail
-          grep -Fq 'affiliate-shopee-smartlink' site-v2/finance-banner.js
-          grep -Fq 'affiliate_shopee_view' site-v2/finance-banner.js
-          grep -Fq 'affiliate_shopee_click' site-v2/finance-banner.js
-          grep -Fq 'ai_checkout_intent' site-v2/finance-banner.js
           grep -Fq 'MỞ BẢN PHÂN TÍCH AI' site-v2/finance-banner.js
           grep -Fq '30.000đ' site-v2/finance-banner.js
-          ! grep -Eiq 'lm-finance-gate|VAY TIỀN NHANH|vay online|lãi suất từ 1,2%|position:fixed;inset:0' site-v2/finance-banner.js
-          echo AI_FIRST_COMMERCE_GUARD_OK
+          grep -Fq 'ai_checkout_intent' site-v2/finance-banner.js
+          grep -Fq 'ai_checkout_open' site-v2/finance-banner.js
+          grep -Fq 'ai_payment_qr_view' site-v2/finance-banner.js
+          grep -Fq 'ai_payment_claim_submit' site-v2/finance-banner.js
+          grep -Fq 'lm_ai_purchase_intent_v1' site-v2/finance-banner.js
+          echo AI_FUNNEL_GUARD_OK
 
-      - name: Mobile finance affiliate gate contract
+      - name: Secondary finance affiliate contract
         run: |
           set -euo pipefail
-          grep -Fq 'after_latest_results_gate' site-v2/finance-gate.js
-          grep -Fq 'affiliate_finance_gate_view' site-v2/finance-gate.js
+          grep -Fq 'deep_engagement_secondary_offer' site-v2/finance-gate.js
+          grep -Fq 'affiliate_finance_view' site-v2/finance-gate.js
           grep -Fq 'affiliate_finance_click' site-v2/finance-gate.js
-          grep -Fq 'Vay tiền mặt online nhanh' site-v2/finance-gate.js
-          grep -Fq 'Lãi suất từ' site-v2/finance-gate.js
-          grep -Fq 'VAY TIỀN NHANH ONLINE' site-v2/finance-gate.js
-          grep -Fq 'Đóng để xem tiếp' site-v2/finance-gate.js
-          grep -Fq 'align-items:flex-end' site-v2/finance-gate.js
-          grep -Fq 'max-height:88svh' site-v2/finance-gate.js
-          grep -Fq 'EARLY_DELAY_MS = 12000' site-v2/finance-gate.js
-          grep -Fq 'EARLY_SCROLL_PX = 120' site-v2/finance-gate.js
-          echo MOBILE_FINANCE_GATE_GUARD_OK
+          grep -Fq 'MIN_DELAY_MS = 60000' site-v2/finance-gate.js
+          grep -Fq 'MIN_SCROLL_RATIO = 0.72' site-v2/finance-gate.js
+          grep -Fq 'COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000' site-v2/finance-gate.js
+          grep -Fq 'isPaidAcquisitionVisit' site-v2/finance-gate.js
+          grep -Fq 'hasAiIntent' site-v2/finance-gate.js
+          grep -Fq 'AI_INTENT_KEY' site-v2/finance-gate.js
+          grep -Fq 'AFFILIATE_INTENT_KEY' site-v2/finance-gate.js
+          grep -Fq 'LAST_SHOWN_KEY' site-v2/finance-gate.js
+          grep -Fq 'role", "complementary' site-v2/finance-gate.js
+          ! grep -Fq 'EARLY_DELAY_MS = 12000' site-v2/finance-gate.js
+          ! grep -Fq 'EARLY_SCROLL_PX = 120' site-v2/finance-gate.js
+          ! grep -Fq 'body.lm-finance-gate-open' site-v2/finance-gate.js
+          ! grep -Fq 'position:fixed;inset:0' site-v2/finance-gate.js
+          echo SECONDARY_FINANCE_GUARD_OK

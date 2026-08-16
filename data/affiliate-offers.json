@@ -1,5 +1,5 @@
 {
-  "schema_version": "LM_ACCESSTRADE_PLACEMENTS_V2",
+  "schema_version": "LM_ACCESSTRADE_PLACEMENTS_V3",
   "enabled": true,
   "network": "ACCESSTRADE",
   "disclosure": "Liên kết tiếp thị: website có thể nhận hoa hồng khi bạn mua hàng hoặc đăng ký qua liên kết đối tác; giá mua của bạn không tăng vì việc đó. Điều kiện dịch vụ tài chính do đơn vị cung cấp quyết định.",
@@ -30,10 +30,9 @@
       "enabled": true,
       "merchant": "Shopee",
       "type": "direct_product_grid",
-      "placement": "home_after_content",
+      "placement": "sitewide_lower_content",
       "runtime": [
-        "site-v2/checkout-enhance.js",
-        "site-v2/affiliate-restore.js"
+        "scripts/sitewide_product_surface.py"
       ],
       "product_count": 4,
       "products": [
@@ -52,15 +51,15 @@
       "enabled": true,
       "merchant": "VPBank",
       "type": "early_floating_banner",
-      "placement": "early_finance_banner",
+      "placement": "early_finance_banner_sitewide_v3",
       "url": "https://go.isclix.com/deep_link/v6/6342443575996511342/6822308958202075636?sub4=oneatweb&url_enc=aHR0cHM6Ly92YXlvbmxpbmUudnBiYW5rLmNvbS52bi8%3D",
       "runtime": [
-        "site-v2/finance-gate.js"
+        "site-v2/finance-gate-sitewide.js"
       ],
-      "delay_ms": 8000,
-      "min_scroll_ratio": 0.18,
-      "cooldown_hours": 24,
-      "close_control": "small_x",
+      "delay_ms": 3000,
+      "min_scroll_ratio": 0.08,
+      "cooldown_hours": 0,
+      "close_control": "small_x_session_only",
       "events": [
         "affiliate_finance_view",
         "affiliate_finance_click",

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import json
 import re
 import shutil
 from pathlib import Path
@@ -10,29 +11,29 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FINANCE_SOURCE = ROOT / "site-v2" / "finance-gate-sitewide.js"
 FINANCE_TAG = '<script defer src="/finance-gate-sitewide.js?v=20260816-2"></script>'
-EXCLUDED = {"404.html"}
+EXCLUDED = {"404.html", "go/shopee/index.html"}
 
 PRODUCTS = [
     {
-        "slug": "1",
+        "id": "1",
         "name": "Tông đơ Philips MG3911/15 7in1",
         "image": "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mp1ohea3di4g9e",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773390&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vVCVDMyVCNG5nLSVDNCU5MSVDNiVBMS1QaGlsaXBzLU1HMzkxMS0xNS1NdWx0aWdyb29tLTMwMDAtN2luMS1jJUUxJUJBJUFGdC10JUUxJUJCJTg5YS1yJUMzJUIzYy0lQzQlOTFhLW4lQzQlODNuZy1zJUUxJUJCJUFELWQlRTElQkIlQTVuZy10JUUxJUJBJUExaS1uaCVDMyVBMC1pLjQ2MzYwMDA2MS40OTUxMTM1NzAxNw==&redirect_302=1",
     },
     {
-        "slug": "2",
+        "id": "2",
         "name": "Sạc dự phòng Anker Zolo 20.000mAh 22.5W",
         "image": "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mlnj4c7kwkjp03",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773391&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vUyVFMSVCQSVBMWMtZCVFMSVCQiVCMS1waCVDMyVCMm5nLUFua2VyLVpvbG8tQTExMEQtMjAwMDBtQWgtY2h1JUUxJUJBJUE5bi0zQy1UcnVuZy1RdSVFMSVCQiU5MWMtYyVDMyVBMXAtVVNCLUMtdCVDMyVBRGNoLWglRTElQkIlQTNwLXMlRTElQkElQTFjLW5oYW5oLTIyLjVXLWkuMTIwMjg4OTY3OC40NTU1NDAxNDY3NQ==&redirect_302=1",
     },
     {
-        "slug": "3",
+        "id": "3",
         "name": "Máy vặn vít pin Bosch GO 3",
         "image": "https://down-vn.img.susercontent.com/file/sg-11134201-8259d-mrbyk5d9m3gs2c",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773392&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktdiVFMSVCQSVCN24tdiVDMyVBRHQtcGluLUJvc2NoLUdvLTMtaS43NTgxMDI0OS4yNTUxNDU2ODgyOQ==&redirect_302=1",
     },
     {
-        "slug": "4",
+        "id": "4",
         "name": "Máy hút bụi cầm tay Deerma DX118C 600W",
         "image": "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m83aax7f0sasfe",
         "url": "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773393&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktSCVDMyVCQXQtQiVFMSVCQiVBNWktQyVFMSVCQSVBN20tVGF5LURlZXJtYS1EWDExOEMtJTI4QiVFMSVCQSVBMk4tTSVFMSVCQiU5QUktNjAwVyUyOS1DaCVDMyVBRG5oLWglQzMlQTNuZy1EZWVybWEtaS4yODE0MzI4NC4yNzQ1Nzg2MDQwNA==&redirect_302=1",
@@ -58,18 +59,17 @@ def remove_section(text: str, marker: str) -> str:
     return text
 
 
-def write_redirects(root: Path) -> None:
-    for product in PRODUCTS:
-        target = root / 'go' / 'sp' / product['slug'] / 'index.html'
-        target.parent.mkdir(parents=True, exist_ok=True)
-        escaped = html.escape(product['url'], quote=True)
-        target.write_text(
-            '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">'
-            '<meta name="viewport" content="width=device-width,initial-scale=1"><title>Đang mở sản phẩm</title>'
-            f'<meta http-equiv="refresh" content="0;url={escaped}"></head><body><p>Đang mở sản phẩm…</p>'
-            f'<script>location.replace({product["url"]!r});</script></body></html>',
-            encoding='utf-8',
-        )
+def write_dispatcher(root: Path) -> None:
+    target = root / 'go' / 'shopee' / 'index.html'
+    target.parent.mkdir(parents=True, exist_ok=True)
+    mapping = {p['id']: p['url'] for p in PRODUCTS}
+    payload = json.dumps(mapping, ensure_ascii=False).replace('</', '<\\/')
+    target.write_text(
+        '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1"><title>Đang mở sản phẩm</title></head>'
+        '<body><p>Đang mở sản phẩm…</p><script>'
+        f'const m={payload};const p=new URLSearchParams(location.search).get("p")||"1";location.replace(m[p]||m["1"]);'
+        '</script></body></html>', encoding='utf-8')
 
 
 def build_grid(home: bool) -> str:
@@ -79,7 +79,7 @@ def build_grid(home: bool) -> str:
         name = html.escape(product['name'])
         image = html.escape(product['image'], quote=True)
         cards.append(
-            f'<a class="lm-shop-item" href="/go/sp/{product["slug"]}/" target="_blank" rel="nofollow noopener" data-shop-item="{index}" data-product-name="{name}">'
+            f'<a class="lm-shop-item" href="/go/shopee/?p={product["id"]}" target="_blank" rel="nofollow noopener" data-shop-item="{index}" data-product-name="{name}">'
             f'<div class="lm-shop-item-media"><img src="{image}" loading="lazy" decoding="async" alt="{name}"></div>'
             f'<div class="lm-shop-item-copy"><strong>{name}</strong><b>Xem trên Shopee →</b></div></a>'
         )
@@ -118,7 +118,7 @@ def insert_grid(text: str, home: bool) -> str:
 
 
 def apply(root: Path) -> dict[str, object]:
-    write_redirects(root)
+    write_dispatcher(root)
     if not FINANCE_SOURCE.is_file():
         raise FileNotFoundError(FINANCE_SOURCE)
     shutil.copy2(FINANCE_SOURCE, root / 'finance-gate-sitewide.js')
@@ -134,22 +134,16 @@ def apply(root: Path) -> dict[str, object]:
         rel = page.relative_to(root).as_posix()
         text = page.read_text(encoding='utf-8')
         for marker in (
-            'data-sitewide-affiliate="true"',
-            'data-primary-affiliate-strip="sitewide-v4"',
-            'data-sitewide-products="true"',
-            'data-affiliate-static-placement="after_tools"',
-            'class="lm-product-deals',
-            'data-primary-affiliate-strip="static-v3"',
-            'data-primary-affiliate-strip="v2"',
-            'data-primary-affiliate-strip="restore-v1"',
+            'data-sitewide-affiliate="true"', 'data-primary-affiliate-strip="sitewide-v4"',
+            'data-sitewide-products="true"', 'data-affiliate-static-placement="after_tools"',
+            'class="lm-product-deals', 'data-primary-affiliate-strip="static-v3"',
+            'data-primary-affiliate-strip="v2"', 'data-primary-affiliate-strip="restore-v1"',
         ):
             text = remove_section(text, marker)
-        text = re.sub(r'<style\s+id="lm-sitewide-affiliate-style">.*?</style>', '', text, flags=re.I | re.S)
-        text = re.sub(r'<style\s+id="lm-sitewide-products-style">.*?</style>', '', text, flags=re.I | re.S)
-        text = re.sub(r'<style\s+id="lm-shop-grid-style-v3">.*?</style>', '', text, flags=re.I | re.S)
-        text = re.sub(r'<script\s+id="lm-sitewide-affiliate-track">.*?</script>', '', text, flags=re.I | re.S)
-        text = re.sub(r'<script\s+id="lm-sitewide-products-track">.*?</script>', '', text, flags=re.I | re.S)
-        text = re.sub(r'<script\s+id="lm-shop-grid-track-v3">.*?</script>', '', text, flags=re.I | re.S)
+        for style_id in ('lm-sitewide-affiliate-style', 'lm-sitewide-products-style', 'lm-shop-grid-style-v3'):
+            text = re.sub(rf'<style\s+id="{style_id}">.*?</style>', '', text, flags=re.I | re.S)
+        for script_id in ('lm-sitewide-affiliate-track', 'lm-sitewide-products-track', 'lm-shop-grid-track-v3'):
+            text = re.sub(rf'<script\s+id="{script_id}">.*?</script>', '', text, flags=re.I | re.S)
 
         text = insert_grid(text, rel == 'index.html')
         if '</head>' not in text or '</body>' not in text:
@@ -160,14 +154,11 @@ def apply(root: Path) -> dict[str, object]:
         text = text.replace('</head>', FINANCE_TAG + '</head>', 1)
         text = text.replace('</body>', TRACK + '</body>', 1)
 
-        sections = re.findall(r'<section\b[^>]*\bdata-sitewide-products="true"', text, flags=re.I)
-        if len(sections) != 1:
-            raise ValueError(f'{rel}: product section count={len(sections)}')
-        visible_section = re.search(r'<section\b[^>]*\bdata-sitewide-products="true".*?</section>', text, flags=re.I | re.S)
-        if not visible_section or 'go.isclix.com' in visible_section.group(0):
-            raise ValueError(f'{rel}: visible cards must use internal links')
-        if visible_section.group(0).count('data-shop-item=') != 4:
-            raise ValueError(f'{rel}: expected four cards')
+        section = re.search(r'<section\b[^>]*\bdata-sitewide-products="true".*?</section>', text, flags=re.I | re.S)
+        if not section or section.group(0).count('data-shop-item=') != 4:
+            raise ValueError(f'{rel}: expected one four-card block')
+        if 'go.isclix.com' in section.group(0):
+            raise ValueError(f'{rel}: direct affiliate URL leaked into visible cards')
         if FINANCE_TAG not in text:
             raise ValueError(f'{rel}: finance runtime missing')
         page.write_text(text, encoding='utf-8')
@@ -175,15 +166,7 @@ def apply(root: Path) -> dict[str, object]:
     home = (root / 'index.html').read_text(encoding='utf-8')
     if home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') != 1:
         raise ValueError('home lower placement missing')
-    return {
-        'status': 'PASS',
-        'pages': len(pages),
-        'top_banner_removed': True,
-        'product_grid_lower': True,
-        'product_count': 4,
-        'internal_product_links': True,
-        'finance_sitewide': True,
-    }
+    return {'status':'PASS','pages':len(pages),'top_banner_removed':True,'product_grid_lower':True,'product_count':4,'internal_product_links':True,'finance_sitewide':True}
 
 
 def self_test() -> None:
@@ -192,32 +175,20 @@ def self_test() -> None:
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         root.joinpath('index.html').write_text('<html><head></head><body><main><section><h2>Công cụ thống kê XSMB</h2></section></main></body></html>', encoding='utf-8')
-        root.joinpath('stats').mkdir()
-        root.joinpath('stats/index.html').write_text('<html><head></head><body><main><h1>Stats</h1></main></body></html>', encoding='utf-8')
-        fake = root / 'finance.js'; fake.write_text('x', encoding='utf-8')
-        old = FINANCE_SOURCE; FINANCE_SOURCE = fake
-        try:
-            result = apply(root)
-        finally:
-            FINANCE_SOURCE = old
-        assert result['status'] == 'PASS' and result['product_count'] == 4
-        home = (root / 'index.html').read_text(encoding='utf-8')
-        assert home.count('data-shop-item=') == 4
-        assert '/go/sp/1/' in home and 'go.isclix.com' not in re.search(r'<section class="lm-shop-grid".*?</section>', home, re.S).group(0)
-        assert (root / 'go' / 'sp' / '1' / 'index.html').is_file()
+        root.joinpath('stats').mkdir(); root.joinpath('stats/index.html').write_text('<html><head></head><body><main><h1>Stats</h1></main></body></html>', encoding='utf-8')
+        fake=root/'finance.js'; fake.write_text('x',encoding='utf-8'); old=FINANCE_SOURCE; FINANCE_SOURCE=fake
+        try: result=apply(root)
+        finally: FINANCE_SOURCE=old
+        home=(root/'index.html').read_text(encoding='utf-8')
+        assert result['status']=='PASS' and home.count('data-shop-item=')==4 and '/go/shopee/?p=1' in home
+        assert 'go.isclix.com' not in re.search(r'<section class="lm-shop-grid".*?</section>',home,re.S).group(0)
+        assert (root/'go'/'shopee'/'index.html').is_file()
     print('SITEWIDE_PRODUCT_SURFACE_SELF_TEST_OK')
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--output-root', type=Path, default=ROOT / '_site')
-    parser.add_argument('--self-test', action='store_true')
-    args = parser.parse_args()
-    if args.self_test:
-        self_test()
-    else:
-        print(apply(args.output_root))
+    parser=argparse.ArgumentParser(); parser.add_argument('--output-root',type=Path,default=ROOT/'_site'); parser.add_argument('--self-test',action='store_true'); args=parser.parse_args()
+    if args.self_test: self_test()
+    else: print(apply(args.output_root))
 
-
-if __name__ == '__main__':
-    main()
+if __name__=='__main__': main()

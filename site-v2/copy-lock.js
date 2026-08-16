@@ -6,10 +6,18 @@
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(bodyDate)) return bodyDate;
     const text = document.body?.textContent || "";
     const target = text.match(/Target\s+(\d{2}\/\d{2}\/\d{4})/i)
-      || text.match(/Gợi\s+ý\s+số\s+(?:cho\s+)?ngày\s+hôm\s+nay(?:\s*[·:-]?\s*)(\d{2}\/\d{2}\/\d{4})/i)
-      || text.match(/Bản\s+phân\s+tích\s+AI\s+ngày\s+(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/Gợi\s+ý\s+số[^\n]{0,80}?(\d{2}\/\d{2}\/\d{4})/i)
       || text.match(/LÊ\s+MIỀN\s+BẮC\s+NGÀY\s+(\d{2}\/\d{2}\/\d{4})/i);
     return target ? target[1] : "";
+  }
+
+  function dataLockLabel() {
+    const bodyLock = String(document.body?.dataset?.dataLock || "").trim();
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(bodyLock)) return bodyLock;
+    const text = document.body?.textContent || "";
+    const match = text.match(/Data\s*lock\s+(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/dữ\s+liệu\s+khóa\s+đến(?:\s+ngày\s+hôm\s+qua\s*\()?\s*(\d{2}\/\d{2}\/\d{4})/i);
+    return match ? match[1] : "";
   }
 
   function setText(node, value) {
@@ -19,24 +27,23 @@
   function applyCopyLock() {
     if (window.location.pathname !== "/") return;
     const date = reportDateLabel();
+    const dataLock = dataLockLabel();
     if (!date) return;
 
     const lead = document.querySelector(".portal-hero .portal-lead");
     if (lead) {
       const desired = `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`;
       if (lead.innerHTML !== desired) lead.innerHTML = desired;
-      lead.dataset.dailySalesCopy = "v2";
+      lead.dataset.dailySalesCopy = "v3";
     }
 
     const paidCard = document.querySelector(".portal-paid-card");
     if (paidCard) {
-      const eyebrow = paidCard.querySelector("small");
-      setText(eyebrow, "GỢI Ý SỐ HÔM NAY");
-
-      const title = paidCard.querySelector("h2");
-      setText(title, `Gợi ý số ngày hôm nay · ${date}`);
+      setText(paidCard.querySelector("small"), "GỢI Ý SỐ HÔM NAY");
+      setText(paidCard.querySelector("h2"), `Gợi ý số ngày hôm nay - ${date}`);
 
       let readyNote = paidCard.querySelector(".lm-returning-note");
+      const title = paidCard.querySelector("h2");
       if (!readyNote && title) {
         readyNote = document.createElement("div");
         readyNote.className = "lm-returning-note";
@@ -49,7 +56,7 @@
         setText(button, "MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ");
         button.setAttribute("aria-label", `Mở gợi ý số ngày hôm nay ${date}, giá 30.000 đồng`);
       }
-      paidCard.dataset.dailyOfferCopy = "v3";
+      paidCard.dataset.dailyOfferCopy = "v4";
     }
 
     const sticky = document.querySelector("[data-ai-sticky-cta]");
@@ -58,15 +65,16 @@
       sticky.setAttribute("aria-label", `Mở gợi ý số ngày hôm nay ${date}, giá 30.000 đồng`);
     }
 
-    const heading = [...document.querySelectorAll(".portal-section-title h2")]
-      .find((node) => /^(Phương pháp công khai hôm nay|Gợi ý số ngày hôm nay)/i.test((node.textContent || "").trim()));
+    const heading = document.querySelector('[data-daily-recommendation-heading]')
+      || [...document.querySelectorAll(".portal-section-title h2")]
+        .find((node) => /^(Phương pháp công khai|Gợi ý số)/i.test((node.textContent || "").trim()));
     if (heading) {
-      const desiredHeading = `Gợi ý số ngày hôm nay · ${date}`;
-      setText(heading, desiredHeading);
-      heading.dataset.dailyRecommendationHeading = "v3";
+      setText(heading, `Gợi ý số ngày hôm nay - ${date}`);
+      heading.dataset.dailyRecommendationHeading = "v4";
       const subtitle = heading.parentElement?.querySelector("p");
-      if (subtitle && /^Số được tạo/i.test(subtitle.textContent || "")) {
-        subtitle.textContent = (subtitle.textContent || "").replace(/^Số được tạo/i, "Gợi ý được tạo");
+      if (subtitle) {
+        const lockText = dataLock ? `ngày hôm qua (${dataLock})` : "ngày hôm qua";
+        setText(subtitle, `Gợi ý được tạo từ dữ liệu khóa đến ${lockText}. Kết luận các số cuối cùng không nằm trong danh sách công khai này.`);
       }
     }
   }

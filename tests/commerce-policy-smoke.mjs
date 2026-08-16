@@ -5,6 +5,7 @@ const read = path => readFileSync(path, 'utf8');
 
 assert.equal(existsSync('site-v2/finance-gate.js'), true, 'Finance affiliate source must exist');
 assert.equal(existsSync('site-v2/affiliate-visibility.js'), true, 'Visible ACCESSTRADE strip source must exist');
+assert.equal(existsSync('site-v2/affiliate-restore.js'), true, 'Final ACCESSTRADE restore source must exist');
 
 const conversion = read('scripts/apply_conversion_v2.py');
 assert.match(conversion, /finance-gate\.js/);
@@ -13,6 +14,11 @@ assert.match(conversion, /finance-banner\.js/);
 assert.match(conversion, /affiliate-visibility\.js/);
 assert.match(conversion, /AFFILIATE_VISIBILITY_SCRIPT_TAG/);
 assert.match(conversion, /affiliate-visibility\.js\?v=20260816-2/);
+
+const runtimeBuilder = read('scripts/optimize_portal_v2_run.py');
+assert.match(runtimeBuilder, /affiliate-restore\.js/);
+assert.match(runtimeBuilder, /AFFILIATE_RESTORE_TAG/);
+assert.match(runtimeBuilder, /affiliate_restore/);
 
 const primaryAffiliate = read('site-v2/affiliate-visibility.js');
 assert.match(primaryAffiliate, /after_results_visible/);
@@ -28,6 +34,19 @@ assert.match(primaryAffiliate, /reportDateLabel/);
 assert.doesNotMatch(primaryAffiliate, /lemienbac_purchase_/);
 assert.doesNotMatch(primaryAffiliate, /position\s*:\s*fixed/i);
 assert.doesNotMatch(primaryAffiliate, /effectivecpmnetwork|highperformanceformat|adsterra/i);
+
+const restore = read('site-v2/affiliate-restore.js');
+assert.match(restore, /ACCESSTRADE/);
+assert.match(restore, /lm-product-deals/);
+assert.match(restore, /lm-affiliate-section/);
+assert.match(restore, /data-primary-affiliate-strip|primaryAffiliateStrip/);
+assert.match(restore, /data-affiliate-checkout-open|affiliateCheckoutOpen/);
+assert.match(restore, /display:block!important/);
+assert.match(restore, /display:none!important/);
+assert.match(restore, /affiliate_shopee_strip_view/);
+assert.match(restore, /affiliate_shopee_strip_click/);
+assert.match(restore, /checkoutIsOpen/);
+assert.doesNotMatch(restore, /effectivecpmnetwork|highperformanceformat|adsterra/i);
 
 const commerce = read('site-v2/finance-banner.js');
 assert.match(commerce, /affiliate-shopee-smartlink/);

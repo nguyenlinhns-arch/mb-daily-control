@@ -1,0 +1,37 @@
+{
+  "name": "Lê Miền Bắc — Thống kê XSMB",
+  "short_name": "Lê Miền Bắc",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#071f33",
+  "lang": "vi-VN",
+  "description": "Kết quả và thống kê XSMB 00–99, tra cứu dữ liệu và báo cáo AI hằng ngày.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Thống kê XSMB",
+      "short_name": "Thống kê",
+      "url": "/thong-ke-xsmb/"
+    },
+    {
+      "name": "Kết quả hôm nay",
+      "short_name": "Kết quả",
+      "url": "/cho-so-mien-bac-hom-nay/"
+    },
+    {
+      "name": "Tra cứu bộ số",
+      "short_name": "Tra cứu",
+      "url": "/tra-cuu-xsmb/"
+    }
+  ]
+}

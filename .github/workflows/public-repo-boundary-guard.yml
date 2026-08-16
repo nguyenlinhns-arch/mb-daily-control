@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: 22
 
       - name: Permanently forbid third-party display runtime
         run: |
@@ -97,6 +97,7 @@ jobs:
           node --check site-v2/ads-tracking.js
           node --check site-v2/finance-banner.js
           node --check site-v2/finance-gate.js
+          node --check site-v2/affiliate-visibility.js
           node --check site-v2/checkout-enhance.js
           node --check site-v2/checkout-entry.js
 
@@ -128,6 +129,15 @@ jobs:
           grep -Fq 'affiliate_product_grid_view' site-v2/finance-banner.js
           grep -Fq 'after_proof' site-v2/finance-banner.js
           grep -Fq '.lm-shopee-nudge{display:none!important}' site-v2/finance-banner.js
+          grep -Fq 'affiliate_shopee_strip_view' site-v2/affiliate-visibility.js
+          grep -Fq 'affiliate_shopee_strip_click' site-v2/affiliate-visibility.js
+          grep -Fq 'after_tools_visible' site-v2/affiliate-visibility.js
+          grep -Fq 'lm_ai_purchase_intent_v1' site-v2/affiliate-visibility.js
+          grep -Fq 'lm_affiliate_intent_v1' site-v2/affiliate-visibility.js
+          grep -Fq 'lemienbac_purchase_' site-v2/affiliate-visibility.js
+          grep -Fq 'affiliate-visibility.js' scripts/apply_conversion_v2.py
+          ! grep -Eiq 'position[[:space:]]*:[[:space:]]*fixed' site-v2/affiliate-visibility.js
+          echo VISIBLE_AFFILIATE_AI_PRIORITY_GUARD_OK
 
       - name: AI conversion funnel contract
         run: |

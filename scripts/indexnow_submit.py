@@ -46,15 +46,24 @@ def payload_for(urls:list[str])->dict[str,object]:
 
 
 def prepare(root:Path)->dict[str,object]:
-    # Final-release housekeeping: keep monetization below the paid-report CTA
-    # before the public artifact is declared ready and submitted for discovery.
+    # Final-release housekeeping: remove forbidden display remnants first.
     import optimize_monetization_placement as monetization
     placement=monetization.apply(root)
+
+    # This is the last HTML mutation before the artifact is declared ready.
+    # It makes the lower purchase block match the hero "GỢI Ý SỐ HÔM NAY"
+    # card and materializes ACCESSTRADE placements in static HTML so visitors
+    # do not depend on retention/runtime timing to see monetization.
+    surface={'status':'SKIP','reason':'missing_home_or_readiness'}
+    if (root/'index.html').is_file() and (root/'report-readiness.json').is_file():
+        import final_revenue_surface as revenue_surface
+        surface=revenue_surface.apply(root)
+
     urls=sitemap_urls(root/'sitemap.xml')
     key_file=root/f'{KEY}.txt';key_file.write_text(KEY,encoding='utf-8')
     payload=payload_for(urls)
     (root/'indexnow-payload.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    return {'status':'READY','urls':len(urls),'key_file':key_file.name,'monetization_placement':placement}
+    return {'status':'READY','urls':len(urls),'key_file':key_file.name,'monetization_placement':placement,'final_revenue_surface':surface}
 
 
 def fetch_live(url:str)->bytes:
@@ -109,6 +118,7 @@ def self_test()->None:
         assert payload['host']==HOST and payload['keyLocation'].endswith(f'/{KEY}.txt') and len(payload['urlList'])==2
         assert sitemap_urls_bytes((root/'sitemap.xml').read_bytes())==payload['urlList']
         assert result['monetization_placement']['status']=='SKIP'
+        assert result['final_revenue_surface']['status']=='SKIP'
     print('INDEXNOW_SELF_TEST_OK')
 
 

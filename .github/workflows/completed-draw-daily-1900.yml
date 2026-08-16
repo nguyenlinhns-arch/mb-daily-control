@@ -1,6 +1,13 @@
 name: Update completed XSMB report at 19:00 Vietnam
 
 on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/completed-draw-daily-1900.yml"
+      - "scripts/normalize_history_pack.py"
+      - "scripts/update_completed_draw_report.py"
+      - "scripts/build_public_snapshot.py"
   schedule:
     # GitHub cron uses UTC. 12:00 UTC = 19:00 Asia/Ho_Chi_Minh.
     - cron: "0 12 * * *"
@@ -63,6 +70,12 @@ jobs:
             fi
           fi
           echo "DRAW_DATE=$target" >> "$GITHUB_ENV"
+
+      - name: Normalize and validate history container
+        run: |
+          set -euo pipefail
+          python scripts/normalize_history_pack.py --self-test
+          python scripts/normalize_history_pack.py
 
       - name: Cross-check published result and refresh retrospective report
         run: |

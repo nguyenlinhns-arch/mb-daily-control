@@ -54,24 +54,22 @@ jobs:
           grep -q 'const dataRoutes=' site-v2/portal-v2.js
           grep -q 'data-google-ads-landing' scripts/optimize_seo_ads_v1.py
           grep -q 'MONETIZATION_TOKENS' scripts/optimize_seo_ads_v1.py
-          grep -q 'FORBIDDEN_AD_DOMAINS' scripts/optimize_monetization_placement.py
-          grep -q 'remove_non_accesstrade_ads' scripts/optimize_monetization_placement.py
-          grep -q "'adsterra_native': False" scripts/optimize_monetization_placement.py
-          grep -q "'adsterra_banner_300': False" scripts/optimize_monetization_placement.py
+          grep -q 'data-lm-native-ad-src' scripts/optimize_monetization_placement.py
+          grep -q 'effectivecpmnetwork.com' scripts/optimize_monetization_placement.py
+          grep -q 'highperformanceformat.com' scripts/optimize_monetization_placement.py
           grep -q 'data-seo-discovery-links' scripts/optimize_monetization_placement.py
           grep -q 'affiliate_evergreen' scripts/optimize_monetization_placement.py
           grep -q 'IntersectionObserver' site-v2/ads-tracking.js
           grep -q 'affiliate_click' site-v2/ads-tracking.js
           grep -q 'ad_slot_view' site-v2/ads-tracking.js
           grep -q 'ad_slot_load' site-v2/ads-tracking.js
-          grep -q 'after_latest_results_gate' site-v2/finance-banner.js
-          grep -q 'affiliate_finance_gate_view' site-v2/finance-banner.js
-          grep -q 'Lãi suất từ 1,2%/tháng' site-v2/finance-banner.js
-          grep -q 'VAY TIỀN NHANH ONLINE' site-v2/finance-banner.js
-          grep -q 'portal-result-card' site-v2/finance-banner.js
-          grep -q 'EARLY_DELAY_MS = 12000' site-v2/finance-banner.js
-          grep -q 'EARLY_SCROLL_PX = 120' site-v2/finance-banner.js
-          ! grep -q '59%/năm' site-v2/finance-banner.js
+          grep -q 'affiliate-shopee-smartlink' site-v2/finance-banner.js
+          grep -q 'affiliate_shopee_view' site-v2/finance-banner.js
+          grep -q 'affiliate_shopee_click' site-v2/finance-banner.js
+          grep -q 'ai_checkout_intent' site-v2/finance-banner.js
+          grep -q 'MỞ BẢN PHÂN TÍCH AI' site-v2/finance-banner.js
+          grep -q '30.000đ' site-v2/finance-banner.js
+          ! grep -Eiq 'lm-finance-gate|VAY TIỀN NHANH|vay online|lãi suất từ 1,2%|position:fixed;inset:0' site-v2/finance-banner.js
           grep -q 'portal-number-compare' site-v2/portal-v3.css
           grep -q 'portal-history-codes' site-v2/portal-v3.css
           ! grep -q 'portal-consent' site-v2/portal-v3.css

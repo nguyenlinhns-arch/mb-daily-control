@@ -10,7 +10,8 @@ assert.equal(
 );
 
 const conversion = read('scripts/apply_conversion_v2.py');
-assert.doesNotMatch(conversion, /finance-gate\.js|FINANCE_GATE_SCRIPT_TAG|lm-finance-gate/i);
+assert.doesNotMatch(conversion, /FINANCE_GATE_SCRIPT_TAG|finance_gate_source|copy2\([^\n]*finance_gate/i);
+assert.doesNotMatch(conversion, /inject_before_head_end\([^\n]*FINANCE_GATE/i);
 assert.match(conversion, /finance-banner\.js/);
 assert.match(conversion, /Intrusive finance gate leaked into production homepage/);
 

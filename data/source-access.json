@@ -1,14 +1,19 @@
 {
   "history_end": "2026-08-15",
-  "history_rows": 946,
+  "history_rows": 947,
   "history_start": "2024-01-01",
   "latest_codes_sha256": "41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024",
-  "locked_at": "2026-08-15T20:03:00+07:00",
+  "locked_at": "2026-08-16T20:51:56+07:00",
   "policy": "COMPLETED_DRAW_ONLY_FAIL_CLOSED_MINIMUM_TWO_EXACT_SOURCES",
   "schema_version": "MB_SOURCE_ACCESS_V3_POST_DRAW_ONLY",
-  "selected": "MULTI_SOURCE_CROSSCHECK_PLUS_CANONICAL_MIRROR",
-  "source_count": 2,
+  "selected": "PUBLIC_MULTI_SOURCE_CROSSCHECK",
+  "source_count": 5,
   "sources": [
+    {
+      "codes_sha256": "41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024",
+      "name": "khiemdoan/vietnam-lottery-xsmb-analysis",
+      "url": "https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis/commit/f83e7d57c63670ba21b93dd1d04cc44fb41930b4"
+    },
     {
       "codes_sha256": "41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024",
       "name": "lucdz/xsmb",
@@ -16,8 +21,18 @@
     },
     {
       "codes_sha256": "41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024",
-      "name": "khiemdoan/vietnam-lottery-xsmb-analysis",
-      "url": "https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis/commit/f83e7d57c63670ba21b93dd1d04cc44fb41930b4"
+      "name": "minhngoc",
+      "url": "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/15-08-2026.html"
+    },
+    {
+      "codes_sha256": "41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024",
+      "name": "xosodaiphat",
+      "url": "https://xosodaiphat.com/xsmb-15-08-2026.html"
+    },
+    {
+      "codes_sha256": "41e396881f43e1a457fbfecf96c9df51660efae6e3476d99d554d3c93fbf3024",
+      "name": "xosothienphu",
+      "url": "https://xosothienphu.vn/xsmb-15-08-2026.html"
     }
   ],
   "status": "LOCKED_CROSSCHECKED_PUBLIC"

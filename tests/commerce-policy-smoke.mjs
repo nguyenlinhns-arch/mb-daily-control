@@ -20,6 +20,7 @@ assert.match(conversion, /FINANCE_GATE_SCRIPT_TAG/);
 assert.match(conversion, /finance-banner\.js/);
 assert.match(conversion, /affiliate-visibility\.js/);
 assert.match(conversion, /AFFILIATE_VISIBILITY_SCRIPT_TAG/);
+assert.match(conversion, /affiliate-visibility\.js\?v=20260816-2/);
 
 const primaryAffiliate = read('site-v2/affiliate-visibility.js');
 assert.match(primaryAffiliate, /after_tools_visible/);
@@ -31,6 +32,9 @@ assert.match(primaryAffiliate, /lm_affiliate_intent_v1/);
 assert.match(primaryAffiliate, /primaryAffiliateStrip|data-primary-affiliate-strip/);
 assert.match(primaryAffiliate, /data-open-checkout/);
 assert.match(primaryAffiliate, /data-ai-sticky-cta/);
+assert.match(primaryAffiliate, /Gợi ý số ngày hôm nay/);
+assert.match(primaryAffiliate, /dailyRecommendationHeading/);
+assert.match(primaryAffiliate, /reportDateLabel/);
 assert.doesNotMatch(primaryAffiliate, /position\s*:\s*fixed/i);
 assert.doesNotMatch(primaryAffiliate, /effectivecpmnetwork|highperformanceformat|adsterra/i);
 

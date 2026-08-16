@@ -44,7 +44,6 @@ jobs:
           python scripts/apply_portal_subpages.py --self-test
           python scripts/optimize_portal_v2.py --self-test
           python scripts/optimize_portal_v3.py --self-test
-          python scripts/add_de_statistics.py --self-test
           python scripts/apply_portal_v3_assets.py --self-test
           python scripts/optimize_seo_ads_v1.py --self-test
           python scripts/finalize_portal_v4.py --self-test
@@ -146,7 +145,6 @@ jobs:
           python scripts/apply_portal_subpages.py --output-root _site
           python scripts/optimize_portal_v2_run.py --output-root _site
           python scripts/optimize_portal_v3.py --output-root _site
-          python scripts/add_de_statistics.py --output-root _site
           python scripts/apply_portal_v3_assets.py --output-root _site
 
       - name: Validate public portal privacy UX and SEO gates
@@ -172,7 +170,6 @@ jobs:
             _site/thong-ke-dau-duoi-xsmb/index.html \
             _site/thong-ke-tong-xsmb/index.html \
             _site/thong-ke-theo-thu-xsmb/index.html \
-            _site/thong-ke-de-xsmb/index.html \
             _site/tra-cuu-xsmb/index.html \
             _site/phuong-phap-cong-khai/index.html \
             _site/cho-so-mien-bac-hom-nay/index.html \
@@ -202,8 +199,6 @@ jobs:
           grep -q 'portal-quick-search' _site/index.html
           grep -q 'portal-consensus' _site/index.html
           grep -q 'portal-headtail-latest' _site/index.html
-          grep -q 'portal-de-summary' _site/index.html
-          grep -q 'Thống kê Đề XSMB' _site/index.html
           grep -q 'Theo tổng 0–9' _site/index.html
           grep -q 'Thống kê theo thứ' _site/index.html
           grep -q 'Phương pháp công khai hôm nay' _site/index.html
@@ -224,8 +219,6 @@ jobs:
           grep -q 'Thống kê đầu đuôi XSMB 0–9' _site/thong-ke-dau-duoi-xsmb/index.html
           grep -q 'Thống kê tổng XSMB 0–9' _site/thong-ke-tong-xsmb/index.html
           grep -q 'Thống kê XSMB theo thứ trong tuần' _site/thong-ke-theo-thu-xsmb/index.html
-          grep -q 'Thống kê Đề XSMB 00–99' _site/thong-ke-de-xsmb/index.html
-          grep -q '2 số cuối Giải Đặc Biệt' _site/thong-ke-de-xsmb/index.html
           grep -q 'Tra cứu XSMB theo bộ số 00–99' _site/tra-cuu-xsmb/index.html
           grep -q 'XSMB 30 ngày gần nhất: lịch sử 27 mã mỗi kỳ' _site/xsmb-30-ngay/index.html
           grep -q 'Nguồn dữ liệu và cách tính các bảng thống kê' _site/nguon-du-lieu-xsmb/index.html
@@ -234,7 +227,6 @@ jobs:
 
           grep -q 'https://lemienbac.com/thong-ke-tong-xsmb/' _site/sitemap.xml
           grep -q 'https://lemienbac.com/thong-ke-theo-thu-xsmb/' _site/sitemap.xml
-          grep -q 'https://lemienbac.com/thong-ke-de-xsmb/' _site/sitemap.xml
           grep -q 'https://lemienbac.com/xsmb-30-ngay/' _site/sitemap.xml
           grep -q 'https://lemienbac.com/nguon-du-lieu-xsmb/' _site/sitemap.xml
 
@@ -268,7 +260,6 @@ jobs:
             _site/thong-ke-dau-duoi-xsmb/index.html \
             _site/thong-ke-tong-xsmb/index.html \
             _site/thong-ke-theo-thu-xsmb/index.html \
-            _site/thong-ke-de-xsmb/index.html \
             _site/tra-cuu-xsmb/index.html \
             _site/phuong-phap-cong-khai/index.html \
             _site/mau-bao-cao.html \
@@ -292,7 +283,6 @@ jobs:
             _site/thong-ke-dau-duoi-xsmb/index.html \
             _site/thong-ke-tong-xsmb/index.html \
             _site/thong-ke-theo-thu-xsmb/index.html \
-            _site/thong-ke-de-xsmb/index.html \
             _site/tra-cuu-xsmb/index.html; do
             grep -q 'portal-breadcrumbs' "$page"
             grep -q '"@type":"Dataset"' "$page"
@@ -312,25 +302,22 @@ jobs:
           home = (site/'index.html').read_text(encoding='utf-8')
           landing = (site/'thong-ke-xsmb/index.html').read_text(encoding='utf-8')
           page30 = (site/'xsmb-30-ngay/index.html').read_text(encoding='utf-8')
-          de_page = (site/'thong-ke-de-xsmb/index.html').read_text(encoding='utf-8')
 
           assert stats['updated_through'] == source['history_end'] == methods['data_lock']
           assert stats['row_count'] == source['history_rows']
           assert len(stats['numbers']) == 100
           assert len(stats['pairs']) == 45
           assert len(stats['recent_history'][-1][1:]) == 27
-          assert re.fullmatch(r'\d{2}', str(stats['recent_history'][-1][1]).zfill(2)[-2:])
           assert all('4SO' not in str(m.get('id','')).upper() and '4SO' not in str(m.get('name','')).upper() for m in methods['methods'])
           assert len(methods['methods']) == 6
           assert proof['validation']['total_days'] == 30
           assert f"{proof['validation']['rate_pct']}%" in home
           assert f"{proof['validation']['hit_days']}/{proof['validation']['total_days']}" in home
-          assert 'Bảng thống kê Đề 00–99' in de_page
           assert status['status'] == 'HEALTHY'
           assert status['seo_ads_cluster'] == 'PASS'
           assert status['google_ads_statistics_landing'] == '/thong-ke-xsmb/'
-          assert status['sitemap_urls'] == 19
-          assert status['html_pages_checked'] == 21
+          assert status['sitemap_urls'] == 18
+          assert status['html_pages_checked'] == 20
           assert page30.count('class="seo30-day"') == 30
           assert 'data-google-ads-landing="true"' in landing
 

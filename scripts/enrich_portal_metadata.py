@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE = "https://lemienbac.com"
 GA4 = "G-R9TBYP97BC"
 CONSENT_KEY = "lm_analytics_consent_v1"
+FAVICON_HREF = "/favicon.svg?v=20260816-lmb1"
 HOME_TITLE = "Thống kê XSMB lô tô, lô gan & AI | Lê Miền Bắc"
 HOME_DESC = (
     "Xổ số Miền Bắc (XSMB): thống kê 00–99, lô gan, 45 cặp đảo, đầu đuôi, "
@@ -77,6 +78,13 @@ def set_first_h1(text: str, value: str) -> str:
     return text
 
 
+def normalize_favicon(text: str) -> str:
+    pattern = re.compile(r'<link\b(?=[^>]*\brel=["\'](?:shortcut\s+)?icon["\'])[^>]*>', re.I)
+    text = pattern.sub("", text)
+    tag = f'<link rel="icon" href="{FAVICON_HREF}" type="image/svg+xml">'
+    return text.replace("</head>", tag + "</head>", 1)
+
+
 def consent_default_js() -> str:
     return (
         "let lmAnalyticsConsent='denied';"
@@ -98,6 +106,7 @@ def normalize_existing_consent(text: str) -> str:
 def enrich(path: Path, root: Path) -> bool:
     text = path.read_text(encoding="utf-8"); before = text
     route = route_for(path, root)
+    text = normalize_favicon(text)
     if route in TITLE_OVERRIDES: text = set_title(text, TITLE_OVERRIDES[route])
     if route in DESC_OVERRIDES: text = upsert_meta(text, "name", "description", DESC_OVERRIDES[route])
     if route in H1_OVERRIDES: text = set_first_h1(text, H1_OVERRIDES[route])
@@ -151,6 +160,7 @@ def apply(root: Path) -> dict[str, int]:
         text = path.read_text(encoding="utf-8")
         if GA4 in text: ga4 += 1
         if CONSENT_KEY in text: consent += 1
+        if FAVICON_HREF not in text: raise ValueError(f"Favicon mismatch: {path}")
     if consent != ga4: raise ValueError(f"GA4 consent coverage mismatch: ga4={ga4} consent={consent}")
     for route, expected in H1_OVERRIDES.items():
         rel = route.strip("/") + "/index.html"
@@ -164,7 +174,7 @@ def apply(root: Path) -> dict[str, int]:
     if home.is_file():
         text = home.read_text(encoding="utf-8")
         if get_title(text) != HOME_TITLE or get_desc(text) != HOME_DESC: raise ValueError("Homepage SEO mismatch")
-        for marker in (HOME_IMAGE, 'content="1200"', 'content="630"', 'name="twitter:card" content="summary_large_image"'):
+        for marker in (HOME_IMAGE, 'content="1200"', 'content="630"', 'name="twitter:card" content="summary_large_image"', FAVICON_HREF):
             if marker not in text: raise ValueError(f"Homepage social metadata missing: {marker}")
         if not (root / "og-seo.svg").is_file(): raise ValueError("Homepage SEO image not published")
     return {"pages": pages, "changed": changed, "ga4_pages": ga4, "consent_pages": consent}
@@ -175,12 +185,13 @@ def self_test() -> None:
     with tempfile.TemporaryDirectory() as td:
         root = Path(td); (root / "phuong-phap-cong-khai").mkdir(); (root / "thong-ke-xsmb").mkdir()
         home = root / "index.html"
-        home.write_text('<html><head><title>Cũ</title><meta name="description" content="Cũ"><meta name="robots" content="index,follow"></head><body><h1>Cũ</h1></body></html>', encoding="utf-8")
+        home.write_text('<html><head><title>Cũ</title><link rel="icon" href="/favicon.svg?v=old"><meta name="description" content="Cũ"><meta name="robots" content="index,follow"></head><body><h1>Cũ</h1></body></html>', encoding="utf-8")
         p = root / "phuong-phap-cong-khai/index.html"; p.write_text('<html><head><title>Cũ</title><meta name="description" content="Mô tả"><meta name="robots" content="index,follow"></head><body><h1>Methods</h1></body></html>', encoding="utf-8")
         s = root / "thong-ke-xsmb/index.html"; s.write_text('<html><head><title>Stats</title><meta name="description" content="Stats"><meta name="robots" content="index,follow"></head><body><h1>Cũ</h1></body></html>', encoding="utf-8")
         result = apply(root); h = home.read_text(encoding="utf-8")
         assert result["pages"] == 3 and result["ga4_pages"] == result["consent_pages"] == 3
-        assert get_title(h) == HOME_TITLE and get_desc(h) == HOME_DESC and HOME_IMAGE in h
+        assert get_title(h) == HOME_TITLE and get_desc(h) == HOME_DESC and HOME_IMAGE in h and FAVICON_HREF in h
+        assert "/favicon.svg?v=old" not in h
         assert (root / "og-seo.svg").is_file()
         assert '<h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>' in s.read_text(encoding="utf-8")
     print("PORTAL_METADATA_SELF_TEST_OK")

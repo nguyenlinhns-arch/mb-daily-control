@@ -12,7 +12,6 @@ INTERNAL_SHOPEE_PATH = "/go/shopee/"
 FINANCE_SOURCE = ROOT / "site-v2" / "finance-gate-sitewide.js"
 FINANCE_TAG = '<script defer src="/finance-gate-sitewide.js?v=20260816-1"></script>'
 STYLE_ID = "lm-sitewide-affiliate-style"
-TRACK_ID = "lm-sitewide-affiliate-track"
 EXCLUDED = {"404.html", "go/shopee/index.html"}
 
 STYLE = '''<style id="lm-sitewide-affiliate-style">
@@ -35,7 +34,7 @@ def remove_section(text: str, marker: str) -> str:
 
 
 def strip_markup() -> str:
-    return f'''<section class="lm-sitewide-affiliate" data-sitewide-affiliate="true" aria-label="Ưu đãi Shopee tài trợ ACCESSTRADE"><div class="lm-sitewide-affiliate-inner"><a class="lm-sitewide-affiliate-card" href="{INTERNAL_SHOPEE_PATH}" rel="sponsored nofollow"><div><span class="lm-sitewide-affiliate-badge">Tài trợ · ACCESSTRADE</span><strong>Shopee · xem ưu đãi mua sắm hôm nay</strong><small>Mở Shopee để xem sản phẩm và ưu đãi đang có. Giá mua không tăng vì liên kết này.</small></div><span class="lm-sitewide-affiliate-cta">XEM ƯU ĐÃI →</span></a><p class="lm-sitewide-affiliate-note">Website có thể nhận hoa hồng khi phát sinh giao dịch đủ điều kiện.</p></div></section>'''
+    return f'''<section class="lm-sitewide-affiliate" data-sitewide-affiliate="true" data-primary-affiliate-strip="sitewide-v4" aria-label="Ưu đãi Shopee tài trợ ACCESSTRADE"><div class="lm-sitewide-affiliate-inner"><a class="lm-sitewide-affiliate-card" href="{INTERNAL_SHOPEE_PATH}" target="_blank" rel="sponsored nofollow noopener"><div><span class="lm-sitewide-affiliate-badge">Tài trợ · ACCESSTRADE</span><strong>Shopee · xem ưu đãi mua sắm hôm nay</strong><small>Mở Shopee để xem sản phẩm và ưu đãi đang có. Giá mua không tăng vì liên kết này.</small></div><span class="lm-sitewide-affiliate-cta">XEM ƯU ĐÃI →</span></a><p class="lm-sitewide-affiliate-note">Website có thể nhận hoa hồng khi phát sinh giao dịch đủ điều kiện.</p></div></section>'''
 
 
 def write_redirect(root: Path) -> None:
@@ -75,7 +74,6 @@ def apply(root: Path) -> dict[str, object]:
         rel = page.relative_to(root).as_posix()
         text = page.read_text(encoding='utf-8')
         text = remove_section(text, 'data-sitewide-affiliate="true"')
-        # Retire the older home strip so the sitewide strip becomes the one canonical visible banner.
         if rel == 'index.html':
             text = remove_section(text, 'data-primary-affiliate-strip="static-v3"')
             text = remove_section(text, 'data-primary-affiliate-strip="v2"')
@@ -84,6 +82,8 @@ def apply(root: Path) -> dict[str, object]:
             if '</head>' not in text:
                 raise ValueError(f'{rel}: missing </head>')
             text = text.replace('</head>', STYLE + '</head>', 1)
+        # Use exactly one finance runtime everywhere; retire the older homepage-only version.
+        text = re.sub(r'<script\s+defer\s+src="/finance-gate\.js\?v=[^"]+"></script>', '', text, flags=re.I)
         text = re.sub(r'<script\s+defer\s+src="/finance-gate-sitewide\.js\?v=[^"]+"></script>', '', text, flags=re.I)
         if '</head>' not in text:
             raise ValueError(f'{rel}: missing </head> for finance runtime')
@@ -93,12 +93,11 @@ def apply(root: Path) -> dict[str, object]:
         if '</body>' not in text:
             raise ValueError(f'{rel}: missing </body>')
         text = text.replace('</body>', TRACK + '</body>', 1)
-        if 'data-sitewide-affiliate="true"' not in text or FINANCE_TAG not in text:
+        if 'data-sitewide-affiliate="true"' not in text or 'data-primary-affiliate-strip="sitewide-v4"' not in text or FINANCE_TAG not in text:
             raise ValueError(f'{rel}: sitewide affiliate contract missing')
         page.write_text(text, encoding='utf-8')
         injected += 1
 
-    # Home must expose the banner in static HTML without waiting for JS.
     home = (root / 'index.html').read_text(encoding='utf-8')
     if 'data-sitewide-affiliate="true"' not in home or INTERNAL_SHOPEE_PATH not in home:
         raise ValueError('Homepage sitewide affiliate strip missing')
@@ -109,7 +108,7 @@ def self_test() -> None:
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
-        root.joinpath('index.html').write_text('<html><head></head><body><main><h1>Home</h1></main></body></html>', encoding='utf-8')
+        root.joinpath('index.html').write_text('<html><head><script defer src="/finance-gate.js?v=old"></script></head><body><main><h1>Home</h1></main></body></html>', encoding='utf-8')
         root.joinpath('stats').mkdir()
         root.joinpath('stats/index.html').write_text('<html><head></head><body><main><h1>Stats</h1></main></body></html>', encoding='utf-8')
         source = root / 'fake-finance.js'
@@ -122,7 +121,11 @@ def self_test() -> None:
         finally:
             FINANCE_SOURCE = old
         assert result['status'] == 'PASS' and result['pages'] == 2
-        assert all('data-sitewide-affiliate="true"' in p.read_text(encoding='utf-8') for p in (root/'index.html', root/'stats/index.html'))
+        for p in (root/'index.html', root/'stats/index.html'):
+            text = p.read_text(encoding='utf-8')
+            assert 'data-sitewide-affiliate="true"' in text and 'data-primary-affiliate-strip="sitewide-v4"' in text
+            assert '/finance-gate-sitewide.js?v=20260816-1' in text
+        assert '/finance-gate.js?v=old' not in (root/'index.html').read_text(encoding='utf-8')
         assert (root/'go/shopee/index.html').is_file()
     print('SITEWIDE_AFFILIATE_SELF_TEST_OK')
 

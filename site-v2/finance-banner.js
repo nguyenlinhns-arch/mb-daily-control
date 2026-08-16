@@ -44,6 +44,7 @@
       .lm-affiliate-card .lm-affiliate-cta{background:#ee4d2d!important;box-shadow:none!important}
       .lm-affiliate-note{color:#8b9298!important}
       .lm-ai-runtime-kicker{display:block;margin-top:6px;color:#8a4d51;font-size:10px;font-weight:900;letter-spacing:.05em}
+      .lm-shopee-nudge{display:none!important}
       @media(max-width:700px){.lm-affiliate-card:before{top:8px;right:8px}.lm-affiliate-card b{padding-right:54px}}
     `;
     document.head.appendChild(style);
@@ -93,6 +94,14 @@
 
   function installAffiliate() {
     if (window.location.pathname !== "/") return;
+
+    // checkout-enhance.js builds a richer direct-product carousel. When it is
+    // present, do not inject a second generic SmartLink card underneath it.
+    if (document.querySelector(".lm-product-deals")) {
+      document.querySelector(".lm-affiliate-section")?.remove();
+      return;
+    }
+
     let card = document.getElementById("affiliate-shopee-smartlink");
     if (!card) {
       const tools = document.querySelector(".portal-tools")?.closest(".portal-section") || document.querySelector(".portal-tools");

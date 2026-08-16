@@ -55,6 +55,17 @@
     }
   }
 
+  function normalizeHeroRecommendationCopy() {
+    if (window.location.pathname !== "/") return;
+    const lead = document.querySelector(".portal-hero .portal-lead");
+    if (!lead) return;
+    const date = reportDateLabel();
+    lead.innerHTML = date
+      ? `Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`
+      : "Gợi ý số cho ngày hôm nay chỉ với 30.000đ.";
+    lead.dataset.dailyRecommendationCopy = "v1";
+  }
+
   function hasPurchaseMarker() {
     try {
       for (let index = 0; index < localStorage.length; index += 1) {
@@ -171,6 +182,7 @@
   function boot() {
     if (window.location.pathname !== "/") return;
     normalizeDailyRecommendationHeading();
+    normalizeHeroRecommendationCopy();
     installSuppressionWatch();
     window.setTimeout(installStrip, 0);
   }

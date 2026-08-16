@@ -15,14 +15,18 @@ SHARE_JS=r'''
 ;(()=>{
   "use strict";
   const MARKER="LM_STATS_SHARE_STATE_V1";
+  const RECENT_KEY="lm_stats_recent_v1";
   const WINDOWS=new Set(["7","14","30","60","90","100","365"]);
   const emit=(event,extra={})=>{window.dataLayer=window.dataLayer||[];window.dataLayer.push({event,page_path:location.pathname,...extra})};
   const currentWindow=()=>document.querySelector('.tabs button.active')?.dataset.w||"60";
   const currentNumber=()=>new URL(location.href).searchParams.get("so")||"";
+  const validNumber=value=>/^\d{2}$/.test(String(value||""))&&Number(value)<=99;
+  const readRecent=()=>{try{const value=JSON.parse(localStorage.getItem(RECENT_KEY)||"[]");return Array.isArray(value)?value.filter(item=>item&&validNumber(item.number)&&WINDOWS.has(String(item.window))).slice(0,5):[]}catch(_){return[]}};
+  const remember=(number,windowValue)=>{if(!validNumber(number)||!WINDOWS.has(String(windowValue)))return;try{const now=Date.now();const next=[{number:String(number),window:String(windowValue),ts:now},...readRecent().filter(item=>item.number!==String(number))].slice(0,5);localStorage.setItem(RECENT_KEY,JSON.stringify(next))}catch(_){}};
   const updateUrl=(number,windowValue)=>{
     if(location.pathname!=="/thong-ke-xsmb/")return;
     const url=new URL(location.href);
-    if(/^\d{2}$/.test(number||""))url.searchParams.set("so",number);else url.searchParams.delete("so");
+    if(validNumber(number))url.searchParams.set("so",number);else url.searchParams.delete("so");
     if(WINDOWS.has(String(windowValue||"")))url.searchParams.set("w",String(windowValue));else url.searchParams.delete("w");
     history.replaceState(null,"",url.pathname+(url.search?url.search:"")+url.hash);
   };
@@ -30,7 +34,7 @@ SHARE_JS=r'''
     if(location.pathname!=="/thong-ke-xsmb/")return;
     const profile=document.getElementById("profile");
     const number=currentNumber();
-    if(!profile||!/^\d{2}$/.test(number)||profile.querySelector("[data-stats-share]"))return;
+    if(!profile||!validNumber(number)||profile.querySelector("[data-stats-share]"))return;
     const actions=document.createElement("div");
     actions.className="lm-stats-profile-actions";
     actions.innerHTML='<button type="button" class="lm-stats-share" data-stats-share>Chia sẻ hồ sơ số '+number+'</button><span class="lm-stats-share-status" aria-live="polite"></span>';
@@ -39,7 +43,7 @@ SHARE_JS=r'''
     const status=actions.querySelector(".lm-stats-share-status");
     button?.addEventListener("click",async()=>{
       const w=currentWindow();
-      updateUrl(number,w);
+      updateUrl(number,w);remember(number,w);
       const url=location.href;
       const title=`Thống kê XSMB số ${number} · ${w} kỳ`;
       let method="copy";
@@ -51,30 +55,43 @@ SHARE_JS=r'''
       }catch(error){if(error?.name!=="AbortError")status.textContent="Không thể chia sẻ tự động trên trình duyệt này.";}
     });
   };
+  const addResume=()=>{
+    if(location.pathname!=="/thong-ke-xsmb/"||validNumber(currentNumber()))return;
+    const profile=document.getElementById("profile");if(!profile||profile.querySelector("[data-stats-resume]"))return;
+    const last=readRecent()[0];if(!last)return;
+    const wrap=document.createElement("div");wrap.className="lm-stats-resume";
+    wrap.innerHTML='<span>Phiên xem gần nhất</span><button type="button" data-stats-resume>Tiếp tục số '+last.number+' · '+last.window+' kỳ</button>';
+    profile.appendChild(wrap);
+    wrap.querySelector("[data-stats-resume]")?.addEventListener("click",()=>{
+      const tab=document.querySelector(`.tabs button[data-w="${last.window}"]`);if(tab&&!tab.classList.contains("active"))tab.click();
+      const button=document.querySelector(`.num[data-number="${last.number}"]`);if(button){button.click();button.scrollIntoView({block:"center",behavior:"smooth"});emit("xsmb_stats_resume",{number:last.number,window:last.window});}
+    });
+    emit("xsmb_stats_resume_view",{number:last.number,window:last.window});
+  };
   const boot=()=>{
     if(location.pathname!=="/thong-ke-xsmb/")return;
     document.documentElement.dataset.statsShare=MARKER;
     document.addEventListener("click",event=>{
       const target=event.target instanceof Element?event.target:null;if(!target)return;
       const tab=target.closest(".tabs button[data-w]");
-      if(tab&&WINDOWS.has(String(tab.dataset.w||""))){updateUrl(currentNumber(),tab.dataset.w);window.setTimeout(addShareButton,0);return;}
+      if(tab&&WINDOWS.has(String(tab.dataset.w||""))){const number=currentNumber();updateUrl(number,tab.dataset.w);if(validNumber(number))remember(number,tab.dataset.w);window.setTimeout(addShareButton,0);return;}
       const numberButton=target.closest(".num[data-number]");
-      if(numberButton&&/^\d{2}$/.test(numberButton.dataset.number||"")){updateUrl(numberButton.dataset.number,currentWindow());window.setTimeout(addShareButton,0);}
+      if(numberButton&&validNumber(numberButton.dataset.number)){const w=currentWindow();updateUrl(numberButton.dataset.number,w);remember(numberButton.dataset.number,w);window.setTimeout(addShareButton,0);}
     });
     const profile=document.getElementById("profile");
     if(profile)new MutationObserver(addShareButton).observe(profile,{childList:true});
     const url=new URL(location.href);const number=url.searchParams.get("so")||"";const w=url.searchParams.get("w")||"";
-    const validNumber=/^\d{2}$/.test(number)&&Number(number)<=99;
-    const validWindow=WINDOWS.has(w);
+    const hasNumber=validNumber(number);const validWindow=WINDOWS.has(w);
     if(validWindow){const tab=document.querySelector(`.tabs button[data-w="${w}"]`);if(tab&&!tab.classList.contains("active"))tab.click();}
-    if(validNumber){const button=document.querySelector(`.num[data-number="${number}"]`);if(button){window.setTimeout(()=>{button.click();button.scrollIntoView({block:"center",behavior:"smooth"});emit("xsmb_deep_link_open",{number,window:validWindow?w:currentWindow()});},0);}}
+    if(hasNumber){const button=document.querySelector(`.num[data-number="${number}"]`);if(button){window.setTimeout(()=>{button.click();button.scrollIntoView({block:"center",behavior:"smooth"});remember(number,validWindow?w:currentWindow());emit("xsmb_deep_link_open",{number,window:validWindow?w:currentWindow()});},0);}}
+    else addResume();
   };
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
 '''
 SHARE_CSS=r'''
-.lm-stats-profile-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}.lm-stats-share{min-height:40px;padding:0 12px;border:1px solid #46647a;border-radius:9px;background:#fff;color:#15364d;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.lm-stats-share-status{color:#bed0df;font-size:10px;font-weight:700}.num{min-width:0}.num small{overflow-wrap:anywhere}
-@media(max-width:760px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px}.num{min-height:72px;padding:8px 3px!important}.num b{font-size:16px}.num small{font-size:9px!important;line-height:1.25}.tabs{width:100%;gap:4px}.tabs button{flex:1 1 58px;min-height:38px;padding:5px 6px!important;font-size:10.5px}.lm-stats-profile-actions{display:grid;grid-template-columns:1fr;gap:5px}.lm-stats-share{width:100%;min-height:44px}}
+.lm-stats-profile-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}.lm-stats-share{min-height:40px;padding:0 12px;border:1px solid #46647a;border-radius:9px;background:#fff;color:#15364d;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.lm-stats-share-status{color:#bed0df;font-size:10px;font-weight:700}.lm-stats-resume{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px;border:1px solid #31546c;border-radius:10px;background:#0d2a40}.lm-stats-resume span{color:#bed0df;font-size:10px;font-weight:700}.lm-stats-resume button{min-height:40px;padding:0 12px;border:1px solid #607f94;border-radius:9px;background:#fff;color:#15364d;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.num{min-width:0}.num small{overflow-wrap:anywhere}
+@media(max-width:760px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px}.num{min-height:72px;padding:8px 3px!important}.num b{font-size:16px}.num small{font-size:9px!important;line-height:1.25}.tabs{width:100%;gap:4px}.tabs button{flex:1 1 58px;min-height:38px;padding:5px 6px!important;font-size:10.5px}.lm-stats-profile-actions{display:grid;grid-template-columns:1fr;gap:5px}.lm-stats-share{width:100%;min-height:44px}.lm-stats-resume{display:grid;grid-template-columns:1fr;gap:6px}.lm-stats-resume button{width:100%;min-height:44px}}
 @media(max-width:390px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px}.num{min-height:68px}.num small{font-size:8.5px!important}}
 '''
 
@@ -101,15 +118,15 @@ def apply(root:Path)->dict[str,object]:
         raise ValueError('Shared statistics loader validation failed')
     if mode=='dynamic' and ("dataStatsVersion" in text or "cache:'default'" not in text or "statsUrl" not in text):
         raise ValueError('Versioned statistics loader contract failed')
-    if SHARE_MARKER not in text or 'xsmb_profile_share' not in text or 'xsmb_deep_link_open' not in text:
-        raise ValueError('Statistics share-state contract failed')
+    for marker in (SHARE_MARKER,'xsmb_profile_share','xsmb_deep_link_open','lm_stats_recent_v1','xsmb_stats_resume'):
+        if marker not in text: raise ValueError(f'Statistics retention contract failed: {marker}')
     css_path=root/'xsmb-stats.css'
     css_changed=False
     if css_path.is_file():
         css=css_path.read_text(encoding='utf-8')
         if '.lm-stats-profile-actions' not in css:
             css=css.rstrip()+'\n'+SHARE_CSS.strip()+'\n';css_path.write_text(css,encoding='utf-8');css_changed=True
-    return {'status':'PASS','changed':changed or css_changed,'shared_loader':True,'mode':mode,'share_state':True,'mobile_grid':True}
+    return {'status':'PASS','changed':changed or css_changed,'shared_loader':True,'mode':mode,'share_state':True,'resume_state':True,'mobile_grid':True}
 
 
 def self_test()->None:
@@ -120,8 +137,9 @@ def self_test()->None:
             result=apply(root);t=p.read_text(encoding='utf-8');c=css.read_text(encoding='utf-8')
             assert result['changed'] and result['mode']==mode and expected in t
             assert 'window.LM_LOAD_STATS=load' in t and t.count('fetch(')==1
-            assert SHARE_MARKER in t and 'xsmb_profile_share' in t and 'xsmb_deep_link_open' in t
-            assert '.lm-stats-profile-actions' in c and 'repeat(4,minmax(0,1fr))' in c
+            for marker in (SHARE_MARKER,'xsmb_profile_share','xsmb_deep_link_open','lm_stats_recent_v1','xsmb_stats_resume'):
+                assert marker in t
+            assert '.lm-stats-profile-actions' in c and '.lm-stats-resume' in c and 'repeat(4,minmax(0,1fr))' in c
             assert apply(root)['changed'] is False
     print('SHARED_STATISTICS_LOADER_SELF_TEST_OK')
 

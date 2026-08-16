@@ -26,7 +26,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,8 +80,25 @@ jobs:
           git push origin HEAD:main
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Dispatch Pages after a bot data commit
+      - name: Dispatch Pages and wait for bot data deploy
         if: steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages.yml --ref main
+        run: |
+          set -euo pipefail
+          gh workflow run pages.yml --ref main
+          sleep 3
+          run_id="$(gh run list --workflow pages.yml --branch main --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId')"
+          test -n "$run_id"
+          echo "Waiting for Pages run $run_id"
+          gh run watch "$run_id" --exit-status --interval 5
+
+      - name: Submit IndexNow and dispatch live health
+        if: steps.commit.outputs.changed == 'true' || github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python scripts/indexnow_submit.py --self-test
+          python scripts/indexnow_submit.py --submit-live
+          gh workflow run live-seo-health.yml --ref main

@@ -63,11 +63,13 @@ jobs:
           grep -q 'affiliate_click' site-v2/ads-tracking.js
           grep -q 'ad_slot_view' site-v2/ads-tracking.js
           grep -q 'ad_slot_load' site-v2/ads-tracking.js
-          grep -q 'home_upper_after_header' site-v2/finance-banner.js
-          grep -q 'affiliate_finance_view' site-v2/finance-banner.js
-          grep -q 'Từ 1,2%/tháng · Đăng ký ban đầu chỉ cần Căn cước công dân' site-v2/finance-banner.js
-          grep -q 'Đăng ký vay online' site-v2/finance-banner.js
-          grep -q 'portal-topline' site-v2/finance-banner.js
+          grep -q 'after_latest_results_gate' site-v2/finance-banner.js
+          grep -q 'affiliate_finance_gate_view' site-v2/finance-banner.js
+          grep -q 'Lãi suất từ 1,2%/tháng' site-v2/finance-banner.js
+          grep -q 'VAY TIỀN NHANH ONLINE' site-v2/finance-banner.js
+          grep -q 'portal-result-card' site-v2/finance-banner.js
+          grep -q 'EARLY_DELAY_MS = 12000' site-v2/finance-banner.js
+          grep -q 'EARLY_SCROLL_PX = 120' site-v2/finance-banner.js
           ! grep -q '59%/năm' site-v2/finance-banner.js
           grep -q 'portal-number-compare' site-v2/portal-v3.css
           grep -q 'portal-history-codes' site-v2/portal-v3.css

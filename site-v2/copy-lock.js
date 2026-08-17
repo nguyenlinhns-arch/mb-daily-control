@@ -2,7 +2,6 @@
   "use strict";
 
   const ZALO_URL = "https://zalo.me/0398696879";
-  const ZALO_PHONE = "0398696879";
 
   function reportDateLabel() {
     const bodyDate = String(document.body?.dataset?.reportDate || "").trim();
@@ -53,15 +52,15 @@
     routeButtonToZalo(card.querySelector("[data-open-checkout]"), date);
 
     const kicker = card.querySelector(".lm-ai-runtime-kicker");
-    if (kicker) setText(kicker, `Mở trực tiếp Zalo ${ZALO_PHONE} · Không cần tạo tài khoản.`);
+    if (kicker) kicker.remove();
 
     const note = card.querySelector(".portal-paid-note");
-    if (note) setText(note, `Trao đổi trực tiếp qua Zalo ${ZALO_PHONE}. Website không mở thanh toán trực tiếp.`);
+    if (note) note.remove();
 
     const lock = card.querySelector(".portal-paid-lock");
     if (lock) lock.setAttribute("aria-label", "TOP 1 và TOP 2 được ẩn trên trang công khai");
 
-    card.dataset.dailyOfferCopy = "zalo-only-v1";
+    card.dataset.dailyOfferCopy = "zalo-only-v2";
   }
 
   function applyCopyLock() {

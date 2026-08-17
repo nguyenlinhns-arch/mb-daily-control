@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const ZALO_URL = "https://zalo.me/0398696879";
+  const ZALO_URL = "/go/zalo/";
 
   function reportDateLabel() {
     const bodyDate = String(document.body?.dataset?.reportDate || "").trim();
@@ -60,7 +60,7 @@
     const lock = card.querySelector(".portal-paid-lock");
     if (lock) lock.setAttribute("aria-label", "TOP 1 và TOP 2 được ẩn trên trang công khai");
 
-    card.dataset.dailyOfferCopy = "zalo-only-v2";
+    card.dataset.dailyOfferCopy = "zalo-only-v3";
   }
 
   function applyCopyLock() {
@@ -73,7 +73,7 @@
     if (lead) {
       const desired = `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số hôm nay <strong>${date}</strong> được trao đổi trực tiếp qua Zalo.`;
       if (lead.innerHTML !== desired) lead.innerHTML = desired;
-      lead.dataset.dailySalesCopy = "zalo-only-v1";
+      lead.dataset.dailySalesCopy = "zalo-only-v2";
     }
 
     document.querySelectorAll(".portal-paid-card").forEach((card) => normalizeSuggestionCard(card, date));
@@ -93,7 +93,7 @@
         .find((node) => /^(Phương pháp công khai|Gợi ý số)/i.test((node.textContent || "").trim()));
     if (heading) {
       setText(heading, `Gợi ý số hôm nay - ${date}`);
-      heading.dataset.dailyRecommendationHeading = "zalo-only-v1";
+      heading.dataset.dailyRecommendationHeading = "zalo-only-v2";
       const subtitle = heading.parentElement?.querySelector("p");
       if (subtitle) {
         const lockText = dataLock ? `ngày hôm qua (${dataLock})` : "ngày hôm qua";

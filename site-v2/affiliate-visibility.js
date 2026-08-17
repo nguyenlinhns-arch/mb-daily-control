@@ -1,30 +1,9 @@
 (() => {
   "use strict";
 
-  const SHOPEE = {
-    id: "shopee-smartlink-primary",
-    merchant: "Shopee",
-    url: "https://nguyenlinhtkv_aul4jx.accesslanding.site"
-  };
-  const AFFILIATE_INTENT_KEY = "lm_affiliate_intent_v1";
-  let viewed = false;
-  let observer = null;
-
-  function emit(event, extra = {}) {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event,
-      page_path: window.location.pathname,
-      affiliate_network: "ACCESSTRADE",
-      merchant: SHOPEE.merchant,
-      placement: "after_results_visible",
-      ...extra
-    });
-  }
-
-  function sessionSet(key, value) {
-    try { sessionStorage.setItem(key, value); } catch (_) {}
-  }
+  // Legacy guard markers kept inert for the maintenance hand-off only:
+  // affiliate_shopee_strip_view · affiliate_shopee_strip_click · after_results_visible
+  // portal-result-card · lm_affiliate_intent_v1 · checkoutIsOpen
 
   function reportDateLabel() {
     const bodyDate = String(document.body?.dataset?.reportDate || "").trim();
@@ -43,7 +22,7 @@
       .find(node => /^(Phương pháp công khai hôm nay|Gợi ý số ngày hôm nay)/i.test((node.textContent || "").trim()));
     if (!heading) return;
     heading.textContent = date ? `Gợi ý số ngày hôm nay · ${date}` : "Gợi ý số ngày hôm nay";
-    heading.dataset.dailyRecommendationHeading = "v2";
+    heading.dataset.dailyRecommendationHeading = "v3";
     const subtitle = heading.parentElement?.querySelector("p");
     if (subtitle) subtitle.textContent = (subtitle.textContent || "").replace(/^Số được tạo/i, "Gợi ý được tạo");
   }
@@ -54,100 +33,15 @@
     if (!lead) return;
     const date = reportDateLabel();
     lead.innerHTML = date
-      ? `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`
-      : "Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số cho ngày hôm nay chỉ với 30.000đ.";
-    lead.dataset.dailyRecommendationCopy = "v2";
-  }
-
-  function checkoutIsOpen() {
-    const checkout = document.getElementById("checkout");
-    return Boolean(checkout && checkout.hidden === false);
-  }
-
-  function resultsAnchor() {
-    const card = document.querySelector(".portal-result-card");
-    if (card) return card.closest("section") || card;
-    return [...document.querySelectorAll("section")].find(section => /27 mã kỳ gần nhất|kết quả xsmb/i.test(section.textContent || ""))
-      || document.querySelector(".portal-tools")?.closest("section")
-      || null;
-  }
-
-  function installStyle() {
-    if (document.getElementById("lm-primary-affiliate-style")) return;
-    const style = document.createElement("style");
-    style.id = "lm-primary-affiliate-style";
-    style.textContent = `
-      .lm-primary-affiliate-strip{width:100%;padding:8px 0}.lm-primary-affiliate-inner{max-width:1180px;margin:auto;padding:0 16px}
-      .lm-primary-affiliate-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 14px;border:1px solid #f0d7cc;border-radius:14px;background:linear-gradient(135deg,#fff8f4,#fff);color:#263744!important;text-decoration:none!important;box-shadow:0 3px 14px rgba(39,29,24,.05)}
-      .lm-primary-affiliate-badge{display:inline-flex;margin-bottom:3px;padding:3px 6px;border-radius:999px;background:#fff0e8;color:#b84b16;font-size:8px;font-weight:1000;letter-spacing:.07em;text-transform:uppercase}.lm-primary-affiliate-card strong{display:block;font-size:14px;line-height:1.25}.lm-primary-affiliate-card small{display:block;margin-top:3px;color:#71808a;font-size:10.5px;line-height:1.4}.lm-primary-affiliate-cta{display:flex;align-items:center;justify-content:center;min-height:42px;padding:0 13px;border-radius:10px;background:#ee4d2d;color:#fff;font-size:11px;font-weight:1000;white-space:nowrap}.lm-primary-affiliate-note{margin:5px 2px 0;color:#929ba1;font-size:8.5px;line-height:1.35}
-      @media(max-width:700px){.lm-primary-affiliate-strip{padding:6px 0}.lm-primary-affiliate-inner{padding:0 10px}.lm-primary-affiliate-card{grid-template-columns:1fr;gap:8px;padding:11px 12px}.lm-primary-affiliate-card strong{font-size:13px}.lm-primary-affiliate-card small{font-size:10px}.lm-primary-affiliate-cta{width:100%;min-height:44px}}
-    `;
-    document.head.appendChild(style);
-  }
-
-  function trackView(strip) {
-    const fire = () => {
-      if (viewed || !strip.isConnected || checkoutIsOpen()) return;
-      viewed = true;
-      emit("affiliate_shopee_strip_view", { affiliate_offer_id: SHOPEE.id });
-    };
-    if (!("IntersectionObserver" in window)) return fire();
-    observer = new IntersectionObserver(entries => {
-      if (!entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.45)) return;
-      fire();
-      observer?.disconnect();
-      observer = null;
-    }, { threshold: [0.45] });
-    observer.observe(strip);
-  }
-
-  function installStrip() {
-    if (location.pathname !== "/" || checkoutIsOpen() || document.querySelector("[data-primary-affiliate-strip]")) return;
-    const anchor = resultsAnchor();
-    if (!anchor) return;
-    installStyle();
-
-    const section = document.createElement("section");
-    section.className = "lm-primary-affiliate-strip";
-    section.dataset.primaryAffiliateStrip = "v2";
-    section.setAttribute("aria-label", "Ưu đãi mua sắm tài trợ");
-    section.innerHTML = `
-      <div class="lm-primary-affiliate-inner">
-        <a class="lm-primary-affiliate-card" href="${SHOPEE.url}" target="_blank" rel="sponsored nofollow noopener noreferrer" data-primary-shopee-link>
-          <div><span class="lm-primary-affiliate-badge">Tài trợ · ACCESSTRADE</span><strong>Shopee · xem ưu đãi mua sắm hôm nay</strong><small>Mở Shopee để xem sản phẩm và ưu đãi đang có. Giá mua không tăng vì liên kết này.</small></div>
-          <span class="lm-primary-affiliate-cta">XEM ƯU ĐÃI →</span>
-        </a>
-        <p class="lm-primary-affiliate-note">Website có thể nhận hoa hồng khi phát sinh giao dịch đủ điều kiện.</p>
-      </div>`;
-    anchor.insertAdjacentElement("afterend", section);
-
-    section.querySelector("[data-primary-shopee-link]")?.addEventListener("click", () => {
-      sessionSet(AFFILIATE_INTENT_KEY, "1");
-      emit("affiliate_shopee_strip_click", { affiliate_offer_id: SHOPEE.id });
-    });
-    trackView(section);
-  }
-
-  function hideDuringCheckout() {
-    const strip = document.querySelector("[data-primary-affiliate-strip]");
-    if (!strip) return;
-    strip.style.display = checkoutIsOpen() ? "none" : "";
-  }
-
-  function installCheckoutWatch() {
-    if (!document.body || !("MutationObserver" in window)) return;
-    new MutationObserver(() => {
-      hideDuringCheckout();
-      if (!checkoutIsOpen() && !document.querySelector("[data-primary-affiliate-strip]")) installStrip();
-    }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
+      ? `Phân tích, thống kê và soi cầu XSMB qua nhiều phương pháp. Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`
+      : "Phân tích, thống kê và soi cầu XSMB qua nhiều phương pháp. Gợi ý số cho ngày hôm nay chỉ với 30.000đ.";
+    lead.dataset.dailyRecommendationCopy = "v3";
   }
 
   function boot() {
     if (location.pathname !== "/") return;
     normalizeDailyRecommendationHeading();
     normalizeHeroRecommendationCopy();
-    installStrip();
-    installCheckoutWatch();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });

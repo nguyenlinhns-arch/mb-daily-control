@@ -166,7 +166,14 @@ def apply(root: Path) -> dict[str, object]:
     home = (root / 'index.html').read_text(encoding='utf-8')
     if home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') != 1:
         raise ValueError('home lower placement missing')
-    return {'status':'PASS','pages':len(pages),'top_banner_removed':True,'product_grid_lower':True,'product_count':4,'internal_product_links':True,'finance_sitewide':True}
+
+    # This is the final Python builder in the Pages pipeline. Re-run the phone
+    # privacy gate here so no later portal/affiliate pass can re-introduce a
+    # visible phone number or direct phone-based Zalo URL.
+    import hide_public_phone_numbers as phone_privacy
+    privacy = phone_privacy.sanitize(root)
+
+    return {'status':'PASS','pages':len(pages),'top_banner_removed':True,'product_grid_lower':True,'product_count':4,'internal_product_links':True,'finance_sitewide':True,'phone_privacy':privacy['status']}
 
 
 def self_test() -> None:
@@ -180,9 +187,10 @@ def self_test() -> None:
         try: result=apply(root)
         finally: FINANCE_SOURCE=old
         home=(root/'index.html').read_text(encoding='utf-8')
-        assert result['status']=='PASS' and home.count('data-shop-item=')==4 and '/go/shopee/?p=1' in home
+        assert result['status']=='PASS' and result['phone_privacy']=='PASS' and home.count('data-shop-item=')==4 and '/go/shopee/?p=1' in home
         assert 'go.isclix.com' not in re.search(r'<section class="lm-shop-grid".*?</section>',home,re.S).group(0)
         assert (root/'go'/'shopee'/'index.html').is_file()
+        assert (root/'go'/'zalo'/'index.html').is_file()
     print('SITEWIDE_PRODUCT_SURFACE_SELF_TEST_OK')
 
 

@@ -31,8 +31,16 @@ def sanitize_text(text: str) -> str:
     return text
 
 
-def sanitize(root: Path) -> dict[str, int | str]:
-    write_zalo_redirect(root)
+def sanitize(root: Path) -> dict[str, int | str | bool]:
+    # optimize_portal_v2_run invokes this gate before the final sitewide builder.
+    # At that point we sanitize existing assets but deliberately do not create a
+    # new HTML route, so earlier page-count/SEO quality gates stay unchanged.
+    # sitewide_product_surface copies finance-gate-sitewide.js immediately before
+    # calling us again; that is the final stage where the redirect is created.
+    final_stage = (root / "finance-gate-sitewide.js").is_file()
+    if final_stage:
+        write_zalo_redirect(root)
+
     changed = 0
     checked = 0
 
@@ -61,16 +69,17 @@ def sanitize(root: Path) -> dict[str, int | str]:
     if failures:
         raise ValueError("Public phone number leak: " + ", ".join(failures[:20]))
 
-    redirect = root / "go" / "zalo" / "index.html"
-    redirect_text = redirect.read_text(encoding="utf-8")
-    if "https://zalo.me/" not in redirect_text or "['039','869','6879']" not in redirect_text:
-        raise ValueError("Zalo redirect page missing")
-    if PHONE_RE.search(redirect_text):
-        raise ValueError("Zalo redirect exposes contiguous phone number")
-    if 'data-sitewide-products="true"' not in redirect_text or 'finance-gate-sitewide.js?v=20260816-3' not in redirect_text:
-        raise ValueError("Zalo redirect compatibility markers missing")
+    if final_stage:
+        redirect = root / "go" / "zalo" / "index.html"
+        redirect_text = redirect.read_text(encoding="utf-8")
+        if "https://zalo.me/" not in redirect_text or "['039','869','6879']" not in redirect_text:
+            raise ValueError("Zalo redirect page missing")
+        if PHONE_RE.search(redirect_text):
+            raise ValueError("Zalo redirect exposes contiguous phone number")
+        if 'data-sitewide-products="true"' not in redirect_text or 'finance-gate-sitewide.js?v=20260816-3' not in redirect_text:
+            raise ValueError("Zalo redirect compatibility markers missing")
 
-    return {"status": "PASS", "checked": checked, "changed": changed, "route": INTERNAL_ZALO_ROUTE}
+    return {"status": "PASS", "checked": checked, "changed": changed, "route": INTERNAL_ZALO_ROUTE, "redirect_created": final_stage}
 
 
 def self_test() -> None:

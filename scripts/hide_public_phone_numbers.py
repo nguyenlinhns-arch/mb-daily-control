@@ -10,6 +10,7 @@ from pathlib import Path
 # literal in its source and uses .htm so portal *.html quality/page counts are
 # unaffected while browsers still receive an HTML document.
 DIRECT_ZALO = "https://zalo.me/0398696879"
+LEGACY_ZALO_ROUTE = "/go/zalo/"
 INTERNAL_ZALO_ROUTE = "/go/zalo.htm"
 PHONE_RE = re.compile(r"(?<!\d)(?:03|05|07|08|09)\d{8}(?!\d)")
 TEL_RE = re.compile(r"tel:\+?(?:84|0)?[0-9][0-9 .()-]{7,18}", re.I)
@@ -27,6 +28,7 @@ def write_zalo_redirect(root: Path) -> None:
 
 def sanitize_text(text: str) -> str:
     text = text.replace(DIRECT_ZALO, INTERNAL_ZALO_ROUTE)
+    text = text.replace(LEGACY_ZALO_ROUTE, INTERNAL_ZALO_ROUTE)
     text = TEL_RE.sub(INTERNAL_ZALO_ROUTE, text)
     text = PHONE_RE.sub("", text)
     return text
@@ -77,9 +79,10 @@ def sanitize(root: Path) -> dict[str, int | str | bool]:
 
 
 def self_test() -> None:
-    sample = '<a href="https://zalo.me/0398696879">Zalo 0398696879</a><a href="tel:0398696879">Gọi</a>'
+    sample = '<a href="https://zalo.me/0398696879">Zalo 0398696879</a><a href="tel:0398696879">Gọi</a><a href="/go/zalo/">Cũ</a>'
     cleaned = sanitize_text(sample)
     assert DIRECT_ZALO not in cleaned
+    assert LEGACY_ZALO_ROUTE not in cleaned
     assert not PHONE_RE.search(cleaned)
     assert "tel:" not in cleaned.lower()
     assert INTERNAL_ZALO_ROUTE in cleaned

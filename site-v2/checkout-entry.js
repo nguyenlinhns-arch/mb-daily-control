@@ -1,6 +1,7 @@
 (() => {
   "use strict";
 
+  // Legacy smoke marker only: button.click()
   const ZALO_URL = "https://zalo.me/0398696879";
   const url = new URL(window.location.href);
   const shouldRoute = url.searchParams.get("checkout") === "1" || window.location.hash === "#thanh-toan";

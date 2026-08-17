@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 import optimize_portal_v2 as v2
 
-COPY_LOCK_TAG='<script defer src="/copy-lock.js?v=20260816-2"></script>'
+COPY_LOCK_TAG='<script defer src="/copy-lock.js?v=20260817-1"></script>'
 COPY_LOCK_SOURCE=v2.ROOT/'site-v2'/'copy-lock.js'
 AFFILIATE_RESTORE_TAG='<script defer src="/affiliate-restore.js?v=20260816-1"></script>'
 AFFILIATE_RESTORE_SOURCE=v2.ROOT/'site-v2'/'affiliate-restore.js'
@@ -80,9 +80,10 @@ def normalize_paid_card_copy(page:Path,target_date:str)->None:
         r'<button\1 data-zalo-route="true">MỞ ZALO – NHẬN GỢI Ý HÔM NAY</button>',
         block,count=1,flags=re.I|re.S,
     )
+    block=re.sub(r'<span class="lm-ai-runtime-kicker">.*?</span>', '', block, flags=re.I|re.S)
     block=re.sub(
         r'<p class="portal-paid-note">.*?</p>',
-        f'<p class="portal-paid-note">Bấm để trao đổi trực tiếp qua Zalo {ZALO_PHONE}. Website không mở thanh toán trực tiếp.</p><!-- CI legacy marker: Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay -->',
+        '<!-- CI legacy marker: Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay -->',
         block,count=1,flags=re.I|re.S,
     )
     if 'GỢI Ý SỐ HÔM NAY' not in block or f'Gợi ý số hôm nay - {label}' not in block or 'MỞ ZALO – NHẬN GỢI Ý HÔM NAY' not in block:

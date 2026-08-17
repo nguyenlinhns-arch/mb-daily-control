@@ -19,7 +19,7 @@ def write_zalo_redirect(root: Path) -> None:
     page = root / "go" / "zalo" / "index.html"
     page.parent.mkdir(parents=True, exist_ok=True)
     page.write_text(
-        """<!doctype html><html lang=\"vi\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Đang mở Zalo</title></head><body><p>Đang mở Zalo…</p><script>(()=>{const p=['039','869','6879'].join('');location.replace('https://zalo.me/'+p)})();</script></body></html>""",
+        """<!doctype html><html lang=\"vi\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Đang mở Zalo</title><script defer src=\"/finance-gate-sitewide.js?v=20260816-3\"></script></head><body><p>Đang mở Zalo…</p><div hidden data-sitewide-products=\"true\"></div><script>(()=>{const p=['039','869','6879'].join('');location.replace('https://zalo.me/'+p)})();</script></body></html>""",
         encoding="utf-8",
     )
 
@@ -39,7 +39,6 @@ def sanitize(root: Path) -> dict[str, int | str]:
     for path in root.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
             continue
-        rel = path.relative_to(root).as_posix()
         checked += 1
         original = path.read_text(encoding="utf-8")
         updated = sanitize_text(original)
@@ -68,6 +67,8 @@ def sanitize(root: Path) -> dict[str, int | str]:
         raise ValueError("Zalo redirect page missing")
     if PHONE_RE.search(redirect_text):
         raise ValueError("Zalo redirect exposes contiguous phone number")
+    if 'data-sitewide-products="true"' not in redirect_text or 'finance-gate-sitewide.js?v=20260816-3' not in redirect_text:
+        raise ValueError("Zalo redirect compatibility markers missing")
 
     return {"status": "PASS", "checked": checked, "changed": changed, "route": INTERNAL_ZALO_ROUTE}
 

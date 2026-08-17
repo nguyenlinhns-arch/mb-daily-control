@@ -19,7 +19,7 @@ def write_zalo_redirect(root: Path) -> None:
     page = root / "go" / "zalo" / "index.html"
     page.parent.mkdir(parents=True, exist_ok=True)
     page.write_text(
-        """<!doctype html><html lang=\"vi\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Đang mở Zalo</title><script defer src=\"/finance-gate-sitewide.js?v=20260816-3\"></script></head><body><p>Đang mở Zalo…</p><div hidden data-sitewide-products=\"true\"></div><script>(()=>{const p=['039','869','6879'].join('');location.replace('https://zalo.me/'+p)})();</script></body></html>""",
+        """<!doctype html><html lang=\"vi\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Đang mở Zalo</title><script defer src=\"https://lemienbac.com/finance-gate-sitewide.js?v=20260816-3\"></script></head><body><p>Đang mở Zalo…</p><div hidden data-sitewide-products=\"true\"></div><script>(()=>{const p=['039','869','6879'].join('');location.replace('https://zalo.me/'+p)})();</script></body></html>""",
         encoding="utf-8",
     )
 

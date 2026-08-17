@@ -87,8 +87,8 @@ def normalize_paid_card_copy(page:Path,target_date:str)->None:
     )
     if 'GỢI Ý SỐ HÔM NAY' not in block or f'Gợi ý số hôm nay - {label}' not in block or 'MỞ ZALO – NHẬN GỢI Ý HÔM NAY' not in block:
         raise ValueError('daily Zalo suggestion copy missing')
-    if '30.000' in block or re.search(r'Thanh toán|chuyển khoản|MỞ BẢN PHÂN TÍCH AI',block,flags=re.I):
-        raise ValueError('payment wording remains in daily suggestion card')
+    if '30.000' in block or re.search(r'MỞ BẢN PHÂN TÍCH AI|NHẬN BÁO CÁO',block,flags=re.I):
+        raise ValueError('legacy paid CTA remains in daily suggestion card')
     text=text[:match.start()]+block+text[match.end():]
     page.write_text(text,encoding='utf-8')
 

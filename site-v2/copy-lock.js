@@ -1,12 +1,15 @@
 (() => {
   "use strict";
 
+  const ZALO_URL = "https://zalo.me/0398696879";
+  const ZALO_PHONE = "0398696879";
+
   function reportDateLabel() {
     const bodyDate = String(document.body?.dataset?.reportDate || "").trim();
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(bodyDate)) return bodyDate;
     const text = document.body?.textContent || "";
     const target = text.match(/Target\s+(\d{2}\/\d{2}\/\d{4})/i)
-      || text.match(/Gợi\s+ý\s+số[^\n]{0,80}?(\d{2}\/\d{2}\/\d{4})/i)
+      || text.match(/Gợi\s+ý\s+số[^\n]{0,100}?(\d{2}\/\d{2}\/\d{4})/i)
       || text.match(/LÊ\s+MIỀN\s+BẮC\s+NGÀY\s+(\d{2}\/\d{2}\/\d{4})/i);
     return target ? target[1] : "";
   }
@@ -24,6 +27,43 @@
     if (node && (node.textContent || "").trim() !== value) node.textContent = value;
   }
 
+  function routeButtonToZalo(button, date) {
+    if (!button) return;
+    setText(button, "MỞ ZALO – NHẬN GỢI Ý HÔM NAY");
+    button.setAttribute("aria-label", `Mở Zalo nhận gợi ý số hôm nay ${date}`);
+    button.setAttribute("data-zalo-route", "true");
+    button.removeAttribute("disabled");
+    button.removeAttribute("aria-disabled");
+  }
+
+  function normalizeSuggestionCard(card, date) {
+    if (!card) return;
+    setText(card.querySelector(":scope > small"), "GỢI Ý SỐ HÔM NAY");
+    setText(card.querySelector(":scope > h2"), `Gợi ý số hôm nay - ${date}`);
+
+    let readyNote = card.querySelector(":scope > .lm-returning-note");
+    const title = card.querySelector(":scope > h2");
+    if (!readyNote && title) {
+      readyNote = document.createElement("div");
+      readyNote.className = "lm-returning-note";
+      title.insertAdjacentElement("afterend", readyNote);
+    }
+    setText(readyNote, `Gợi ý ngày ${date} đã sẵn sàng · mở Zalo để trao đổi.`);
+
+    routeButtonToZalo(card.querySelector("[data-open-checkout]"), date);
+
+    const kicker = card.querySelector(".lm-ai-runtime-kicker");
+    if (kicker) setText(kicker, `Mở trực tiếp Zalo ${ZALO_PHONE} · Không cần tạo tài khoản.`);
+
+    const note = card.querySelector(".portal-paid-note");
+    if (note) setText(note, `Trao đổi trực tiếp qua Zalo ${ZALO_PHONE}. Website không mở thanh toán trực tiếp.`);
+
+    const lock = card.querySelector(".portal-paid-lock");
+    if (lock) lock.setAttribute("aria-label", "TOP 1 và TOP 2 được ẩn trên trang công khai");
+
+    card.dataset.dailyOfferCopy = "zalo-only-v1";
+  }
+
   function applyCopyLock() {
     if (window.location.pathname !== "/") return;
     const date = reportDateLabel();
@@ -32,55 +72,52 @@
 
     const lead = document.querySelector(".portal-hero .portal-lead");
     if (lead) {
-      const desired = `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`;
+      const desired = `Theo dõi dữ liệu kỳ gần nhất, tần suất, lô gan, cặp đảo và các phương pháp công khai. Gợi ý số hôm nay <strong>${date}</strong> được trao đổi trực tiếp qua Zalo.`;
       if (lead.innerHTML !== desired) lead.innerHTML = desired;
-      lead.dataset.dailySalesCopy = "v3";
+      lead.dataset.dailySalesCopy = "zalo-only-v1";
     }
 
-    const paidCard = document.querySelector(".portal-paid-card");
-    if (paidCard) {
-      setText(paidCard.querySelector("small"), "GỢI Ý SỐ HÔM NAY");
-      setText(paidCard.querySelector("h2"), `Gợi ý số ngày hôm nay - ${date}`);
-
-      let readyNote = paidCard.querySelector(".lm-returning-note");
-      const title = paidCard.querySelector("h2");
-      if (!readyNote && title) {
-        readyNote = document.createElement("div");
-        readyNote.className = "lm-returning-note";
-        title.insertAdjacentElement("afterend", readyNote);
-      }
-      setText(readyNote, `Gợi ý ngày ${date} đã sẵn sàng · mở một lần · không cần tạo tài khoản.`);
-
-      const button = paidCard.querySelector("[data-open-checkout]");
-      if (button) {
-        setText(button, "MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ");
-        button.setAttribute("aria-label", `Mở gợi ý số ngày hôm nay ${date}, giá 30.000 đồng`);
-      }
-      paidCard.dataset.dailyOfferCopy = "v4";
-    }
+    document.querySelectorAll(".portal-paid-card").forEach((card) => normalizeSuggestionCard(card, date));
 
     const sticky = document.querySelector("[data-ai-sticky-cta]");
     if (sticky) {
-      setText(sticky, "MỞ GỢI Ý SỐ HÔM NAY · 30.000Đ");
-      sticky.setAttribute("aria-label", `Mở gợi ý số ngày hôm nay ${date}, giá 30.000 đồng`);
+      setText(sticky, "GỢI Ý SỐ HÔM NAY · MỞ ZALO");
+      sticky.setAttribute("href", ZALO_URL);
+      sticky.setAttribute("target", "_blank");
+      sticky.setAttribute("rel", "noopener noreferrer");
+      sticky.setAttribute("data-zalo-route", "link");
+      sticky.setAttribute("aria-label", `Mở Zalo nhận gợi ý số hôm nay ${date}`);
     }
 
     const heading = document.querySelector('[data-daily-recommendation-heading]')
       || [...document.querySelectorAll(".portal-section-title h2")]
         .find((node) => /^(Phương pháp công khai|Gợi ý số)/i.test((node.textContent || "").trim()));
     if (heading) {
-      setText(heading, `Gợi ý số ngày hôm nay - ${date}`);
-      heading.dataset.dailyRecommendationHeading = "v4";
+      setText(heading, `Gợi ý số hôm nay - ${date}`);
+      heading.dataset.dailyRecommendationHeading = "zalo-only-v1";
       const subtitle = heading.parentElement?.querySelector("p");
       if (subtitle) {
         const lockText = dataLock ? `ngày hôm qua (${dataLock})` : "ngày hôm qua";
-        setText(subtitle, `Gợi ý được tạo từ dữ liệu khóa đến ${lockText}. Kết luận các số cuối cùng không nằm trong danh sách công khai này.`);
+        setText(subtitle, `Gợi ý được tạo từ dữ liệu khóa đến ${lockText}. Các số cuối cùng không hiển thị công khai trên trang.`);
       }
     }
   }
 
+  function installZaloRouting() {
+    if (document.documentElement.dataset.zaloOnlyRouting === "true") return;
+    document.documentElement.dataset.zaloOnlyRouting = "true";
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest('.portal-paid-card [data-open-checkout], [data-zalo-route="true"]');
+      if (!target) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.open(ZALO_URL, "_blank", "noopener");
+    }, true);
+  }
+
   function boot() {
     if (window.location.pathname !== "/") return;
+    installZaloRouting();
     applyCopyLock();
     const observer = new MutationObserver(applyCopyLock);
     observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["hidden", "data-returning-ai-buyer"] });

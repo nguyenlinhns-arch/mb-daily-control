@@ -1,29 +1,23 @@
 {
-  "schema_version": "LM_ACCESSTRADE_PLACEMENTS_V3",
+  "schema_version": "LM_ACCESSTRADE_PLACEMENTS_V4",
   "enabled": true,
   "network": "ACCESSTRADE",
   "disclosure": "Liên kết tiếp thị: website có thể nhận hoa hồng khi bạn mua hàng hoặc đăng ký qua liên kết đối tác; giá mua của bạn không tăng vì việc đó. Điều kiện dịch vụ tài chính do đơn vị cung cấp quyết định.",
   "policy": {
     "adsterra_display": false,
     "hide_affiliate_only_while_ai_checkout_open": true,
-    "returning_buyer_affiliate_visible": true
+    "returning_buyer_affiliate_visible": true,
+    "shopee_single_canonical_surface": true
   },
   "placements": [
     {
       "id": "shopee-early-strip",
-      "enabled": true,
+      "enabled": false,
       "merchant": "Shopee",
-      "type": "smartlink_strip",
-      "placement": "home_after_results",
-      "url": "https://nguyenlinhtkv_aul4jx.accesslanding.site",
-      "runtime": [
-        "site-v2/affiliate-visibility.js",
-        "site-v2/affiliate-restore.js"
-      ],
-      "events": [
-        "affiliate_shopee_strip_view",
-        "affiliate_shopee_strip_click"
-      ]
+      "type": "retired_legacy_strip",
+      "placement": "retired",
+      "runtime": [],
+      "events": []
     },
     {
       "id": "shopee-product-grid",

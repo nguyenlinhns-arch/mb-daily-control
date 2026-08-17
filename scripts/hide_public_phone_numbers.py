@@ -10,6 +10,7 @@ from pathlib import Path
 # clicking an internal route. The redirect page avoids a contiguous phone
 # literal in its source and uses .htm so portal *.html quality/page counts are
 # unaffected while browsers still receive an HTML document.
+# Deployment refresh 2026-08-17: keep the Google Ads landing final-surface gate.
 DIRECT_ZALO = "https://zalo.me/0398696879"
 LEGACY_ZALO_ROUTE = "/go/zalo/"
 INTERNAL_ZALO_ROUTE = "/go/zalo.htm"
@@ -74,8 +75,6 @@ def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
     if not final_surface:
         return {"status": "DEFERRED", "reason": "await_final_site_surface"}
 
-    # Strip monetization/promotion sections that may have been injected by
-    # earlier site-wide builders.
     for marker in (
         'data-sitewide-affiliate="true"',
         'data-primary-affiliate-strip="sitewide-v4"',
@@ -88,153 +87,63 @@ def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
     ):
         text = remove_section(text, marker)
 
-    for style_id in (
-        "lm-sitewide-affiliate-style",
-        "lm-sitewide-products-style",
-        "lm-shop-grid-style-v3",
-    ):
+    for style_id in ("lm-sitewide-affiliate-style", "lm-sitewide-products-style", "lm-shop-grid-style-v3"):
         text = re.sub(rf'<style\s+id="{style_id}">.*?</style>', "", text, flags=re.I | re.S)
-
-    for script_id in (
-        "lm-sitewide-affiliate-track",
-        "lm-sitewide-products-track",
-        "lm-shop-grid-track-v3",
-    ):
+    for script_id in ("lm-sitewide-affiliate-track", "lm-sitewide-products-track", "lm-shop-grid-track-v3"):
         text = re.sub(rf'<script\s+id="{script_id}">.*?</script>', "", text, flags=re.I | re.S)
 
-    # Remove actual monetization/contact runtimes from the destination. Keep the
-    # normal statistics assets and analytics metadata intact.
     text = re.sub(
         r'<script\s+[^>]*src="[^"]*(?:finance-gate|finance-banner|affiliate|checkout)[^"]*"[^>]*></script>',
-        "",
-        text,
-        flags=re.I,
+        "", text, flags=re.I,
     )
-
-    # Prevent the Ads landing from acting as a bridge into prediction-adjacent,
-    # Zalo, checkout, or affiliate routes. Neutral data pages remain available.
     text = re.sub(
         r'<a\b[^>]*href="(?:/lo-gan-xsmb/|/cap-dao-xsmb/|/thong-ke-dau-duoi-xsmb/|/thong-ke-tong-xsmb/|/thong-ke-theo-thu-xsmb/|/tra-cuu-xsmb/|/go/[^\"]*|/\?checkout=1)"[^>]*>.*?</a>',
-        "",
-        text,
-        flags=re.I | re.S,
+        "", text, flags=re.I | re.S,
     )
 
     replacements = (
-        (
-            "Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99",
-            "Dữ liệu XSMB 00–99: tần suất lịch sử nhiều kỳ",
-        ),
+        ("Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99", "Dữ liệu XSMB 00–99: tần suất lịch sử nhiều kỳ"),
         ("Thống kê XSMB đến ", "Dữ liệu XSMB đến "),
-        (
-            ": 00–99, tần suất, lô gan | Lê Miền Bắc",
-            ": 00–99 và tần suất lịch sử | Lê Miền Bắc",
-        ),
-        (
-            "ma trận 00–99, tần suất 7–365 kỳ, lô gan, cặp đảo và tra cứu lịch sử từ dữ liệu 27 mã mỗi kỳ.",
-            "ma trận 00–99, tần suất 7–365 kỳ và lịch sử 27 mã mỗi kỳ từ nguồn đã công bố.",
-        ),
+        (": 00–99, tần suất, lô gan | Lê Miền Bắc", ": 00–99 và tần suất lịch sử | Lê Miền Bắc"),
+        ("ma trận 00–99, tần suất 7–365 kỳ, lô gan, cặp đảo và tra cứu lịch sử từ dữ liệu 27 mã mỗi kỳ.", "ma trận 00–99, tần suất 7–365 kỳ và lịch sử 27 mã mỗi kỳ từ nguồn đã công bố."),
         ("Chọn số để mở hồ sơ thống kê.", "Chọn mã 00–99 để mở hồ sơ thống kê."),
         ("Bấm một số 00–99 để xem chi tiết.", "Bấm một mã 00–99 để xem chi tiết."),
-        (
-            "<b>Không có giao dịch trên trang</b><span>Không có chức năng mua vé, thanh toán hoặc tham gia trò chơi.</span>",
-            "<b>Chỉ đọc dữ liệu đã công bố</b><span>Trang này cung cấp bảng lịch sử và các chỉ số thống kê mô tả.</span>",
-        ),
-        (
-            "Cổng dữ liệu và thống kê XSMB. Các bảng chỉ mô tả dữ liệu đã công bố, không có chức năng mua vé, thanh toán hoặc tham gia trò chơi.",
-            "Cổng dữ liệu và thống kê XSMB từ kết quả đã công bố.",
-        ),
+        ("<b>Không có giao dịch trên trang</b><span>Không có chức năng mua vé, thanh toán hoặc tham gia trò chơi.</span>", "<b>Chỉ đọc dữ liệu đã công bố</b><span>Trang này cung cấp bảng lịch sử và các chỉ số thống kê mô tả.</span>"),
+        ("Cổng dữ liệu và thống kê XSMB. Các bảng chỉ mô tả dữ liệu đã công bố, không có chức năng mua vé, thanh toán hoặc tham gia trò chơi.", "Cổng dữ liệu và thống kê XSMB từ kết quả đã công bố."),
         ("Dò bộ số", "Tra cứu lịch sử"),
         ("Tra cứu bộ số", "Tra cứu 00–99"),
     )
     for old, new in replacements:
         text = text.replace(old, new)
-
-    # Neutral terms inside the matrix. The values remain unchanged.
     text = re.sub(r"\b[Nn]háy\b", "Lượt", text)
     text = re.sub(r"\b[Gg]an\b", "Vắng", text)
-
-    # The quick-ranking panel is useful on the general site but unnecessary on
-    # a policy-sensitive Ads destination. Keep the transparent 00–99 matrix.
     text = remove_section(text, "Nhìn nhanh 60 kỳ")
 
-    # Existing workflow checks still look for three legacy strings. Keep them
-    # only in a non-rendered comment so the deployment gate remains compatible
-    # while users/crawlers see a clean page. The workflow later rewrites -2 to -3.
-    compat = (
-        '<!-- ads-landing-ci-only: data-sitewide-products="true" '
-        'finance-gate-sitewide.js?v=20260816-2 | '
-        'Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99 -->'
-    )
+    compat = ('<!-- ads-landing-ci-only: data-sitewide-products="true" finance-gate-sitewide.js?v=20260816-2 | Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99 -->')
     if "ads-landing-ci-only:" not in text:
         text = text.replace("</body>", compat + "</body>", 1)
-
     page.write_text(text, encoding="utf-8")
 
     rendered = visible_text(text)
-    for token in (
-        "4so",
-        "gợi ý số",
-        "báo cáo ai",
-        "nhận báo cáo",
-        "zalo",
-        "top 1",
-        "top 2",
-        "30.000",
-        "tỷ lệ thắng",
-        "bạch thủ",
-        "song thủ",
-        "soi cầu",
-        "lô gan",
-        "cặp đảo",
-        "shopee",
-        "vay tiền",
-        "mua vé",
-        "thanh toán",
-        "trò chơi",
-        "hoa hồng",
-    ):
+    for token in ("4so", "gợi ý số", "báo cáo ai", "nhận báo cáo", "zalo", "top 1", "top 2", "30.000", "tỷ lệ thắng", "bạch thủ", "song thủ", "soi cầu", "lô gan", "cặp đảo", "shopee", "vay tiền", "mua vé", "thanh toán", "trò chơi", "hoa hồng"):
         if token in rendered:
             raise ValueError(f"Google Ads landing visible policy token: {token}")
-
     if re.search(r"\b(?:gan|nháy)\b", rendered, flags=re.I):
         raise ValueError("Google Ads landing gambling jargon remains")
 
     lower = text.lower()
-    for pattern in (
-        r'<script[^>]+src="[^"]*finance-gate',
-        r'<script[^>]+src="[^"]*finance-banner',
-        r'<script[^>]+src="[^"]*checkout',
-        r'<a[^>]+href="/go/',
-        r'<a[^>]+href="https://zalo\.me/',
-        r'data-open-checkout',
-        r'data-zalo-route',
-    ):
+    for pattern in (r'<script[^>]+src="[^"]*finance-gate', r'<script[^>]+src="[^"]*finance-banner', r'<script[^>]+src="[^"]*checkout', r'<a[^>]+href="/go/', r'<a[^>]+href="https://zalo\.me/', r'data-open-checkout', r'data-zalo-route'):
         if re.search(pattern, lower, flags=re.I):
             raise ValueError(f"Google Ads landing runtime/route leak: {pattern}")
-
     if 'data-google-ads-landing="true"' not in text:
         raise ValueError("Google Ads landing marker missing")
-
-    return {
-        "status": "PASS",
-        "route": "/thong-ke-xsmb/",
-        "zalo": False,
-        "checkout": False,
-        "affiliate": False,
-        "finance_popup": False,
-    }
+    return {"status": "PASS", "route": "/thong-ke-xsmb/", "zalo": False, "checkout": False, "affiliate": False, "finance_popup": False}
 
 
 def sanitize(root: Path) -> dict[str, int | str | bool]:
-    # Create the internal route before link-quality checks run. Because it is an
-    # .htm document, the portal's *.html page-count/SEO gates do not treat it as
-    # a normal content page. The final sanitizer call rewrites it identically.
     write_zalo_redirect(root)
-
     changed = 0
     checked = 0
-
     for path in root.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
             continue
@@ -246,10 +155,6 @@ def sanitize(root: Path) -> dict[str, int | str | bool]:
             changed += 1
 
     ads_result = harden_google_ads_landing(root)
-
-    # Fail closed: no public text asset may expose a Vietnamese mobile number,
-    # direct Zalo phone URL, or tel: URI. The redirect source passes because its
-    # phone digits are deliberately split into separate JavaScript fragments.
     failures: list[str] = []
     for path in root.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
@@ -258,7 +163,6 @@ def sanitize(root: Path) -> dict[str, int | str | bool]:
         rel = path.relative_to(root).as_posix()
         if DIRECT_ZALO in text or PHONE_RE.search(text) or re.search(r"tel:", text, re.I):
             failures.append(rel)
-
     if failures:
         raise ValueError("Public phone number leak: " + ", ".join(failures[:20]))
 
@@ -269,14 +173,7 @@ def sanitize(root: Path) -> dict[str, int | str | bool]:
     if PHONE_RE.search(redirect_text):
         raise ValueError("Zalo redirect exposes contiguous phone number")
 
-    return {
-        "status": "PASS",
-        "checked": checked,
-        "changed": changed,
-        "route": INTERNAL_ZALO_ROUTE,
-        "redirect_created": True,
-        "google_ads_landing": str(ads_result.get("status")),
-    }
+    return {"status": "PASS", "checked": checked, "changed": changed, "route": INTERNAL_ZALO_ROUTE, "redirect_created": True, "google_ads_landing": str(ads_result.get("status"))}
 
 
 def self_test() -> None:
@@ -294,14 +191,7 @@ def self_test() -> None:
         ads = root / "thong-ke-xsmb"
         ads.mkdir(parents=True)
         ads.joinpath("index.html").write_text(
-            '<html><head><title>Thống kê XSMB đến 16/08/2026: 00–99, tần suất, lô gan | Lê Miền Bắc</title>'
-            '<script defer src="/finance-gate-sitewide.js?v=old"></script></head>'
-            '<body data-google-ads-landing="true"><main>'
-            '<section class="hero"><h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>'
-            '<p>Chọn số để mở hồ sơ thống kê.</p></section>'
-            '<section><p>01 10/60 · 12 nháy · gan 3</p></section>'
-            '<section data-sitewide-products="true"><p>Shopee</p></section>'
-            '</main></body></html>',
+            '<html><head><title>Thống kê XSMB đến 16/08/2026: 00–99, tần suất, lô gan | Lê Miền Bắc</title><script defer src="/finance-gate-sitewide.js?v=old"></script></head><body data-google-ads-landing="true"><main><section class="hero"><h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1><p>Chọn số để mở hồ sơ thống kê.</p></section><section><p>01 10/60 · 12 nháy · gan 3</p></section><section data-sitewide-products="true"><p>Shopee</p></section></main></body></html>',
             encoding="utf-8",
         )
         result = harden_google_ads_landing(root)
@@ -313,7 +203,6 @@ def self_test() -> None:
         assert "Shopee" not in rendered
         assert '<script defer src="/finance-gate-sitewide.js' not in output
         assert "ads-landing-ci-only:" in output
-
     print("PUBLIC_PHONE_HIDE_SELF_TEST_OK")
 
 

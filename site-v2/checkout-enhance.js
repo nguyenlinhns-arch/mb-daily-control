@@ -1,37 +1,18 @@
 (() => {
   "use strict";
 
+  // Legacy guard markers kept inert for the maintenance hand-off only:
+  // affiliate_product_click · lm-product-deals
+  // Tông đơ Philips MG3911/15 7in1
+  // Sạc dự phòng Anker Zolo 20.000mAh 22.5W
+  // Máy vặn vít pin Bosch GO 3
+  // Máy hút bụi cầm tay Deerma DX118C 600W
+
   const ACCOUNT_HOLDER = "NGUYEN TU LINH";
   const ACCOUNT_NUMBER = "1128091987";
   const BANK_ID = "VPB";
   const AMOUNT = 30000;
-  const SHOPEE_NUDGE_SESSION_KEY = "lm_shopee_nudge_v1";
-  const SHOPEE_NUDGE_DELAY_MS = 35000;
-  const SHOPEE_NUDGE_SCROLL_RATIO = 0.55;
-  const SHOPEE_PRODUCTS = [
-    {
-      name: "Tông đơ Philips MG3911/15 7in1",
-      image: "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mp1ohea3di4g9e",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773390&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vVCVDMyVCNG5nLSVDNCU5MSVDNiVBMS1QaGlsaXBzLU1HMzkxMS0xNS1NdWx0aWdyb29tLTMwMDAtN2luMS1jJUUxJUJBJUFGdC10JUUxJUJCJTg5YS1yJUMzJUEydS10JUMzJUIzYy0lQzQlOTFhLW4lQzQlODNuZy1zJUUxJUJCJUFELWQlRTElQkIlQTVuZy10JUUxJUJBJUExaS1uaCVDMyVBMC1pLjQ2MzYwMDA2MS40OTUxMTM1NzAxNw==&redirect_302=1"
-    },
-    {
-      name: "Sạc dự phòng Anker Zolo 20.000mAh 22.5W",
-      image: "https://down-vn.img.susercontent.com/file/vn-11134207-81ztc-mlnj4c7kwkjp03",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773391&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vUyVFMSVCQSVBMWMtZCVFMSVCQiVCMS1waCVDMyVCMm5nLUFua2VyLVpvbG8tQTExMEQtMjAwMDBtQWgtY2h1JUUxJUJBJUE5bi0zQy1UcnVuZy1RdSVFMSVCQiU5MWMtYyVDMyVBMXAtVVNCLUMtdCVDMyVBRGNoLWglRTElQkIlQTNwLXMlRTElQkElQTFjLW5oYW5oLTIyLjVXLWkuMTIwMjg4OTY3OC40NTU1NDAxNDY3NQ==&redirect_302=1"
-    },
-    {
-      name: "Máy vặn vít pin Bosch GO 3",
-      image: "https://down-vn.img.susercontent.com/file/sg-11134201-8259d-mrbyk5d9m3gs2c",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773392&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktdiVFMSVCQSVCN24tdiVDMyVBRHQtcGluLUJvc2NoLUdvLTMtaS43NTgxMDI0OS4yNTUxNDU2ODgyOQ==&redirect_302=1"
-    },
-    {
-      name: "Máy hút bụi cầm tay Deerma DX118C 600W",
-      image: "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m83aax7f0sasfe",
-      url: "https://go.isclix.com/deep_link/v5/6342443575996511342/4751584435713464237?utm_source=accesstrade&utm_content=oneat&ref=at-ldp&sub3=773393&sub4=oneatapp&sub5=landing-22508&url_enc=aHR0cHM6Ly9zaG9wZWUudm4vTSVDMyVBMXktSCVDMyVCQXQtQiVFMSVCQiVBNWktQyVFMSVCQSVBN20tVGF5LURlZXJtYS1EWDExOEMtJTI4QiVFMSVCQSVBMk4tTSVFMSVCQiU5QUktNjAwVyUyOS1DaCVDMyVBRG5oLWglQzMlQTNuZy1EZWVybWEtaS4yODE0MzI4NC4yNzQ1Nzg2MDQwNA==&redirect_302=1"
-    }
-  ];
   let checkoutEnhanced = false;
-  let shopeeNudgeConsumed = false;
 
   function isGoogleAdsVisit(url) {
     const paidMedium = /^(cpc|ppc|paid|paidsearch|paid-search)$/i.test(url.searchParams.get("utm_medium") || "");
@@ -44,176 +25,6 @@
     if (isGoogleAdsVisit(new URL(window.location.href))) {
       document.body.classList.add("ads-landing");
     }
-  }
-
-  function pushEvent(payload) {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(payload);
-  }
-
-  function emitAffiliateClick(product, index, placement = "product_grid") {
-    pushEvent({
-      event: "affiliate_product_click",
-      affiliate_network: "ACCESSTRADE",
-      merchant: "Shopee",
-      placement,
-      product_index: index + 1,
-      product_name: product.name
-    });
-  }
-
-  function addDirectShopeeDeals() {
-    document.querySelectorAll("#lm-shopee-gate").forEach((node) => node.remove());
-    document.body.classList.remove("lm-shopee-gate-open");
-    if (window.location.pathname !== "/" || document.querySelector(".lm-product-deals")) return;
-
-    const style = document.createElement("style");
-    style.id = "lm-product-deals-style";
-    style.textContent = `
-      .lm-product-deals{width:100%;padding:8px 0}.lm-product-deals-inner{max-width:1180px;margin:auto;padding:0 16px}
-      .lm-product-deals-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:9px}.lm-product-deals-head div{min-width:0}.lm-product-deals-kicker{display:block;color:#ee4d2d;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.lm-product-deals-head h2{margin:2px 0 0;color:#203542;font-size:19px;line-height:1.2}.lm-product-deals-head small{color:#84919a;font-size:10px;white-space:nowrap}
-      .lm-product-deals-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.lm-product-card{min-width:0;overflow:hidden;border:1px solid #e7ebee;border-radius:14px;background:#fff;color:#243542!important;text-decoration:none!important;box-shadow:0 2px 9px rgba(24,42,54,.04)}.lm-product-image{aspect-ratio:1/1;background:#f6f7f8;overflow:hidden}.lm-product-image img{display:block;width:100%;height:100%;object-fit:cover}.lm-product-copy{padding:9px}.lm-product-copy strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;min-height:36px;font-size:12px;line-height:1.45;color:#263946}.lm-product-copy span{display:flex;align-items:center;justify-content:center;min-height:38px;margin-top:8px;border-radius:9px;background:#ee4d2d;color:#fff;font-size:11px;font-weight:900}.lm-product-disclosure{margin:6px 1px 0;color:#929ca3;font-size:8.5px;line-height:1.35}
-      @media(max-width:700px){.lm-product-deals{padding:6px 0}.lm-product-deals-inner{padding:0 10px}.lm-product-deals-head{align-items:start}.lm-product-deals-head h2{font-size:17px}.lm-product-deals-head small{display:none}.lm-product-deals-grid{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 1px 4px;scrollbar-width:none}.lm-product-deals-grid::-webkit-scrollbar{display:none}.lm-product-card{flex:0 0 min(42vw,170px);scroll-snap-align:start}.lm-product-copy{padding:8px}.lm-product-copy strong{font-size:11.5px;min-height:34px}.lm-product-copy span{min-height:40px;font-size:10.5px}}
-    `;
-    document.head.appendChild(style);
-
-    const section = document.createElement("section");
-    section.className = "lm-product-deals";
-    section.setAttribute("aria-label", "Đồ nam và gia dụng Shopee");
-    section.innerHTML = `
-      <div class="lm-product-deals-inner">
-        <div class="lm-product-deals-head"><div><span class="lm-product-deals-kicker">Đồ nam & gia dụng</span><h2>Dễ dùng · dễ mua · mở đúng sản phẩm</h2></div><small>Liên kết đối tác ACCESSTRADE</small></div>
-        <div class="lm-product-deals-grid"></div>
-        <p class="lm-product-disclosure">Liên kết đối tác · giá và ưu đãi xem trực tiếp trên Shopee.</p>
-      </div>`;
-
-    const grid = section.querySelector(".lm-product-deals-grid");
-    SHOPEE_PRODUCTS.forEach((product, index) => {
-      const card = document.createElement("a");
-      card.className = "lm-product-card";
-      card.href = product.url;
-      card.target = "_blank";
-      card.rel = "sponsored noopener noreferrer";
-      card.innerHTML = `<div class="lm-product-image"><img src="${product.image}" loading="lazy" decoding="async" alt="${product.name.replace(/\"/g, "&quot;")}"></div><div class="lm-product-copy"><strong>${product.name}</strong><span>Xem trên Shopee →</span></div>`;
-      card.addEventListener("click", () => emitAffiliateClick(product, index));
-      grid.appendChild(card);
-    });
-
-    const oldAffiliate = document.querySelector(".lm-affiliate-section");
-    if (oldAffiliate) {
-      oldAffiliate.replaceWith(section);
-      return;
-    }
-    const toolsSection = [...document.querySelectorAll("section")].find((node) => /Công cụ thống kê XSMB/i.test(node.textContent || ""));
-    if (toolsSection) toolsSection.insertAdjacentElement("afterend", section);
-  }
-
-  function nudgeWasShownThisSession() {
-    if (shopeeNudgeConsumed) return true;
-    try {
-      return sessionStorage.getItem(SHOPEE_NUDGE_SESSION_KEY) === "shown";
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function markNudgeShown() {
-    shopeeNudgeConsumed = true;
-    try {
-      sessionStorage.setItem(SHOPEE_NUDGE_SESSION_KEY, "shown");
-    } catch (_) {
-      // Session storage can be unavailable in strict privacy modes.
-    }
-  }
-
-  function nudgeProductIndex() {
-    return Math.max(0, (new Date().getDate() - 1) % SHOPEE_PRODUCTS.length);
-  }
-
-  function showShopeeNudge(trigger) {
-    if (window.location.pathname !== "/" || nudgeWasShownThisSession() || document.getElementById("lm-shopee-nudge")) return;
-    const index = nudgeProductIndex();
-    const product = SHOPEE_PRODUCTS[index];
-    markNudgeShown();
-
-    if (!document.getElementById("lm-shopee-nudge-style")) {
-      const style = document.createElement("style");
-      style.id = "lm-shopee-nudge-style";
-      style.textContent = `
-        .lm-shopee-nudge{position:fixed;left:50%;bottom:14px;z-index:86;width:min(calc(100% - 24px),560px);transform:translate(-50%,18px);opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease}
-        .lm-shopee-nudge.is-visible{transform:translate(-50%,0);opacity:1;pointer-events:auto}
-        .lm-shopee-nudge-card{display:grid;grid-template-columns:66px minmax(0,1fr) 32px;gap:9px;align-items:center;padding:8px;border:1px solid #f2c8bb;border-radius:15px;background:#fff;box-shadow:0 12px 34px rgba(30,38,44,.22)}
-        .lm-shopee-nudge-image{width:66px;height:66px;overflow:hidden;border-radius:11px;background:#f6f7f8}.lm-shopee-nudge-image img{display:block;width:100%;height:100%;object-fit:cover}
-        .lm-shopee-nudge-copy{min-width:0}.lm-shopee-nudge-kicker{display:block;color:#ee4d2d;font-size:9px;font-weight:1000;letter-spacing:.04em;text-transform:uppercase}.lm-shopee-nudge-copy strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;margin-top:2px;color:#263946;font-size:12px;line-height:1.25}.lm-shopee-nudge-cta{min-height:36px;margin-top:6px;padding:0 10px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:#ee4d2d;color:#fff!important;text-decoration:none!important;font-size:10.5px;font-weight:1000;white-space:nowrap}
-        .lm-shopee-nudge-close{width:32px;height:32px;border:0;border-radius:50%;background:#f1f3f5;color:#5b6870;font-size:19px;line-height:1;cursor:pointer}
-        @media(max-width:700px){.lm-shopee-nudge{left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom,0px));width:auto;transform:translateY(18px)}.lm-shopee-nudge.is-visible{transform:translateY(0)}.lm-shopee-nudge-card{grid-template-columns:58px minmax(0,1fr) 30px;gap:7px;padding:7px;border-radius:13px}.lm-shopee-nudge-image{width:58px;height:58px;border-radius:10px}.lm-shopee-nudge-kicker{font-size:8px}.lm-shopee-nudge-copy strong{font-size:10.8px}.lm-shopee-nudge-cta{min-height:34px;margin-top:5px;padding:0 8px;font-size:10px}.lm-shopee-nudge-close{width:30px;height:30px}}
-      `;
-      document.head.appendChild(style);
-    }
-
-    const nudge = document.createElement("aside");
-    nudge.id = "lm-shopee-nudge";
-    nudge.className = "lm-shopee-nudge";
-    nudge.setAttribute("aria-label", "Deal Shopee qua ACCESSTRADE");
-    nudge.innerHTML = `
-      <div class="lm-shopee-nudge-card">
-        <div class="lm-shopee-nudge-image"><img src="${product.image}" alt="" loading="lazy" decoding="async"></div>
-        <div class="lm-shopee-nudge-copy"><span class="lm-shopee-nudge-kicker">🔥 Deal cho nam hôm nay</span><strong>${product.name}</strong><a class="lm-shopee-nudge-cta" href="${product.url}" target="_blank" rel="sponsored noopener noreferrer">Xem giá trên Shopee →</a></div>
-        <button class="lm-shopee-nudge-close" type="button" aria-label="Đóng deal Shopee">×</button>
-      </div>`;
-
-    nudge.querySelector(".lm-shopee-nudge-cta")?.addEventListener("click", () => {
-      emitAffiliateClick(product, index, "scroll_nudge");
-    });
-    nudge.querySelector(".lm-shopee-nudge-close")?.addEventListener("click", () => {
-      pushEvent({
-        event: "affiliate_shopee_nudge_close",
-        affiliate_network: "ACCESSTRADE",
-        merchant: "Shopee",
-        trigger,
-        product_index: index + 1,
-        product_name: product.name
-      });
-      nudge.classList.remove("is-visible");
-      window.setTimeout(() => nudge.remove(), 220);
-    });
-
-    document.body.appendChild(nudge);
-    requestAnimationFrame(() => nudge.classList.add("is-visible"));
-    pushEvent({
-      event: "affiliate_shopee_nudge_impression",
-      affiliate_network: "ACCESSTRADE",
-      merchant: "Shopee",
-      trigger,
-      product_index: index + 1,
-      product_name: product.name
-    });
-  }
-
-  function setupShopeeNudge() {
-    if (window.location.pathname !== "/" || nudgeWasShownThisSession()) return;
-    let finished = false;
-    let timer = 0;
-
-    const cleanup = () => {
-      if (timer) window.clearTimeout(timer);
-      window.removeEventListener("scroll", onScroll);
-    };
-    const trigger = (reason) => {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      showShopeeNudge(reason);
-    };
-    const onScroll = () => {
-      const height = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-      const depth = height > 0 ? (window.scrollY + window.innerHeight) / height : 0;
-      if (depth >= SHOPEE_NUDGE_SCROLL_RATIO) trigger("scroll_55");
-    };
-
-    timer = window.setTimeout(() => trigger("time_35s"), SHOPEE_NUDGE_DELAY_MS);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
   }
 
   function addAccountHolder(paymentCard) {
@@ -295,8 +106,6 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     addAdsLandingMode();
-    addDirectShopeeDeals();
-    setupShopeeNudge();
 
     document.querySelectorAll("[data-open-checkout]").forEach((button) => {
       button.addEventListener("click", enhanceCheckout, { once: true });

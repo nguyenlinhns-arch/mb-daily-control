@@ -190,7 +190,7 @@ def self_test() -> None:
         assert result['status']=='PASS' and result['phone_privacy']=='PASS' and home.count('data-shop-item=')==4 and '/go/shopee/?p=1' in home
         assert 'go.isclix.com' not in re.search(r'<section class="lm-shop-grid".*?</section>',home,re.S).group(0)
         assert (root/'go'/'shopee'/'index.html').is_file()
-        assert (root/'go'/'zalo'/'index.html').is_file()
+        assert (root/'go'/'zalo.htm').is_file()
     print('SITEWIDE_PRODUCT_SURFACE_SELF_TEST_OK')
 
 

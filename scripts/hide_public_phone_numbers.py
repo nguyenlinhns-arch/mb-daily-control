@@ -67,6 +67,12 @@ def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
         return {"status": "SKIP", "reason": "missing_ads_landing"}
 
     text = page.read_text(encoding="utf-8")
+    final_surface = (
+        'data-sitewide-products="true"' in text
+        and ("finance-gate-sitewide.js" in text or "lm-shop-grid" in text)
+    )
+    if not final_surface:
+        return {"status": "DEFERRED", "reason": "await_final_site_surface"}
 
     # Strip monetization/promotion sections that may have been injected by
     # earlier site-wide builders.

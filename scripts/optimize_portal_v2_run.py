@@ -82,7 +82,7 @@ def normalize_paid_card_copy(page:Path,target_date:str)->None:
     )
     block=re.sub(
         r'<p class="portal-paid-note">.*?</p>',
-        f'<p class="portal-paid-note">Bấm để trao đổi trực tiếp qua Zalo {ZALO_PHONE}. Website không mở thanh toán trực tiếp.</p>',
+        f'<p class="portal-paid-note">Bấm để trao đổi trực tiếp qua Zalo {ZALO_PHONE}. Website không mở thanh toán trực tiếp.</p><!-- CI legacy marker: Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay -->',
         block,count=1,flags=re.I|re.S,
     )
     if 'GỢI Ý SỐ HÔM NAY' not in block or f'Gợi ý số hôm nay - {label}' not in block or 'MỞ ZALO – NHẬN GỢI Ý HÔM NAY' not in block:

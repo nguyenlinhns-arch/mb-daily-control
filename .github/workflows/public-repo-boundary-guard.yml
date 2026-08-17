@@ -44,17 +44,18 @@ jobs:
               "b3caa" + "39744fc30610e7756cf4ccb98cd",
               "e336b" + "428517bbcb55a3e3da308cc7939",
           )
-          scan = [Path('site-v2')]
-          active_builders = (
+          roots = [Path('site-v2')]
+          builders = (
               Path('scripts/apply_conversion_site.py'),
               Path('scripts/apply_conversion_v2.py'),
               Path('scripts/apply_home_portal_safe.py'),
               Path('scripts/build_statistics_site.py'),
+              Path('scripts/sitewide_product_surface.py'),
           )
           files = []
-          for root in scan:
+          for root in roots:
               files.extend(path for path in root.rglob('*') if path.is_file())
-          files.extend(path for path in active_builders if path.is_file())
+          files.extend(path for path in builders if path.is_file())
           hits = []
           for path in files:
               try:
@@ -86,6 +87,7 @@ jobs:
           python scripts/optimize_monetization_placement.py --self-test
           python scripts/optimize_seo_ads_v1.py --self-test
           python scripts/finalize_portal_v4.py --self-test
+          python scripts/sitewide_product_surface.py --self-test
           python scripts/indexnow_submit.py --self-test
           node tests/commerce-policy-smoke.mjs
 
@@ -95,7 +97,7 @@ jobs:
           node --check site-v2/portal-v2.js
           node --check site-v2/ads-tracking.js
           node --check site-v2/finance-banner.js
-          node --check site-v2/finance-gate.js
+          node --check site-v2/finance-gate-sitewide.js
           node --check site-v2/affiliate-visibility.js
           node --check site-v2/checkout-enhance.js
           node --check site-v2/checkout-entry.js
@@ -117,27 +119,23 @@ jobs:
           grep -Fq 'portal-history-codes' site-v2/portal-v3.css
           ! grep -Fq 'statistics-data.json' site-v2/checkout-entry.js
 
-      - name: Affiliate merchandising contract
+      - name: Canonical Shopee four-card contract
         run: |
           set -euo pipefail
-          grep -Fq 'affiliate_product_click' site-v2/checkout-enhance.js
-          grep -Fq 'Tông đơ Philips MG3911/15 7in1' site-v2/checkout-enhance.js
-          grep -Fq 'Sạc dự phòng Anker Zolo 20.000mAh 22.5W' site-v2/checkout-enhance.js
-          grep -Fq 'Máy vặn vít pin Bosch GO 3' site-v2/checkout-enhance.js
-          grep -Fq 'Máy hút bụi cầm tay Deerma DX118C 600W' site-v2/checkout-enhance.js
-          grep -Fq 'lm-product-deals' site-v2/checkout-enhance.js
-          grep -Fq 'affiliate_product_grid_view' site-v2/finance-banner.js
-          grep -Fq 'after_proof' site-v2/finance-banner.js
-          grep -Fq '.lm-shopee-nudge{display:none!important}' site-v2/finance-banner.js
-          grep -Fq 'affiliate_shopee_strip_view' site-v2/affiliate-visibility.js
-          grep -Fq 'affiliate_shopee_strip_click' site-v2/affiliate-visibility.js
-          grep -Fq 'after_results_visible' site-v2/affiliate-visibility.js
-          grep -Fq 'portal-result-card' site-v2/affiliate-visibility.js
-          grep -Fq 'lm_affiliate_intent_v1' site-v2/affiliate-visibility.js
-          grep -Fq 'checkoutIsOpen' site-v2/affiliate-visibility.js
-          grep -Fq 'affiliate-visibility.js' scripts/apply_conversion_v2.py
-          ! grep -Eiq 'position[[:space:]]*:[[:space:]]*fixed' site-v2/affiliate-visibility.js
-          echo VISIBLE_ACCESSTRADE_EARLY_GUARD_OK
+          grep -Fq 'class="lm-shop-grid"' scripts/sitewide_product_surface.py
+          grep -Fq 'class="lm-shop-item"' scripts/sitewide_product_surface.py
+          grep -Fq 'data-sitewide-products="true"' scripts/sitewide_product_surface.py
+          grep -Fq 'data-affiliate-static-placement="after_tools"' scripts/sitewide_product_surface.py
+          grep -Fq '/go/shopee/?p=' scripts/sitewide_product_surface.py
+          grep -Fq 'display:block!important;visibility:visible!important;opacity:1!important' scripts/sitewide_product_surface.py
+          grep -Fq 'affiliate_product_grid_view' scripts/sitewide_product_surface.py
+          grep -Fq 'affiliate_product_click' scripts/sitewide_product_surface.py
+          ! grep -Fq 'go.isclix.com' site-v2/checkout-enhance.js site-v2/finance-banner.js site-v2/affiliate-visibility.js
+          ! grep -Fq 'function addDirectShopeeDeals' site-v2/checkout-enhance.js
+          ! grep -Fq 'function setupShopeeNudge' site-v2/checkout-enhance.js
+          ! grep -Fq 'function installAffiliateFallback' site-v2/finance-banner.js
+          ! grep -Fq 'function installStrip' site-v2/affiliate-visibility.js
+          echo CANONICAL_SHOPEE_FOUR_CARD_GUARD_OK
 
       - name: AI conversion funnel contract
         run: |
@@ -153,30 +151,24 @@ jobs:
           ! grep -Fq 'Khi cần phần kết luận riêng cho ngày' site-v2/finance-banner.js
           echo AI_FUNNEL_GUARD_OK
 
-      - name: Early finance affiliate contract
+      - name: VPBank sitewide finance contract
         run: |
           set -euo pipefail
-          grep -Fq 'early_finance_banner' site-v2/finance-gate.js
-          grep -Fq 'affiliate_finance_view' site-v2/finance-gate.js
-          grep -Fq 'affiliate_finance_click' site-v2/finance-gate.js
-          grep -Fq 'MIN_DELAY_MS = 8000' site-v2/finance-gate.js
-          grep -Fq 'MIN_SCROLL_RATIO = 0.18' site-v2/finance-gate.js
-          grep -Fq 'COOLDOWN_MS = 24 * 60 * 60 * 1000' site-v2/finance-gate.js
-          grep -Fq 'early_8s' site-v2/finance-gate.js
-          grep -Fq 'early_scroll_18' site-v2/finance-gate.js
-          grep -Fq 'lm-finance-secondary-x' site-v2/finance-gate.js
-          grep -Fq 'Đóng quảng cáo' site-v2/finance-gate.js
-          grep -Fq 'Vay tiền online' site-v2/finance-gate.js
-          grep -Fq 'Tài trợ · ACCESSTRADE · VPBank' site-v2/finance-gate.js
-          grep -Fq 'XEM NGAY' site-v2/finance-gate.js
-          grep -Fq 'hasAiIntent' site-v2/finance-gate.js
-          grep -Fq 'AI_INTENT_KEY' site-v2/finance-gate.js
-          grep -Fq 'AFFILIATE_INTENT_KEY' site-v2/finance-gate.js
-          grep -Fq 'LAST_SHOWN_KEY' site-v2/finance-gate.js
-          grep -Fq 'role", "complementary' site-v2/finance-gate.js
-          ! grep -Fq 'lm-finance-secondary-close' site-v2/finance-gate.js
-          ! grep -Fq 'MIN_DELAY_MS = 60000' site-v2/finance-gate.js
-          ! grep -Fq 'MIN_SCROLL_RATIO = 0.72' site-v2/finance-gate.js
-          ! grep -Fq 'body.lm-finance-gate-open' site-v2/finance-gate.js
-          ! grep -Fq 'position:fixed;inset:0' site-v2/finance-gate.js
-          echo EARLY_FINANCE_BANNER_GUARD_OK
+          f=site-v2/finance-gate-sitewide.js
+          grep -Fq 'const MIN_DELAY_MS = 3000' "$f"
+          grep -Fq 'const MIN_SCROLL_RATIO = 0.08' "$f"
+          grep -Fq 'lm_vpbank_banner_closed_v3' "$f"
+          grep -Fq 'early_finance_banner_sitewide_v3' "$f"
+          grep -Fq 'lm-sponsor-vp' "$f"
+          grep -Fq 'Vay tiền online' "$f"
+          grep -Fq 'Đóng quảng cáo' "$f"
+          grep -Fq 'data-go-vpbank' "$f"
+          grep -Fq 'affiliate_finance_view' "$f"
+          grep -Fq 'affiliate_finance_click' "$f"
+          grep -Fq 'affiliate_finance_close' "$f"
+          grep -Fq 'closeOffer("checkout_open", false)' "$f"
+          grep -Fq 'closeOffer("checkout_intent", false)' "$f"
+          ! grep -Fq 'COOLDOWN_MS' "$f"
+          ! grep -Fq '24h' "$f"
+          ! grep -Fq 'href="https://go.isclix.com' "$f"
+          echo VPBANK_SITEWIDE_CANONICAL_GUARD_OK

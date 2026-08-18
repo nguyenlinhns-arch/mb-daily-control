@@ -8,6 +8,7 @@ on:
     branches: ["main"]
     paths:
       - ".github/workflows/daily-report-midnight.yml"
+      - "data/completed-draw-audit.json"
       - "scripts/mb4so_daily.py"
       - "scripts/normalize_history_pack.py"
       - "tests/test_mb4so_daily.py"

@@ -61,6 +61,54 @@ jobs:
           echo "LOCK_DATE=$target" >> "$GITHUB_ENV"
           echo "REPORT_DATE=$report" >> "$GITHUB_ENV"
 
+      - name: Wait for private readiness before any public mutation
+        run: |
+          set -euo pipefail
+          for attempt in {1..6}; do
+            if python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          lock = os.environ["LOCK_DATE"]
+          report = os.environ["REPORT_DATE"]
+
+          def load(path):
+              return json.loads(Path(path).read_text(encoding="utf-8"))
+
+          methods = load("ai-methods/public-methods.json")
+          ready = load("data/paid-report-ready.json")
+          proof = load("ai-methods/yesterday-proof.json")
+          historical = load("data/public-historical-proof.json")
+
+          errors = []
+          if methods.get("target_date") != report or methods.get("data_lock") != lock:
+              errors.append(f"public-methods={methods.get('target_date')}/{methods.get('data_lock')}")
+          if ready.get("report_date") != report or ready.get("data_lock") != lock or ready.get("status") != "PUBLISHED_PASS_PRIVATE":
+              errors.append(f"paid-ready={ready.get('report_date')}/{ready.get('data_lock')}/{ready.get('status')}")
+          if proof.get("date") != lock:
+              errors.append(f"yesterday-proof={proof.get('date')}")
+          validation = historical.get("validation") or {}
+          recent = historical.get("recent_period") or {}
+          if validation.get("window_end") != lock:
+              errors.append(f"historical-proof-window={validation.get('window_end')}")
+          if recent.get("period_end") != lock:
+              errors.append(f"historical-proof-recent={recent.get('period_end')}")
+          if errors:
+              raise SystemExit("FAIL_CLOSED_PRIVATE_NOT_READY: " + "; ".join(errors))
+          print(f"PRIVATE_READINESS_OK report={report} lock={lock}")
+          PY
+            then
+              exit 0
+            fi
+            if [[ "$attempt" -eq 6 ]]; then
+              echo "Private readiness is still stale after 30 minutes. No public history/report files were mutated."
+              exit 1
+            fi
+            echo "Private readiness chưa đủ; thử lại sau 5 phút ($attempt/6)."
+            sleep 300
+          done
+
       - name: Normalize and validate history container
         run: |
           set -euo pipefail

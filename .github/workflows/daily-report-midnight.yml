@@ -4,14 +4,6 @@ on:
   schedule:
     # GitHub cron uses UTC. 17:05 UTC = 00:05 Asia/Ho_Chi_Minh.
     - cron: "5 17 * * *"
-  push:
-    branches: ["main"]
-    paths:
-      - ".github/workflows/daily-report-midnight.yml"
-      - "data/completed-draw-audit.json"
-      - "scripts/mb4so_daily.py"
-      - "scripts/normalize_history_pack.py"
-      - "tests/test_mb4so_daily.py"
   workflow_dispatch:
     inputs:
       lock_date:

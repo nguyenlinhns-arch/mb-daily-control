@@ -1,43 +1,28 @@
 {
-  "history_end": "2026-08-16",
-  "history_rows": 947,
+  "history_end": "2026-08-17",
+  "history_rows": 948,
   "history_start": "2024-01-01",
-  "latest_codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
-  "locked_at": "2026-08-17T00:19:23+07:00",
+  "latest_codes_sha256": "042789df97577066970a9390080eafea40430290caad7ca1198617b94576ce6f",
+  "locked_at": "2026-08-18T20:26:45+07:00",
   "policy": "COMPLETED_DRAW_ONLY_FAIL_CLOSED_MINIMUM_TWO_EXACT_SOURCES",
   "schema_version": "MB_SOURCE_ACCESS_V3_POST_DRAW_ONLY",
   "selected": "PUBLIC_MULTI_SOURCE_CROSSCHECK",
-  "source_count": 6,
+  "source_count": 3,
   "sources": [
     {
-      "codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
-      "name": "ketqua",
-      "url": "https://ketqua.net/xo-so-truyen-thong.php?ngay=16-08-2026"
-    },
-    {
-      "codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
-      "name": "kqxs",
-      "url": "https://kqxs.vn/mien-bac/xsmb-16-08-2026"
-    },
-    {
-      "codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
+      "codes_sha256": "042789df97577066970a9390080eafea40430290caad7ca1198617b94576ce6f",
       "name": "minhngoc",
-      "url": "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/16-08-2026.html"
+      "url": "https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/17-08-2026.html"
     },
     {
-      "codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
-      "name": "xoso.com.vn",
-      "url": "https://xoso.com.vn/xsmb-16-08-2026.html"
-    },
-    {
-      "codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
+      "codes_sha256": "042789df97577066970a9390080eafea40430290caad7ca1198617b94576ce6f",
       "name": "xosodaiphat",
-      "url": "https://xosodaiphat.com/xsmb-16-08-2026.html"
+      "url": "https://xosodaiphat.com/xsmb-17-08-2026.html"
     },
     {
-      "codes_sha256": "360db9528fdda1e80a43875ecf60c4846170db00df616c335f80726bd64e968f",
+      "codes_sha256": "042789df97577066970a9390080eafea40430290caad7ca1198617b94576ce6f",
       "name": "xosothienphu",
-      "url": "https://xosothienphu.vn/xsmb-16-08-2026.html"
+      "url": "https://xosothienphu.vn/xsmb-17-08-2026.html"
     }
   ],
   "status": "LOCKED_CROSSCHECKED_PUBLIC"

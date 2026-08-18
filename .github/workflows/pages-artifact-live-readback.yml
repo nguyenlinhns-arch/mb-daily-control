@@ -1,0 +1,219 @@
+name: Persist Pages artifact and live readback
+
+on:
+  workflow_run:
+    workflows: ["Deploy Lê Miền Bắc XSMB portal to GitHub Pages"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: pages-artifact-live-readback
+  cancel-in-progress: true
+
+jobs:
+  verify-and-persist:
+    if: github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      PAGES_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+    steps:
+      - name: Checkout main utilities
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source
+          fetch-depth: 1
+
+      - name: Checkout ops status branch
+        uses: actions/checkout@v4
+        with:
+          ref: ops-status
+          path: status-branch
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download Pages artifact and verify artifact plus live site
+        id: verify
+        shell: bash
+        run: |
+          set +e
+          mkdir -p /tmp/readback /tmp/pages-bundle /tmp/pages-site
+          (
+            set -euo pipefail
+            [[ "$PAGES_CONCLUSION" == "success" ]]
+
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" > /tmp/readback/artifacts.json
+            ARTIFACT_ID="$(jq -r '.artifacts[] | select(.name == "github-pages" and .expired == false) | .id' /tmp/readback/artifacts.json | head -n1)"
+            [[ "$ARTIFACT_ID" =~ ^[0-9]+$ ]]
+            echo "$ARTIFACT_ID" > /tmp/readback/artifact_id.txt
+
+            gh api -H 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/readback/github-pages.zip
+            unzip -q /tmp/readback/github-pages.zip -d /tmp/pages-bundle
+            TAR_FILE="$(find /tmp/pages-bundle -type f -name '*.tar' -print -quit)"
+            if [[ -n "$TAR_FILE" ]]; then
+              tar -xf "$TAR_FILE" -C /tmp/pages-site
+            else
+              cp -a /tmp/pages-bundle/. /tmp/pages-site/
+            fi
+
+            FINANCE="$(find /tmp/pages-site -type f -name 'finance-gate-sitewide.js' -print -quit)"
+            [[ -s "$FINANCE" ]]
+            grep -q 'MIN_DELAY_MS = 3000' "$FINANCE"
+            grep -q 'MIN_SCROLL_RATIO = 0.08' "$FINANCE"
+            grep -q 'lm_vpbank_banner_closed_v3' "$FINANCE"
+            grep -q 'lm-sponsor-vp' "$FINANCE"
+            grep -q 'Vay tiền online' "$FINANCE"
+            grep -q 'Đóng quảng cáo' "$FINANCE"
+            grep -q 'data-go-vpbank' "$FINANCE"
+            grep -q 'affiliate_finance_view' "$FINANCE"
+            grep -q 'affiliate_finance_click' "$FINANCE"
+            grep -q 'affiliate_finance_close' "$FINANCE"
+            ! grep -q 'COOLDOWN_MS' "$FINANCE"
+            ! grep -q '24h' "$FINANCE"
+
+            python - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('/tmp/pages-site')
+          excluded = {'404.html', 'go/shopee/index.html'}
+          pages = [p for p in root.rglob('*.html') if p.relative_to(root).as_posix() not in excluded and not p.relative_to(root).as_posix().startswith('go/shopee/')]
+          assert pages, 'no public HTML pages in Pages artifact'
+          for page in pages:
+              text = page.read_text(encoding='utf-8')
+              assert text.count('data-sitewide-products="true"') == 1, page
+              assert 'lm-shop-grid' in text and 'lm-shop-item' in text, page
+              for idx in range(1, 5):
+                  assert f'/go/shopee/?p={idx}' in text, (page, idx)
+              assert 'go.isclix.com' not in text, page
+          home = (root / 'index.html').read_text(encoding='utf-8')
+          assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
+          runtime_files = [*root.rglob('*.html'), *root.rglob('*.js')]
+          banned = re.compile(r'effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|adsterra', re.I)
+          for path in runtime_files:
+              if path.relative_to(root).as_posix() == 'go/shopee/index.html':
+                  continue
+              assert not banned.search(path.read_text(encoding='utf-8', errors='ignore')), path
+          print(f'PUBLIC_PRODUCT_SURFACE_OK pages={len(pages)}')
+          PY
+
+            ART_SHA="$(sha256sum "$FINANCE" | awk '{print $1}')"
+            echo "$ART_SHA" > /tmp/readback/artifact_finance_sha256.txt
+
+            BASE='https://lemienbac.com'
+            LIVE_OK=0
+            for attempt in {1..12}; do
+              curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' \
+                "${BASE}/finance-gate-sitewide.js?readback=${RUN_ID}-${attempt}" -o /tmp/readback/live-finance.js || true
+              if [[ -s /tmp/readback/live-finance.js ]]; then
+                LIVE_SHA="$(sha256sum /tmp/readback/live-finance.js | awk '{print $1}')"
+                if [[ "$LIVE_SHA" == "$ART_SHA" ]]; then
+                  LIVE_OK=1
+                  break
+                fi
+              fi
+              sleep 10
+            done
+            [[ "$LIVE_OK" == "1" ]]
+            echo "$LIVE_SHA" > /tmp/readback/live_finance_sha256.txt
+
+            curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${BASE}/site-status.json?readback=${RUN_ID}" -o /tmp/readback/site-status.json
+            grep -q 'HEALTHY' /tmp/readback/site-status.json
+            curl -fsSL --max-time 20 "${BASE}/" -o /tmp/readback/home.html
+            curl -fsSL --max-time 20 "${BASE}/thong-ke-xsmb/" -o /tmp/readback/stats.html
+            curl -fsSL --max-time 20 "${BASE}/robots.txt" -o /tmp/readback/robots.txt
+            curl -fsSL --max-time 20 "${BASE}/sitemap.xml" -o /tmp/readback/sitemap.xml
+            grep -q 'data-sitewide-products="true"' /tmp/readback/home.html
+            grep -q 'data-affiliate-static-placement="after_tools" data-sitewide-products="true"' /tmp/readback/home.html
+            ! grep -Eiq 'effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|adsterra' /tmp/readback/home.html /tmp/readback/stats.html
+
+            cd source
+            python scripts/indexnow_submit.py --self-test
+            python scripts/indexnow_submit.py --submit-live | tee /tmp/readback/indexnow.log
+          ) > /tmp/readback/verify.log 2>&1
+          RC=$?
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          if [[ "$RC" -eq 0 ]]; then
+            echo 'ok=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ok=false' >> "$GITHUB_OUTPUT"
+          fi
+          cat /tmp/readback/verify.log
+          exit 0
+
+      - name: Build durable readback status
+        if: always()
+        shell: bash
+        env:
+          VERIFY_OK: ${{ steps.verify.outputs.ok || 'false' }}
+          VERIFY_RC: ${{ steps.verify.outputs.rc || '999' }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          def read(path):
+              p = Path(path)
+              return p.read_text(encoding='utf-8').strip() if p.exists() else ''
+
+          status_text = read('/tmp/readback/site-status.json')
+          site_healthy = 'HEALTHY' in status_text
+          doc = {
+              'schema_version': 'PAGES_ARTIFACT_LIVE_READBACK_V1',
+              'checked_at_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
+              'pages_run_id': int(os.environ.get('RUN_ID') or 0),
+              'source_head_sha': os.environ.get('HEAD_SHA', ''),
+              'pages_conclusion': os.environ.get('PAGES_CONCLUSION', ''),
+              'verification_ok': os.environ.get('VERIFY_OK') == 'true',
+              'verification_rc': int(os.environ.get('VERIFY_RC') or 999),
+              'artifact_id': int(read('/tmp/readback/artifact_id.txt') or 0),
+              'artifact_finance_sha256': read('/tmp/readback/artifact_finance_sha256.txt'),
+              'live_finance_sha256': read('/tmp/readback/live_finance_sha256.txt'),
+              'site_status_healthy': site_healthy,
+              'required_finance_tokens_checked': True if os.environ.get('VERIFY_OK') == 'true' else False,
+              'shopee_four_card_surface_checked': True if os.environ.get('VERIFY_OK') == 'true' else False,
+              'adsterra_runtime_absent_checked': True if os.environ.get('VERIFY_OK') == 'true' else False,
+              'indexnow_submitted': True if os.environ.get('VERIFY_OK') == 'true' and read('/tmp/readback/indexnow.log') else False,
+              'verify_log_tail': '\n'.join(read('/tmp/readback/verify.log').splitlines()[-40:]),
+          }
+          target = Path('status-branch/ops/last-pages-readback.json')
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+      - name: Persist readback on ops-status branch
+        if: always()
+        working-directory: status-branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'lemienbac-ops-readback'
+          git config user.email 'actions@users.noreply.github.com'
+          git add ops/last-pages-readback.json
+          if git diff --cached --quiet; then
+            echo 'Readback status unchanged.'
+          else
+            git commit -m "ops: Pages readback ${HEAD_SHA:0:12} run ${RUN_ID}"
+            git push origin HEAD:ops-status
+          fi
+
+      - name: Fail workflow when readback failed
+        if: always()
+        shell: bash
+        env:
+          VERIFY_OK: ${{ steps.verify.outputs.ok || 'false' }}
+        run: |
+          [[ "$VERIFY_OK" == 'true' ]]

@@ -1,0 +1,66 @@
+name: Manual XSMB crosscheck 2026-08-20
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/manual-xsmb-crosscheck-20260820.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manual-xsmb-crosscheck-20260820
+  cancel-in-progress: false
+
+jobs:
+  crosscheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Ho_Chi_Minh
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cross-check 20-08-2026 and save temporary audit
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import date
+          from pathlib import Path
+          from scripts.build_public_snapshot import crosscheck_draw
+
+          codes, sources, failures = crosscheck_draw(date(2026, 8, 20))
+          payload = {
+              "date": "2026-08-20",
+              "status": "LOCKED_CROSSCHECKED_PUBLIC",
+              "codes": codes,
+              "source_count": len(sources),
+              "sources": sources,
+              "failures": failures,
+          }
+          Path("data/manual-xsmb-crosscheck-20260820.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(payload, ensure_ascii=False))
+          PY
+
+      - name: Commit temporary audit
+        run: |
+          set -euo pipefail
+          git config user.name "mb-manual-crosscheck"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/manual-xsmb-crosscheck-20260820.json
+          git commit -m "manual: crosscheck XSMB 2026-08-20"
+          git pull --rebase origin main
+          git push origin HEAD:main

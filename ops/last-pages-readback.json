@@ -1,12 +1,12 @@
 {
   "schema_version": "PAGES_ARTIFACT_LIVE_READBACK_V1",
-  "checked_at_utc": "2026-08-21T01:38:01+00:00",
-  "pages_run_id": 32436968939,
-  "source_head_sha": "2c93e8152a5ef4b953ec7e10829594e4affdd576",
-  "pages_conclusion": "failure",
+  "checked_at_utc": "2026-08-21T01:40:24+00:00",
+  "pages_run_id": 32437097983,
+  "source_head_sha": "e493aa49771614d59bb3b9e6a98fe477513dd278",
+  "pages_conclusion": "success",
   "verification_ok": false,
   "verification_rc": 1,
-  "artifact_id": 0,
+  "artifact_id": 9431132177,
   "artifact_finance_sha256": "",
   "live_finance_sha256": "",
   "site_status_healthy": false,
@@ -14,5 +14,5 @@
   "shopee_four_card_surface_checked": false,
   "adsterra_runtime_absent_checked": false,
   "indexnow_submitted": false,
-  "verify_log_tail": ""
+  "verify_log_tail": "Traceback (most recent call last):\n  File \"<stdin>\", line 10, in <module>\nAssertionError: /tmp/pages-site/index.html"
 }

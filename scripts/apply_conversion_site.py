@@ -72,7 +72,7 @@ def paid_report_is_ready() -> bool:
             and data_lock == today.isoformat()
         )
         return (
-            payload.get("schema_version") == "MB_PAID_REPORT_READINESS_V1"
+            payload.get("schema_version") in {"MB_PAID_REPORT_READINESS_V1", "MB_PAID_REPORT_READINESS_V2_MAX2"}
             and payload.get("status") == "PUBLISHED_PASS_PRIVATE"
             and payload.get("outcome_known_at_selection") is False
             and (same_day or post_draw_next_day)

@@ -10,7 +10,13 @@
   "history_end": "2026-08-20",
   "latest_codes_sha256": "f641f7a42bdea7c86a43b6465aa325a714f65c20413ac31a3442990359557d28",
   "source_count": 5,
-  "sources": ["ketqua","kqxs","minhngoc","xosodaiphat","xosothienphu"],
+  "sources": [
+    {"name":"ketqua","codes_sha256":"f641f7a42bdea7c86a43b6465aa325a714f65c20413ac31a3442990359557d28"},
+    {"name":"kqxs","codes_sha256":"f641f7a42bdea7c86a43b6465aa325a714f65c20413ac31a3442990359557d28"},
+    {"name":"minhngoc","codes_sha256":"f641f7a42bdea7c86a43b6465aa325a714f65c20413ac31a3442990359557d28"},
+    {"name":"xosodaiphat","codes_sha256":"f641f7a42bdea7c86a43b6465aa325a714f65c20413ac31a3442990359557d28"},
+    {"name":"xosothienphu","codes_sha256":"f641f7a42bdea7c86a43b6465aa325a714f65c20413ac31a3442990359557d28"}
+  ],
   "crosscheck_status": "LOCKED_CROSSCHECKED_PUBLIC",
   "locked_at": "2026-08-21T08:24:00+07:00",
   "target_date": "2026-08-21",

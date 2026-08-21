@@ -30,8 +30,6 @@ jobs:
           from pathlib import Path
           import hashlib, json, re
 
-          # 1) SEO builder: allow a fixed audited benchmark plus a current-month
-          # Production-aware detail stream that switches from 4SO to MAX2.
           path = Path('scripts/build_seo_pages.py')
           text = path.read_text(encoding='utf-8')
           start = text.index('def validate_proof_payload(')
@@ -102,8 +100,6 @@ jobs:
           '''
           path.write_text(text[:start] + replacement + text[end+1:], encoding='utf-8')
 
-          # 2) Public-repo guard: historical completed outputs are allowed, but
-          # current paid Production output must remain absent from public JSON.
           path = Path('scripts/public_repo_boundary_guard.py')
           text = path.read_text(encoding='utf-8')
           start = text.index('def validate_changed_sensitive(')
@@ -140,17 +136,6 @@ jobs:
           '''
           path.write_text(text[:start] + replacement + text[end+1:], encoding='utf-8')
 
-          # 3) Midnight readiness: a frozen benchmark can end before the live
-          # data lock; only the current-month completed detail must end at T-1.
-          path = Path('.github/workflows/daily-report-midnight.yml')
-          text = path.read_text(encoding='utf-8')
-          old = '''          if validation.get("window_end") != lock:\n              errors.append(f"historical-proof-window={validation.get('window_end')}")'''
-          new = '''          if validation.get("window_end") and validation.get("window_end") > lock:\n              errors.append(f"historical-proof-window-ahead={validation.get('window_end')}")'''
-          if old not in text:
-              raise SystemExit('daily-report historical-window gate not found')
-          path.write_text(text.replace(old, new, 1), encoding='utf-8')
-
-          # 4) Recompute every proof record hash from its actual completed data.
           path = Path('ai-methods/yesterday-proof.json')
           doc = json.loads(path.read_text(encoding='utf-8'))
           for record in (doc.get('month_summary') or {}).get('daily_records') or []:
@@ -168,13 +153,12 @@ jobs:
           python scripts/build_seo_pages.py --self-test --today 2026-08-21
           git diff --check
 
-      - name: Commit one-shot fix
+      - name: Commit durable source fixes
         run: |
           set -euo pipefail
-          rm .github/workflows/hotfix-pages-production-aware.yml
           git config user.name "mb-pages-hotfix"
           git config user.email "actions@users.noreply.github.com"
-          git add scripts/build_seo_pages.py scripts/public_repo_boundary_guard.py .github/workflows/daily-report-midnight.yml ai-methods/yesterday-proof.json .github/workflows/hotfix-pages-production-aware.yml
+          git add scripts/build_seo_pages.py scripts/public_repo_boundary_guard.py ai-methods/yesterday-proof.json
           git commit -m "fix: support production-aware MAX2 proof in Pages"
           git pull --rebase origin main
           git push origin HEAD:main

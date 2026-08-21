@@ -1,10 +1,12 @@
 {
-  "schema_version": "MB_PAID_REPORT_READINESS_V1",
-  "report_date": "2026-08-17",
-  "data_lock": "2026-08-16",
+  "schema_version": "MB_PAID_REPORT_READINESS_V2_MAX2",
+  "report_date": "2026-08-21",
+  "data_lock": "2026-08-20",
   "status": "PUBLISHED_PASS_PRIVATE",
   "outcome_known_at_selection": false,
-  "updated_at": "2026-08-16T22:40:00+07:00",
-  "source": "Paid_Report",
-  "note": "Public readiness only. Paid TOP1/TOP2 codes are intentionally excluded."
+  "updated_at": "2026-08-21T07:57:00+07:00",
+  "source": "MAX2_Daily_Plan -> private Paid_Report after daily review sync",
+  "production_method": "MAX2_V1_R4268_P0072_HR60",
+  "production_config": "MAX2_PRIMARY_V1_20260819",
+  "note": "Public readiness only. Current Production codes are intentionally excluded."
 }

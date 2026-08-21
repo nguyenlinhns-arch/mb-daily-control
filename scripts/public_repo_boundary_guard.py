@@ -69,15 +69,32 @@ def changed_files() -> set[str]:
 
 def validate_changed_sensitive() -> dict[str,Any]:
     changed=changed_files(); inspected=[]
+    ready=load(ROOT/'data/paid-report-ready.json')
+    report_day=date.fromisoformat(str(ready['report_date']))
     for rel in sorted(SENSITIVE_LEGACY & changed):
-        raw=(ROOT/rel).read_text(encoding='utf-8').lower(); inspected.append(rel)
-        if 'aggregate' not in raw:
-            raise ValueError(f'{rel} changed but is not aggregate-only')
-        for token in FORBIDDEN_DETAIL:
-            if token.lower() in raw:
-                raise ValueError(f'{rel} changed with detailed 4SO token: {token}')
+        doc=load(ROOT/rel); inspected.append(rel)
+        raw=(ROOT/rel).read_text(encoding='utf-8').lower()
+        for key in ('canonical_codes','canonical_pairs','final_codes','final_pairs','top1','top2','slot1_r4268','slot2_selected'):
+            if key in raw: raise ValueError(f'{rel} contains current paid-output field: {key}')
+        if rel=='ai-methods/yesterday-proof.json':
+            if doc.get('schema_version')!='MB_PUBLIC_YESTERDAY_PROOF_V3_PRODUCTION_AWARE':
+                raise ValueError('yesterday proof must use Production-aware completed schema')
+            proof_day=date.fromisoformat(str(doc['date']))
+            if proof_day>=report_day: raise ValueError('yesterday proof must be completed before current paid report')
+            picks=doc.get('recommended_numbers') or []
+            if len(picks) not in (2,4) or any(not re.fullmatch(r'\d{2}',str(x)) for x in picks):
+                raise ValueError('invalid completed Production output')
+        elif rel=='data/public-historical-proof.json':
+            if doc.get('schema_version')!='MB_PUBLIC_HISTORICAL_PROOF_V2_PRODUCTION_AWARE':
+                raise ValueError('historical proof must use Production-aware schema')
+            recent=doc.get('recent_period') or {}
+            recent_end=date.fromisoformat(str(recent['period_end']))
+            if recent_end>=report_day: raise ValueError('historical proof may contain completed days only')
+            snap=doc.get('method_snapshot') or {}
+            if snap.get('paid_output_hidden') is not True: raise ValueError('paid output must stay hidden')
+            if str(snap.get('target_date'))!=str(ready.get('report_date')) or str(snap.get('data_lock'))!=str(ready.get('data_lock')):
+                raise ValueError('method snapshot must match public readiness dates')
     return {'changed_files':len(changed),'sensitive_inspected':inspected}
-
 
 def run() -> dict[str,Any]:
     validate_public_methods(); validate_report_templates(); validate_safe_public_json()

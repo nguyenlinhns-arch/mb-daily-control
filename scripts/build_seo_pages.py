@@ -93,18 +93,21 @@ def validate_public_payload(payload: dict[str, Any]) -> None:
 
 
 def validate_proof_payload(proof: dict[str, Any]) -> None:
-    if proof.get("schema_version") != "MB_PUBLIC_YESTERDAY_PROOF_V2":
+    if proof.get("schema_version") != "MB_PUBLIC_YESTERDAY_PROOF_V3_PRODUCTION_AWARE":
         raise ValueError("Invalid public proof schema")
     proof_day = date.fromisoformat(str(proof.get("date")))
     recommended = proof.get("recommended_numbers")
-    if not isinstance(recommended, list) or len(recommended) != 4:
-        raise ValueError("Yesterday proof must contain exactly four recommendations")
+    if not isinstance(recommended, list) or len(recommended) not in (2, 4) or len(set(recommended)) != len(recommended):
+        raise ValueError("Yesterday proof must contain the official Production output count")
+    if any(not re.fullmatch(r"\d{2}", str(number)) for number in recommended):
+        raise ValueError("Yesterday proof contains an invalid number")
+
     validation = proof.get("historical_validation") or {}
     window_start = date.fromisoformat(str(validation.get("window_start")))
     window_end = date.fromisoformat(str(validation.get("window_end")))
     total_days = int(validation.get("total_days") or 0)
     hit_days = int(validation.get("hit_days") or 0)
-    if window_end != proof_day or (window_end - window_start).days + 1 != total_days:
+    if (window_end - window_start).days + 1 != total_days or window_end > proof_day:
         raise ValueError("Historical validation window is incomplete")
     if int(validation.get("rate_pct") or -1) != round(hit_days * 100 / total_days):
         raise ValueError("Historical validation rate is inconsistent")
@@ -118,6 +121,8 @@ def validate_proof_payload(proof: dict[str, Any]) -> None:
     expected_end = date.fromisoformat(str(month.get("period_end")))
     if expected_end != proof_day or (expected_end - expected_start).days + 1 != observed:
         raise ValueError("Month history dates are not continuous")
+    transition = proof.get("production_transition") or {}
+    max2_live_from = date.fromisoformat(str(transition.get("max2_live_from") or "9999-12-31"))
     wins = 0
     for index, record in enumerate(records):
         if not isinstance(record, dict):
@@ -127,8 +132,9 @@ def validate_proof_payload(proof: dict[str, Any]) -> None:
             raise ValueError("Month history is not ordered or continuous")
         picks = record.get("recommended_numbers")
         hits = record.get("hits")
-        if not isinstance(picks, list) or len(picks) != 4 or len(set(picks)) != 4:
-            raise ValueError(f"Invalid four-number record for {record_day}")
+        expected_count = 2 if record_day >= max2_live_from else 4
+        if not isinstance(picks, list) or len(picks) != expected_count or len(set(picks)) != expected_count:
+            raise ValueError(f"Invalid Production record for {record_day}")
         if any(not re.fullmatch(r"\d{2}", str(number)) for number in picks):
             raise ValueError(f"Invalid number in history for {record_day}")
         if not isinstance(hits, list):
@@ -140,14 +146,7 @@ def validate_proof_payload(proof: dict[str, Any]) -> None:
         if not re.fullmatch(r"[0-9a-f]{64}", record_hash):
             raise ValueError(f"Missing record hash for {record_day}")
         canonical_record = {key: value for key, value in record.items() if key != "record_hash"}
-        expected_hash = hashlib.sha256(
-            json.dumps(
-                canonical_record,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-            ).encode("utf-8")
-        ).hexdigest()
+        expected_hash = hashlib.sha256(json.dumps(canonical_record, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
         if record_hash != expected_hash:
             raise ValueError(f"Record hash mismatch for {record_day}")
         wins += bool(hits)
@@ -155,7 +154,6 @@ def validate_proof_payload(proof: dict[str, Any]) -> None:
         raise ValueError("Month win count is inconsistent")
     if observed - wins != int(month.get("miss_days") or -1):
         raise ValueError("Month miss count is inconsistent")
-
 
 def breadcrumb_schema(items: list[tuple[str, str]]) -> dict[str, Any]:
     return {

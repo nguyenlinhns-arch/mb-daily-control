@@ -85,18 +85,18 @@ const isoDistanceDays = (start, end) => (
   (Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000
 );
 
-// The public evidence source remains a complete, internally consistent rolling window.
-assert.equal(publicProof.schema_version, "MB_PUBLIC_HISTORICAL_PROOF_V1_COMPLETED_ONLY");
+// Historical validation may stay frozen as an audited 30-day benchmark, while
+// the visible current-month proof must advance through the latest completed draw.
+assert.equal(publicProof.schema_version, "MB_PUBLIC_HISTORICAL_PROOF_V2_PRODUCTION_AWARE");
 assert.equal(publicProof.status, "COMPLETED_DATES_ONLY");
 assert.equal(publicProof.validation.total_days, 30);
 assert.equal(isoDistanceDays(publicProof.validation.window_start, publicProof.validation.window_end), 29);
-assert.equal(sourceAccess.history_end, publicProof.validation.window_end);
+assert.ok(publicProof.validation.window_end <= sourceAccess.history_end);
 assert.equal(
   Math.round(publicProof.validation.hit_days * 100 / publicProof.validation.total_days),
   publicProof.validation.rate_pct
 );
 
-// The visible detailed period may be the current month rather than the full rolling window.
 assert.equal(publicProof.recent_period.period_end, sourceAccess.history_end);
 assert.equal(
   isoDistanceDays(publicProof.recent_period.period_start, publicProof.recent_period.period_end) + 1,
@@ -111,21 +111,16 @@ assert.equal(
 for (let index = 0; index < publicProof.recent_period.days.length; index += 1) {
   const day = publicProof.recent_period.days[index];
   assert.equal(day.date, new Date(Date.parse(`${publicProof.recent_period.period_start}T00:00:00Z`) + index * 86_400_000).toISOString().slice(0, 10));
-  assert.equal(day.outputs.length, 4, `${day.date} must contain four report numbers`);
-  assert.equal(new Set(day.outputs).size, 4, `${day.date} report numbers must be unique`);
+  assert.ok([2, 4].includes(day.outputs.length), `${day.date} must contain the official Production output count`);
+  assert.equal(new Set(day.outputs).size, day.outputs.length, `${day.date} report numbers must be unique`);
   assert.ok(day.outputs.every((value) => /^\d{2}$/.test(value)), `${day.date} contains an invalid report number`);
+  if (day.date >= "2026-08-19") assert.equal(day.outputs.length, 2, `${day.date} must use MAX2 Production output`);
   assert.equal(day.status, day.observed.length ? "hit" : "miss");
 }
 
-assert.equal(yesterdayProof.schema_version, "MB_PUBLIC_YESTERDAY_PROOF_V2");
-assert.equal(yesterdayProof.date, publicProof.validation.window_end);
-assert.deepEqual(yesterdayProof.historical_validation, {
-  window_start: publicProof.validation.window_start,
-  window_end: publicProof.validation.window_end,
-  hit_days: publicProof.validation.hit_days,
-  total_days: publicProof.validation.total_days,
-  rate_pct: publicProof.validation.rate_pct
-});
+assert.equal(yesterdayProof.schema_version, "MB_PUBLIC_YESTERDAY_PROOF_V3_PRODUCTION_AWARE");
+assert.equal(yesterdayProof.date, sourceAccess.history_end);
+assert.deepEqual(yesterdayProof.historical_validation, publicProof.validation);
 assert.equal(yesterdayProof.month_summary.period_end, sourceAccess.history_end);
 assert.equal(
   yesterdayProof.month_summary.daily_records.length,
@@ -149,18 +144,19 @@ assert.deepEqual(
   publicProof.recent_period.days
 );
 
-// Current paid readiness may be public, but the paid TOP1/TOP2 codes must not be.
-assert.equal(paidReady.schema_version, "MB_PAID_REPORT_READINESS_V1");
+// Current paid readiness may be public, but the current paid Production codes must not be.
+assert.equal(paidReady.schema_version, "MB_PAID_REPORT_READINESS_V2_MAX2");
 assert.equal(paidReady.report_date, isoNextDay(paidReady.data_lock));
 assert.equal(paidReady.data_lock, sourceAccess.history_end);
 assert.equal(paidReady.outcome_known_at_selection, false);
-assert.equal(publicProof.method_snapshot.target_date, sourceAccess.history_end);
-assert.equal(publicProof.method_snapshot.data_lock, isoPreviousDay(publicProof.method_snapshot.target_date));
-assert.equal(publicProof.method_snapshot.layers.length, 7);
-assert.deepEqual(publicProof.method_snapshot.layers.map((layer) => layer.index), [1, 2, 3, 4, 5, 6, 7]);
+assert.equal(publicProof.method_snapshot.target_date, paidReady.report_date);
+assert.equal(publicProof.method_snapshot.data_lock, sourceAccess.history_end);
+assert.equal(publicProof.method_snapshot.target_date, isoNextDay(publicProof.method_snapshot.data_lock));
+assert.equal(publicProof.method_snapshot.layers.length, 6);
+assert.deepEqual(publicProof.method_snapshot.layers.map((layer) => layer.index), [1, 2, 3, 4, 5, 6]);
 assert.equal(publicProof.method_snapshot.paid_output_hidden, true);
 assert.doesNotMatch(publicProofRaw, /"final_(?:codes|pairs)"|"top1"|"top2"/i);
-assert.doesNotMatch(paidReadyRaw, /19\s*[-–—]\s*91|05\s*[-–—]\s*50/);
+assert.doesNotMatch(paidReadyRaw, /"final_(?:codes|pairs)"|"top1"|"top2"|"slot1_r4268"|"slot2_selected"/i);
 
 // The source template remains a single daily report with a protected checkout.
 assert.match(index, /BÁO CÁO DỮ LIỆU AI NGÀY/i);

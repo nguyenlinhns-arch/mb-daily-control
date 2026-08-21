@@ -15,6 +15,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 HISTORY = ROOT / "data" / "history-27.bz2.b64"
+HISTORY_DELTA = ROOT / "data" / "history-27-delta.json"
 AFFILIATE = ROOT / "data" / "affiliate-offers.json"
 BASE = "https://lemienbac.com"
 VN = timezone(timedelta(hours=7))
@@ -93,15 +94,23 @@ def load_history(path: Path = HISTORY) -> list[tuple[date, list[str]]]:
     text = bz2.decompress(base64.b64decode(packed)).decode("utf-8-sig")
     if FORBIDDEN.search(text):
         raise ValueError("Nguồn public chứa trường canonical/final")
+    history = None
     try:
-        return parse_rows(row_container(json.loads(text)))
+        history = parse_rows(row_container(json.loads(text)))
     except json.JSONDecodeError:
         for sep in (",", "\t", ";", "|"):
             rows = [r for r in csv.reader(io.StringIO(text), delimiter=sep) if len(r) >= 28]
             if rows:
-                return parse_rows(rows)
-    raise ValueError("Không đọc được history-27.bz2.b64")
-
+                history = parse_rows(rows)
+                break
+    if history is None:
+        raise ValueError("Không đọc được history-27.bz2.b64")
+    if path.resolve() == HISTORY.resolve() and HISTORY_DELTA.exists():
+        delta_payload = json.loads(HISTORY_DELTA.read_text(encoding="utf-8"))
+        merged = [[draw.isoformat(), *codes] for draw, codes in history]
+        merged.extend(row_container(delta_payload))
+        history = parse_rows(merged)
+    return history
 
 def gap(flags: list[bool]) -> tuple[int, int]:
     cur = 0

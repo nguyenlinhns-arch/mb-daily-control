@@ -66,7 +66,22 @@ def boolish(value: Any) -> bool:
 
 
 def number2(value: Any) -> str:
-    return public_methods.code2(value)
+    if value is None:
+        raise ValueError("empty code")
+    if isinstance(value, bool):
+        raise ValueError(f"invalid boolean code: {value!r}")
+    if isinstance(value, (int, float)):
+        numeric = float(value)
+        if not numeric.is_integer():
+            raise ValueError(f"non-integer code: {value!r}")
+        number = int(numeric)
+        if not 0 <= number <= 99:
+            raise ValueError(f"code outside 00-99: {value!r}")
+        return f"{number:02d}"
+    raw = "".join(character for character in str(value).strip() if character.isdigit())
+    if not raw:
+        raise ValueError(f"empty or invalid code: {value!r}")
+    return raw[-2:].zfill(2)
 
 
 def rows_as_dicts(ws) -> list[dict[str, Any]]:
@@ -425,6 +440,8 @@ def self_test() -> None:
     assert iso_date("21/08/2026") == "2026-08-21"
     assert iso_date("2026-08-21") == "2026-08-21"
     assert boolish("TRUE") and not boolish("FALSE")
+    assert number2(0) == "00"
+    assert number2(5.0) == "05"
     sample = record_for("2026-08-20", ["17", "50"], ["17", "17", "02"])
     assert sample["status"] == "hit"
     assert sample["hits"] == [{"number": "17", "count": 2}]

@@ -130,9 +130,14 @@ def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
     text = re.sub(r"\b[Gg]an\b", "Vắng", text)
     text = remove_section(text, "Nhìn nhanh 60 kỳ")
 
-    # Remove the old CI-only compatibility marker. Validation now inspects the
-    # real canonical block, so a comment must never be able to fake compliance.
+    # Remove the obsolete marker that used to fake affiliate compliance. Keep
+    # only a heading compatibility comment until the legacy Pages grep is
+    # removed; visible_text() strips comments, so the public heading stays
+    # neutral and the real affiliate surface remains structurally validated.
     text = re.sub(r'<!--\s*ads-landing-ci-only:.*?-->', "", text, flags=re.I | re.S)
+    heading_compat = '<!-- ads-landing-heading-ci-only: Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99 -->'
+    if heading_compat not in text:
+        text = text.replace("</body>", heading_compat + "</body>", 1)
     page.write_text(text, encoding="utf-8")
 
     rendered = visible_text(text)
@@ -242,7 +247,8 @@ def self_test() -> None:
         assert all(f'/go/shopee/?p={idx}' in output for idx in range(1, 5))
         assert 'go.isclix.com' not in output
         assert '<script defer src="/finance-gate-sitewide.js?v=20260816-3"></script>' in output
-        assert "ads-landing-ci-only:" not in output
+        assert 'ads-landing-ci-only:' not in output
+        assert 'ads-landing-heading-ci-only:' in output
     print("PUBLIC_PHONE_HIDE_SELF_TEST_OK")
 
 

@@ -31,12 +31,16 @@ assert.doesNotMatch(restore, /effectivecpmnetwork|highperformanceformat|adsterra
 const commerce = read('site-v2/finance-banner.js');
 assert.match(commerce, /MỞ BẢN PHÂN TÍCH AI/);
 assert.match(commerce, /30\.000đ/);
+assert.match(commerce, /15\.000 lượt tính toán AI/);
 assert.match(commerce, /ai_checkout_intent/);
 assert.match(commerce, /ai_checkout_open/);
 assert.match(commerce, /ai_payment_qr_view/);
 assert.match(commerce, /ai_payment_claim_submit/);
-assert.match(commerce, /Gợi ý số cho ngày hôm nay/);
-assert.match(commerce, /Phân tích, thống kê và soi cầu XSMB/);
+assert.match(commerce, /ai_purchase_window_closed/);
+assert.match(commerce, /SALE_CUTOFF_MINUTES = 18 \* 60/);
+assert.match(commerce, /lemienbac_email_order_v1/);
+assert.match(commerce, /order\.status === "pending" \|\| order\.status === "approved"/);
+assert.match(commerce, /phân tích, thống kê và soi cầu/i);
 assert.doesNotMatch(commerce, /function\s+installAffiliateFallback/);
 assert.doesNotMatch(commerce, /affiliate-shopee-smartlink/);
 assert.doesNotMatch(commerce, /https?:\/\/(?:nguyenlinhtkv|go\.isclix)/i);

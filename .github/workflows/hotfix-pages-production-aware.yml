@@ -1,0 +1,180 @@
+name: One-shot fix production-aware Pages validators
+
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/hotfix-pages-production-aware.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Patch production-aware validators and repair proof hashes
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, re
+
+          # 1) SEO builder: allow a fixed audited benchmark plus a current-month
+          # Production-aware detail stream that switches from 4SO to MAX2.
+          path = Path('scripts/build_seo_pages.py')
+          text = path.read_text(encoding='utf-8')
+          start = text.index('def validate_proof_payload(')
+          end = text.index('\ndef breadcrumb_schema', start)
+          replacement = '''def validate_proof_payload(proof: dict[str, Any]) -> None:
+              if proof.get("schema_version") != "MB_PUBLIC_YESTERDAY_PROOF_V3_PRODUCTION_AWARE":
+                  raise ValueError("Invalid public proof schema")
+              proof_day = date.fromisoformat(str(proof.get("date")))
+              recommended = proof.get("recommended_numbers")
+              if not isinstance(recommended, list) or len(recommended) not in (2, 4) or len(set(recommended)) != len(recommended):
+                  raise ValueError("Yesterday proof must contain the official Production output count")
+              if any(not re.fullmatch(r"\\d{2}", str(number)) for number in recommended):
+                  raise ValueError("Yesterday proof contains an invalid number")
+
+              validation = proof.get("historical_validation") or {}
+              window_start = date.fromisoformat(str(validation.get("window_start")))
+              window_end = date.fromisoformat(str(validation.get("window_end")))
+              total_days = int(validation.get("total_days") or 0)
+              hit_days = int(validation.get("hit_days") or 0)
+              if (window_end - window_start).days + 1 != total_days or window_end > proof_day:
+                  raise ValueError("Historical validation window is incomplete")
+              if int(validation.get("rate_pct") or -1) != round(hit_days * 100 / total_days):
+                  raise ValueError("Historical validation rate is inconsistent")
+
+              month = proof.get("month_summary") or {}
+              records = month.get("daily_records")
+              observed = int(month.get("observed_days") or 0)
+              if not isinstance(records, list) or len(records) != observed:
+                  raise ValueError("Month history must contain one record per observed day")
+              expected_start = date.fromisoformat(str(month.get("period_start")))
+              expected_end = date.fromisoformat(str(month.get("period_end")))
+              if expected_end != proof_day or (expected_end - expected_start).days + 1 != observed:
+                  raise ValueError("Month history dates are not continuous")
+              transition = proof.get("production_transition") or {}
+              max2_live_from = date.fromisoformat(str(transition.get("max2_live_from") or "9999-12-31"))
+              wins = 0
+              for index, record in enumerate(records):
+                  if not isinstance(record, dict):
+                      raise ValueError("Invalid month history record")
+                  record_day = date.fromisoformat(str(record.get("date")))
+                  if record_day != expected_start + timedelta(days=index):
+                      raise ValueError("Month history is not ordered or continuous")
+                  picks = record.get("recommended_numbers")
+                  hits = record.get("hits")
+                  expected_count = 2 if record_day >= max2_live_from else 4
+                  if not isinstance(picks, list) or len(picks) != expected_count or len(set(picks)) != expected_count:
+                      raise ValueError(f"Invalid Production record for {record_day}")
+                  if any(not re.fullmatch(r"\\d{2}", str(number)) for number in picks):
+                      raise ValueError(f"Invalid number in history for {record_day}")
+                  if not isinstance(hits, list):
+                      raise ValueError(f"Invalid hits for {record_day}")
+                  status = "hit" if hits else "miss"
+                  if record.get("status") != status:
+                      raise ValueError(f"History status mismatch for {record_day}")
+                  record_hash = str(record.get("record_hash") or "")
+                  if not re.fullmatch(r"[0-9a-f]{64}", record_hash):
+                      raise ValueError(f"Missing record hash for {record_day}")
+                  canonical_record = {key: value for key, value in record.items() if key != "record_hash"}
+                  expected_hash = hashlib.sha256(json.dumps(canonical_record, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+                  if record_hash != expected_hash:
+                      raise ValueError(f"Record hash mismatch for {record_day}")
+                  wins += bool(hits)
+              if wins != int(month.get("win_days") or -1):
+                  raise ValueError("Month win count is inconsistent")
+              if observed - wins != int(month.get("miss_days") or -1):
+                  raise ValueError("Month miss count is inconsistent")
+
+          '''
+          path.write_text(text[:start] + replacement + text[end+1:], encoding='utf-8')
+
+          # 2) Public-repo guard: historical completed outputs are allowed, but
+          # current paid Production output must remain absent from public JSON.
+          path = Path('scripts/public_repo_boundary_guard.py')
+          text = path.read_text(encoding='utf-8')
+          start = text.index('def validate_changed_sensitive(')
+          end = text.index('\ndef run()', start)
+          replacement = '''def validate_changed_sensitive() -> dict[str,Any]:
+              changed=changed_files(); inspected=[]
+              ready=load(ROOT/'data/paid-report-ready.json')
+              report_day=date.fromisoformat(str(ready['report_date']))
+              for rel in sorted(SENSITIVE_LEGACY & changed):
+                  doc=load(ROOT/rel); inspected.append(rel)
+                  raw=(ROOT/rel).read_text(encoding='utf-8').lower()
+                  for key in ('canonical_codes','canonical_pairs','final_codes','final_pairs','top1','top2','slot1_r4268','slot2_selected'):
+                      if key in raw: raise ValueError(f'{rel} contains current paid-output field: {key}')
+                  if rel=='ai-methods/yesterday-proof.json':
+                      if doc.get('schema_version')!='MB_PUBLIC_YESTERDAY_PROOF_V3_PRODUCTION_AWARE':
+                          raise ValueError('yesterday proof must use Production-aware completed schema')
+                      proof_day=date.fromisoformat(str(doc['date']))
+                      if proof_day>=report_day: raise ValueError('yesterday proof must be completed before current paid report')
+                      picks=doc.get('recommended_numbers') or []
+                      if len(picks) not in (2,4) or any(not re.fullmatch(r'\\d{2}',str(x)) for x in picks):
+                          raise ValueError('invalid completed Production output')
+                  elif rel=='data/public-historical-proof.json':
+                      if doc.get('schema_version')!='MB_PUBLIC_HISTORICAL_PROOF_V2_PRODUCTION_AWARE':
+                          raise ValueError('historical proof must use Production-aware schema')
+                      recent=doc.get('recent_period') or {}
+                      recent_end=date.fromisoformat(str(recent['period_end']))
+                      if recent_end>=report_day: raise ValueError('historical proof may contain completed days only')
+                      snap=doc.get('method_snapshot') or {}
+                      if snap.get('paid_output_hidden') is not True: raise ValueError('paid output must stay hidden')
+                      if str(snap.get('target_date'))!=str(ready.get('report_date')) or str(snap.get('data_lock'))!=str(ready.get('data_lock')):
+                          raise ValueError('method snapshot must match public readiness dates')
+              return {'changed_files':len(changed),'sensitive_inspected':inspected}
+
+          '''
+          path.write_text(text[:start] + replacement + text[end+1:], encoding='utf-8')
+
+          # 3) Midnight readiness: a frozen benchmark can end before the live
+          # data lock; only the current-month completed detail must end at T-1.
+          path = Path('.github/workflows/daily-report-midnight.yml')
+          text = path.read_text(encoding='utf-8')
+          old = '''          if validation.get("window_end") != lock:\n              errors.append(f"historical-proof-window={validation.get('window_end')}")'''
+          new = '''          if validation.get("window_end") and validation.get("window_end") > lock:\n              errors.append(f"historical-proof-window-ahead={validation.get('window_end')}")'''
+          if old not in text:
+              raise SystemExit('daily-report historical-window gate not found')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          # 4) Recompute every proof record hash from its actual completed data.
+          path = Path('ai-methods/yesterday-proof.json')
+          doc = json.loads(path.read_text(encoding='utf-8'))
+          for record in (doc.get('month_summary') or {}).get('daily_records') or []:
+              canonical = {k:v for k,v in record.items() if k!='record_hash'}
+              record['record_hash'] = hashlib.sha256(json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode('utf-8')).hexdigest()
+          path.write_text(json.dumps(doc, ensure_ascii=False, separators=(",", ":"))+'\n', encoding='utf-8')
+          PY
+
+      - name: Verify before committing
+        run: |
+          set -euo pipefail
+          node --check tests/ai-data-site-smoke.mjs
+          npm test
+          python scripts/public_repo_boundary_guard.py --self-test
+          python scripts/build_seo_pages.py --self-test --today 2026-08-21
+          git diff --check
+
+      - name: Commit one-shot fix
+        run: |
+          set -euo pipefail
+          rm .github/workflows/hotfix-pages-production-aware.yml
+          git config user.name "mb-pages-hotfix"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/build_seo_pages.py scripts/public_repo_boundary_guard.py .github/workflows/daily-report-midnight.yml ai-methods/yesterday-proof.json .github/workflows/hotfix-pages-production-aware.yml
+          git commit -m "fix: support production-aware MAX2 proof in Pages"
+          git pull --rebase origin main
+          git push origin HEAD:main

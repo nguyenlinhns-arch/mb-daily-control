@@ -1,12 +1,12 @@
 {
   "schema_version": "PAGES_ARTIFACT_LIVE_READBACK_V1",
-  "checked_at_utc": "2026-08-21T13:58:14+00:00",
-  "pages_run_id": 32489600149,
-  "source_head_sha": "f3e3ca61bad4a0ad36c729630e48da3d3c7940d8",
-  "pages_conclusion": "failure",
+  "checked_at_utc": "2026-08-21T13:58:49+00:00",
+  "pages_run_id": 32489648614,
+  "source_head_sha": "771130a9c548d98554aae46ccd0eacc456dd78cd",
+  "pages_conclusion": "success",
   "verification_ok": false,
   "verification_rc": 1,
-  "artifact_id": 0,
+  "artifact_id": 9449219032,
   "artifact_finance_sha256": "",
   "live_finance_sha256": "",
   "site_status_healthy": false,
@@ -14,5 +14,5 @@
   "shopee_four_card_surface_checked": false,
   "adsterra_runtime_absent_checked": false,
   "indexnow_submitted": false,
-  "verify_log_tail": ""
+  "verify_log_tail": "Traceback (most recent call last):\n  File \"<stdin>\", line 11, in <module>\nAssertionError: /tmp/pages-site/thong-ke-xsmb/index.html"
 }

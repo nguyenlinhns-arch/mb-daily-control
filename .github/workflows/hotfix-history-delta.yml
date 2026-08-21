@@ -1,0 +1,86 @@
+name: Patch public statistics history delta loader
+
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/hotfix-history-delta.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Patch loader
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/build_statistics_site.py')
+          s = p.read_text(encoding='utf-8')
+          old = 'HISTORY = ROOT / "data" / "history-27.bz2.b64"\nAFFILIATE = ROOT / "data" / "affiliate-offers.json"'
+          new = 'HISTORY = ROOT / "data" / "history-27.bz2.b64"\nHISTORY_DELTA = ROOT / "data" / "history-27-delta.json"\nAFFILIATE = ROOT / "data" / "affiliate-offers.json"'
+          if old not in s and 'HISTORY_DELTA = ' not in s:
+              raise SystemExit('history constant anchor not found')
+          if 'HISTORY_DELTA = ' not in s:
+              s = s.replace(old, new, 1)
+          start = s.index('def load_history(')
+          end = s.index('\ndef gap(', start)
+          replacement = '''def load_history(path: Path = HISTORY) -> list[tuple[date, list[str]]]:
+              packed = "".join(path.read_text(encoding="utf-8").split())
+              text = bz2.decompress(base64.b64decode(packed)).decode("utf-8-sig")
+              if FORBIDDEN.search(text):
+                  raise ValueError("Nguồn public chứa trường canonical/final")
+              history = None
+              try:
+                  history = parse_rows(row_container(json.loads(text)))
+              except json.JSONDecodeError:
+                  for sep in (",", "\\t", ";", "|"):
+                      rows = [r for r in csv.reader(io.StringIO(text), delimiter=sep) if len(r) >= 28]
+                      if rows:
+                          history = parse_rows(rows)
+                          break
+              if history is None:
+                  raise ValueError("Không đọc được history-27.bz2.b64")
+              if path.resolve() == HISTORY.resolve() and HISTORY_DELTA.exists():
+                  delta_payload = json.loads(HISTORY_DELTA.read_text(encoding="utf-8"))
+                  merged = [[draw.isoformat(), *codes] for draw, codes in history]
+                  merged.extend(row_container(delta_payload))
+                  history = parse_rows(merged)
+              return history
+
+          '''
+          p.write_text(s[:start] + replacement + s[end+1:], encoding='utf-8')
+          PY
+      - name: Verify
+        run: |
+          set -euo pipefail
+          python scripts/build_statistics_site.py --self-test
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, 'scripts')
+          import build_statistics_site as b
+          h=b.load_history()
+          assert len(h)==951, len(h)
+          assert h[-1][0].isoformat()=='2026-08-20', h[-1][0]
+          print('PUBLIC_HISTORY_DELTA_OK', len(h), h[-1][0])
+          PY
+          git diff --check
+      - name: Commit code patch
+        run: |
+          set -euo pipefail
+          git config user.name "mb-pages-hotfix"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/build_statistics_site.py
+          git commit -m "fix: merge completed draw delta into public statistics"
+          git pull --rebase origin main
+          git push origin HEAD:main

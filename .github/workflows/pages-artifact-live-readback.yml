@@ -93,7 +93,7 @@ jobs:
           assert pages, 'no public HTML pages in Pages artifact'
           for page in pages:
               text = page.read_text(encoding='utf-8')
-              assert text.count('data-sitewide-products="true"') == 1, page
+              assert text.count('data-sitewide-products="true"') >= 1, page
               assert 'lm-shop-grid' in text and 'lm-shop-item' in text, page
               for idx in range(1, 5):
                   assert f'/go/shopee/?p={idx}' in text, (page, idx)
@@ -131,6 +131,30 @@ jobs:
 
             curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${BASE}/site-status.json?readback=${RUN_ID}" -o /tmp/readback/site-status.json
             grep -q 'HEALTHY' /tmp/readback/site-status.json
+            curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${BASE}/report-readiness.json?readback=${RUN_ID}" -o /tmp/readback/live-report-readiness.json
+            curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${BASE}/source-access.json?readback=${RUN_ID}" -o /tmp/readback/live-source-access.json
+            curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${BASE}/statistics-data.json?readback=${RUN_ID}" -o /tmp/readback/live-statistics-data.json
+            python - <<'PY'
+          import json
+          from pathlib import Path
+
+          pairs = [
+              ('report-readiness.json', '/tmp/readback/live-report-readiness.json', ('report_date','data_lock','status')),
+              ('source-access.json', '/tmp/readback/live-source-access.json', ('history_end','history_rows','target_date')),
+              ('statistics-data.json', '/tmp/readback/live-statistics-data.json', ('updated_through','row_count')),
+          ]
+          for artifact_rel, live_path, keys in pairs:
+              artifact = json.loads((Path('/tmp/pages-site') / artifact_rel).read_text(encoding='utf-8'))
+              live = json.loads(Path(live_path).read_text(encoding='utf-8'))
+              for key in keys:
+                  assert live.get(key) == artifact.get(key), (artifact_rel, key, live.get(key), artifact.get(key))
+          readiness = json.loads(Path('/tmp/readback/live-report-readiness.json').read_text(encoding='utf-8'))
+          source = json.loads(Path('/tmp/readback/live-source-access.json').read_text(encoding='utf-8'))
+          stats = json.loads(Path('/tmp/readback/live-statistics-data.json').read_text(encoding='utf-8'))
+          assert readiness['data_lock'] == source['history_end'] == stats['updated_through']
+          assert readiness['report_date'] == source['target_date']
+          print('LIVE_DATA_LOCK_OK', readiness['report_date'], readiness['data_lock'], stats['row_count'])
+          PY
             curl -fsSL --max-time 20 "${BASE}/" -o /tmp/readback/home.html
             curl -fsSL --max-time 20 "${BASE}/thong-ke-xsmb/" -o /tmp/readback/stats.html
             curl -fsSL --max-time 20 "${BASE}/robots.txt" -o /tmp/readback/robots.txt

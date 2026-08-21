@@ -5,9 +5,12 @@
   // affiliate_product_grid_view · after_proof
 
   const AI_INTENT_KEY = "lm_ai_purchase_intent_v1";
+  const ORDER_KEY = "lemienbac_email_order_v1";
+  const SALE_CUTOFF_MINUTES = 18 * 60;
   let checkoutOpened = false;
   let qrViewed = false;
   let claimSubmitted = false;
+  let blockedTracked = false;
 
   function emit(event, extra = {}) {
     window.dataLayer = window.dataLayer || [];
@@ -33,12 +36,96 @@
     }).format(new Date());
   }
 
+  function vietnamNow() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23"
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return {
+      date: `${values.day}/${values.month}/${values.year}`,
+      minutes: Number(values.hour || 0) * 60 + Number(values.minute || 0)
+    };
+  }
+
+  function readExistingOrder() {
+    let raw = "";
+    try { raw = localStorage.getItem(ORDER_KEY) || ""; } catch (_) {}
+    if (!raw) {
+      try { raw = sessionStorage.getItem(ORDER_KEY) || ""; } catch (_) {}
+    }
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (_) { return null; }
+  }
+
+  function existingBuyerMayReopen() {
+    const order = readExistingOrder();
+    if (!order || order.reportDate !== reportDateLabel()) return false;
+    return order.status === "pending" || order.status === "approved";
+  }
+
+  function newPurchaseWindowClosed() {
+    const now = vietnamNow();
+    return reportDateLabel() === now.date
+      && now.minutes >= SALE_CUTOFF_MINUTES
+      && !existingBuyerMayReopen();
+  }
+
+  function applyPurchaseWindowGate() {
+    const closed = newPurchaseWindowClosed();
+    document.body?.classList.toggle("lm-ai-sale-closed", closed);
+    if (!closed) return;
+
+    document.querySelectorAll("[data-open-checkout], [data-ai-sticky-cta]").forEach(button => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      button.disabled = true;
+      button.setAttribute("aria-disabled", "true");
+      button.setAttribute("title", "Báo cáo hôm nay đã khóa trước giờ quay");
+      if (button.closest(".portal-paid-card")) button.textContent = "BÁO CÁO HÔM NAY ĐÃ KHÓA";
+    });
+
+    const paidCard = document.querySelector(".portal-paid-card");
+    if (paidCard && !paidCard.querySelector(".lm-postdraw-lock-note")) {
+      const note = document.createElement("p");
+      note.className = "lm-postdraw-lock-note";
+      note.textContent = "Báo cáo hôm nay đã khóa trước giờ quay. Báo cáo ngày mới chỉ mở khi dữ liệu T−1 được khóa hợp lệ.";
+      paidCard.append(note);
+    }
+
+    if (!blockedTracked) {
+      blockedTracked = true;
+      emit("ai_purchase_window_closed", { cutoff: "18:00", product: "daily_ai_analysis" });
+    }
+  }
+
+  function installPurchaseWindowGate() {
+    document.addEventListener("click", event => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target?.closest("[data-open-checkout], [data-ai-sticky-cta]")) return;
+      if (!newPurchaseWindowClosed()) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      applyPurchaseWindowGate();
+    }, true);
+    applyPurchaseWindowGate();
+    window.setTimeout(applyPurchaseWindowGate, 0);
+    window.setTimeout(applyPurchaseWindowGate, 500);
+    window.setInterval(applyPurchaseWindowGate, 30000);
+  }
+
   function addRuntimeStyle() {
     if (document.getElementById("lm-commerce-runtime-style")) return;
     const style = document.createElement("style");
     style.id = "lm-commerce-runtime-style";
     style.textContent = `
       .lm-ai-runtime-kicker{display:block;margin-top:7px;color:#79575a;font-size:10px;font-weight:850;line-height:1.4}
+      .lm-postdraw-lock-note{margin:9px 0 0;padding:9px 10px;border:1px solid #ead9db;border-radius:10px;background:#fff7f7;color:#74565a;font-size:10px;font-weight:800;line-height:1.45}
+      .lm-ai-sale-closed [data-open-checkout]:disabled,.lm-ai-sale-closed [data-ai-sticky-cta]:disabled{cursor:not-allowed!important;opacity:.62!important;filter:saturate(.6)!important}
       .lm-shopee-nudge{display:none!important}
       .conversion-benefits li{display:flex!important;align-items:flex-start!important;gap:8px!important;text-align:left!important}
       .conversion-benefits li::before{content:"✓"!important;display:grid!important;place-items:center!important;flex:0 0 18px!important;width:18px!important;height:18px!important;margin:1px 0 0!important;border:1px solid #e9c5c9!important;border-radius:999px!important;background:#fff1f2!important;color:#b4232f!important;font-size:11px!important;font-weight:1000!important;line-height:1!important}
@@ -62,7 +149,7 @@
 
     const heroLead = document.querySelector(".portal-hero .portal-lead");
     if (heroLead) {
-      heroLead.innerHTML = `Phân tích, thống kê và soi cầu XSMB qua nhiều phương pháp. Gợi ý số cho ngày hôm nay <strong>${date}</strong> chỉ với 30.000đ.`;
+      heroLead.innerHTML = `Chỉ <strong>30.000đ</strong>, nhận gợi ý XSMB hôm nay <strong>${date}</strong> từ hơn <strong>15.000 lượt tính toán AI</strong>, kết hợp phân tích, thống kê và soi cầu qua nhiều phương pháp.`;
     }
 
     const paidCard = document.querySelector(".portal-paid-card");
@@ -141,5 +228,6 @@
     addRuntimeStyle();
     polishHomeCopy();
     installAiFunnelTracking();
+    installPurchaseWindowGate();
   }, { once: true });
 })();

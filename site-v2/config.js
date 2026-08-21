@@ -80,3 +80,59 @@ try {
     // Storage may be unavailable in strict privacy modes; checkout still works.
   }
 })();
+
+// MAX2 delivery compatibility layer.
+// The existing Apps Script web app still returns the legacy two-pair schema.
+// During the MB ALL transition the private Paid_Report writes the same MAX2
+// pair into both legacy slots. After approval this observer collapses that
+// duplicated compatibility payload to one two-number Production result, so the
+// customer never sees a fake second pair or a mixed legacy 4SO recommendation.
+(() => {
+  "use strict";
+
+  function normalizePair(card) {
+    if (!card) return [];
+    const values = Array.from(card.querySelectorAll("strong, .delivery-number, .number"))
+      .map((node) => String(node.textContent || "").match(/\b\d{2}\b/g) || [])
+      .flat();
+    return values.slice(0, 2);
+  }
+
+  function collapseMax2Delivery() {
+    const view = document.querySelector("#delivery-view, [data-delivery-view]");
+    if (!view || view.hidden) return;
+    const cards = Array.from(view.querySelectorAll(".delivery-pair, [data-delivery-pair]"));
+    if (cards.length < 2) return;
+    const first = normalizePair(cards[0]);
+    const second = normalizePair(cards[1]);
+    if (first.length !== 2 || second.length !== 2 || first.join("|") !== second.join("|")) return;
+
+    cards[1].remove();
+    const rank = cards[0].querySelector(".delivery-rank, [data-delivery-rank]");
+    if (rank) rank.textContent = "SỐ CHỌN PRODUCTION";
+    const title = view.querySelector("h2, h3, [data-delivery-title]");
+    const reportDate = String(document.body?.dataset?.reportDate || "").trim();
+    if (title) title.textContent = reportDate ? `Số MAX2 ngày ${reportDate}` : "Số MAX2 hôm nay";
+    view.dataset.max2Collapsed = "true";
+  }
+
+  function relabelPublicMethods() {
+    for (const node of document.querySelectorAll("h1,h2,h3,p,span")) {
+      if (String(node.textContent || "").trim() === "Phương pháp công khai hôm nay") {
+        node.textContent = "Phương pháp công khai theo dữ liệu T−1";
+      }
+    }
+  }
+
+  const start = () => {
+    relabelPublicMethods();
+    collapseMax2Delivery();
+    const observer = new MutationObserver(() => {
+      collapseMax2Delivery();
+      relabelPublicMethods();
+    });
+    observer.observe(document.body, {subtree: true, childList: true, attributes: true, attributeFilter: ["hidden", "class"]});
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, {once: true});
+  else start();
+})();

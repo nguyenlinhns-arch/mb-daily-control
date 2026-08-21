@@ -10,7 +10,8 @@ from pathlib import Path
 # clicking an internal route. The redirect page avoids a contiguous phone
 # literal in its source and uses .htm so portal *.html quality/page counts are
 # unaffected while browsers still receive an HTML document.
-# Deployment refresh 2026-08-17: keep the Google Ads landing final-surface gate.
+# The Google Ads statistics landing remains read-only for the AI product while
+# preserving the canonical sitewide Shopee four-card surface and VPBank gate.
 DIRECT_ZALO = "https://zalo.me/0398696879"
 LEGACY_ZALO_ROUTE = "/go/zalo/"
 INTERNAL_ZALO_ROUTE = "/go/zalo.htm"
@@ -57,11 +58,12 @@ def visible_text(text: str) -> str:
 
 
 def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
-    """Keep /thong-ke-xsmb/ as a neutral, read-only Google Ads destination.
+    """Keep /thong-ke-xsmb/ neutral for the AI product without breaking sitewide commerce.
 
-    This runs after every other builder, so later affiliate/finance passes cannot
-    re-introduce Zalo, checkout, product cards, finance popups, or prediction-like
-    wording onto the Ads landing page.
+    This runs after every other builder. It removes AI checkout/Zalo/prediction-like
+    elements from the Ads destination, but deliberately preserves the canonical
+    lower Shopee four-card block and the VPBank sitewide runtime required on every
+    public page.
     """
     page = root / ADS_LANDING
     if not page.is_file():
@@ -70,16 +72,19 @@ def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
     text = page.read_text(encoding="utf-8")
     final_surface = (
         'data-sitewide-products="true"' in text
-        and ("finance-gate-sitewide.js" in text or "lm-shop-grid" in text)
+        and 'class="lm-shop-grid"' in text
+        and 'class="lm-shop-item"' in text
+        and "/go/shopee/?p=1" in text
+        and "finance-gate-sitewide.js" in text
     )
     if not final_surface:
         return {"status": "DEFERRED", "reason": "await_final_site_surface"}
 
+    # Retire only legacy/duplicate affiliate surfaces. The canonical four-card
+    # block (data-sitewide-products=true) must remain visible on this page.
     for marker in (
         'data-sitewide-affiliate="true"',
         'data-primary-affiliate-strip="sitewide-v4"',
-        'data-sitewide-products="true"',
-        'data-affiliate-static-placement="after_tools"',
         'class="lm-product-deals',
         'data-primary-affiliate-strip="static-v3"',
         'data-primary-affiliate-strip="v2"',
@@ -87,17 +92,23 @@ def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
     ):
         text = remove_section(text, marker)
 
-    for style_id in ("lm-sitewide-affiliate-style", "lm-sitewide-products-style", "lm-shop-grid-style-v3"):
+    for style_id in ("lm-sitewide-affiliate-style", "lm-sitewide-products-style"):
         text = re.sub(rf'<style\s+id="{style_id}">.*?</style>', "", text, flags=re.I | re.S)
-    for script_id in ("lm-sitewide-affiliate-track", "lm-sitewide-products-track", "lm-shop-grid-track-v3"):
+    for script_id in ("lm-sitewide-affiliate-track", "lm-sitewide-products-track"):
         text = re.sub(rf'<script\s+id="{script_id}">.*?</script>', "", text, flags=re.I | re.S)
 
+    # Keep finance-gate-sitewide.js. Remove only AI checkout/legacy commerce
+    # runtimes from the neutral Ads destination.
     text = re.sub(
-        r'<script\s+[^>]*src="[^"]*(?:finance-gate|finance-banner|affiliate|checkout)[^"]*"[^>]*></script>',
+        r'<script\s+[^>]*src="[^"]*(?:finance-banner|checkout|affiliate)[^"]*"[^>]*></script>',
         "", text, flags=re.I,
     )
     text = re.sub(
-        r'<a\b[^>]*href="(?:/lo-gan-xsmb/|/cap-dao-xsmb/|/thong-ke-dau-duoi-xsmb/|/thong-ke-tong-xsmb/|/thong-ke-theo-thu-xsmb/|/tra-cuu-xsmb/|/go/[^\"]*|/\?checkout=1)"[^>]*>.*?</a>',
+        r'<script\s+[^>]*src="[^"]*/finance-gate\.js\?[^\"]*"[^>]*></script>',
+        "", text, flags=re.I,
+    )
+    text = re.sub(
+        r'<a\b[^>]*href="(?:/lo-gan-xsmb/|/cap-dao-xsmb/|/thong-ke-dau-duoi-xsmb/|/thong-ke-tong-xsmb/|/thong-ke-theo-thu-xsmb/|/tra-cuu-xsmb/|/go/zalo(?:\.htm|/)?|/\?checkout=1)"[^>]*>.*?</a>',
         "", text, flags=re.I | re.S,
     )
 
@@ -119,25 +130,39 @@ def harden_google_ads_landing(root: Path) -> dict[str, str | bool]:
     text = re.sub(r"\b[Gg]an\b", "Vắng", text)
     text = remove_section(text, "Nhìn nhanh 60 kỳ")
 
-    compat = ('<!-- ads-landing-ci-only: data-sitewide-products="true" finance-gate-sitewide.js?v=20260816-2 | Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99 -->')
-    if "ads-landing-ci-only:" not in text:
-        text = text.replace("</body>", compat + "</body>", 1)
+    # Remove the old CI-only compatibility marker. Validation now inspects the
+    # real canonical block, so a comment must never be able to fake compliance.
+    text = re.sub(r'<!--\s*ads-landing-ci-only:.*?-->', "", text, flags=re.I | re.S)
     page.write_text(text, encoding="utf-8")
 
     rendered = visible_text(text)
-    for token in ("4so", "gợi ý số", "báo cáo ai", "nhận báo cáo", "zalo", "top 1", "top 2", "30.000", "tỷ lệ thắng", "bạch thủ", "song thủ", "soi cầu", "lô gan", "cặp đảo", "shopee", "vay tiền", "mua vé", "thanh toán", "trò chơi", "hoa hồng"):
+    for token in ("4so", "gợi ý số", "báo cáo ai", "nhận báo cáo", "zalo", "top 1", "top 2", "30.000", "tỷ lệ thắng", "bạch thủ", "song thủ", "soi cầu", "lô gan", "cặp đảo", "mua vé", "thanh toán", "trò chơi"):
         if token in rendered:
             raise ValueError(f"Google Ads landing visible policy token: {token}")
     if re.search(r"\b(?:gan|nháy)\b", rendered, flags=re.I):
         raise ValueError("Google Ads landing gambling jargon remains")
 
     lower = text.lower()
-    for pattern in (r'<script[^>]+src="[^"]*finance-gate', r'<script[^>]+src="[^"]*finance-banner', r'<script[^>]+src="[^"]*checkout', r'<a[^>]+href="/go/', r'<a[^>]+href="https://zalo\.me/', r'data-open-checkout', r'data-zalo-route'):
+    for pattern in (r'<script[^>]+src="[^"]*finance-banner', r'<script[^>]+src="[^"]*checkout', r'<a[^>]+href="/go/zalo', r'<a[^>]+href="https://zalo\.me/', r'data-open-checkout', r'data-zalo-route'):
         if re.search(pattern, lower, flags=re.I):
             raise ValueError(f"Google Ads landing runtime/route leak: {pattern}")
     if 'data-google-ads-landing="true"' not in text:
         raise ValueError("Google Ads landing marker missing")
-    return {"status": "PASS", "route": "/thong-ke-xsmb/", "zalo": False, "checkout": False, "affiliate": False, "finance_popup": False}
+
+    section = re.search(r'<section\b[^>]*\bdata-sitewide-products="true".*?</section>', text, flags=re.I | re.S)
+    if not section or section.group(0).count('data-shop-item=') != 4:
+        raise ValueError("Google Ads landing canonical four-card block missing")
+    if 'lm-shop-grid' not in section.group(0) or 'lm-shop-item' not in section.group(0):
+        raise ValueError("Google Ads landing canonical product classes missing")
+    for idx in range(1, 5):
+        if f'/go/shopee/?p={idx}' not in section.group(0):
+            raise ValueError(f"Google Ads landing product route p={idx} missing")
+    if 'go.isclix.com' in section.group(0):
+        raise ValueError("Google Ads landing leaked direct affiliate URL")
+    if 'finance-gate-sitewide.js' not in text:
+        raise ValueError("Google Ads landing VPBank sitewide runtime missing")
+
+    return {"status": "PASS", "route": "/thong-ke-xsmb/", "zalo": False, "checkout": False, "affiliate": True, "finance_popup": True}
 
 
 def sanitize(root: Path) -> dict[str, int | str | bool]:
@@ -190,19 +215,34 @@ def self_test() -> None:
         root = Path(td)
         ads = root / "thong-ke-xsmb"
         ads.mkdir(parents=True)
+        cards = ''.join(
+            f'<a class="lm-shop-item" href="/go/shopee/?p={idx}" data-shop-item="{idx}">Sản phẩm {idx}</a>'
+            for idx in range(1, 5)
+        )
         ads.joinpath("index.html").write_text(
-            '<html><head><title>Thống kê XSMB đến 16/08/2026: 00–99, tần suất, lô gan | Lê Miền Bắc</title><script defer src="/finance-gate-sitewide.js?v=old"></script></head><body data-google-ads-landing="true"><main><section class="hero"><h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1><p>Chọn số để mở hồ sơ thống kê.</p></section><section><p>01 10/60 · 12 nháy · gan 3</p></section><section data-sitewide-products="true"><p>Shopee</p></section></main></body></html>',
+            '<html><head><title>Thống kê XSMB đến 16/08/2026: 00–99, tần suất, lô gan | Lê Miền Bắc</title>'
+            '<style id="lm-shop-grid-style-v3">.lm-shop-grid{display:block!important;visibility:visible!important;opacity:1!important}</style>'
+            '<script defer src="/finance-gate-sitewide.js?v=20260816-3"></script></head>'
+            '<body data-google-ads-landing="true"><main><section class="hero"><h1>Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99</h1>'
+            '<p>Chọn số để mở hồ sơ thống kê.</p></section><section><p>01 10/60 · 12 nháy · gan 3</p></section>'
+            f'<section class="lm-shop-grid" data-sitewide-products="true"><div>{cards}</div><p>Liên kết Shopee · hoa hồng đối tác</p></section>'
+            '</main><script id="lm-shop-grid-track-v3">/* canonical tracking */</script></body></html>',
             encoding="utf-8",
         )
         result = harden_google_ads_landing(root)
         output = ads.joinpath("index.html").read_text(encoding="utf-8")
         rendered = visible_text(output)
         assert result["status"] == "PASS"
+        assert result["affiliate"] is True and result["finance_popup"] is True
         assert "lô gan" not in rendered and "cặp đảo" not in rendered
         assert "nháy" not in rendered and not re.search(r"\bgan\b", rendered)
-        assert "Shopee" not in rendered
-        assert '<script defer src="/finance-gate-sitewide.js' not in output
-        assert "ads-landing-ci-only:" in output
+        assert output.count('data-sitewide-products="true"') == 1
+        assert output.count('data-shop-item=') == 4
+        assert 'class="lm-shop-grid"' in output and 'class="lm-shop-item"' in output
+        assert all(f'/go/shopee/?p={idx}' in output for idx in range(1, 5))
+        assert 'go.isclix.com' not in output
+        assert '<script defer src="/finance-gate-sitewide.js?v=20260816-3"></script>' in output
+        assert "ads-landing-ci-only:" not in output
     print("PUBLIC_PHONE_HIDE_SELF_TEST_OK")
 
 

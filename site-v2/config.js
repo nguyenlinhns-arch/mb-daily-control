@@ -91,12 +91,22 @@ try {
     if (document.getElementById(STYLE_ID)) return;
     const style = document.createElement("style");
     style.id = STYLE_ID;
-    style.textContent = ".historical-proof-section,#statistics.historical-proof-section{display:none!important}";
+    style.textContent = `
+      .historical-proof-section,
+      #statistics.historical-proof-section,
+      .portal-home .portal-proof,
+      .portal-home .lm-ai-history-note{display:none!important}
+      .portal-home .mball31-process{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+      .portal-home .mball31-process .portal-method p{margin:0;color:#5f6e79;font-size:12px;line-height:1.5}
+      @media(max-width:900px){.portal-home .mball31-process{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+      @media(max-width:620px){.portal-home .mball31-process{grid-template-columns:1fr!important}}
+    `;
     document.head.appendChild(style);
   }
 
   function isHomepage() {
     return document.body?.classList.contains("landing-simple")
+      || document.body?.classList.contains("portal-home")
       || window.location.pathname === "/"
       || window.location.pathname === "/index.html";
   }
@@ -145,13 +155,94 @@ try {
     }
   }
 
-  function applyHomeCopy() {
-    if (!document.body || !isHomepage()) return;
-
+  function removeLegacyRateBlocks() {
     document.querySelectorAll(".historical-proof-section").forEach((node) => node.remove());
     const statistics = document.getElementById("statistics");
     if (statistics?.querySelector(".historical-rate")) statistics.remove();
 
+    for (const rate of document.querySelectorAll(".portal-proof-rate,.historical-rate")) {
+      const section = rate.closest(".portal-section,.historical-proof-section,section");
+      if (section) section.remove();
+    }
+    document.querySelectorAll(".lm-ai-history-note").forEach((node) => node.remove());
+  }
+
+  function rebuildMethodSection() {
+    const sections = Array.from(document.querySelectorAll(".portal-section"));
+    const section = sections.find((item) => {
+      const title = item.querySelector(".portal-section-title h2");
+      return /Phương pháp công khai hôm nay|MB_ALL chạy đủ 31 phương pháp/.test(String(title?.textContent || ""));
+    });
+    if (!section) return;
+
+    const title = section.querySelector(".portal-section-title h2");
+    const description = section.querySelector(".portal-section-title p");
+    if (title) title.textContent = "MB_ALL chạy đủ 31 phương pháp mỗi ngày";
+    if (description) {
+      description.textContent = "Không dùng một phương pháp cố định. Toàn bộ 31 phương pháp được chạy bằng dữ liệu đến T−1, sau đó mới đánh giá trạng thái và chấm điểm từng số.";
+    }
+
+    const grid = section.querySelector(".portal-methods");
+    if (grid && grid.dataset.mball31Process !== "true") {
+      grid.dataset.mball31Process = "true";
+      grid.classList.add("mball31-process");
+      grid.innerHTML = `
+        <article class="portal-method"><div class="portal-method-head"><b>1. Chạy đủ 31/31</b><span>T−1</span></div><p>Mỗi phương pháp chỉ được dùng dữ liệu đã hoàn tất đến ngày liền trước.</p></article>
+        <article class="portal-method"><div class="portal-method-head"><b>2. Đánh giá hiệu quả gần</b><span>3–5–7–10</span></div><p>Đối chiếu chuỗi thắng/thua, P/L, số nháy, ROI và độ ổn định gần.</p></article>
+        <article class="portal-method"><div class="portal-method-head"><b>3. Chấm HOT/COLD</b><span>THEO SỐ</span></div><p>Tín hiệu tốt cộng điểm, tín hiệu xấu trừ điểm; không chọn theo cảm tính.</p></article>
+        <article class="portal-method"><div class="portal-method-head"><b>4. Chọn động và khóa</b><span>PRE-DRAW</span></div><p>Số lượng số thay đổi theo điểm thực tế và được khóa trước giờ quay.</p></article>
+      `;
+    }
+
+    const disclaimer = section.querySelector(".portal-disclaimer");
+    if (disclaimer) {
+      disclaimer.textContent = "Đầu ra từng phương pháp và số cuối cùng không công khai trước thanh toán. Kết quả ngày T không được dùng để sửa lựa chọn ngày T.";
+    }
+  }
+
+  function rewriteCommerceProof() {
+    const block = document.querySelector(".lm-ai-commerce-proof");
+    if (!block) return;
+    setText(".lm-ai-commerce-proof h3", "Báo cáo MB_ALL gồm gì?");
+    const lead = block.querySelector(":scope > p:not(.lm-ai-history-note)");
+    if (lead) lead.textContent = "Một báo cáo riêng cho ngày hiện tại, được tạo sau khi khóa dữ liệu T−1 và chạy đủ 31 phương pháp.";
+
+    const cards = Array.from(block.querySelectorAll(".lm-ai-commerce-grid > div"));
+    const values = [
+      ["31 phương pháp độc lập", "Không phụ thuộc vào một công thức duy nhất; toàn bộ hệ thống được chạy trước khi kết luận."],
+      ["Chọn lọc động theo ngày", "Đánh giá phong độ gần, P/L và trạng thái HOT/COLD rồi chấm trực tiếp từng số."],
+      ["Khóa trước giờ quay", "Kết luận chỉ mở sau xác nhận thanh toán và không sửa theo kết quả ngày hiện tại."]
+    ];
+    cards.slice(0, values.length).forEach((card, index) => {
+      const bold = card.querySelector("b");
+      const span = card.querySelector("span");
+      if (bold) bold.textContent = values[index][0];
+      if (span) span.textContent = values[index][1];
+    });
+
+    block.querySelectorAll(".lm-ai-history-note").forEach((node) => node.remove());
+    const link = block.querySelector(".lm-ai-secondary-link");
+    if (link) {
+      link.textContent = "Xem nguyên tắc vận hành MB_ALL →";
+      link.setAttribute("href", "/gioi-thieu/");
+    }
+  }
+
+  function rewriteCheckout() {
+    replaceText(document.querySelector("#checkout"), [
+      ["Đang tải kết luận 4SO", "Đang tải kết luận MB_ALL"],
+      ["kết luận 4SO", "kết luận MB_ALL"],
+      ["Kết luận 4SO", "Kết luận MB_ALL"],
+      ["4SO ngày", "MB_ALL ngày"],
+      ["2 cặp 4SO · 4 đầu ra xếp hạng · Top 3 và hồ sơ nguồn", "Kết luận MB_ALL đã khóa · số chọn cuối cùng · dữ liệu T−1"],
+      ["4 số được chia thành 2 cặp theo thứ tự xếp hạng.", "Kết luận MB_ALL chỉ mở sau khi giao dịch được xác nhận."]
+    ]);
+  }
+
+  function applyHomeCopy() {
+    if (!document.body || !isHomepage()) return;
+
+    removeLegacyRateBlocks();
     document.title = HOME_TITLE;
     setMeta('meta[name="description"]', HOME_DESCRIPTION);
     setMeta('meta[property="og:title"]', HOME_TITLE);
@@ -163,8 +254,8 @@ try {
     const lockDate = String(document.body.dataset.lockDate || "T−1");
 
     setText(".hero .eyebrow", `MB_ALL · 31 PHƯƠNG PHÁP · NGÀY ${reportDate}`);
-    const heading = document.querySelector(".hero h1");
-    if (heading) heading.innerHTML = "MB_ALL với 31 phương pháp<br><em>chọn lọc động mỗi ngày</em>";
+    const simpleHeading = document.querySelector(".hero h1");
+    if (simpleHeading) simpleHeading.innerHTML = "MB_ALL với 31 phương pháp<br><em>chọn lọc động mỗi ngày</em>";
     setText(
       ".hero-lead",
       "MB_ALL không dùng một công thức cố định. Mỗi ngày hệ thống chạy đủ 31 phương pháp bằng dữ liệu đến hết ngày T−1, đánh giá hiệu quả gần theo 3–5–7–10 ngày cùng P/L, số nháy và trạng thái HOT/COLD, rồi chấm điểm từng số để tạo lựa chọn động."
@@ -175,6 +266,18 @@ try {
     );
     setText(".simple-hero-offer small", "BÁO CÁO MB_ALL HÔM NAY");
     setText(".simple-hero-offer span", "31 phương pháp · Chấm HOT/COLD · Chọn số động theo ngày");
+
+    setText(".portal-kicker", "MB_ALL · 31 PHƯƠNG PHÁP");
+    const portalHeading = document.querySelector(".portal-hero h1");
+    if (portalHeading) portalHeading.innerHTML = "MB_ALL – 31 phương pháp<br>chọn lọc động mỗi ngày";
+    setText(
+      ".portal-lead",
+      "Mỗi ngày MB_ALL chạy đủ 31 phương pháp bằng dữ liệu đến T−1, đánh giá hiệu quả gần theo 3–5–7–10 ngày, P/L, số nháy và trạng thái HOT/COLD, rồi chấm điểm trực tiếp từng số. Không cố định phương pháp và không cố định số lượng số được chọn."
+    );
+    setText(".portal-paid-card small", "MB_ALL · BÁO CÁO RIÊNG");
+    setText(".portal-paid-card h2", "Kết luận hôm nay đã khóa");
+    setText(".portal-paid-card button", "MỞ KẾT LUẬN MB_ALL – 30.000Đ");
+    setText(".portal-paid-note", "Số cuối cùng chỉ mở sau khi giao dịch được xác nhận.");
 
     const sampleLink = document.querySelector(".sample-link");
     if (sampleLink) {
@@ -192,18 +295,20 @@ try {
     if (headerButton) headerButton.textContent = "Mở báo cáo MB_ALL";
     const heroButton = document.querySelector(".hero [data-open-checkout]");
     if (heroButton) heroButton.textContent = "Mở kết luận hôm nay";
+    const finalButton = document.querySelector(".portal-buy [data-open-checkout]");
+    if (finalButton) finalButton.textContent = "MỞ KẾT LUẬN MB_ALL – 30.000Đ";
 
-    replaceText(document.querySelector("#checkout"), [
-      ["Đang tải kết luận 4SO", "Đang tải kết luận MB_ALL"],
-      ["kết luận 4SO", "kết luận MB_ALL"],
-      ["Kết luận 4SO", "Kết luận MB_ALL"],
-      ["4SO ngày", "MB_ALL ngày"]
-    ]);
+    rebuildMethodSection();
+    rewriteCommerceProof();
+    rewriteCheckout();
+
     replaceText(document.body, [
       ["7 lớp báo cáo", "31 phương pháp MB_ALL"],
       ["7 lớp phân tích", "31 phương pháp MB_ALL"],
       ["phân tích qua 7 lớp", "chạy qua 31 phương pháp"],
-      ["Xem mẫu 4SO", "Cách MB_ALL hoạt động"]
+      ["Xem mẫu 4SO", "Cách MB_ALL hoạt động"],
+      ["BẢN PHÂN TÍCH AI", "BÁO CÁO MB_ALL"],
+      ["MỞ BẢN PHÂN TÍCH AI", "MỞ BÁO CÁO MB_ALL"]
     ]);
 
     rewriteJsonLd();
@@ -284,7 +389,7 @@ try {
   function relabelPublicMethods() {
     for (const node of document.querySelectorAll("h1,h2,h3,p,span")) {
       if (String(node.textContent || "").trim() === "Phương pháp công khai hôm nay") {
-        node.textContent = "Phương pháp công khai theo dữ liệu T−1";
+        node.textContent = "MB_ALL chạy đủ 31 phương pháp mỗi ngày";
       }
     }
   }

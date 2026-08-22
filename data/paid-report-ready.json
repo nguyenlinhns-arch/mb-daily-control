@@ -1,12 +1,17 @@
 {
-  "schema_version": "MB_PAID_REPORT_READINESS_V2_MAX2",
-  "report_date": "2026-08-21",
-  "data_lock": "2026-08-20",
-  "status": "PUBLISHED_PASS_PRIVATE",
+  "schema_version": "MB_REPORT_READINESS_V3_MB_ALL_PUBLIC_OPEN",
+  "report_date": "2026-08-22",
+  "data_lock": "2026-08-21",
+  "status": "PUBLISHED_PASS_PUBLIC_OPEN",
   "outcome_known_at_selection": false,
-  "updated_at": "2026-08-21T07:57:00+07:00",
-  "source": "MAX2_Daily_Plan -> private Paid_Report after daily review sync",
-  "production_method": "MAX2_V1_R4268_P0072_HR60",
-  "production_config": "MAX2_PRIMARY_V1_20260819",
-  "note": "Public readiness only. Current Production codes are intentionally excluded."
+  "updated_at": "2026-08-22T10:40:22+07:00",
+  "source": "MB_ALL_METHOD_BACKTEST / PICKS_20260822 / ROUTER_FORWARD_LOG",
+  "production_method": "V5.0_KEP5OF5",
+  "production_config": "V5_0_HOT_COLD_KEP_5OF5",
+  "production_status": "PRE_DRAW_FROZEN_KEP5OF5",
+  "freeze_at": "2026-08-22T00:50:00+07:00",
+  "public_output_open": true,
+  "paid_output_hidden": false,
+  "numbers": ["98", "89"],
+  "note": "MB ALL final numbers for 22/08/2026 are opened publicly. No payment or unlock is required."
 }

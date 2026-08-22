@@ -1,7 +1,7 @@
 // Public endpoint only. Administrative approval secrets must never be stored here.
 window.ORDER_CONFIRMATION_ENDPOINT = "https://script.google.com/macros/s/AKfycbygWuNvfFPiG9rKbW_tXgbo1LKssBhmqfO9JYxQP7BFLz4iamOHiiMnftEdaH6KeRrV/exec";
 
-// Keep the paid report as the primary mobile conversion.
+// Keep the paid MB_ALL report as the primary mobile conversion.
 try {
   sessionStorage.setItem("lm_shopee_nudge_v1", "shown");
 } catch (_) {}
@@ -74,12 +74,14 @@ try {
   }
 })();
 
-// Current homepage model: MB_ALL, 31 methods, dynamic daily selection.
+// Current website model: MB_ALL, 31 methods, dynamic daily selection.
 (() => {
   "use strict";
 
   const HOME_TITLE = "MB_ALL hôm nay – 31 phương pháp chọn lọc động";
-  const HOME_DESCRIPTION = "Báo cáo MB_ALL ngày hôm nay: chạy đủ 31 phương pháp bằng dữ liệu khóa đến T−1, đánh giá phong độ 3/5/7/10 ngày, P/L và trạng thái HOT/COLD để chọn số động trước giờ quay.";
+  const HOME_DESCRIPTION = "Gợi ý số MB_ALL ngày hôm nay: chạy đủ 31 phương pháp bằng dữ liệu khóa đến T−1, đánh giá phong độ 3/5/7/10 ngày, P/L và trạng thái HOT/COLD để chọn số động trước giờ quay.";
+  const ZALO_URL = "https://zalo.me/0398696879";
+  const SUPPORT_ID = "mball-zalo-support";
 
   function isHomepage() {
     return document.body?.classList.contains("landing-simple")
@@ -97,10 +99,159 @@ try {
       #statistics.historical-proof-section,
       .portal-home .portal-proof,
       .portal-home .lm-ai-history-note{display:none!important}
+
       .portal-home .mball31-process{grid-template-columns:repeat(4,minmax(0,1fr))!important}
       .portal-home .mball31-process .portal-method p{margin:0;color:#5f6e79;font-size:12px;line-height:1.5}
-      @media(max-width:900px){.portal-home .mball31-process{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-      @media(max-width:620px){.portal-home .mball31-process{grid-template-columns:1fr!important}}
+
+      [data-mball-payment-card="true"]{
+        position:relative!important;
+        overflow:hidden!important;
+        box-sizing:border-box!important;
+        border-color:#edc5c7!important;
+        background:linear-gradient(145deg,#fff 0%,#fff7f7 100%)!important;
+        box-shadow:0 4px 16px rgba(130,20,27,.06)!important;
+      }
+      [data-mball-payment-card="true"]::before{
+        content:"";
+        position:absolute;
+        inset:0 0 auto 0;
+        height:4px;
+        background:linear-gradient(90deg,#a20e15,#d31b22);
+      }
+      .mball-offer-kicker{
+        display:inline-flex;
+        align-items:center;
+        min-height:25px;
+        padding:0 9px;
+        border-radius:999px;
+        background:#fae8e9;
+        color:#a20e15;
+        font-size:9.5px;
+        font-weight:1000;
+        letter-spacing:.07em;
+      }
+      .mball-offer-title{
+        margin:10px 0 6px!important;
+        color:#172432!important;
+        font-size:22px!important;
+        line-height:1.18!important;
+      }
+      .mball-offer-price{
+        display:flex;
+        align-items:baseline;
+        gap:4px;
+        margin:5px 0 10px;
+        color:#b11118;
+      }
+      .mball-offer-price strong{
+        font-size:31px;
+        line-height:1;
+        letter-spacing:-.035em;
+      }
+      .mball-offer-price span{
+        font-size:13px;
+        font-weight:900;
+      }
+      .mball-offer-copy,
+      .mball-offer-email{
+        margin:0 0 9px!important;
+        color:#596875!important;
+        font-size:12px!important;
+        line-height:1.48!important;
+      }
+      .mball-offer-email{
+        display:flex;
+        gap:7px;
+        align-items:flex-start;
+        padding:9px 10px;
+        border:1px solid #ead9da;
+        border-radius:10px;
+        background:#fff;
+        color:#5e4b4d!important;
+      }
+      .mball-offer-email b{flex:0 0 auto;color:#a20e15}
+      .mball-footer-pay-button{
+        width:100%;
+        min-height:47px;
+        margin-top:2px;
+        padding:11px 13px;
+        border:0;
+        border-radius:11px;
+        background:linear-gradient(135deg,#981018,#c71921);
+        color:#fff;
+        font:inherit;
+        font-size:11.5px;
+        font-weight:1000;
+        letter-spacing:.025em;
+        cursor:pointer;
+        box-shadow:0 8px 20px rgba(151,16,24,.19);
+      }
+      .mball-footer-pay-button:hover{filter:brightness(1.05)}
+      .mball-footer-pay-button:focus-visible{outline:3px solid rgba(196,25,33,.25);outline-offset:3px}
+
+      #${SUPPORT_ID}{
+        position:fixed!important;
+        right:20px!important;
+        bottom:22px!important;
+        z-index:2147483000!important;
+        width:76px!important;
+        height:76px!important;
+        box-sizing:border-box!important;
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:center!important;
+        gap:1px!important;
+        padding:0!important;
+        border:4px solid #fff!important;
+        border-radius:50%!important;
+        background:linear-gradient(145deg,#1780ff,#0068ff)!important;
+        color:#fff!important;
+        text-decoration:none!important;
+        text-align:center!important;
+        font-size:12px!important;
+        font-weight:1000!important;
+        line-height:1.05!important;
+        box-shadow:0 12px 28px rgba(0,74,190,.32)!important;
+        visibility:visible!important;
+        opacity:1!important;
+        transform:none;
+        transition:transform .16s ease,box-shadow .16s ease!important;
+      }
+      #${SUPPORT_ID}::before{
+        content:"Zalo";
+        display:block;
+        font-size:13px;
+        font-weight:1000;
+      }
+      #${SUPPORT_ID}:hover{
+        transform:translateY(-2px)!important;
+        box-shadow:0 15px 34px rgba(0,74,190,.4)!important;
+      }
+      #${SUPPORT_ID}:focus-visible{outline:4px solid rgba(0,104,255,.25);outline-offset:3px}
+
+      @media(max-width:900px){
+        .portal-home .mball31-process{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+      }
+      @media(max-width:700px){
+        #${SUPPORT_ID}{
+          right:12px!important;
+          bottom:72px!important;
+          width:66px!important;
+          height:66px!important;
+          border-width:3px!important;
+          font-size:10.5px!important;
+        }
+        #${SUPPORT_ID}::before{font-size:12px}
+        .mball-offer-title{font-size:20px!important}
+        .mball-offer-price strong{font-size:28px}
+      }
+      @media(max-width:620px){
+        .portal-home .mball31-process{grid-template-columns:1fr!important}
+      }
+      @media(prefers-reduced-motion:reduce){
+        #${SUPPORT_ID}{transition:none!important}
+      }
     `;
     document.head.appendChild(style);
   }
@@ -118,6 +269,10 @@ try {
   function setMeta(selector, value) {
     const node = document.querySelector(selector);
     if (node && node.getAttribute("content") !== value) node.setAttribute("content", value);
+  }
+
+  function normalized(value) {
+    return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
   }
 
   function replaceText(root, replacements) {
@@ -180,15 +335,15 @@ try {
     const block = document.querySelector(".lm-ai-commerce-proof");
     if (!block) return;
 
-    setText("h3", "Báo cáo MB_ALL gồm gì?", block);
+    setText("h3", "Gợi ý số MB_ALL gồm gì?", block);
     const lead = block.querySelector(":scope > p:not(.lm-ai-history-note)");
-    const leadCopy = "Một báo cáo riêng cho ngày hiện tại, được tạo sau khi khóa dữ liệu T−1 và chạy đủ 31 phương pháp.";
+    const leadCopy = "Một gợi ý số riêng cho ngày hiện tại, được tạo sau khi khóa dữ liệu T−1 và chạy đủ 31 phương pháp.";
     if (lead && lead.textContent !== leadCopy) lead.textContent = leadCopy;
 
     const values = [
       ["31 phương pháp độc lập", "Không phụ thuộc vào một công thức duy nhất; toàn bộ hệ thống được chạy trước khi kết luận."],
       ["Chọn lọc động theo ngày", "Đánh giá phong độ gần, P/L và trạng thái HOT/COLD rồi chấm trực tiếp từng số."],
-      ["Khóa trước giờ quay", "Kết luận chỉ mở sau xác nhận thanh toán và không sửa theo kết quả ngày hiện tại."]
+      ["Khóa trước giờ quay", "Gợi ý số chỉ mở sau xác nhận thanh toán và không sửa theo kết quả ngày hiện tại."]
     ];
     Array.from(block.querySelectorAll(".lm-ai-commerce-grid > div")).slice(0, values.length).forEach((card, index) => {
       setText("b", values[index][0], card);
@@ -203,22 +358,134 @@ try {
     }
   }
 
+  function findAdvertisingCard() {
+    const heading = Array.from(document.querySelectorAll("h2,h3,h4,strong,b,p,span"))
+      .find((node) => normalized(node.textContent).includes("đặt banner quảng cáo"));
+    if (!heading) return null;
+
+    let current = heading.parentElement;
+    for (let depth = 0; current && depth < 7; depth += 1, current = current.parentElement) {
+      const classes = String(current.className || "");
+      if (/(^|\s|[-_])(card|box|support|advert|contact)(\s|[-_]|$)/i.test(classes)) return current;
+    }
+    return heading.closest("article") || heading.parentElement;
+  }
+
+  function openCheckoutFromNewButton(button) {
+    const existing = Array.from(document.querySelectorAll("[data-open-checkout]"))
+      .find((node) => node !== button && !node.disabled);
+    if (existing) {
+      existing.click();
+      return;
+    }
+
+    const checkout = document.getElementById("checkout");
+    if (checkout) {
+      checkout.hidden = false;
+      document.body.classList.add("modal-open", "checkout-open");
+      document.getElementById("checkout-close")?.focus();
+      return;
+    }
+    window.location.assign("/?checkout=1");
+  }
+
+  function rewriteAdvertisingCard() {
+    const card = findAdvertisingCard();
+    if (!card || card.dataset.mballPaymentCard === "true") return;
+
+    card.dataset.mballPaymentCard = "true";
+    card.innerHTML = `
+      <span class="mball-offer-kicker">GỢI Ý SỐ MB_ALL</span>
+      <h3 class="mball-offer-title">Thanh toán nhận gợi ý số</h3>
+      <div class="mball-offer-price"><strong>30.000đ</strong><span>/ ngày</span></div>
+      <p class="mball-offer-copy">Thanh toán một lần để nhận gợi ý số đã khóa cho đúng ngày hiện tại.</p>
+      <p class="mball-offer-email"><b>✉</b><span>Sau khi chuyển khoản, bấm gửi xác nhận. Hệ thống gửi email để chủ dịch vụ kiểm tra giao dịch và mở gợi ý số.</span></p>
+      <button class="mball-footer-pay-button" type="button" data-mball-footer-checkout>THANH TOÁN NHẬN GỢI Ý SỐ</button>
+    `;
+
+    const button = card.querySelector("[data-mball-footer-checkout]");
+    button?.addEventListener("click", () => {
+      try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "mball_footer_checkout_click",
+          value: 30000,
+          currency: "VND",
+          product: "daily_number_suggestion"
+        });
+      } catch (_) {}
+      openCheckoutFromNewButton(button);
+    });
+  }
+
+  function ensureZaloSupport() {
+    let support = document.getElementById(SUPPORT_ID);
+    const legacy = document.querySelector("#floating-zalo,.floating-zalo");
+
+    if (!support && legacy) support = legacy;
+    if (!support) {
+      support = document.createElement("a");
+      document.body.appendChild(support);
+    }
+
+    support.id = SUPPORT_ID;
+    support.className = "mball-zalo-support-button";
+    support.href = ZALO_URL;
+    support.target = "_blank";
+    support.rel = "noopener noreferrer";
+    support.setAttribute("aria-label", "Hỗ trợ qua Zalo 0398696879");
+    if (support.textContent !== "Hỗ trợ") support.textContent = "Hỗ trợ";
+
+    if (support.dataset.mballZaloBound !== "true") {
+      support.dataset.mballZaloBound = "true";
+      support.addEventListener("click", () => {
+        try {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: "generate_lead",
+            method: "zalo_support",
+            phone: "0398696879"
+          });
+        } catch (_) {}
+      });
+    }
+  }
+
   function rewriteCheckoutText() {
     replaceText(document.querySelector("#checkout"), [
-      ["2 cặp 4SO · 4 đầu ra xếp hạng · Top 3 và hồ sơ nguồn", "Kết luận MB_ALL đã khóa · số chọn cuối cùng · dữ liệu T−1"],
-      ["4 số được chia thành 2 cặp theo thứ tự xếp hạng.", "Kết luận MB_ALL chỉ mở sau khi giao dịch được xác nhận."],
-      ["Đang tải kết luận 4SO", "Đang tải kết luận MB_ALL"],
-      ["Kết luận 4SO", "Kết luận MB_ALL"],
-      ["kết luận 4SO", "kết luận MB_ALL"],
-      ["Bản phân tích AI", "Báo cáo MB_ALL"],
-      ["bản phân tích AI", "báo cáo MB_ALL"],
+      ["2 cặp 4SO · 4 đầu ra xếp hạng · Top 3 và hồ sơ nguồn", "Gợi ý số MB_ALL đã khóa · dữ liệu T−1"],
+      ["4 số được chia thành 2 cặp theo thứ tự xếp hạng.", "Gợi ý số MB_ALL chỉ mở sau khi giao dịch được xác nhận."],
+      ["Đang tải kết luận 4SO", "Đang tải gợi ý số MB_ALL"],
+      ["Kết luận 4SO", "Gợi ý số MB_ALL"],
+      ["kết luận 4SO", "gợi ý số MB_ALL"],
+      ["Bản phân tích AI", "Gợi ý số MB_ALL"],
+      ["bản phân tích AI", "gợi ý số MB_ALL"],
+      ["Báo cáo dữ liệu AI", "Gợi ý số MB_ALL"],
       ["4SO ngày", "MB_ALL ngày"]
     ]);
+
+    const instruction = document.querySelector(".zalo-instruction");
+    const instructionCopy = "Sau khi chuyển khoản, bấm nút dưới đây. Hệ thống gửi email xác nhận để chủ dịch vụ kiểm tra giao dịch và mở gợi ý số.";
+    if (instruction && instruction.textContent !== instructionCopy) instruction.textContent = instructionCopy;
+
+    const confirm = document.getElementById("payment-self-confirm");
+    if (confirm && !confirm.disabled && confirm.textContent !== "TÔI ĐÃ CHUYỂN KHOẢN – GỬI EMAIL XÁC NHẬN") {
+      confirm.textContent = "TÔI ĐÃ CHUYỂN KHOẢN – GỬI EMAIL XÁC NHẬN";
+    }
+
+    const pendingTitle = document.getElementById("pending-title");
+    const pendingCopy = document.getElementById("pending-copy");
+    if (pendingTitle && /đã gửi|đối soát/i.test(pendingTitle.textContent || "")) {
+      pendingTitle.textContent = "Đã gửi email xác nhận thanh toán";
+    }
+    if (pendingCopy && /chờ|quay lại|tải lại|xác nhận/i.test(pendingCopy.textContent || "")) {
+      pendingCopy.textContent = "Chủ dịch vụ sẽ kiểm tra giao dịch qua email; gợi ý số tự mở sau khi được xác nhận.";
+    }
   }
 
   function rewriteJsonLd() {
     const replacements = [
-      ["Báo cáo dữ liệu AI ngày hôm nay", "Báo cáo MB_ALL ngày hôm nay"],
+      ["Báo cáo dữ liệu AI ngày hôm nay", "Gợi ý số MB_ALL ngày hôm nay"],
       ["bảy phương pháp phân tích", "31 phương pháp độc lập"],
       ["7 lớp báo cáo", "31 phương pháp MB_ALL"],
       ["7 lớp phân tích", "31 phương pháp MB_ALL"],
@@ -234,9 +501,8 @@ try {
     }
   }
 
-  function applyHomeCopy() {
-    if (!document.body || !isHomepage()) return;
-    ensureStyle();
+  function applyHomepageCopy() {
+    if (!isHomepage()) return;
     removeLegacyProof();
 
     document.title = HOME_TITLE;
@@ -257,9 +523,9 @@ try {
     );
     setText(
       ".hero-proof-text",
-      `Báo cáo cho ngày ${reportDate}. Dữ liệu khóa đến ${lockDate}; kết luận được khóa trước giờ quay và không sửa theo kết quả ngày hiện tại.`
+      `Gợi ý cho ngày ${reportDate}. Dữ liệu khóa đến ${lockDate}; số được khóa trước giờ quay và không sửa theo kết quả ngày hiện tại.`
     );
-    setText(".simple-hero-offer small", "BÁO CÁO MB_ALL HÔM NAY");
+    setText(".simple-hero-offer small", "GỢI Ý SỐ MB_ALL HÔM NAY");
     setText(".simple-hero-offer span", "31 phương pháp · Chấm HOT/COLD · Chọn số động theo ngày");
 
     setText(".portal-kicker", "MB_ALL · 31 PHƯƠNG PHÁP");
@@ -268,10 +534,10 @@ try {
       ".portal-lead",
       "Mỗi ngày MB_ALL chạy đủ 31 phương pháp bằng dữ liệu đến T−1, đánh giá hiệu quả gần theo 3–5–7–10 ngày, P/L, số nháy và trạng thái HOT/COLD, rồi chấm điểm trực tiếp từng số. Không cố định phương pháp và không cố định số lượng số được chọn."
     );
-    setText(".portal-paid-card small", "MB_ALL · BÁO CÁO RIÊNG");
-    setText(".portal-paid-card h2", "Kết luận hôm nay đã khóa");
-    setText(".portal-paid-card button", "MỞ KẾT LUẬN MB_ALL – 30.000Đ");
-    setText(".portal-paid-note", "Số cuối cùng chỉ mở sau khi giao dịch được xác nhận.");
+    setText(".portal-paid-card small", "GỢI Ý SỐ MB_ALL");
+    setText(".portal-paid-card h2", "Gợi ý hôm nay đã khóa");
+    setText(".portal-paid-card button", "MỞ GỢI Ý SỐ · 30.000Đ");
+    setText(".portal-paid-note", "Gợi ý số cuối cùng chỉ mở sau khi giao dịch được xác nhận qua email.");
 
     const sampleLink = document.querySelector(".sample-link");
     if (sampleLink) {
@@ -279,19 +545,19 @@ try {
       if (sampleLink.getAttribute("href") !== "/gioi-thieu/") sampleLink.setAttribute("href", "/gioi-thieu/");
     }
 
-    setText(".buy-simple .eyebrow", "MỞ KẾT LUẬN MB_ALL HÔM NAY");
+    setText(".buy-simple .eyebrow", "THANH TOÁN NHẬN GỢI Ý SỐ");
     setText(
       ".buy-copy",
-      "Trang công khai giới thiệu nguyên tắc vận hành. Bản trả phí mở kết luận MB_ALL đã khóa cho ngày hôm nay, được tạo sau khi chạy đủ 31 phương pháp và chọn lọc tín hiệu theo trạng thái hiệu quả gần."
+      "Thanh toán 30.000đ cho một ngày để mở gợi ý số MB_ALL đã khóa. Sau khi chuyển khoản, hệ thống gửi email để chủ dịch vụ kiểm tra và xác nhận giao dịch."
     );
-    setText(".site-header [data-open-checkout]", "Mở báo cáo MB_ALL");
-    setText(".hero [data-open-checkout]", "Mở kết luận hôm nay");
-    setText(".portal-buy [data-open-checkout]", "MỞ KẾT LUẬN MB_ALL – 30.000Đ");
-    setText(".lm-ai-sticky", "MỞ BÁO CÁO MB_ALL · 30.000Đ");
+    setText(".site-header [data-open-checkout]", "Nhận gợi ý số");
+    setText(".hero [data-open-checkout]", "Nhận gợi ý số hôm nay");
+    setText(".portal-buy [data-open-checkout]", "THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ");
+    setText(".lm-ai-sticky", "NHẬN GỢI Ý SỐ · 30.000Đ");
 
     rebuildMethodSection();
     rewriteCommerceProof();
-    rewriteCheckoutText();
+    rewriteAdvertisingCard();
     rewriteJsonLd();
 
     replaceText(document.body, [
@@ -304,11 +570,19 @@ try {
     document.body.dataset.mballModel = "31-method-dynamic-selection";
   }
 
+  function refresh() {
+    ensureStyle();
+    ensureZaloSupport();
+    rewriteCheckoutText();
+    applyHomepageCopy();
+  }
+
   const start = () => {
-    applyHomeCopy();
-    window.setTimeout(applyHomeCopy, 250);
-    window.setTimeout(applyHomeCopy, 900);
-    window.setTimeout(applyHomeCopy, 1800);
+    refresh();
+    window.setTimeout(refresh, 250);
+    window.setTimeout(refresh, 900);
+    window.setTimeout(refresh, 1800);
+    window.setTimeout(refresh, 3200);
 
     document.addEventListener("click", (event) => {
       const target = event.target instanceof Element ? event.target : null;
@@ -330,7 +604,7 @@ try {
 
 // Paid-delivery compatibility layer.
 // Paid_Report can write the same two-number MB_ALL result into both legacy
-// slots. Only after approval do we collapse that duplicate payload.
+// slots. Only after owner approval do we collapse that duplicate payload.
 (() => {
   "use strict";
 
@@ -353,16 +627,16 @@ try {
       if (first.length === 2 && second.length === 2 && first.join("|") === second.join("|")) {
         cards[1].remove();
         const rank = cards[0].querySelector(".delivery-pair-rank, .delivery-rank, [data-delivery-rank]");
-        if (rank && rank.textContent !== "SỐ CHỌN MB ALL") rank.textContent = "SỐ CHỌN MB ALL";
+        if (rank && rank.textContent !== "GỢI Ý SỐ MB ALL") rank.textContent = "GỢI Ý SỐ MB ALL";
         const pairWrap = view.querySelector("#delivery-pairs, [data-delivery-pairs]");
-        if (pairWrap) pairWrap.setAttribute("aria-label", `Số MB ALL: ${first.join(", ")}`);
+        if (pairWrap) pairWrap.setAttribute("aria-label", `Gợi ý số MB ALL: ${first.join(", ")}`);
         view.dataset.mballCollapsed = "true";
       }
     }
 
     const reportDate = String(document.body?.dataset?.reportDate || "").trim();
     const title = view.querySelector("#delivery-title, h2, h3, [data-delivery-title]");
-    const wantedTitle = reportDate ? `Số MB ALL ngày ${reportDate}` : "Số MB ALL hôm nay";
+    const wantedTitle = reportDate ? `Gợi ý số MB ALL ngày ${reportDate}` : "Gợi ý số MB ALL hôm nay";
     if (title && title.textContent !== wantedTitle) title.textContent = wantedTitle;
   }
 

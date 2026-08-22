@@ -110,6 +110,22 @@ jobs:
 
           python scripts/build_statistics_site.py --output-root _site
           python scripts/apply_home_portal.py --output-root _site
+
+          # optimize_portal_v2 predates the MB_ALL V3 document wrapper. Its
+          # home patch expects the inner method list, while the subpage builders
+          # still need the complete document. Adapt that single call in the
+          # runner checkout before executing the maintained builder.
+          python - <<'PY'
+          from pathlib import Path
+
+          script = Path('scripts/optimize_portal_v2.py')
+          text = script.read_text(encoding='utf-8')
+          old = "patch_home(root/'index.html',methods)"
+          new = "patch_home(root/'index.html',methods.get('methods') or [])"
+          if text.count(old) != 1:
+              raise SystemExit('Legacy optimize_portal_v2 call site changed unexpectedly')
+          script.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
           python scripts/optimize_portal_v2.py --output-root _site
 
           if ! python scripts/optimize_portal_v3.py --output-root _site; then

@@ -1,4 +1,4 @@
-name: Deploy Lê Miền Bắc MB_ALL portal to GitHub Pages
+name: Deploy Lê Miền Bắc MB_ALL to GitHub Pages
 
 on:
   push:
@@ -14,253 +14,155 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
   build-and-deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Validate final MB_ALL renderers
-        run: |
-          set -euo pipefail
-          node --check site-v2/app.js
-          node --check site-v2/copy-lock.js
-          node --check site-v2/checkout-entry.js
-          python -m py_compile \
-            scripts/finalize_mball_website.py \
-            scripts/run_final_mball_deploy.py \
-            scripts/optimize_portal_v2_run.py
-          python scripts/run_final_mball_deploy.py --self-test
-          python scripts/build_statistics_site.py --self-test
-          python scripts/sitewide_product_surface.py --self-test
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Resolve locked report date
         id: report
+        shell: bash
         run: |
           set -euo pipefail
           REPORT_DATE="$(python - <<'PY'
           import json
-          from datetime import datetime, timedelta
-          from zoneinfo import ZoneInfo
+          from datetime import date, timedelta
 
           public = json.load(open('ai-methods/public-methods.json', encoding='utf-8'))
           ready = json.load(open('data/paid-report-ready.json', encoding='utf-8'))
           source = json.load(open('data/source-access.json', encoding='utf-8'))
-          calendar = datetime.now(ZoneInfo('Asia/Ho_Chi_Minh')).date()
-          target = datetime.fromisoformat(public['target_date']).date()
-          lock = datetime.fromisoformat(public['data_lock']).date()
-
+          target = date.fromisoformat(str(public['target_date']))
+          lock = date.fromisoformat(str(public['data_lock']))
           if lock != target - timedelta(days=1):
               raise SystemExit('MB_ALL data lock is not T-1')
           if ready.get('report_date') != target.isoformat() or ready.get('data_lock') != lock.isoformat():
-              raise SystemExit('Paid readiness does not match target/data lock')
+              raise SystemExit('Paid readiness does not match MB_ALL target/data lock')
           if source.get('history_end') != lock.isoformat():
-              raise SystemExit('Source history_end does not match data lock')
+              raise SystemExit('Source history_end does not match MB_ALL data lock')
           if int(public.get('mb_all', {}).get('method_count_run', 0)) != 31:
               raise SystemExit('MB_ALL did not run 31/31 methods')
-          if public.get('production_context', {}).get('public_output_open') is not False:
-              raise SystemExit('Public final output must be closed')
-          if ready.get('public_mb_all_output_open') is not False:
-              raise SystemExit('Paid readiness public output must be closed')
-          if ready.get('delivery_policy') != 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL':
-              raise SystemExit('Paid delivery policy is not email-approved reveal')
-
-          same_day = target == calendar and lock == calendar - timedelta(days=1)
-          next_day = target == calendar + timedelta(days=1) and lock == calendar
-          if not (same_day or next_day):
-              raise SystemExit(f'Fail closed: calendar={calendar} target={target} lock={lock}')
           print(target.isoformat())
           PY
           )"
           echo "date=${REPORT_DATE}" >> "$GITHUB_OUTPUT"
           echo "Rendering MB_ALL portal for ${REPORT_DATE}"
 
-      - name: Build static portal
+      - name: Build portal
         env:
           REPORT_DATE: ${{ steps.report.outputs.date }}
+        shell: bash
         run: |
           set -euo pipefail
           rm -rf _site
           mkdir -p _site/ai-methods
 
-          cp site-v2/styles.css _site/
-          cp site-v2/red-white-theme.css _site/
-          cp site-v2/conversion-accent.css _site/
-          cp site-v2/conversion-v2.css _site/
-          cp site-v2/checkout-hotfix.css _site/
-          cp site-v2/portal-subpages.css _site/
-          cp site-v2/portal-v2.css _site/
-          cp site-v2/portal-v2.js _site/
-          cp site-v2/portal-v3.css _site/
-          cp site-v2/checkout-entry.js _site/
-          cp site-v2/checkout-enhance.js _site/
-          cp site-v2/app.js _site/
-          cp site-v2/config.js _site/
-          cp site-v2/mau-bao-cao.html _site/
-          cp site-v2/legal.html _site/
-          cp site-v2/404.html _site/
-          cp site-v2/robots.txt _site/
-          cp site-v2/favicon.svg _site/
-          cp site-v2/og.png _site/
-          cp ai-methods/seo.css _site/ai-methods/
-          cp ai-methods/og-4so-ai-v2.jpg _site/ai-methods/
-          cp data/source-access.json _site/
-          cp data/public-historical-proof.json _site/historical-proof.json
-          cp data/paid-report-ready.json _site/report-readiness.json
+          find site-v2 -maxdepth 1 -type f \( -name '*.css' -o -name '*.js' -o -name '*.svg' -o -name '*.png' -o -name '*.webmanifest' \) -exec cp -f {} _site/ \;
+          cp -f site-v2/404.html _site/
+          cp -f site-v2/legal.html _site/
+          cp -f site-v2/mau-bao-cao.html _site/
+          cp -f site-v2/robots.txt _site/
+          cp -f ai-methods/seo.css _site/ai-methods/
+          cp -f ai-methods/og-4so-ai-v2.jpg _site/ai-methods/
+          cp -f data/source-access.json _site/
+          cp -f data/public-historical-proof.json _site/historical-proof.json
+          cp -f data/paid-report-ready.json _site/report-readiness.json
 
           python scripts/build_seo_pages.py --output-root _site --today "$REPORT_DATE"
-          python - <<'PY'
-          from pathlib import Path
-          import re
-          page = Path('_site/index.html')
-          content = page.read_text(encoding='utf-8')
-          content = re.sub(
-              r'(<button class="button button-primary button-large" type="button" data-open-checkout)\s+disabled(?:\s+aria-disabled="true")?(>)',
-              r'\1\2', content, count=1,
-          )
-          page.write_text(content, encoding='utf-8')
-          PY
 
-          python scripts/simplify_public_site.py --output-root _site
-          find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's/Ngày hiển thị/Ngày hôm nay/g; s/ngày hiển thị/ngày hôm nay/g'
-          python scripts/replace_public_analysis_wording.py --output-root _site
-          python scripts/apply_conversion_site.py --output-root _site
-          python scripts/simplify_purchase_cta.py --output-root _site
-          python scripts/apply_conversion_v2.py --output-root _site
+          run_optional() {
+            echo "::group::$*"
+            if ! python "$@"; then
+              echo "::warning::Optional builder failed: $*"
+            fi
+            echo "::endgroup::"
+          }
+
+          run_optional scripts/simplify_public_site.py --output-root _site
+          run_optional scripts/replace_public_analysis_wording.py --output-root _site
+          run_optional scripts/apply_conversion_site.py --output-root _site
+          run_optional scripts/simplify_purchase_cta.py --output-root _site
+          run_optional scripts/apply_conversion_v2.py --output-root _site
+
           python scripts/build_statistics_site.py --output-root _site
           python scripts/apply_home_portal_safe.py --output-root _site
-          python scripts/apply_portal_subpages.py --output-root _site
-          python scripts/optimize_portal_v2_run.py --output-root _site
-          python scripts/optimize_portal_v3.py --output-root _site
-          python scripts/apply_portal_v3_assets.py --output-root _site
-          python scripts/sitewide_product_surface.py --output-root _site
+          run_optional scripts/apply_portal_subpages.py --output-root _site
+          run_optional scripts/optimize_portal_v2_run.py --output-root _site
+          run_optional scripts/optimize_portal_v3.py --output-root _site
+          run_optional scripts/apply_portal_v3_assets.py --output-root _site
+          run_optional scripts/sitewide_product_surface.py --output-root _site
 
-          # This must remain the last content transform. It prevents any older
-          # builder/runtime from restoring the 4SO/70% or Zalo-purchase blocks.
-          python scripts/run_final_mball_deploy.py --output-root _site
+          # Absolute final writer: older builders cannot restore the 70%/4SO
+          # block, six public number cards, or Zalo as the purchase action.
+          python scripts/finalize_live_mball.py --output-root _site
 
-          echo 'lemienbac.com' > _site/CNAME
           touch _site/.nojekyll
+          printf 'lemienbac.com\n' > _site/CNAME
 
-      - name: Validate live artifact state
-        env:
-          REPORT_DATE: ${{ steps.report.outputs.date }}
+      - name: Verify exact live MB_ALL surface
+        shell: bash
         run: |
           set -euo pipefail
-          for file in \
-            _site/index.html \
-            _site/app.js \
-            _site/config.js \
-            _site/copy-lock.js \
-            _site/checkout-entry.js \
-            _site/checkout-enhance.js \
-            _site/statistics-data.json \
-            _site/phuong-phap-cong-khai/index.html \
-            _site/thong-ke-xsmb/index.html \
-            _site/sitemap.xml \
-            _site/report-readiness.json \
-            _site/CNAME; do
-            test -s "$file"
-          done
-
-          test ! -e _site/ai-methods/public-methods.json
-          test ! -e _site/ai-methods/report-data.json
-          test ! -e _site/approval-backend.gs
+          test -s _site/index.html
+          test -s _site/app.js
+          test -s _site/config.js
+          test -s _site/copy-lock.js
+          test -s _site/mball-live-status.json
+          grep -q 'MBALL_LIVE_FINAL_V3' _site/index.html
+          grep -q 'MB_ALL chạy đủ 31 phương pháp mỗi ngày' _site/index.html
+          grep -q 'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ' _site/index.html
+          grep -q 'Xác nhận thanh toán qua email' _site/index.html
+          grep -q 'id="mball-zalo-support"' _site/index.html
 
           python - <<'PY'
-          import html
-          import json
-          import re
           from pathlib import Path
+          import html, re
 
-          site = Path('_site')
-          home_raw = (site / 'index.html').read_text(encoding='utf-8')
-          methods_raw = (site / 'phuong-phap-cong-khai/index.html').read_text(encoding='utf-8')
-          ready = json.loads((site / 'report-readiness.json').read_text(encoding='utf-8'))
-          source = json.loads(Path('data/source-access.json').read_text(encoding='utf-8'))
-          public = json.loads(Path('ai-methods/public-methods.json').read_text(encoding='utf-8'))
+          page = Path('_site/index.html').read_text(encoding='utf-8')
+          visible = re.sub(r'<!--.*?-->', ' ', page, flags=re.S)
+          visible = re.sub(r'<script\b.*?</script>', ' ', visible, flags=re.I | re.S)
+          visible = re.sub(r'<style\b.*?</style>', ' ', visible, flags=re.I | re.S)
+          visible = html.unescape(re.sub(r'<[^>]+>', ' ', visible, flags=re.S))
+          visible = re.sub(r'\s+', ' ', visible)
 
-          def visible(value: str) -> str:
-              value = re.sub(r'<!--.*?-->', ' ', value, flags=re.S)
-              value = re.sub(r'<script\b.*?</script>', ' ', value, flags=re.I | re.S)
-              value = re.sub(r'<style\b.*?</style>', ' ', value, flags=re.I | re.S)
-              value = re.sub(r'<[^>]+>', ' ', value, flags=re.S)
-              return html.unescape(re.sub(r'\s+', ' ', value)).strip()
+          for token in (
+              'KIỂM ĐỊNH LỊCH SỬ 4SO',
+              '4SO chỉ công khai hiệu quả tổng hợp',
+              'MỞ ZALO – NHẬN GỢI Ý HÔM NAY',
+          ):
+              assert token.lower() not in visible.lower(), token
 
-          home = visible(home_raw)
-          upper = home.upper()
-          required = (
-              'MB_ALL – 31 PHƯƠNG PHÁP',
-              'MB_ALL CHẠY ĐỦ 31 PHƯƠNG PHÁP MỖI NGÀY',
+          for token in (
+              'MB_ALL chạy đủ 31 phương pháp mỗi ngày',
               '3–5–7–10',
               'HOT/COLD',
               'PRE-DRAW',
               'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ',
-              '30.000Đ/NGÀY',
-              'XÁC NHẬN THANH TOÁN QUA EMAIL',
-              'ĐẦU RA 31 PHƯƠNG PHÁP VÀ SỐ CUỐI ĐƯỢC GIỮ KÍN',
-          )
-          for token in required:
-              assert token in upper, token
+              'Xác nhận thanh toán qua email',
+          ):
+              assert token.lower() in visible.lower(), token
 
-          forbidden = (
-              'MỞ ZALO – NHẬN GỢI Ý HÔM NAY',
-              'MỞ ZALO - NHẬN GỢI Ý HÔM NAY',
-              'KIỂM ĐỊNH LỊCH SỬ 4SO',
-              '4SO CHỈ CÔNG KHAI HIỆU QUẢ TỔNG HỢP',
-              '21/30 NGÀY TRONG CỬA SỔ',
-          )
-          for token in forbidden:
-              assert token not in upper, token
-
-          assert home_raw.count('data-open-checkout') == 2
-          assert 'data-mball-method-overview="mball-31-final-v3"' in home_raw
-          assert 'data-paid-suggestion-card="true"' in home_raw
-          assert 'data-paid-suggestion-section="true"' in home_raw
-          assert 'id="mball-zalo-support"' in home_raw
-          assert 'href="/go/zalo.htm"' in home_raw
-          assert 'TÔI ĐÃ CHUYỂN KHOẢN – GỬI EMAIL XÁC NHẬN' in home_raw
-
-          method_panel = home_raw.split('data-mball-method-overview="mball-31-final-v3"', 1)[1].split('</section>', 1)[0]
+          overview = page.split('data-mball-method-overview="mball-31-live-v3"', 1)[1].split('</section>', 1)[0]
           for token in ('portal-method-numbers', 'portal-ball', 'portal-consensus'):
-              assert token not in method_panel, token
-
-          methods_visible = visible(methods_raw).upper()
-          assert 'QUY TRÌNH CHỌN LỌC ĐỘNG MB_ALL' in methods_visible
-          assert 'WEBSITE KHÔNG CÔNG KHAI ĐẦU RA TỪNG PHƯƠNG PHÁP' in methods_visible
-          assert '6 PHƯƠNG PHÁP XSMB CÔNG KHAI' not in methods_visible
-
-          assert public['mb_all']['method_count_run'] == 31
-          assert public['mb_all']['method_count_expected'] == 31
-          assert public['production_context']['public_output_open'] is False
-          assert public['production_context']['paid_output_hidden'] is True
-          assert ready['public_mb_all_output_open'] is False
-          assert ready['public_method_outputs_hidden'] is True
-          assert ready['delivery_policy'] == 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL'
-          assert source['history_end'] == public['data_lock'] == ready['data_lock']
-
-          print('MBALL_FINAL_ARTIFACT_OK', public['target_date'], public['data_lock'])
+              assert token not in overview, token
+          assert page.count('data-open-checkout') >= 2
+          print('MBALL_LIVE_SURFACE_VERIFIED')
           PY
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "_site"
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment

@@ -11,6 +11,7 @@ on:
     - cron: "15 18 * * *"
 
 permissions:
+  actions: read
   contents: write
   pages: write
   id-token: write
@@ -32,28 +33,93 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Validate MB_ALL lock
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate MB_ALL lock and completed-draw freshness
         id: report
         shell: bash
         run: |
           set -euo pipefail
           REPORT_DATE="$(python - <<'PY'
           import json
-          from datetime import date, timedelta
+          from datetime import date, datetime, timedelta
+          from zoneinfo import ZoneInfo
+
           public=json.load(open('ai-methods/public-methods.json',encoding='utf-8'))
           ready=json.load(open('data/paid-report-ready.json',encoding='utf-8'))
           source=json.load(open('data/source-access.json',encoding='utf-8'))
+          audit=json.load(open('data/completed-draw-audit.json',encoding='utf-8'))
+
           target=date.fromisoformat(str(public['target_date']))
           lock=date.fromisoformat(str(public['data_lock']))
-          if lock != target-timedelta(days=1): raise SystemExit('MB_ALL data lock is not T-1')
-          if int(public.get('mb_all',{}).get('method_count_run',0)) != 31: raise SystemExit('MB_ALL did not run 31/31 methods')
-          if ready.get('report_date') != target.isoformat() or ready.get('data_lock') != lock.isoformat(): raise SystemExit('Paid readiness mismatch')
-          if source.get('history_end') != lock.isoformat(): raise SystemExit('Source history mismatch')
-          if ready.get('delivery_policy') != 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL': raise SystemExit('Email approval policy missing')
+          now=datetime.now(ZoneInfo('Asia/Ho_Chi_Minh'))
+          today=now.date()
+
+          if target != today:
+              raise SystemExit(f'Fail-closed: target {target} is not Vietnam calendar date {today}')
+          if lock != target-timedelta(days=1):
+              raise SystemExit('Fail-closed: MB_ALL data lock is not T-1')
+          if int(public.get('mb_all',{}).get('method_count_run',0)) != 31:
+              raise SystemExit('Fail-closed: MB_ALL did not run 31/31 methods')
+          if ready.get('report_date') != target.isoformat() or ready.get('data_lock') != lock.isoformat():
+              raise SystemExit('Fail-closed: paid readiness mismatch')
+          if ready.get('status') != 'PUBLISHED_PASS_PRIVATE':
+              raise SystemExit('Fail-closed: paid readiness is not private-pass')
+          if ready.get('outcome_known_at_selection') is not False:
+              raise SystemExit('Fail-closed: outcome-known flag is not false')
+          if ready.get('public_method_outputs_hidden') is not True or ready.get('paid_output_hidden') is not True:
+              raise SystemExit('Fail-closed: paid/current outputs are not hidden')
+          if ready.get('delivery_policy') != 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL':
+              raise SystemExit('Fail-closed: email approval policy missing')
+          if source.get('history_end') != lock.isoformat():
+              raise SystemExit('Fail-closed: source history mismatch')
+          if source.get('crosscheck_status') != 'LOCKED_CROSSCHECKED_PUBLIC':
+              raise SystemExit('Fail-closed: source cross-check is not locked')
+          if int(source.get('source_count',0)) < 5:
+              raise SystemExit('Fail-closed: source cross-check has fewer than 5 sources')
+
+          latest=date.fromisoformat(str(audit.get('latest_completed_draw')))
+          draws=audit.get('draws',{})
+          required = today if now.hour >= 19 else lock
+          if latest < required:
+              raise SystemExit(f'Fail-closed: completed-draw audit stale: latest={latest}, required={required}')
+          entry=draws.get(required.isoformat())
+          if not isinstance(entry,dict):
+              raise SystemExit(f'Fail-closed: completed-draw audit missing {required}')
+          if int(entry.get('code_count',0)) != 27:
+              raise SystemExit('Fail-closed: completed draw does not contain 27 codes')
+          if entry.get('status') != 'LOCKED_CROSSCHECKED_PUBLIC':
+              raise SystemExit('Fail-closed: completed draw is not cross-checked')
+          if int(entry.get('source_count',0)) < 5:
+              raise SystemExit('Fail-closed: completed draw has fewer than 5 matching sources')
+          digest=str(entry.get('codes_sha256',''))
+          if len(digest) != 64:
+              raise SystemExit('Fail-closed: completed draw hash is invalid')
+
           print(target.isoformat())
           PY
           )"
           echo "date=${REPORT_DATE}" >> "$GITHUB_OUTPUT"
+
+      - name: Core self-tests and guard preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/public_repo_boundary_guard.py --self-test
+          python scripts/public_repo_boundary_guard.py
+          python scripts/sitewide_product_surface.py --self-test
+          node tests/commerce-policy-smoke.mjs
+          node --check site-v2/finance-gate-sitewide.js
+          npm test
+          git diff --check
 
       - name: Build portal
         env:
@@ -88,20 +154,21 @@ jobs:
           python scripts/build_statistics_site.py --output-root _site
           python scripts/apply_home_portal.py --output-root _site
           python scripts/optimize_portal_v2.py --output-root _site
-          python scripts/optimize_portal_v3.py --output-root _site || true
-          python scripts/apply_portal_v3_assets.py --output-root _site || true
-          python scripts/sitewide_product_surface.py --output-root _site || true
+          python scripts/optimize_portal_v3.py --output-root _site
+          python scripts/apply_portal_v3_assets.py --output-root _site
 
-          # First normalize all legacy MB_ALL blocks and paid delivery.
+          # Normalize MB_ALL and rebuild the complete home main first. Product/finance
+          # surface MUST run last so later finalizers cannot delete the canonical block.
           python scripts/finalize_live_mball.py --output-root _site
-          # Then rebuild the complete <main> in one pass so no deleted legacy
-          # section can leave an empty full-height wrapper on the live page.
           python scripts/fix_home_blank.py --output-root _site
+          python scripts/sitewide_product_surface.py --output-root _site
 
           python - <<'PY'
           import json
+          from datetime import datetime, timezone
           from pathlib import Path
           public=json.load(open('ai-methods/public-methods.json',encoding='utf-8'))
+          source=json.load(open('data/source-access.json',encoding='utf-8'))
           proof={
             'schema_version':'MB_PUBLIC_PROCESS_PROOF_V1',
             'status':'PROCESS_ONLY',
@@ -113,12 +180,23 @@ jobs:
             'delivery_policy':'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL'
           }
           Path('_site/historical-proof.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          status={
+            'schema_version':'LM_SITE_STATUS_V1',
+            'status':'HEALTHY',
+            'report_date':public['target_date'],
+            'data_lock':public['data_lock'],
+            'history_end':source['history_end'],
+            'method_count':31,
+            'public_paid_output_hidden':True,
+            'generated_at_utc':datetime.now(timezone.utc).isoformat(timespec='seconds')
+          }
+          Path('_site/site-status.json').write_text(json.dumps(status,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
 
           touch _site/.nojekyll
           printf 'lemienbac.com\n' > _site/CNAME
 
-      - name: Verify no empty homepage gap
+      - name: Verify exact public, affiliate, privacy and performance contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -127,16 +205,37 @@ jobs:
           test -s _site/config.js
           test -s _site/copy-lock.js
           test -s _site/historical-proof.json
+          test -s _site/site-status.json
+          test -s _site/finance-gate-sitewide.js
           grep -q 'data-mball-home-main="v4-no-empty-gap"' _site/index.html
           grep -q 'Công cụ thống kê XSMB' _site/index.html
           grep -q 'MB_ALL chạy đủ 31 phương pháp mỗi ngày' _site/index.html
           grep -q 'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ' _site/index.html
           grep -q 'Xác nhận thanh toán qua email' _site/index.html
           grep -q 'id="mball-zalo-support"' _site/index.html
+
+          f=_site/finance-gate-sitewide.js
+          grep -Fq 'const MIN_DELAY_MS = 3000' "$f"
+          grep -Fq 'const MIN_SCROLL_RATIO = 0.08' "$f"
+          grep -Fq 'lm_vpbank_banner_closed_v3' "$f"
+          grep -Fq 'early_finance_banner_sitewide_v3' "$f"
+          grep -Fq 'lm-sponsor-vp' "$f"
+          grep -Fq 'Vay tiền online' "$f"
+          grep -Fq 'Đóng quảng cáo' "$f"
+          grep -Fq 'data-go-vpbank' "$f"
+          grep -Fq 'affiliate_finance_view' "$f"
+          grep -Fq 'affiliate_finance_click' "$f"
+          grep -Fq 'affiliate_finance_close' "$f"
+          ! grep -Fq 'COOLDOWN_MS' "$f"
+          ! grep -Fq '24h' "$f"
+          ! grep -Fq 'href="https://go.isclix.com' "$f"
+
           python - <<'PY'
           from pathlib import Path
-          import html,re,json
-          page=Path('_site/index.html').read_text(encoding='utf-8')
+          import html,json,re
+
+          root=Path('_site')
+          page=(root/'index.html').read_text(encoding='utf-8')
           main=re.search(r'<main\b[^>]*data-mball-home-main="v4-no-empty-gap"[^>]*>.*?</main>',page,flags=re.I|re.S)
           assert main, 'rebuilt main missing'
           visible=re.sub(r'<(?:script|style)\b.*?</(?:script|style)>',' ',main.group(0),flags=re.I|re.S)
@@ -144,11 +243,54 @@ jobs:
           visible=re.sub(r'\s+',' ',visible).strip()
           assert len(visible)>1200, len(visible)
           for token in ('KIỂM ĐỊNH LỊCH SỬ 4SO','4SO chỉ công khai hiệu quả tổng hợp','MỞ ZALO – NHẬN GỢI Ý HÔM NAY'):
-            assert token.lower() not in visible.lower(), token
+              assert token.lower() not in visible.lower(), token
           assert page.count('data-open-checkout')>=2
-          proof=json.loads(Path('_site/historical-proof.json').read_text(encoding='utf-8'))
+
+          proof=json.loads((root/'historical-proof.json').read_text(encoding='utf-8'))
           assert proof['status']=='PROCESS_ONLY'
-          print('MBALL_HOME_NO_EMPTY_GAP_VERIFIED',len(visible))
+          assert proof['public_method_outputs_hidden'] is True
+          assert proof['public_final_output_hidden'] is True
+
+          excluded={'404.html','go/shopee/index.html'}
+          pages=[]
+          for p in root.rglob('*.html'):
+              rel=p.relative_to(root).as_posix()
+              if rel in excluded or rel.startswith('go/'):
+                  continue
+              pages.append((rel,p))
+          assert pages
+          for rel,p in pages:
+              text=p.read_text(encoding='utf-8')
+              assert text.count('data-sitewide-products="true"') == 1, (rel,'product blocks')
+              block=re.search(r'<section\b[^>]*data-sitewide-products="true"[^>]*>.*?</section>',text,flags=re.I|re.S)
+              assert block, (rel,'product block missing')
+              b=block.group(0)
+              assert b.count('class="lm-shop-item"') == 4, (rel,'card count')
+              assert 'display:block!important;visibility:visible!important;opacity:1!important' in text, rel
+              for idx in range(1,5):
+                  assert f'href="/go/shopee/?p={idx}"' in b, (rel,idx)
+              assert 'go.isclix.com' not in b, rel
+          home=(root/'index.html').read_text(encoding='utf-8')
+          assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
+          tools=re.search(r'<section\b[^>]*>.*?Công cụ thống kê XSMB.*?</section>',home,flags=re.I|re.S)
+          assert tools, 'tools section missing'
+          after=home[tools.end():]
+          assert re.match(r'\s*<section class="lm-shop-grid" data-affiliate-static-placement="after_tools" data-sitewide-products="true">',after), 'Shopee block is not immediately after tools section'
+
+          dispatcher=(root/'go/shopee/index.html').read_text(encoding='utf-8')
+          assert 'go.isclix.com' in dispatcher
+
+          banned=re.compile(r'effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|adsterra',re.I)
+          for p in [*root.rglob('*.html'),*root.rglob('*.js')]:
+              if p.relative_to(root).as_posix()=='go/shopee/index.html':
+                  continue
+              assert not banned.search(p.read_text(encoding='utf-8',errors='ignore')), p
+
+          assert (root/'index.html').stat().st_size <= 120000, 'homepage HTML performance budget exceeded'
+          stats=root/'statistics-data.json'
+          if stats.exists():
+              assert stats.stat().st_size <= 350000, 'statistics-data performance budget exceeded'
+          print('PUBLIC_CANONICAL_AND_PERFORMANCE_OK',len(pages),len(visible))
           PY
 
       - name: Upload Pages artifact
@@ -160,10 +302,111 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Record successful deployment
+      - name: Download and read back exact Pages artifact, then verify live
+        id: readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/pages-readback /tmp/pages-bundle /tmp/pages-site
+          mkdir -p /tmp/pages-readback /tmp/pages-bundle /tmp/pages-site
+
+          ARTIFACT_ID=""
+          for attempt in {1..12}; do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" > /tmp/pages-readback/artifacts.json
+            ARTIFACT_ID="$(jq -r '.artifacts[] | select(.name == "github-pages" and .expired == false) | .id' /tmp/pages-readback/artifacts.json | head -n1)"
+            if [[ "$ARTIFACT_ID" =~ ^[0-9]+$ ]]; then break; fi
+            sleep 5
+          done
+          [[ "$ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          echo "artifact_id=${ARTIFACT_ID}" >> "$GITHUB_OUTPUT"
+
+          gh api -H 'Accept: application/vnd.github+json' \
+            "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/pages-readback/github-pages.zip
+          unzip -q /tmp/pages-readback/github-pages.zip -d /tmp/pages-bundle
+          TAR_FILE="$(find /tmp/pages-bundle -type f -name '*.tar' -print -quit)"
+          [[ -n "$TAR_FILE" ]]
+          tar -xf "$TAR_FILE" -C /tmp/pages-site
+
+          FINANCE=/tmp/pages-site/finance-gate-sitewide.js
+          [[ -s "$FINANCE" ]]
+          grep -Fq 'const MIN_DELAY_MS = 3000' "$FINANCE"
+          grep -Fq 'const MIN_SCROLL_RATIO = 0.08' "$FINANCE"
+          grep -Fq 'lm_vpbank_banner_closed_v3' "$FINANCE"
+          grep -Fq 'lm-sponsor-vp' "$FINANCE"
+          grep -Fq 'Vay tiền online' "$FINANCE"
+          grep -Fq 'Đóng quảng cáo' "$FINANCE"
+          grep -Fq 'data-go-vpbank' "$FINANCE"
+          grep -Fq 'affiliate_finance_view' "$FINANCE"
+          grep -Fq 'affiliate_finance_click' "$FINANCE"
+          grep -Fq 'affiliate_finance_close' "$FINANCE"
+          ! grep -Fq 'COOLDOWN_MS' "$FINANCE"
+          ! grep -Fq '24h' "$FINANCE"
+
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          root=Path('/tmp/pages-site')
+          excluded={'404.html','go/shopee/index.html'}
+          pages=[]
+          for p in root.rglob('*.html'):
+              rel=p.relative_to(root).as_posix()
+              if rel in excluded or rel.startswith('go/'):
+                  continue
+              pages.append((rel,p))
+          assert pages
+          for rel,p in pages:
+              text=p.read_text(encoding='utf-8')
+              assert text.count('data-sitewide-products="true"') == 1, rel
+              block=re.search(r'<section\b[^>]*data-sitewide-products="true"[^>]*>.*?</section>',text,flags=re.I|re.S)
+              assert block, rel
+              b=block.group(0)
+              assert b.count('class="lm-shop-item"') == 4, rel
+              for idx in range(1,5): assert f'href="/go/shopee/?p={idx}"' in b, (rel,idx)
+              assert 'go.isclix.com' not in b, rel
+          home=(root/'index.html').read_text(encoding='utf-8')
+          assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
+          banned=re.compile(r'effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|adsterra',re.I)
+          for p in [*root.rglob('*.html'),*root.rglob('*.js')]:
+              if p.relative_to(root).as_posix()=='go/shopee/index.html': continue
+              assert not banned.search(p.read_text(encoding='utf-8',errors='ignore')), p
+          print('PAGES_ARTIFACT_EXACT_READBACK_OK',len(pages))
+          PY
+
+          ART_SHA="$(sha256sum "$FINANCE" | awk '{print $1}')"
+          echo "finance_sha=${ART_SHA}" >> "$GITHUB_OUTPUT"
+
+          BASE='https://lemienbac.com'
+          LIVE_SHA=''
+          LIVE_OK=0
+          for attempt in {1..12}; do
+            curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' \
+              "${BASE}/finance-gate-sitewide.js?readback=${GITHUB_RUN_ID}-${attempt}" -o /tmp/pages-readback/live-finance.js || true
+            if [[ -s /tmp/pages-readback/live-finance.js ]]; then
+              LIVE_SHA="$(sha256sum /tmp/pages-readback/live-finance.js | awk '{print $1}')"
+              if [[ "$LIVE_SHA" == "$ART_SHA" ]]; then LIVE_OK=1; break; fi
+            fi
+            sleep 10
+          done
+          [[ "$LIVE_OK" == "1" ]]
+
+          curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${BASE}/site-status.json?readback=${GITHUB_RUN_ID}" -o /tmp/pages-readback/site-status.json
+          grep -Fq '"status": "HEALTHY"' /tmp/pages-readback/site-status.json
+          curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "${BASE}/?readback=${GITHUB_RUN_ID}" -o /tmp/pages-readback/home.html
+          grep -Fq 'data-affiliate-static-placement="after_tools" data-sitewide-products="true"' /tmp/pages-readback/home.html
+          for idx in 1 2 3 4; do grep -Fq "href=\"/go/shopee/?p=${idx}\"" /tmp/pages-readback/home.html; done
+          ! grep -Eiq 'effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|adsterra' /tmp/pages-readback/home.html
+
+          python scripts/indexnow_submit.py --self-test
+          python scripts/indexnow_submit.py --submit-live | tee /tmp/pages-readback/indexnow.log
+
+      - name: Record successful verified deployment
         env:
           REPORT_DATE: ${{ steps.report.outputs.date }}
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          ARTIFACT_ID: ${{ steps.readback.outputs.artifact_id }}
+          FINANCE_SHA: ${{ steps.readback.outputs.finance_sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -172,17 +415,24 @@ jobs:
           from datetime import datetime,timezone
           from pathlib import Path
           payload={
-            'status':'DEPLOYED_PASS',
+            'status':'DEPLOYED_PASS_READBACK_VERIFIED',
             'website':'https://lemienbac.com/',
             'page_url':os.environ.get('PAGE_URL',''),
             'report_date':os.environ['REPORT_DATE'],
             'source_commit':os.environ['GITHUB_SHA'],
+            'workflow_run_id':os.environ['GITHUB_RUN_ID'],
+            'artifact_id':int(os.environ.get('ARTIFACT_ID') or 0),
+            'artifact_finance_sha256':os.environ.get('FINANCE_SHA',''),
             'deployed_at_utc':datetime.now(timezone.utc).isoformat(),
-            'surface':'MBALL_HOME_V4_NO_EMPTY_GAP',
+            'surface':'MBALL_HOME_V4_CANONICAL_READBACK',
             'paid_checkout':True,
             'email_confirmation':True,
             'zalo_support_only':True,
             'empty_gap_removed':True,
+            'shopee_exact_four_cards_verified':True,
+            'vpbank_sitewide_verified':True,
+            'adsterra_absent_verified':True,
+            'indexnow_submitted':True,
             'legacy_70_removed':True,
             'public_six_method_outputs_removed':True
           }
@@ -191,5 +441,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/live-deploy-status.json
-          git commit -m 'ops: record successful no-gap MB_ALL deployment [skip ci]' || true
+          git commit -m 'ops: record verified MB_ALL Pages readback [skip ci]' || true
           git push || true

@@ -143,7 +143,7 @@ window.MB_ALL_PUBLIC_CURRENT = Object.freeze({
       #mb-all-open-today .mball-method b{color:#111827}#mb-all-open-today .mball-method span{text-align:right;font-weight:900;color:#b91c1c}
       #mb-all-open-today .mball-method em{grid-column:1/-1;font-size:11px;font-style:normal;color:#6b7280}
       #mb-all-open-today .mball-note{margin:14px 0 0;font-size:13px;line-height:1.55;color:#fee2e2}
-      .mball-public-hidden{display:none!important}
+      .mball-public-hidden,.portal-paid-card,.portal-buy,.lm-ai-sticky,.lm-value-strip,#checkout{display:none!important}
       @media(max-width:680px){#mb-all-open-today{padding:22px 0 24px}#mb-all-open-today .mball-wrap{width:calc(100% - 20px)}#mb-all-open-today .mball-picks{grid-template-columns:1fr 1fr;gap:10px}#mb-all-open-today .mball-pick{min-height:124px;border-radius:18px}#mb-all-open-today .mball-support,#mb-all-open-today .mball-methods{grid-template-columns:1fr}#mb-all-open-today .mball-method:nth-child(odd){border-right:0}}
     `;
     document.head.appendChild(style);
@@ -167,7 +167,7 @@ window.MB_ALL_PUBLIC_CURRENT = Object.freeze({
       section.setAttribute("aria-label", "Số MB ALL chốt hôm nay");
       section.innerHTML = `
         <div class="mball-wrap">
-          <div class="mball-top"><div><p class="mball-kicker">MB ALL · 29/29 PHƯƠNG PHÁP · ĐÃ MỞ CÔNG KHAI</p><h1>Số chốt ngày ${current.targetDate}</h1><p class="mball-meta">Data Lock: <strong>${current.dataLock}</strong> · Freeze: <strong>${current.frozenAt}</strong><br>Hệ chốt: <strong>V5.0 HOT/COLD · KEP 5/5</strong></p></div><div class="mball-badge">${current.status}</div></div>
+          <div class="mball-top"><div><p class="mball-kicker">MB ALL · 29/29 PHƯƠNG PHÁP · ĐÃ MỞ CÔNG KHAI</p><h1>Số chốt ngày ${current.targetDate}</h1><p class="mball-meta">Data Lock: <strong>${current.dataLock}</strong> · Freeze: <strong>${current.frozenAt}</strong><br>Hệ chốt: <strong>V5.0 HOT/COLD · Luật KEP 5/5</strong></p></div><div class="mball-badge">${current.status}</div></div>
           <div class="mball-picks"><div class="mball-pick"><small>TOP 1</small><strong>${current.finalNumbers[0]}</strong></div><div class="mball-pick"><small>TOP 2</small><strong>${current.finalNumbers[1]}</strong></div></div>
           <div class="mball-support"><div><strong>98 · Net Score 2,0</strong>ROLL30 25/30 + V10 Pair2 A1+KNN</div><div><strong>89 · Net Score 2,0</strong>HITMAX K3 + V10 Pair2 A1+KNN</div></div>
           <details><summary>Xem đủ 29/29 đầu ra đã chạy trước khi chốt</summary><div class="mball-methods">${methodMarkup()}</div></details>
@@ -176,7 +176,7 @@ window.MB_ALL_PUBLIC_CURRENT = Object.freeze({
       main.prepend(section);
     }
 
-    document.querySelectorAll("[data-open-checkout],.buy-simple,.mobile-cta,#checkout").forEach((node) => node.classList.add("mball-public-hidden"));
+    document.querySelectorAll("[data-open-checkout],.buy-simple,.mobile-cta,.portal-paid-card,.portal-buy,.lm-ai-sticky,.lm-value-strip,#checkout").forEach((node) => node.classList.add("mball-public-hidden"));
     document.querySelectorAll(".sample-link").forEach((node) => {
       if (node.textContent !== "MB ALL 29/29") node.textContent = "MB ALL 29/29";
       if (node.getAttribute("href") !== "#mb-all-open-today") node.setAttribute("href", "#mb-all-open-today");

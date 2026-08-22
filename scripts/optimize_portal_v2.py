@@ -95,7 +95,7 @@ def add_assets(text:str)->str:
     return text
 
 
-def patch_home(path:Path,methods:dict[str,Any])->None:
+def patch_home(path:Path,methods:list[dict[str,Any]])->None:
     t=path.read_text(encoding='utf-8')
     title='Xổ số Miền Bắc (XSMB): thống kê 00–99, lô gan, tần suất | Lê Miền Bắc'
     desc='Cổng dữ liệu XSMB: 27 mã kỳ gần nhất, tần suất 00–99, lô gan, 45 cặp đảo, đầu đuôi, tra cứu lịch sử và các phương pháp AI công khai.'
@@ -143,7 +143,7 @@ def update_sitemap(root:Path,updated:str)->None:
 def apply(root:Path)->dict[str,Any]:
     stats=load(root/'statistics-data.json');methods=load(METHODS_PATH)
     if stats.get('updated_through')!=methods.get('data_lock'):raise ValueError('stats/method lock mismatch')
-    patch_home(root/'index.html',methods)
+    patch_home(root/'index.html',methods.get('methods') or [])
     (root/'phuong-phap-cong-khai').mkdir(exist_ok=True);(root/'phuong-phap-cong-khai/index.html').write_text(build_methods_page(methods),encoding='utf-8')
     (root/'thong-ke-dau-duoi-xsmb').mkdir(exist_ok=True);(root/'thong-ke-dau-duoi-xsmb/index.html').write_text(build_headtail_page(stats),encoding='utf-8')
     externalize_stats(root)

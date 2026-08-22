@@ -1,16 +1,16 @@
 {
-  "status": "DEPLOYED_PASS",
-  "conclusion": "success",
+  "status": "DEPLOY_FAILED",
+  "conclusion": "failure",
   "website": "https://lemienbac.com/",
-  "source_commit": "c6a03b6f1a5a53eed0ae31d4b1b80284bd26e80c",
-  "workflow_run_id": "32570771916",
-  "workflow_run_url": "https://github.com/nguyenlinhns-arch/mb-daily-control/actions/runs/32570771916",
+  "source_commit": "d86f2bfdab088edc17e066d6c510e3d8026f456a",
+  "workflow_run_id": "32570798012",
+  "workflow_run_url": "https://github.com/nguyenlinhns-arch/mb-daily-control/actions/runs/32570798012",
   "workflow_event": "push",
-  "recorded_at_utc": "2026-08-22T11:37:42.445931+00:00",
+  "recorded_at_utc": "2026-08-22T11:38:08.551769+00:00",
   "surface": "MBALL_31_LIVE_V3",
-  "paid_checkout": true,
-  "email_confirmation": true,
-  "zalo_support_only": true,
-  "legacy_70_removed": true,
-  "public_six_method_outputs_removed": true
+  "paid_checkout": false,
+  "email_confirmation": false,
+  "zalo_support_only": false,
+  "legacy_70_removed": false,
+  "public_six_method_outputs_removed": false
 }

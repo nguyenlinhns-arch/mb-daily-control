@@ -1,4 +1,4 @@
-name: Deploy Lê Miền Bắc XSMB portal to GitHub Pages
+name: Deploy Lê Miền Bắc MB_ALL portal to GitHub Pages
 
 on:
   push:
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-and-deploy:
+  build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -32,66 +32,69 @@ jobs:
         with:
           node-version: 22
 
-      - name: Test builders
+      - name: Validate final MB_ALL renderers
         run: |
           set -euo pipefail
-          npm test
-          python scripts/simplify_public_site.py --self-test
-          python scripts/replace_public_analysis_wording.py --self-test
-          python scripts/optimize_conversion_site.py --self-test
+          node --check site-v2/app.js
+          node --check site-v2/copy-lock.js
+          node --check site-v2/checkout-entry.js
+          python -m py_compile \
+            scripts/finalize_mball_website.py \
+            scripts/run_final_mball_deploy.py \
+            scripts/optimize_portal_v2_run.py
+          python scripts/run_final_mball_deploy.py --self-test
           python scripts/build_statistics_site.py --self-test
-          python scripts/apply_home_portal.py --self-test
-          python scripts/apply_portal_subpages.py --self-test
-          python scripts/optimize_portal_v2.py --self-test
-          python scripts/optimize_portal_v3.py --self-test
-          python scripts/apply_portal_v3_assets.py --self-test
-          python scripts/optimize_seo_ads_v1.py --self-test
-          python scripts/finalize_portal_v4.py --self-test
-          python scripts/sync_statistics_history.py --self-test
           python scripts/sitewide_product_surface.py --self-test
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Resolve report date fail closed
+      - name: Resolve locked report date
         id: report
         run: |
           set -euo pipefail
           REPORT_DATE="$(python - <<'PY'
           import json
-          from datetime import date, datetime, timedelta
+          from datetime import datetime, timedelta
           from zoneinfo import ZoneInfo
 
-          public = json.load(open("ai-methods/public-methods.json", encoding="utf-8"))
-          proof = json.load(open("ai-methods/yesterday-proof.json", encoding="utf-8"))
-          ready = json.load(open("data/paid-report-ready.json", encoding="utf-8"))
-          source = json.load(open("data/source-access.json", encoding="utf-8"))
-          calendar = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).date()
-          target = date.fromisoformat(str(public["target_date"]))
-          lock = date.fromisoformat(str(public["data_lock"]))
+          public = json.load(open('ai-methods/public-methods.json', encoding='utf-8'))
+          ready = json.load(open('data/paid-report-ready.json', encoding='utf-8'))
+          source = json.load(open('data/source-access.json', encoding='utf-8'))
+          calendar = datetime.now(ZoneInfo('Asia/Ho_Chi_Minh')).date()
+          target = datetime.fromisoformat(public['target_date']).date()
+          lock = datetime.fromisoformat(public['data_lock']).date()
+
           if lock != target - timedelta(days=1):
-              raise SystemExit("Public methods data_lock is not T-1")
-          if ready.get("report_date") != target.isoformat() or ready.get("data_lock") != lock.isoformat():
-              raise SystemExit("Paid readiness does not match public target/data lock")
-          if source.get("history_end") != lock.isoformat():
-              raise SystemExit("Source history_end does not match public data lock")
+              raise SystemExit('MB_ALL data lock is not T-1')
+          if ready.get('report_date') != target.isoformat() or ready.get('data_lock') != lock.isoformat():
+              raise SystemExit('Paid readiness does not match target/data lock')
+          if source.get('history_end') != lock.isoformat():
+              raise SystemExit('Source history_end does not match data lock')
+          if int(public.get('mb_all', {}).get('method_count_run', 0)) != 31:
+              raise SystemExit('MB_ALL did not run 31/31 methods')
+          if public.get('production_context', {}).get('public_output_open') is not False:
+              raise SystemExit('Public final output must be closed')
+          if ready.get('public_mb_all_output_open') is not False:
+              raise SystemExit('Paid readiness public output must be closed')
+          if ready.get('delivery_policy') != 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL':
+              raise SystemExit('Paid delivery policy is not email-approved reveal')
+
           same_day = target == calendar and lock == calendar - timedelta(days=1)
-          post_draw_next = target == calendar + timedelta(days=1) and lock == calendar and proof.get("date") == calendar.isoformat()
-          if not (same_day or post_draw_next):
-              raise SystemExit(f"Fail closed: calendar={calendar} target={target} lock={lock} proof={proof.get('date')}")
+          next_day = target == calendar + timedelta(days=1) and lock == calendar
+          if not (same_day or next_day):
+              raise SystemExit(f'Fail closed: calendar={calendar} target={target} lock={lock}')
           print(target.isoformat())
           PY
           )"
           echo "date=${REPORT_DATE}" >> "$GITHUB_OUTPUT"
-          echo "Rendering portal for ${REPORT_DATE}"
+          echo "Rendering MB_ALL portal for ${REPORT_DATE}"
 
       - name: Build static portal
         env:
           REPORT_DATE: ${{ steps.report.outputs.date }}
         run: |
           set -euo pipefail
-          python scripts/build_public_methods.py --self-test
-          python scripts/build_seo_pages.py --self-test --today "$REPORT_DATE"
           rm -rf _site
           mkdir -p _site/ai-methods
 
@@ -121,17 +124,16 @@ jobs:
           cp data/paid-report-ready.json _site/report-readiness.json
 
           python scripts/build_seo_pages.py --output-root _site --today "$REPORT_DATE"
-
           python - <<'PY'
           from pathlib import Path
           import re
-          page = Path("_site/index.html")
-          content = page.read_text(encoding="utf-8")
+          page = Path('_site/index.html')
+          content = page.read_text(encoding='utf-8')
           content = re.sub(
               r'(<button class="button button-primary button-large" type="button" data-open-checkout)\s+disabled(?:\s+aria-disabled="true")?(>)',
               r'\1\2', content, count=1,
           )
-          page.write_text(content, encoding="utf-8")
+          page.write_text(content, encoding='utf-8')
           PY
 
           python scripts/simplify_public_site.py --output-root _site
@@ -140,7 +142,6 @@ jobs:
           python scripts/apply_conversion_site.py --output-root _site
           python scripts/simplify_purchase_cta.py --output-root _site
           python scripts/apply_conversion_v2.py --output-root _site
-          find _site -type f -name '*.html' -print0 | xargs -0 sed -i -E 's#app\.js\?v=[^"]+#app.js?v=20260815-2#g'
           python scripts/build_statistics_site.py --output-root _site
           python scripts/apply_home_portal_safe.py --output-root _site
           python scripts/apply_portal_subpages.py --output-root _site
@@ -148,228 +149,113 @@ jobs:
           python scripts/optimize_portal_v3.py --output-root _site
           python scripts/apply_portal_v3_assets.py --output-root _site
           python scripts/sitewide_product_surface.py --output-root _site
-          find _site -type f -name '*.html' -print0 | xargs -0 sed -i 's#finance-gate-sitewide.js?v=20260816-2#finance-gate-sitewide.js?v=20260816-3#g'
 
-      - name: Validate public portal privacy UX and SEO gates
+          # This must remain the last content transform. It prevents any older
+          # builder/runtime from restoring the 4SO/70% or Zalo-purchase blocks.
+          python scripts/run_final_mball_deploy.py --output-root _site
+
+          echo 'lemienbac.com' > _site/CNAME
+          touch _site/.nojekyll
+
+      - name: Validate live artifact state
         env:
           REPORT_DATE: ${{ steps.report.outputs.date }}
         run: |
           set -euo pipefail
           for file in \
             _site/index.html \
-            _site/portal-subpages.css \
-            _site/portal-v2.css \
-            _site/portal-v2.js \
-            _site/portal-v3.css \
-            _site/xsmb-stats.css \
-            _site/xsmb-stats.js \
-            _site/statistics-data.json \
-            _site/thong-ke-xsmb/index.html \
-            _site/xsmb-30-ngay/index.html \
-            _site/nguon-du-lieu-xsmb/index.html \
-            _site/tan-suat-xsmb/index.html \
-            _site/lo-gan-xsmb/index.html \
-            _site/cap-dao-xsmb/index.html \
-            _site/thong-ke-dau-duoi-xsmb/index.html \
-            _site/thong-ke-tong-xsmb/index.html \
-            _site/thong-ke-theo-thu-xsmb/index.html \
-            _site/tra-cuu-xsmb/index.html \
-            _site/phuong-phap-cong-khai/index.html \
-            _site/cho-so-mien-bac-hom-nay/index.html \
-            _site/phuong-phap-4so/index.html \
-            _site/lich-su-doi-chieu/index.html \
-            _site/thong-ke-lo-to-mien-bac-bang-ai/index.html \
-            _site/gioi-thieu/index.html \
-            _site/mau-bao-cao.html \
-            _site/legal.html \
-            _site/404.html \
-            _site/sitemap.xml \
-            _site/site-status.json \
-            _site/llms.txt \
+            _site/app.js \
+            _site/config.js \
+            _site/copy-lock.js \
             _site/checkout-entry.js \
             _site/checkout-enhance.js \
-            _site/app.js \
-            _site/finance-gate-sitewide.js; do
+            _site/statistics-data.json \
+            _site/phuong-phap-cong-khai/index.html \
+            _site/thong-ke-xsmb/index.html \
+            _site/sitemap.xml \
+            _site/report-readiness.json \
+            _site/CNAME; do
             test -s "$file"
           done
 
           test ! -e _site/ai-methods/public-methods.json
           test ! -e _site/ai-methods/report-data.json
           test ! -e _site/approval-backend.gs
-          ! grep -E -q '(canonical|final)[_-]?(codes|pairs)' _site/statistics-data.json
-
-          grep -q 'data-home-portal="v1"' _site/index.html
-          grep -q 'Xổ số Miền Bắc (XSMB): thống kê 00–99' _site/index.html
-          grep -q 'portal-quick-search' _site/index.html
-          grep -q 'portal-consensus' _site/index.html
-          grep -q 'portal-headtail-latest' _site/index.html
-          grep -q 'Theo tổng 0–9' _site/index.html
-          grep -q 'Thống kê theo thứ' _site/index.html
-          grep -q 'Phương pháp công khai hôm nay' _site/index.html
-          grep -q 'A1' _site/index.html
-          grep -q '2SO / X2' _site/index.html
-          grep -q 'X3 GROWTH' _site/index.html
-          grep -q 'F01 TẦN SUẤT' _site/index.html
-          grep -q 'F06 CHUYỂN TIẾP' _site/index.html
-          grep -q 'KÉP V1' _site/index.html
-          grep -q 'TOP 1' _site/index.html
-          grep -q '•• — ••' _site/index.html
-          grep -q 'Trang công khai không chứa số chọn, Score hay thứ hạng 4SO hôm nay' _site/index.html
 
           python - <<'PY'
-          from pathlib import Path
-          site = Path('_site')
-          excluded = {'404.html', 'go/shopee/index.html'}
-          pages = [p for p in site.rglob('*.html') if p.relative_to(site).as_posix() not in excluded and not p.relative_to(site).as_posix().startswith('go/shopee/')]
-          assert pages
-          for page in pages:
-              text = page.read_text(encoding='utf-8')
-              assert 'data-sitewide-products="true"' in text, page
-              assert 'finance-gate-sitewide.js?v=20260816-3' in text, page
-              assert 'data-sitewide-affiliate="true"' not in text, page
-              assert 'data-primary-affiliate-strip="sitewide-v4"' not in text, page
-          home = (site/'index.html').read_text(encoding='utf-8')
-          assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
-          print('LOWER_FOUR_PRODUCT_ACCESSTRADE_OK', len(pages))
-          PY
-
-          grep -q 'MIN_DELAY_MS = 3000' _site/finance-gate-sitewide.js
-          grep -q 'MIN_SCROLL_RATIO = 0.08' _site/finance-gate-sitewide.js
-          grep -q 'lm_vpbank_banner_closed_v3' _site/finance-gate-sitewide.js
-          grep -q 'Vay tiền online' _site/finance-gate-sitewide.js
-          grep -q 'Đóng quảng cáo' _site/finance-gate-sitewide.js
-          ! grep -q 'COOLDOWN_MS' _site/finance-gate-sitewide.js
-
-          grep -q 'Thống kê XSMB: tần suất, lô gan và cặp đảo 00–99' _site/thong-ke-xsmb/index.html
-          grep -q 'Tần suất XSMB 00–99 theo 7–365 kỳ' _site/tan-suat-xsmb/index.html
-          grep -q 'Lô gan XSMB 00–99: khoảng vắng hiện tại' _site/lo-gan-xsmb/index.html
-          grep -q 'Thống kê 45 cặp đảo XSMB' _site/cap-dao-xsmb/index.html
-          grep -q 'Thống kê đầu đuôi XSMB 0–9' _site/thong-ke-dau-duoi-xsmb/index.html
-          grep -q 'Thống kê tổng XSMB 0–9' _site/thong-ke-tong-xsmb/index.html
-          grep -q 'Thống kê XSMB theo thứ trong tuần' _site/thong-ke-theo-thu-xsmb/index.html
-          grep -q 'Tra cứu XSMB theo bộ số 00–99' _site/tra-cuu-xsmb/index.html
-          grep -q 'XSMB 30 ngày gần nhất: lịch sử 27 mã mỗi kỳ' _site/xsmb-30-ngay/index.html
-          grep -q 'Nguồn dữ liệu và cách tính các bảng thống kê' _site/nguon-du-lieu-xsmb/index.html
-          grep -q '6 phương pháp XSMB công khai' _site/phuong-phap-cong-khai/index.html
-          grep -q 'Không công khai 4SO' _site/phuong-phap-cong-khai/index.html
-
-          grep -q 'https://lemienbac.com/thong-ke-tong-xsmb/' _site/sitemap.xml
-          grep -q 'https://lemienbac.com/thong-ke-theo-thu-xsmb/' _site/sitemap.xml
-          grep -q 'https://lemienbac.com/xsmb-30-ngay/' _site/sitemap.xml
-          grep -q 'https://lemienbac.com/nguon-du-lieu-xsmb/' _site/sitemap.xml
-
-          grep -q 'data-google-ads-landing="true"' _site/thong-ke-xsmb/index.html
-          ! grep -Eiq '4SO|gợi ý số|báo cáo AI|nhận báo cáo' _site/thong-ke-xsmb/index.html
-          ! grep -Eiq 'data-open-checkout|effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra' _site/thong-ke-xsmb/index.html
-          ! grep -q '/?checkout=1' _site/thong-ke-xsmb/index.html
-
-          for page in \
-            _site/thong-ke-xsmb/index.html \
-            _site/tan-suat-xsmb/index.html \
-            _site/lo-gan-xsmb/index.html \
-            _site/cap-dao-xsmb/index.html \
-            _site/tra-cuu-xsmb/index.html; do
-            grep -q 'xsmb-stats.css?v=20260815-2' "$page"
-            grep -q 'xsmb-stats.js?v=20260815-2' "$page"
-          done
-
-          for page in \
-            _site/cho-so-mien-bac-hom-nay/index.html \
-            _site/phuong-phap-4so/index.html \
-            _site/lich-su-doi-chieu/index.html \
-            _site/thong-ke-lo-to-mien-bac-bang-ai/index.html \
-            _site/gioi-thieu/index.html \
-            _site/thong-ke-xsmb/index.html \
-            _site/xsmb-30-ngay/index.html \
-            _site/nguon-du-lieu-xsmb/index.html \
-            _site/tan-suat-xsmb/index.html \
-            _site/lo-gan-xsmb/index.html \
-            _site/cap-dao-xsmb/index.html \
-            _site/thong-ke-dau-duoi-xsmb/index.html \
-            _site/thong-ke-tong-xsmb/index.html \
-            _site/thong-ke-theo-thu-xsmb/index.html \
-            _site/tra-cuu-xsmb/index.html \
-            _site/phuong-phap-cong-khai/index.html \
-            _site/mau-bao-cao.html \
-            _site/legal.html \
-            _site/404.html; do
-            grep -q 'data-portal-shell="v1"' "$page"
-            grep -q 'portal-subpages.css?v=20260815-1' "$page"
-            grep -q 'portal-v2.css?v=20260815-3' "$page"
-            grep -q 'portal-v2.js?v=20260815-2' "$page"
-            grep -q 'portal-v3.css?v=20260815-1' "$page"
-            grep -q 'LÊ MIỀN BẮC' "$page"
-          done
-
-          for page in \
-            _site/thong-ke-xsmb/index.html \
-            _site/xsmb-30-ngay/index.html \
-            _site/nguon-du-lieu-xsmb/index.html \
-            _site/tan-suat-xsmb/index.html \
-            _site/lo-gan-xsmb/index.html \
-            _site/cap-dao-xsmb/index.html \
-            _site/thong-ke-dau-duoi-xsmb/index.html \
-            _site/thong-ke-tong-xsmb/index.html \
-            _site/thong-ke-theo-thu-xsmb/index.html \
-            _site/tra-cuu-xsmb/index.html; do
-            grep -q 'portal-breadcrumbs' "$page"
-            grep -q '"@type":"Dataset"' "$page"
-            grep -q '"@type":"BreadcrumbList"' "$page"
-          done
-
-          python - <<'PY'
-          import json, re
+          import html
+          import json
+          import re
           from pathlib import Path
 
           site = Path('_site')
-          stats = json.loads((site/'statistics-data.json').read_text(encoding='utf-8'))
+          home_raw = (site / 'index.html').read_text(encoding='utf-8')
+          methods_raw = (site / 'phuong-phap-cong-khai/index.html').read_text(encoding='utf-8')
+          ready = json.loads((site / 'report-readiness.json').read_text(encoding='utf-8'))
           source = json.loads(Path('data/source-access.json').read_text(encoding='utf-8'))
-          methods = json.loads(Path('ai-methods/public-methods.json').read_text(encoding='utf-8'))
-          proof = json.loads(Path('data/public-historical-proof.json').read_text(encoding='utf-8'))
-          status = json.loads((site/'site-status.json').read_text(encoding='utf-8'))
-          home = (site/'index.html').read_text(encoding='utf-8')
-          landing = (site/'thong-ke-xsmb/index.html').read_text(encoding='utf-8')
-          page30 = (site/'xsmb-30-ngay/index.html').read_text(encoding='utf-8')
+          public = json.loads(Path('ai-methods/public-methods.json').read_text(encoding='utf-8'))
 
-          assert stats['updated_through'] == source['history_end'] == methods['data_lock']
-          assert stats['row_count'] == source['history_rows']
-          assert len(stats['numbers']) == 100
-          assert len(stats['pairs']) == 45
-          assert len(stats['recent_history'][-1][1:]) == 27
-          assert all('4SO' not in str(m.get('id','')).upper() and '4SO' not in str(m.get('name','')).upper() for m in methods['methods'])
-          assert len(methods['methods']) == 6
-          assert proof['validation']['total_days'] == 30
-          assert f"{proof['validation']['rate_pct']}%" in home
-          assert f"{proof['validation']['hit_days']}/{proof['validation']['total_days']}" in home
-          assert status['status'] == 'HEALTHY'
-          assert status['seo_ads_cluster'] == 'PASS'
-          assert status['google_ads_statistics_landing'] == '/thong-ke-xsmb/'
-          assert status['sitemap_urls'] == 18
-          assert status['html_pages_checked'] == 20
-          assert page30.count('class="seo30-day"') == 30
-          assert 'data-google-ads-landing="true"' in landing
+          def visible(value: str) -> str:
+              value = re.sub(r'<!--.*?-->', ' ', value, flags=re.S)
+              value = re.sub(r'<script\b.*?</script>', ' ', value, flags=re.I | re.S)
+              value = re.sub(r'<style\b.*?</style>', ' ', value, flags=re.I | re.S)
+              value = re.sub(r'<[^>]+>', ' ', value, flags=re.S)
+              return html.unescape(re.sub(r'\s+', ' ', value)).strip()
 
-          buttons = re.findall(r'<button\b[^>]*\bdata-open-checkout\b[^>]*>', home, flags=re.I)
-          if len(buttons) != 2:
-              raise SystemExit(f"Expected exactly 2 home checkout buttons, found {len(buttons)}")
-          header = re.search(r'<header\b[^>]*class="[^"]*site-header[^"]*"[^>]*>.*?</header>', home, flags=re.I|re.S)
-          assert header and 'data-open-checkout' not in header.group(0)
+          home = visible(home_raw)
+          upper = home.upper()
+          required = (
+              'MB_ALL – 31 PHƯƠNG PHÁP',
+              'MB_ALL CHẠY ĐỦ 31 PHƯƠNG PHÁP MỖI NGÀY',
+              '3–5–7–10',
+              'HOT/COLD',
+              'PRE-DRAW',
+              'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ',
+              '30.000Đ/NGÀY',
+              'XÁC NHẬN THANH TOÁN QUA EMAIL',
+              'ĐẦU RA 31 PHƯƠNG PHÁP VÀ SỐ CUỐI ĐƯỢC GIỮ KÍN',
+          )
+          for token in required:
+              assert token in upper, token
 
-          for forbidden in ('canonical_codes','canonical_pairs','final_codes','final_pairs'):
-              assert forbidden not in home.lower()
-          assert not re.search(r'4SO[^<]{0,180}\b\d{2}\b\s*[-–—]\s*\b\d{2}\b', home, flags=re.I)
+          forbidden = (
+              'MỞ ZALO – NHẬN GỢI Ý HÔM NAY',
+              'MỞ ZALO - NHẬN GỢI Ý HÔM NAY',
+              'KIỂM ĐỊNH LỊCH SỬ 4SO',
+              '4SO CHỈ CÔNG KHAI HIỆU QUẢ TỔNG HỢP',
+              '21/30 NGÀY TRONG CỬA SỔ',
+          )
+          for token in forbidden:
+              assert token not in upper, token
 
-          for rel in ('phuong-phap-4so/index.html','lich-su-doi-chieu/index.html','phuong-phap-cong-khai/index.html'):
-              text = (site/rel).read_text(encoding='utf-8')
-              assert not re.search(r'4SO[^<]{0,180}\b\d{2}\b\s*[-–—]\s*\b\d{2}\b', text, flags=re.I)
-          print('PORTAL_SEO_ADS_PRIVACY_GATES_OK', stats['row_count'], stats['updated_through'], status['sitemap_urls'])
+          assert home_raw.count('data-open-checkout') == 2
+          assert 'data-mball-method-overview="mball-31-final-v3"' in home_raw
+          assert 'data-paid-suggestion-card="true"' in home_raw
+          assert 'data-paid-suggestion-section="true"' in home_raw
+          assert 'id="mball-zalo-support"' in home_raw
+          assert 'href="/go/zalo.htm"' in home_raw
+          assert 'TÔI ĐÃ CHUYỂN KHOẢN – GỬI EMAIL XÁC NHẬN' in home_raw
+
+          method_panel = home_raw.split('data-mball-method-overview="mball-31-final-v3"', 1)[1].split('</section>', 1)[0]
+          for token in ('portal-method-numbers', 'portal-ball', 'portal-consensus'):
+              assert token not in method_panel, token
+
+          methods_visible = visible(methods_raw).upper()
+          assert 'QUY TRÌNH CHỌN LỌC ĐỘNG MB_ALL' in methods_visible
+          assert 'WEBSITE KHÔNG CÔNG KHAI ĐẦU RA TỪNG PHƯƠNG PHÁP' in methods_visible
+          assert '6 PHƯƠNG PHÁP XSMB CÔNG KHAI' not in methods_visible
+
+          assert public['mb_all']['method_count_run'] == 31
+          assert public['mb_all']['method_count_expected'] == 31
+          assert public['production_context']['public_output_open'] is False
+          assert public['production_context']['paid_output_hidden'] is True
+          assert ready['public_mb_all_output_open'] is False
+          assert ready['public_method_outputs_hidden'] is True
+          assert ready['delivery_policy'] == 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL'
+          assert source['history_end'] == public['data_lock'] == ready['data_lock']
+
+          print('MBALL_FINAL_ARTIFACT_OK', public['target_date'], public['data_lock'])
           PY
-
-          grep -q 'NGUYEN TU LINH' _site/checkout-enhance.js
-          grep -q 'img.vietqr.io/image' _site/checkout-enhance.js
-          grep -q 'const DELIVERY_SCHEMA = "fourso-top2-v1"' _site/app.js
-          ! grep -R -i 'ngày hiển thị' _site --include='*.html'
-          touch _site/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -1,0 +1,63 @@
+name: Record MB_ALL Pages outcome
+
+on:
+  workflow_run:
+    workflows: ["Deploy Lê Miền Bắc MB_ALL to GitHub Pages"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Record workflow result
+        env:
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          EVENT_NAME: ${{ github.event.workflow_run.event }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          conclusion = os.environ.get('CONCLUSION', '')
+          success = conclusion == 'success'
+          payload = {
+              'status': 'DEPLOYED_PASS' if success else 'DEPLOY_FAILED',
+              'conclusion': conclusion,
+              'website': 'https://lemienbac.com/',
+              'source_commit': os.environ.get('HEAD_SHA', ''),
+              'workflow_run_id': os.environ.get('RUN_ID', ''),
+              'workflow_run_url': os.environ.get('RUN_URL', ''),
+              'workflow_event': os.environ.get('EVENT_NAME', ''),
+              'recorded_at_utc': datetime.now(timezone.utc).isoformat(),
+              'surface': 'MBALL_31_LIVE_V3',
+              'paid_checkout': success,
+              'email_confirmation': success,
+              'zalo_support_only': success,
+              'legacy_70_removed': success,
+              'public_six_method_outputs_removed': success
+          }
+          Path('data/live-deploy-status.json').write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/live-deploy-status.json
+          git commit -m "ops: record MB_ALL Pages ${CONCLUSION} [skip ci]"
+          git push

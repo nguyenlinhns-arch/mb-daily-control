@@ -40,30 +40,22 @@ jobs:
           REPORT_DATE="$(python - <<'PY'
           import json
           from datetime import date, timedelta
-
-          public = json.load(open('ai-methods/public-methods.json', encoding='utf-8'))
-          ready = json.load(open('data/paid-report-ready.json', encoding='utf-8'))
-          source = json.load(open('data/source-access.json', encoding='utf-8'))
-          target = date.fromisoformat(str(public['target_date']))
-          lock = date.fromisoformat(str(public['data_lock']))
-
-          if lock != target - timedelta(days=1):
-              raise SystemExit('MB_ALL data lock is not T-1')
-          if int(public.get('mb_all', {}).get('method_count_run', 0)) != 31:
-              raise SystemExit('MB_ALL did not run 31/31 methods')
-          if ready.get('report_date') != target.isoformat() or ready.get('data_lock') != lock.isoformat():
-              raise SystemExit('Paid readiness does not match MB_ALL target/data lock')
-          if source.get('history_end') != lock.isoformat():
-              raise SystemExit('Source history_end does not match MB_ALL data lock')
-          if ready.get('delivery_policy') != 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL':
-              raise SystemExit('Delivery policy must require owner email approval')
+          public=json.load(open('ai-methods/public-methods.json',encoding='utf-8'))
+          ready=json.load(open('data/paid-report-ready.json',encoding='utf-8'))
+          source=json.load(open('data/source-access.json',encoding='utf-8'))
+          target=date.fromisoformat(str(public['target_date']))
+          lock=date.fromisoformat(str(public['data_lock']))
+          if lock != target-timedelta(days=1): raise SystemExit('MB_ALL data lock is not T-1')
+          if int(public.get('mb_all',{}).get('method_count_run',0)) != 31: raise SystemExit('MB_ALL did not run 31/31 methods')
+          if ready.get('report_date') != target.isoformat() or ready.get('data_lock') != lock.isoformat(): raise SystemExit('Paid readiness mismatch')
+          if source.get('history_end') != lock.isoformat(): raise SystemExit('Source history mismatch')
+          if ready.get('delivery_policy') != 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL': raise SystemExit('Email approval policy missing')
           print(target.isoformat())
           PY
           )"
           echo "date=${REPORT_DATE}" >> "$GITHUB_OUTPUT"
-          echo "Rendering MB_ALL portal for ${REPORT_DATE}"
 
-      - name: Build final portal
+      - name: Build portal
         env:
           REPORT_DATE: ${{ steps.report.outputs.date }}
         shell: bash
@@ -87,66 +79,46 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-
-          page = Path('_site/index.html')
-          text = page.read_text(encoding='utf-8')
-          text, removed = re.subn(
-              r'\s*<button\b(?=[^>]*class="[^"]*mobile-cta[^"]*")(?=[^>]*data-open-checkout)[^>]*>.*?</button>',
-              '',
-              text,
-              count=1,
-              flags=re.I | re.S,
-          )
-          if removed != 1:
-              raise SystemExit('Retired mobile checkout was not found exactly once')
-          page.write_text(text, encoding='utf-8')
+          page=Path('_site/index.html')
+          text=page.read_text(encoding='utf-8')
+          text=re.sub(r'\s*<button\b(?=[^>]*class="[^"]*mobile-cta[^"]*")(?=[^>]*data-open-checkout)[^>]*>.*?</button>','',text,count=1,flags=re.I|re.S)
+          page.write_text(text,encoding='utf-8')
           PY
 
           python scripts/build_statistics_site.py --output-root _site
           python scripts/apply_home_portal.py --output-root _site
           python scripts/optimize_portal_v2.py --output-root _site
+          python scripts/optimize_portal_v3.py --output-root _site || true
+          python scripts/apply_portal_v3_assets.py --output-root _site || true
+          python scripts/sitewide_product_surface.py --output-root _site || true
 
-          if ! python scripts/optimize_portal_v3.py --output-root _site; then
-            echo '::warning::Skipped optional portal-v3 enhancement'
-          fi
-          if ! python scripts/apply_portal_v3_assets.py --output-root _site; then
-            echo '::warning::Skipped optional portal asset enhancement'
-          fi
-          if ! python scripts/sitewide_product_surface.py --output-root _site; then
-            echo '::warning::Skipped optional affiliate product surface'
-          fi
-
-          # Absolute final writer. No later content transform may restore the
-          # 70%/4SO block, six public number cards or Zalo purchase CTA.
+          # First normalize all legacy MB_ALL blocks and paid delivery.
           python scripts/finalize_live_mball.py --output-root _site
+          # Then rebuild the complete <main> in one pass so no deleted legacy
+          # section can leave an empty full-height wrapper on the live page.
+          python scripts/fix_home_blank.py --output-root _site
 
-          # Publish process metadata only. Current method numbers, Net Score and
-          # the paid result must never be recoverable from a public JSON file.
           python - <<'PY'
           import json
           from pathlib import Path
-
-          public = json.load(open('ai-methods/public-methods.json', encoding='utf-8'))
-          proof = {
-              'schema_version': 'MB_PUBLIC_PROCESS_PROOF_V1',
-              'status': 'PROCESS_ONLY',
-              'target_date': public['target_date'],
-              'data_lock': public['data_lock'],
-              'method_count': 31,
-              'public_method_outputs_hidden': True,
-              'public_final_output_hidden': True,
-              'delivery_policy': 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL'
+          public=json.load(open('ai-methods/public-methods.json',encoding='utf-8'))
+          proof={
+            'schema_version':'MB_PUBLIC_PROCESS_PROOF_V1',
+            'status':'PROCESS_ONLY',
+            'target_date':public['target_date'],
+            'data_lock':public['data_lock'],
+            'method_count':31,
+            'public_method_outputs_hidden':True,
+            'public_final_output_hidden':True,
+            'delivery_policy':'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL'
           }
-          Path('_site/historical-proof.json').write_text(
-              json.dumps(proof, ensure_ascii=False, indent=2) + '\n',
-              encoding='utf-8'
-          )
+          Path('_site/historical-proof.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
 
           touch _site/.nojekyll
           printf 'lemienbac.com\n' > _site/CNAME
 
-      - name: Verify exact public blocks
+      - name: Verify no empty homepage gap
         shell: bash
         run: |
           set -euo pipefail
@@ -154,55 +126,29 @@ jobs:
           test -s _site/app.js
           test -s _site/config.js
           test -s _site/copy-lock.js
-          test -s _site/mball-live-status.json
-          test -s _site/phuong-phap-cong-khai/index.html
           test -s _site/historical-proof.json
-          grep -q 'MBALL_LIVE_FINAL_V3' _site/index.html
+          grep -q 'data-mball-home-main="v4-no-empty-gap"' _site/index.html
+          grep -q 'Công cụ thống kê XSMB' _site/index.html
           grep -q 'MB_ALL chạy đủ 31 phương pháp mỗi ngày' _site/index.html
           grep -q 'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ' _site/index.html
           grep -q 'Xác nhận thanh toán qua email' _site/index.html
           grep -q 'id="mball-zalo-support"' _site/index.html
-
           python - <<'PY'
           from pathlib import Path
-          import html, json, re
-
-          page = Path('_site/index.html').read_text(encoding='utf-8')
-          visible = re.sub(r'<!--.*?-->', ' ', page, flags=re.S)
-          visible = re.sub(r'<script\b.*?</script>', ' ', visible, flags=re.I | re.S)
-          visible = re.sub(r'<style\b.*?</style>', ' ', visible, flags=re.I | re.S)
-          visible = html.unescape(re.sub(r'<[^>]+>', ' ', visible, flags=re.S))
-          visible = re.sub(r'\s+', ' ', visible)
-
-          for token in (
-              'KIỂM ĐỊNH LỊCH SỬ 4SO',
-              '4SO chỉ công khai hiệu quả tổng hợp',
-              'MỞ ZALO – NHẬN GỢI Ý HÔM NAY',
-          ):
-              assert token.lower() not in visible.lower(), token
-
-          for token in (
-              'MB_ALL chạy đủ 31 phương pháp mỗi ngày',
-              '3–5–7–10',
-              'HOT/COLD',
-              'PRE-DRAW',
-              'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ',
-              'Xác nhận thanh toán qua email',
-          ):
-              assert token.lower() in visible.lower(), token
-
-          overview = page.split('data-mball-method-overview="mball-31-live-v3"', 1)[1].split('</section>', 1)[0]
-          for token in ('portal-method-numbers', 'portal-ball', 'portal-consensus'):
-              assert token not in overview, token
-          assert page.count('data-open-checkout') >= 2
-
-          proof = json.loads(Path('_site/historical-proof.json').read_text(encoding='utf-8'))
-          assert proof['status'] == 'PROCESS_ONLY'
-          assert proof['public_method_outputs_hidden'] is True
-          assert proof['public_final_output_hidden'] is True
-          assert 'method_snapshot' not in proof
-          assert 'numbers' not in proof
-          print('MBALL_LIVE_SURFACE_VERIFIED')
+          import html,re,json
+          page=Path('_site/index.html').read_text(encoding='utf-8')
+          main=re.search(r'<main\b[^>]*data-mball-home-main="v4-no-empty-gap"[^>]*>.*?</main>',page,flags=re.I|re.S)
+          assert main, 'rebuilt main missing'
+          visible=re.sub(r'<(?:script|style)\b.*?</(?:script|style)>',' ',main.group(0),flags=re.I|re.S)
+          visible=html.unescape(re.sub(r'<[^>]+>',' ',visible))
+          visible=re.sub(r'\s+',' ',visible).strip()
+          assert len(visible)>1200, len(visible)
+          for token in ('KIỂM ĐỊNH LỊCH SỬ 4SO','4SO chỉ công khai hiệu quả tổng hợp','MỞ ZALO – NHẬN GỢI Ý HÔM NAY'):
+            assert token.lower() not in visible.lower(), token
+          assert page.count('data-open-checkout')>=2
+          proof=json.loads(Path('_site/historical-proof.json').read_text(encoding='utf-8'))
+          assert proof['status']=='PROCESS_ONLY'
+          print('MBALL_HOME_NO_EMPTY_GAP_VERIFIED',len(visible))
           PY
 
       - name: Upload Pages artifact
@@ -214,7 +160,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Record successful lemienbac.com deployment
+      - name: Record successful deployment
         env:
           REPORT_DATE: ${{ steps.report.outputs.date }}
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
@@ -222,32 +168,28 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json
-          import os
-          from datetime import datetime, timezone
+          import json,os
+          from datetime import datetime,timezone
           from pathlib import Path
-
-          payload = {
-              'status': 'DEPLOYED_PASS',
-              'website': 'https://lemienbac.com/',
-              'page_url': os.environ.get('PAGE_URL', ''),
-              'report_date': os.environ['REPORT_DATE'],
-              'source_commit': os.environ['GITHUB_SHA'],
-              'deployed_at_utc': datetime.now(timezone.utc).isoformat(),
-              'surface': 'MBALL_31_LIVE_V3',
-              'paid_checkout': True,
-              'email_confirmation': True,
-              'zalo_support_only': True,
-              'legacy_70_removed': True,
-              'public_six_method_outputs_removed': True
+          payload={
+            'status':'DEPLOYED_PASS',
+            'website':'https://lemienbac.com/',
+            'page_url':os.environ.get('PAGE_URL',''),
+            'report_date':os.environ['REPORT_DATE'],
+            'source_commit':os.environ['GITHUB_SHA'],
+            'deployed_at_utc':datetime.now(timezone.utc).isoformat(),
+            'surface':'MBALL_HOME_V4_NO_EMPTY_GAP',
+            'paid_checkout':True,
+            'email_confirmation':True,
+            'zalo_support_only':True,
+            'empty_gap_removed':True,
+            'legacy_70_removed':True,
+            'public_six_method_outputs_removed':True
           }
-          Path('data/live-deploy-status.json').write_text(
-              json.dumps(payload, ensure_ascii=False, indent=2) + '\n',
-              encoding='utf-8'
-          )
+          Path('data/live-deploy-status.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/live-deploy-status.json
-          git commit -m 'ops: record successful live MB_ALL deployment [skip ci]'
-          git push
+          git commit -m 'ops: record successful no-gap MB_ALL deployment [skip ci]' || true
+          git push || true

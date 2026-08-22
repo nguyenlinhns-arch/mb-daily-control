@@ -1,15 +1,12 @@
 // Public endpoint only. Administrative approval secrets must never be stored here.
 window.ORDER_CONFIRMATION_ENDPOINT = "https://script.google.com/macros/s/AKfycbygWuNvfFPiG9rKbW_tXgbo1LKssBhmqfO9JYxQP7BFLz4iamOHiiMnftEdaH6KeRrV/exec";
 
-// Keep the paid AI report as the primary mobile conversion.
+// Keep the paid report as the primary mobile conversion.
 try {
   sessionStorage.setItem("lm_shopee_nudge_v1", "shown");
 } catch (_) {}
 
-// Privacy-safe first-party attribution. This random browser identifier contains
-// no name, phone number, email address or device fingerprint. app.js persists
-// the attribution object with each payment claim so Orders can distinguish
-// repeat-browser purchases without changing the backend schema.
+// Privacy-safe first-party attribution.
 (() => {
   "use strict";
   const VISITOR_KEY = "lemienbac_visitor_v1";
@@ -73,24 +70,28 @@ try {
 
     localStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(attribution));
   } catch (_) {
-    // Storage may be unavailable in strict privacy modes; checkout still works.
+    // Checkout still works when storage is unavailable.
   }
 })();
 
-// Homepage copy for the current MB_ALL operating model.
-// The historical 70% block belongs to the retired 4SO presentation and is
-// removed from the public homepage. The paid result remains gated by approval.
+// Current homepage model: MB_ALL, 31 methods, dynamic daily selection.
 (() => {
   "use strict";
 
-  const STYLE_ID = "mball-31-home-style";
   const HOME_TITLE = "MB_ALL hôm nay – 31 phương pháp chọn lọc động";
   const HOME_DESCRIPTION = "Báo cáo MB_ALL ngày hôm nay: chạy đủ 31 phương pháp bằng dữ liệu khóa đến T−1, đánh giá phong độ 3/5/7/10 ngày, P/L và trạng thái HOT/COLD để chọn số động trước giờ quay.";
 
+  function isHomepage() {
+    return document.body?.classList.contains("landing-simple")
+      || document.body?.classList.contains("portal-home")
+      || window.location.pathname === "/"
+      || window.location.pathname === "/index.html";
+  }
+
   function ensureStyle() {
-    if (document.getElementById(STYLE_ID)) return;
+    if (document.getElementById("mball-31-home-style")) return;
     const style = document.createElement("style");
-    style.id = STYLE_ID;
+    style.id = "mball-31-home-style";
     style.textContent = `
       .historical-proof-section,
       #statistics.historical-proof-section,
@@ -104,21 +105,19 @@ try {
     document.head.appendChild(style);
   }
 
-  function isHomepage() {
-    return document.body?.classList.contains("landing-simple")
-      || document.body?.classList.contains("portal-home")
-      || window.location.pathname === "/"
-      || window.location.pathname === "/index.html";
+  function setText(selector, value, root = document) {
+    const node = root.querySelector(selector);
+    if (node && node.textContent !== value) node.textContent = value;
+  }
+
+  function setHtml(selector, value, root = document) {
+    const node = root.querySelector(selector);
+    if (node && node.innerHTML !== value) node.innerHTML = value;
   }
 
   function setMeta(selector, value) {
     const node = document.querySelector(selector);
-    if (node) node.setAttribute("content", value);
-  }
-
-  function setText(selector, value) {
-    const node = document.querySelector(selector);
-    if (node && node.textContent !== value) node.textContent = value;
+    if (node && node.getAttribute("content") !== value) node.setAttribute("content", value);
   }
 
   function replaceText(root, replacements) {
@@ -135,6 +134,88 @@ try {
     }
   }
 
+  function removeLegacyProof() {
+    document.querySelectorAll(".historical-proof-section").forEach((node) => node.remove());
+    for (const rate of document.querySelectorAll(".portal-proof-rate,.historical-rate")) {
+      const section = rate.closest(".portal-section,.historical-proof-section,section");
+      if (section) section.remove();
+    }
+    document.querySelectorAll(".lm-ai-history-note").forEach((node) => node.remove());
+  }
+
+  function rebuildMethodSection() {
+    const section = Array.from(document.querySelectorAll(".portal-section")).find((item) => {
+      const title = item.querySelector(".portal-section-title h2");
+      return /Phương pháp công khai hôm nay|MB_ALL chạy đủ 31 phương pháp/.test(String(title?.textContent || ""));
+    });
+    if (!section) return;
+
+    setText(".portal-section-title h2", "MB_ALL chạy đủ 31 phương pháp mỗi ngày", section);
+    setText(
+      ".portal-section-title p",
+      "Không dùng một phương pháp cố định. Toàn bộ 31 phương pháp được chạy bằng dữ liệu đến T−1, sau đó mới đánh giá trạng thái và chấm điểm từng số.",
+      section
+    );
+
+    const grid = section.querySelector(".portal-methods");
+    if (grid && grid.dataset.mball31Process !== "true") {
+      grid.dataset.mball31Process = "true";
+      grid.classList.add("mball31-process");
+      grid.innerHTML = `
+        <article class="portal-method"><div class="portal-method-head"><b>1. Chạy đủ 31/31</b><span>T−1</span></div><p>Mỗi phương pháp chỉ dùng dữ liệu đã hoàn tất đến ngày liền trước.</p></article>
+        <article class="portal-method"><div class="portal-method-head"><b>2. Đánh giá hiệu quả gần</b><span>3–5–7–10</span></div><p>Đối chiếu chuỗi thắng/thua, P/L, số nháy, ROI và độ ổn định gần.</p></article>
+        <article class="portal-method"><div class="portal-method-head"><b>3. Chấm HOT/COLD</b><span>THEO SỐ</span></div><p>Tín hiệu tốt cộng điểm, tín hiệu xấu trừ điểm; không chọn theo cảm tính.</p></article>
+        <article class="portal-method"><div class="portal-method-head"><b>4. Chọn động và khóa</b><span>PRE-DRAW</span></div><p>Số lượng số thay đổi theo điểm thực tế và được khóa trước giờ quay.</p></article>
+      `;
+    }
+
+    setText(
+      ".portal-disclaimer",
+      "Đầu ra từng phương pháp và số cuối cùng không công khai trước thanh toán. Kết quả ngày T không được dùng để sửa lựa chọn ngày T.",
+      section
+    );
+  }
+
+  function rewriteCommerceProof() {
+    const block = document.querySelector(".lm-ai-commerce-proof");
+    if (!block) return;
+
+    setText("h3", "Báo cáo MB_ALL gồm gì?", block);
+    const lead = block.querySelector(":scope > p:not(.lm-ai-history-note)");
+    const leadCopy = "Một báo cáo riêng cho ngày hiện tại, được tạo sau khi khóa dữ liệu T−1 và chạy đủ 31 phương pháp.";
+    if (lead && lead.textContent !== leadCopy) lead.textContent = leadCopy;
+
+    const values = [
+      ["31 phương pháp độc lập", "Không phụ thuộc vào một công thức duy nhất; toàn bộ hệ thống được chạy trước khi kết luận."],
+      ["Chọn lọc động theo ngày", "Đánh giá phong độ gần, P/L và trạng thái HOT/COLD rồi chấm trực tiếp từng số."],
+      ["Khóa trước giờ quay", "Kết luận chỉ mở sau xác nhận thanh toán và không sửa theo kết quả ngày hiện tại."]
+    ];
+    Array.from(block.querySelectorAll(".lm-ai-commerce-grid > div")).slice(0, values.length).forEach((card, index) => {
+      setText("b", values[index][0], card);
+      setText("span", values[index][1], card);
+    });
+
+    block.querySelectorAll(".lm-ai-history-note").forEach((node) => node.remove());
+    const link = block.querySelector(".lm-ai-secondary-link");
+    if (link) {
+      if (link.textContent !== "Xem nguyên tắc vận hành MB_ALL →") link.textContent = "Xem nguyên tắc vận hành MB_ALL →";
+      if (link.getAttribute("href") !== "/gioi-thieu/") link.setAttribute("href", "/gioi-thieu/");
+    }
+  }
+
+  function rewriteCheckoutText() {
+    replaceText(document.querySelector("#checkout"), [
+      ["2 cặp 4SO · 4 đầu ra xếp hạng · Top 3 và hồ sơ nguồn", "Kết luận MB_ALL đã khóa · số chọn cuối cùng · dữ liệu T−1"],
+      ["4 số được chia thành 2 cặp theo thứ tự xếp hạng.", "Kết luận MB_ALL chỉ mở sau khi giao dịch được xác nhận."],
+      ["Đang tải kết luận 4SO", "Đang tải kết luận MB_ALL"],
+      ["Kết luận 4SO", "Kết luận MB_ALL"],
+      ["kết luận 4SO", "kết luận MB_ALL"],
+      ["Bản phân tích AI", "Báo cáo MB_ALL"],
+      ["bản phân tích AI", "báo cáo MB_ALL"],
+      ["4SO ngày", "MB_ALL ngày"]
+    ]);
+  }
+
   function rewriteJsonLd() {
     const replacements = [
       ["Báo cáo dữ liệu AI ngày hôm nay", "Báo cáo MB_ALL ngày hôm nay"],
@@ -149,100 +230,15 @@ try {
         for (const [from, to] of replacements) raw = raw.split(from).join(to);
         JSON.parse(raw);
         if (raw !== script.textContent) script.textContent = raw;
-      } catch (_) {
-        // Keep the original structured data if it cannot be parsed safely.
-      }
+      } catch (_) {}
     }
-  }
-
-  function removeLegacyRateBlocks() {
-    document.querySelectorAll(".historical-proof-section").forEach((node) => node.remove());
-    const statistics = document.getElementById("statistics");
-    if (statistics?.querySelector(".historical-rate")) statistics.remove();
-
-    for (const rate of document.querySelectorAll(".portal-proof-rate,.historical-rate")) {
-      const section = rate.closest(".portal-section,.historical-proof-section,section");
-      if (section) section.remove();
-    }
-    document.querySelectorAll(".lm-ai-history-note").forEach((node) => node.remove());
-  }
-
-  function rebuildMethodSection() {
-    const sections = Array.from(document.querySelectorAll(".portal-section"));
-    const section = sections.find((item) => {
-      const title = item.querySelector(".portal-section-title h2");
-      return /Phương pháp công khai hôm nay|MB_ALL chạy đủ 31 phương pháp/.test(String(title?.textContent || ""));
-    });
-    if (!section) return;
-
-    const title = section.querySelector(".portal-section-title h2");
-    const description = section.querySelector(".portal-section-title p");
-    if (title) title.textContent = "MB_ALL chạy đủ 31 phương pháp mỗi ngày";
-    if (description) {
-      description.textContent = "Không dùng một phương pháp cố định. Toàn bộ 31 phương pháp được chạy bằng dữ liệu đến T−1, sau đó mới đánh giá trạng thái và chấm điểm từng số.";
-    }
-
-    const grid = section.querySelector(".portal-methods");
-    if (grid && grid.dataset.mball31Process !== "true") {
-      grid.dataset.mball31Process = "true";
-      grid.classList.add("mball31-process");
-      grid.innerHTML = `
-        <article class="portal-method"><div class="portal-method-head"><b>1. Chạy đủ 31/31</b><span>T−1</span></div><p>Mỗi phương pháp chỉ được dùng dữ liệu đã hoàn tất đến ngày liền trước.</p></article>
-        <article class="portal-method"><div class="portal-method-head"><b>2. Đánh giá hiệu quả gần</b><span>3–5–7–10</span></div><p>Đối chiếu chuỗi thắng/thua, P/L, số nháy, ROI và độ ổn định gần.</p></article>
-        <article class="portal-method"><div class="portal-method-head"><b>3. Chấm HOT/COLD</b><span>THEO SỐ</span></div><p>Tín hiệu tốt cộng điểm, tín hiệu xấu trừ điểm; không chọn theo cảm tính.</p></article>
-        <article class="portal-method"><div class="portal-method-head"><b>4. Chọn động và khóa</b><span>PRE-DRAW</span></div><p>Số lượng số thay đổi theo điểm thực tế và được khóa trước giờ quay.</p></article>
-      `;
-    }
-
-    const disclaimer = section.querySelector(".portal-disclaimer");
-    if (disclaimer) {
-      disclaimer.textContent = "Đầu ra từng phương pháp và số cuối cùng không công khai trước thanh toán. Kết quả ngày T không được dùng để sửa lựa chọn ngày T.";
-    }
-  }
-
-  function rewriteCommerceProof() {
-    const block = document.querySelector(".lm-ai-commerce-proof");
-    if (!block) return;
-    setText(".lm-ai-commerce-proof h3", "Báo cáo MB_ALL gồm gì?");
-    const lead = block.querySelector(":scope > p:not(.lm-ai-history-note)");
-    if (lead) lead.textContent = "Một báo cáo riêng cho ngày hiện tại, được tạo sau khi khóa dữ liệu T−1 và chạy đủ 31 phương pháp.";
-
-    const cards = Array.from(block.querySelectorAll(".lm-ai-commerce-grid > div"));
-    const values = [
-      ["31 phương pháp độc lập", "Không phụ thuộc vào một công thức duy nhất; toàn bộ hệ thống được chạy trước khi kết luận."],
-      ["Chọn lọc động theo ngày", "Đánh giá phong độ gần, P/L và trạng thái HOT/COLD rồi chấm trực tiếp từng số."],
-      ["Khóa trước giờ quay", "Kết luận chỉ mở sau xác nhận thanh toán và không sửa theo kết quả ngày hiện tại."]
-    ];
-    cards.slice(0, values.length).forEach((card, index) => {
-      const bold = card.querySelector("b");
-      const span = card.querySelector("span");
-      if (bold) bold.textContent = values[index][0];
-      if (span) span.textContent = values[index][1];
-    });
-
-    block.querySelectorAll(".lm-ai-history-note").forEach((node) => node.remove());
-    const link = block.querySelector(".lm-ai-secondary-link");
-    if (link) {
-      link.textContent = "Xem nguyên tắc vận hành MB_ALL →";
-      link.setAttribute("href", "/gioi-thieu/");
-    }
-  }
-
-  function rewriteCheckout() {
-    replaceText(document.querySelector("#checkout"), [
-      ["Đang tải kết luận 4SO", "Đang tải kết luận MB_ALL"],
-      ["kết luận 4SO", "kết luận MB_ALL"],
-      ["Kết luận 4SO", "Kết luận MB_ALL"],
-      ["4SO ngày", "MB_ALL ngày"],
-      ["2 cặp 4SO · 4 đầu ra xếp hạng · Top 3 và hồ sơ nguồn", "Kết luận MB_ALL đã khóa · số chọn cuối cùng · dữ liệu T−1"],
-      ["4 số được chia thành 2 cặp theo thứ tự xếp hạng.", "Kết luận MB_ALL chỉ mở sau khi giao dịch được xác nhận."]
-    ]);
   }
 
   function applyHomeCopy() {
     if (!document.body || !isHomepage()) return;
+    ensureStyle();
+    removeLegacyProof();
 
-    removeLegacyRateBlocks();
     document.title = HOME_TITLE;
     setMeta('meta[name="description"]', HOME_DESCRIPTION);
     setMeta('meta[property="og:title"]', HOME_TITLE);
@@ -254,8 +250,7 @@ try {
     const lockDate = String(document.body.dataset.lockDate || "T−1");
 
     setText(".hero .eyebrow", `MB_ALL · 31 PHƯƠNG PHÁP · NGÀY ${reportDate}`);
-    const simpleHeading = document.querySelector(".hero h1");
-    if (simpleHeading) simpleHeading.innerHTML = "MB_ALL với 31 phương pháp<br><em>chọn lọc động mỗi ngày</em>";
+    setHtml(".hero h1", "MB_ALL với 31 phương pháp<br><em>chọn lọc động mỗi ngày</em>");
     setText(
       ".hero-lead",
       "MB_ALL không dùng một công thức cố định. Mỗi ngày hệ thống chạy đủ 31 phương pháp bằng dữ liệu đến hết ngày T−1, đánh giá hiệu quả gần theo 3–5–7–10 ngày cùng P/L, số nháy và trạng thái HOT/COLD, rồi chấm điểm từng số để tạo lựa chọn động."
@@ -268,8 +263,7 @@ try {
     setText(".simple-hero-offer span", "31 phương pháp · Chấm HOT/COLD · Chọn số động theo ngày");
 
     setText(".portal-kicker", "MB_ALL · 31 PHƯƠNG PHÁP");
-    const portalHeading = document.querySelector(".portal-hero h1");
-    if (portalHeading) portalHeading.innerHTML = "MB_ALL – 31 phương pháp<br>chọn lọc động mỗi ngày";
+    setHtml(".portal-hero h1", "MB_ALL – 31 phương pháp<br>chọn lọc động mỗi ngày");
     setText(
       ".portal-lead",
       "Mỗi ngày MB_ALL chạy đủ 31 phương pháp bằng dữ liệu đến T−1, đánh giá hiệu quả gần theo 3–5–7–10 ngày, P/L, số nháy và trạng thái HOT/COLD, rồi chấm điểm trực tiếp từng số. Không cố định phương pháp và không cố định số lượng số được chọn."
@@ -281,8 +275,8 @@ try {
 
     const sampleLink = document.querySelector(".sample-link");
     if (sampleLink) {
-      sampleLink.textContent = "Cách MB_ALL hoạt động";
-      sampleLink.setAttribute("href", "/gioi-thieu/");
+      if (sampleLink.textContent !== "Cách MB_ALL hoạt động") sampleLink.textContent = "Cách MB_ALL hoạt động";
+      if (sampleLink.getAttribute("href") !== "/gioi-thieu/") sampleLink.setAttribute("href", "/gioi-thieu/");
     }
 
     setText(".buy-simple .eyebrow", "MỞ KẾT LUẬN MB_ALL HÔM NAY");
@@ -290,32 +284,25 @@ try {
       ".buy-copy",
       "Trang công khai giới thiệu nguyên tắc vận hành. Bản trả phí mở kết luận MB_ALL đã khóa cho ngày hôm nay, được tạo sau khi chạy đủ 31 phương pháp và chọn lọc tín hiệu theo trạng thái hiệu quả gần."
     );
-
-    const headerButton = document.querySelector(".site-header [data-open-checkout]");
-    if (headerButton) headerButton.textContent = "Mở báo cáo MB_ALL";
-    const heroButton = document.querySelector(".hero [data-open-checkout]");
-    if (heroButton) heroButton.textContent = "Mở kết luận hôm nay";
-    const finalButton = document.querySelector(".portal-buy [data-open-checkout]");
-    if (finalButton) finalButton.textContent = "MỞ KẾT LUẬN MB_ALL – 30.000Đ";
+    setText(".site-header [data-open-checkout]", "Mở báo cáo MB_ALL");
+    setText(".hero [data-open-checkout]", "Mở kết luận hôm nay");
+    setText(".portal-buy [data-open-checkout]", "MỞ KẾT LUẬN MB_ALL – 30.000Đ");
+    setText(".lm-ai-sticky", "MỞ BÁO CÁO MB_ALL · 30.000Đ");
 
     rebuildMethodSection();
     rewriteCommerceProof();
-    rewriteCheckout();
+    rewriteCheckoutText();
+    rewriteJsonLd();
 
     replaceText(document.body, [
       ["7 lớp báo cáo", "31 phương pháp MB_ALL"],
       ["7 lớp phân tích", "31 phương pháp MB_ALL"],
       ["phân tích qua 7 lớp", "chạy qua 31 phương pháp"],
-      ["Xem mẫu 4SO", "Cách MB_ALL hoạt động"],
-      ["BẢN PHÂN TÍCH AI", "BÁO CÁO MB_ALL"],
-      ["MỞ BẢN PHÂN TÍCH AI", "MỞ BÁO CÁO MB_ALL"]
+      ["Xem mẫu 4SO", "Cách MB_ALL hoạt động"]
     ]);
 
-    rewriteJsonLd();
     document.body.dataset.mballModel = "31-method-dynamic-selection";
   }
-
-  ensureStyle();
 
   const start = () => {
     applyHomeCopy();
@@ -323,16 +310,13 @@ try {
     window.setTimeout(applyHomeCopy, 900);
     window.setTimeout(applyHomeCopy, 1800);
 
-    let queued = false;
-    const observer = new MutationObserver(() => {
-      if (queued) return;
-      queued = true;
-      window.requestAnimationFrame(() => {
-        queued = false;
-        applyHomeCopy();
-      });
+    document.addEventListener("click", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target?.closest("[data-open-checkout],#payment-self-confirm")) return;
+      window.setTimeout(rewriteCheckoutText, 0);
+      window.setTimeout(rewriteCheckoutText, 250);
+      window.setTimeout(rewriteCheckoutText, 900);
     });
-    observer.observe(document.body, { subtree: true, childList: true });
   };
 
   if (document.readyState === "loading") {
@@ -340,13 +324,13 @@ try {
   } else {
     start();
   }
+
+  window.MB_ALL_REWRITE_CHECKOUT = rewriteCheckoutText;
 })();
 
 // Paid-delivery compatibility layer.
-// The existing Apps Script endpoint still returns the legacy two-pair schema.
-// During the MB ALL transition, Paid_Report can write the same two-number MB ALL
-// result into both legacy slots. Only after the order is approved do we collapse
-// that duplicate payload into one paid MB ALL result for the customer.
+// Paid_Report can write the same two-number MB_ALL result into both legacy
+// slots. Only after approval do we collapse that duplicate payload.
 (() => {
   "use strict";
 
@@ -363,27 +347,23 @@ try {
     if (!view || view.hidden) return;
 
     const cards = Array.from(view.querySelectorAll(".delivery-pair, [data-delivery-pair]"));
-    if (cards.length < 2) return;
-
-    const first = normalizePair(cards[0]);
-    const second = normalizePair(cards[1]);
-    if (first.length !== 2 || second.length !== 2 || first.join("|") !== second.join("|")) return;
-
-    cards[1].remove();
-
-    const rank = cards[0].querySelector(
-      ".delivery-pair-rank, .delivery-rank, [data-delivery-rank]"
-    );
-    if (rank) rank.textContent = "SỐ CHỌN MB ALL";
+    if (cards.length >= 2) {
+      const first = normalizePair(cards[0]);
+      const second = normalizePair(cards[1]);
+      if (first.length === 2 && second.length === 2 && first.join("|") === second.join("|")) {
+        cards[1].remove();
+        const rank = cards[0].querySelector(".delivery-pair-rank, .delivery-rank, [data-delivery-rank]");
+        if (rank && rank.textContent !== "SỐ CHỌN MB ALL") rank.textContent = "SỐ CHỌN MB ALL";
+        const pairWrap = view.querySelector("#delivery-pairs, [data-delivery-pairs]");
+        if (pairWrap) pairWrap.setAttribute("aria-label", `Số MB ALL: ${first.join(", ")}`);
+        view.dataset.mballCollapsed = "true";
+      }
+    }
 
     const reportDate = String(document.body?.dataset?.reportDate || "").trim();
     const title = view.querySelector("#delivery-title, h2, h3, [data-delivery-title]");
-    if (title) title.textContent = reportDate ? `Số MB ALL ngày ${reportDate}` : "Số MB ALL hôm nay";
-
-    const pairWrap = view.querySelector("#delivery-pairs, [data-delivery-pairs]");
-    if (pairWrap) pairWrap.setAttribute("aria-label", `Số MB ALL: ${first.join(", ")}`);
-
-    view.dataset.mballCollapsed = "true";
+    const wantedTitle = reportDate ? `Số MB ALL ngày ${reportDate}` : "Số MB ALL hôm nay";
+    if (title && title.textContent !== wantedTitle) title.textContent = wantedTitle;
   }
 
   function relabelPublicMethods() {
@@ -394,13 +374,15 @@ try {
     }
   }
 
-  const start = () => {
-    relabelPublicMethods();
+  const refresh = () => {
     collapsePaidDelivery();
-    const observer = new MutationObserver(() => {
-      collapsePaidDelivery();
-      relabelPublicMethods();
-    });
+    relabelPublicMethods();
+    if (typeof window.MB_ALL_REWRITE_CHECKOUT === "function") window.MB_ALL_REWRITE_CHECKOUT();
+  };
+
+  const start = () => {
+    refresh();
+    const observer = new MutationObserver(refresh);
     observer.observe(document.body, {
       subtree: true,
       childList: true,

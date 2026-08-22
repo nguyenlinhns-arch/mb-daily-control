@@ -1,17 +1,16 @@
 {
-  "schema_version": "MB_REPORT_READINESS_V3_MB_ALL_PUBLIC_OPEN",
+  "schema_version": "MB_PAID_REPORT_READINESS_V2_MAX2",
   "report_date": "2026-08-22",
   "data_lock": "2026-08-21",
-  "status": "PUBLISHED_PASS_PUBLIC_OPEN",
+  "status": "PUBLISHED_PASS_PRIVATE",
   "outcome_known_at_selection": false,
-  "updated_at": "2026-08-22T10:40:22+07:00",
+  "updated_at": "2026-08-22T11:12:00+07:00",
   "source": "MB_ALL_METHOD_BACKTEST / PICKS_20260822 / ROUTER_FORWARD_LOG",
   "production_method": "V5.0_KEP5OF5",
   "production_config": "V5_0_HOT_COLD_KEP_5OF5",
   "production_status": "PRE_DRAW_FROZEN_KEP5OF5",
   "freeze_at": "2026-08-22T00:50:00+07:00",
-  "public_output_open": true,
-  "paid_output_hidden": false,
-  "numbers": ["98", "89"],
-  "note": "MB ALL final numbers for 22/08/2026 are opened publicly. No payment or unlock is required."
+  "public_mb_all_output_open": true,
+  "paid_output_hidden": true,
+  "note": "The legacy paid-delivery contract remains hidden. The owner-authorized MB ALL public output is rendered separately by the website runtime."
 }

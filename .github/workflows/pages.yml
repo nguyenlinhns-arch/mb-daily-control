@@ -32,7 +32,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Resolve locked report date
+      - name: Validate MB_ALL lock
         id: report
         shell: bash
         run: |
@@ -46,21 +46,24 @@ jobs:
           source = json.load(open('data/source-access.json', encoding='utf-8'))
           target = date.fromisoformat(str(public['target_date']))
           lock = date.fromisoformat(str(public['data_lock']))
+
           if lock != target - timedelta(days=1):
               raise SystemExit('MB_ALL data lock is not T-1')
+          if int(public.get('mb_all', {}).get('method_count_run', 0)) != 31:
+              raise SystemExit('MB_ALL did not run 31/31 methods')
           if ready.get('report_date') != target.isoformat() or ready.get('data_lock') != lock.isoformat():
               raise SystemExit('Paid readiness does not match MB_ALL target/data lock')
           if source.get('history_end') != lock.isoformat():
               raise SystemExit('Source history_end does not match MB_ALL data lock')
-          if int(public.get('mb_all', {}).get('method_count_run', 0)) != 31:
-              raise SystemExit('MB_ALL did not run 31/31 methods')
+          if ready.get('delivery_policy') != 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL':
+              raise SystemExit('Delivery policy must require owner email approval')
           print(target.isoformat())
           PY
           )"
           echo "date=${REPORT_DATE}" >> "$GITHUB_OUTPUT"
           echo "Rendering MB_ALL portal for ${REPORT_DATE}"
 
-      - name: Build portal
+      - name: Build final portal
         env:
           REPORT_DATE: ${{ steps.report.outputs.date }}
         shell: bash
@@ -69,6 +72,10 @@ jobs:
           rm -rf _site
           mkdir -p _site/ai-methods
 
+          # Use the maintained checkout template directly. The retired
+          # build_seo_pages V2 validator is intentionally not called because
+          # the production payload is MB_ALL V3 with 31 methods.
+          cp -f site-v2/index.html _site/index.html
           find site-v2 -maxdepth 1 -type f \( -name '*.css' -o -name '*.js' -o -name '*.svg' -o -name '*.png' -o -name '*.webmanifest' \) -exec cp -f {} _site/ \;
           cp -f site-v2/404.html _site/
           cp -f site-v2/legal.html _site/
@@ -80,38 +87,28 @@ jobs:
           cp -f data/public-historical-proof.json _site/historical-proof.json
           cp -f data/paid-report-ready.json _site/report-readiness.json
 
-          python scripts/build_seo_pages.py --output-root _site --today "$REPORT_DATE"
-
-          run_optional() {
-            echo "::group::$*"
-            if ! python "$@"; then
-              echo "::warning::Optional builder failed: $*"
-            fi
-            echo "::endgroup::"
-          }
-
-          run_optional scripts/simplify_public_site.py --output-root _site
-          run_optional scripts/replace_public_analysis_wording.py --output-root _site
-          run_optional scripts/apply_conversion_site.py --output-root _site
-          run_optional scripts/simplify_purchase_cta.py --output-root _site
-          run_optional scripts/apply_conversion_v2.py --output-root _site
-
           python scripts/build_statistics_site.py --output-root _site
-          python scripts/apply_home_portal_safe.py --output-root _site
-          run_optional scripts/apply_portal_subpages.py --output-root _site
-          run_optional scripts/optimize_portal_v2_run.py --output-root _site
-          run_optional scripts/optimize_portal_v3.py --output-root _site
-          run_optional scripts/apply_portal_v3_assets.py --output-root _site
-          run_optional scripts/sitewide_product_surface.py --output-root _site
+          python scripts/apply_home_portal.py --output-root _site
+          python scripts/optimize_portal_v2.py --output-root _site
 
-          # Absolute final writer: older builders cannot restore the 70%/4SO
-          # block, six public number cards, or Zalo as the purchase action.
+          if ! python scripts/optimize_portal_v3.py --output-root _site; then
+            echo '::warning::Skipped optional portal-v3 enhancement'
+          fi
+          if ! python scripts/apply_portal_v3_assets.py --output-root _site; then
+            echo '::warning::Skipped optional portal asset enhancement'
+          fi
+          if ! python scripts/sitewide_product_surface.py --output-root _site; then
+            echo '::warning::Skipped optional affiliate product surface'
+          fi
+
+          # Absolute final writer. No later content transform may restore the
+          # 70%/4SO block, six public number cards or Zalo purchase CTA.
           python scripts/finalize_live_mball.py --output-root _site
 
           touch _site/.nojekyll
           printf 'lemienbac.com\n' > _site/CNAME
 
-      - name: Verify exact live MB_ALL surface
+      - name: Verify exact public blocks
         shell: bash
         run: |
           set -euo pipefail
@@ -120,6 +117,7 @@ jobs:
           test -s _site/config.js
           test -s _site/copy-lock.js
           test -s _site/mball-live-status.json
+          test -s _site/phuong-phap-cong-khai/index.html
           grep -q 'MBALL_LIVE_FINAL_V3' _site/index.html
           grep -q 'MB_ALL chạy đủ 31 phương pháp mỗi ngày' _site/index.html
           grep -q 'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ' _site/index.html
@@ -184,26 +182,26 @@ jobs:
           from pathlib import Path
 
           payload = {
-              "status": "DEPLOYED_PASS",
-              "website": "https://lemienbac.com/",
-              "page_url": os.environ.get("PAGE_URL", ""),
-              "report_date": os.environ["REPORT_DATE"],
-              "source_commit": os.environ["GITHUB_SHA"],
-              "deployed_at_utc": datetime.now(timezone.utc).isoformat(),
-              "surface": "MBALL_31_LIVE_V3",
-              "paid_checkout": True,
-              "email_confirmation": True,
-              "zalo_support_only": True,
-              "legacy_70_removed": True,
-              "public_six_method_outputs_removed": True
+              'status': 'DEPLOYED_PASS',
+              'website': 'https://lemienbac.com/',
+              'page_url': os.environ.get('PAGE_URL', ''),
+              'report_date': os.environ['REPORT_DATE'],
+              'source_commit': os.environ['GITHUB_SHA'],
+              'deployed_at_utc': datetime.now(timezone.utc).isoformat(),
+              'surface': 'MBALL_31_LIVE_V3',
+              'paid_checkout': True,
+              'email_confirmation': True,
+              'zalo_support_only': True,
+              'legacy_70_removed': True,
+              'public_six_method_outputs_removed': True
           }
-          Path("data/live-deploy-status.json").write_text(
-              json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-              encoding="utf-8"
+          Path('data/live-deploy-status.json').write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
           )
           PY
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/live-deploy-status.json
-          git commit -m "ops: record successful live MB_ALL deployment [skip ci]"
+          git commit -m 'ops: record successful live MB_ALL deployment [skip ci]'
           git push

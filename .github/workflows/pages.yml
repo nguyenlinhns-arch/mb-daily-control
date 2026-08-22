@@ -81,6 +81,7 @@ jobs:
           cp -f site-v2/legal.html _site/
           cp -f site-v2/mau-bao-cao.html _site/
           cp -f site-v2/robots.txt _site/
+          cp -f site-v2/sitemap.xml _site/
           cp -f ai-methods/seo.css _site/ai-methods/
           cp -f ai-methods/og-4so-ai-v2.jpg _site/ai-methods/
           cp -f data/source-access.json _site/

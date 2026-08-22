@@ -11,6 +11,8 @@ on:
   schedule:
     # GitHub cron uses UTC. 12:00 UTC = 19:00 Asia/Ho_Chi_Minh.
     - cron: "0 12 * * *"
+    # Safe fallback in case the primary scheduled run is delayed or sources are not ready.
+    - cron: "30 12 * * *"
   workflow_dispatch:
     inputs:
       draw_date:

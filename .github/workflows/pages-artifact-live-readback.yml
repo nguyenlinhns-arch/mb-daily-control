@@ -2,7 +2,7 @@ name: Persist Pages artifact and live readback
 
 on:
   workflow_run:
-    workflows: ["Deploy Lê Miền Bắc XSMB portal to GitHub Pages"]
+    workflows: ["Deploy Lê Miền Bắc MB_ALL to GitHub Pages"]
     types: [completed]
 
 permissions:
@@ -89,15 +89,19 @@ jobs:
 
           root = Path('/tmp/pages-site')
           excluded = {'404.html', 'go/shopee/index.html'}
-          pages = [p for p in root.rglob('*.html') if p.relative_to(root).as_posix() not in excluded and not p.relative_to(root).as_posix().startswith('go/shopee/')]
+          pages = [p for p in root.rglob('*.html') if p.relative_to(root).as_posix() not in excluded and not p.relative_to(root).as_posix().startswith('go/')]
           assert pages, 'no public HTML pages in Pages artifact'
           for page in pages:
+              rel = page.relative_to(root).as_posix()
               text = page.read_text(encoding='utf-8')
-              assert text.count('data-sitewide-products="true"') >= 1, page
-              assert 'lm-shop-grid' in text and 'lm-shop-item' in text, page
+              assert text.count('data-sitewide-products="true"') == 1, (rel, 'product block count')
+              block = re.search(r'<section\b[^>]*data-sitewide-products="true"[^>]*>.*?</section>', text, flags=re.I | re.S)
+              assert block, (rel, 'product block missing')
+              block_text = block.group(0)
+              assert block_text.count('class="lm-shop-item"') == 4, (rel, 'card count')
               for idx in range(1, 5):
-                  assert f'/go/shopee/?p={idx}' in text, (page, idx)
-              assert 'go.isclix.com' not in text, page
+                  assert f'href="/go/shopee/?p={idx}"' in block_text, (rel, idx)
+              assert 'go.isclix.com' not in block_text, rel
           home = (root / 'index.html').read_text(encoding='utf-8')
           assert home.count('data-affiliate-static-placement="after_tools" data-sitewide-products="true"') == 1
           runtime_files = [*root.rglob('*.html'), *root.rglob('*.js')]
@@ -114,6 +118,7 @@ jobs:
 
             BASE='https://lemienbac.com'
             LIVE_OK=0
+            LIVE_SHA=''
             for attempt in {1..12}; do
               curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' \
                 "${BASE}/finance-gate-sitewide.js?readback=${RUN_ID}-${attempt}" -o /tmp/readback/live-finance.js || true
@@ -161,6 +166,7 @@ jobs:
             curl -fsSL --max-time 20 "${BASE}/sitemap.xml" -o /tmp/readback/sitemap.xml
             grep -q 'data-sitewide-products="true"' /tmp/readback/home.html
             grep -q 'data-affiliate-static-placement="after_tools" data-sitewide-products="true"' /tmp/readback/home.html
+            for idx in 1 2 3 4; do grep -Fq "href=\"/go/shopee/?p=${idx}\"" /tmp/readback/home.html; done
             ! grep -Eiq 'effectivecpmnetwork\.com|highperformanceformat\.com|lm-adsterra|adsterra' /tmp/readback/home.html /tmp/readback/stats.html
 
             cd source

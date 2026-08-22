@@ -147,7 +147,7 @@ jobs:
           grep -Fq 'ai_payment_qr_view' site-v2/finance-banner.js
           grep -Fq 'ai_payment_claim_submit' site-v2/finance-banner.js
           grep -Fq 'lm_ai_purchase_intent_v1' site-v2/finance-banner.js
-          grep -Fq 'Gợi ý số cho ngày hôm nay' site-v2/finance-banner.js
+          grep -Fq 'gợi ý XSMB hôm nay' site-v2/finance-banner.js
           ! grep -Fq 'Khi cần phần kết luận riêng cho ngày' site-v2/finance-banner.js
           echo AI_FUNNEL_GUARD_OK
 

@@ -72,9 +72,6 @@ jobs:
           rm -rf _site
           mkdir -p _site/ai-methods
 
-          # Use the maintained checkout template directly. The retired
-          # build_seo_pages V2 validator is intentionally not called because
-          # the production payload is MB_ALL V3 with 31 methods.
           cp -f site-v2/index.html _site/index.html
           find site-v2 -maxdepth 1 -type f \( -name '*.css' -o -name '*.js' -o -name '*.svg' -o -name '*.png' -o -name '*.webmanifest' \) -exec cp -f {} _site/ \;
           cp -f site-v2/404.html _site/
@@ -85,12 +82,8 @@ jobs:
           cp -f ai-methods/seo.css _site/ai-methods/
           cp -f ai-methods/og-4so-ai-v2.jpg _site/ai-methods/
           cp -f data/source-access.json _site/
-          cp -f data/public-historical-proof.json _site/historical-proof.json
           cp -f data/paid-report-ready.json _site/report-readiness.json
 
-          # The source template still contains a retired sticky mobile checkout
-          # outside <main>. apply_home_portal creates the two canonical checkout
-          # buttons itself, so remove the obsolete third button first.
           python - <<'PY'
           from pathlib import Path
           import re
@@ -111,22 +104,6 @@ jobs:
 
           python scripts/build_statistics_site.py --output-root _site
           python scripts/apply_home_portal.py --output-root _site
-
-          # optimize_portal_v2 predates the MB_ALL V3 document wrapper. Its
-          # home patch expects the inner method list, while the subpage builders
-          # still need the complete document. Adapt that single call in the
-          # runner checkout before executing the maintained builder.
-          python - <<'PY'
-          from pathlib import Path
-
-          script = Path('scripts/optimize_portal_v2.py')
-          text = script.read_text(encoding='utf-8')
-          old = "patch_home(root/'index.html',methods)"
-          new = "patch_home(root/'index.html',methods.get('methods') or [])"
-          if text.count(old) != 1:
-              raise SystemExit('Legacy optimize_portal_v2 call site changed unexpectedly')
-          script.write_text(text.replace(old, new, 1), encoding='utf-8')
-          PY
           python scripts/optimize_portal_v2.py --output-root _site
 
           if ! python scripts/optimize_portal_v3.py --output-root _site; then
@@ -143,6 +120,29 @@ jobs:
           # 70%/4SO block, six public number cards or Zalo purchase CTA.
           python scripts/finalize_live_mball.py --output-root _site
 
+          # Publish process metadata only. Current method numbers, Net Score and
+          # the paid result must never be recoverable from a public JSON file.
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          public = json.load(open('ai-methods/public-methods.json', encoding='utf-8'))
+          proof = {
+              'schema_version': 'MB_PUBLIC_PROCESS_PROOF_V1',
+              'status': 'PROCESS_ONLY',
+              'target_date': public['target_date'],
+              'data_lock': public['data_lock'],
+              'method_count': 31,
+              'public_method_outputs_hidden': True,
+              'public_final_output_hidden': True,
+              'delivery_policy': 'REVEAL_ONLY_AFTER_OWNER_EMAIL_APPROVAL'
+          }
+          Path('_site/historical-proof.json').write_text(
+              json.dumps(proof, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+          PY
+
           touch _site/.nojekyll
           printf 'lemienbac.com\n' > _site/CNAME
 
@@ -156,6 +156,7 @@ jobs:
           test -s _site/copy-lock.js
           test -s _site/mball-live-status.json
           test -s _site/phuong-phap-cong-khai/index.html
+          test -s _site/historical-proof.json
           grep -q 'MBALL_LIVE_FINAL_V3' _site/index.html
           grep -q 'MB_ALL chạy đủ 31 phương pháp mỗi ngày' _site/index.html
           grep -q 'THANH TOÁN NHẬN GỢI Ý SỐ · 30.000Đ' _site/index.html
@@ -164,7 +165,7 @@ jobs:
 
           python - <<'PY'
           from pathlib import Path
-          import html, re
+          import html, json, re
 
           page = Path('_site/index.html').read_text(encoding='utf-8')
           visible = re.sub(r'<!--.*?-->', ' ', page, flags=re.S)
@@ -194,6 +195,13 @@ jobs:
           for token in ('portal-method-numbers', 'portal-ball', 'portal-consensus'):
               assert token not in overview, token
           assert page.count('data-open-checkout') >= 2
+
+          proof = json.loads(Path('_site/historical-proof.json').read_text(encoding='utf-8'))
+          assert proof['status'] == 'PROCESS_ONLY'
+          assert proof['public_method_outputs_hidden'] is True
+          assert proof['public_final_output_hidden'] is True
+          assert 'method_snapshot' not in proof
+          assert 'numbers' not in proof
           print('MBALL_LIVE_SURFACE_VERIFIED')
           PY
 

@@ -1,5 +1,5 @@
 {
-  "schema_version": "MB_PUBLIC_METHOD_OUTPUTS_V2_TODAY_ONLY",
+  "schema_version": "MB_PUBLIC_METHOD_OUTPUTS_V3_MB_ALL_31",
   "recommendation_scope": "TODAY_ONLY",
   "target_date": "2026-08-22",
   "data_lock": "2026-08-21",
@@ -8,6 +8,7 @@
   "source_row_count": 2375,
   "source_sha256": "5fa64cc54f546dd21bad694cba1a1550f1ade26581c9b6d78dcb4cea4c02bcd1",
   "outcome_known_at_selection": false,
+  "public_display_policy": "PROCESS_ONLY_NO_CURRENT_METHOD_NUMBERS_NO_FINAL_NUMBERS",
   "methods": [
     {"id": "A1", "name": "A1", "numbers": ["98", "01", "79", "57"]},
     {"id": "X2_RBK", "name": "2SO / X2", "numbers": ["60", "06"]},
@@ -17,8 +18,10 @@
     {"id": "MB_KEP_V1", "name": "KÉP V1", "numbers": ["44", "33", "00"]}
   ],
   "mb_all": {
-    "method_count_expected": 29,
-    "method_count_run": 29,
+    "method_count_expected": 31,
+    "method_count_run": 31,
+    "selection_model": "DYNAMIC_HOT_COLD_NET_SCORE_PRE_DRAW_FROZEN",
+    "public_method_outputs_hidden": true,
     "methods": [
       {"index": 1, "name": "A1 Exact", "numbers": ["98"], "status": "ACTIVE"},
       {"index": 2, "name": "X2 RBK Exact", "numbers": [], "status": "A0"},
@@ -48,24 +51,26 @@
       {"index": 26, "name": "V10 Pair2 A1+KNN", "numbers": ["05", "50", "89", "98"], "status": "ACTIVE"},
       {"index": 27, "name": "HITMAX K1", "numbers": ["50"], "status": "ACTIVE"},
       {"index": 28, "name": "HITMAX K2", "numbers": ["89", "98"], "status": "ACTIVE"},
-      {"index": 29, "name": "HITMAX K3", "numbers": ["05", "50", "89"], "status": "ACTIVE"}
+      {"index": 29, "name": "HITMAX K3", "numbers": ["05", "50", "89"], "status": "ACTIVE"},
+      {"index": 30, "name": "F01 Frequency60", "numbers": ["54", "90", "50", "83", "19", "34", "61"], "status": "ACTIVE"},
+      {"index": 31, "name": "F06 Transition180", "numbers": ["91", "52", "83", "54", "13", "27", "95"], "status": "ACTIVE"}
     ],
-    "hot_support": {
-      "98": ["ROLL30 25/30", "V10 Pair2 A1+KNN"],
-      "89": ["HITMAX K3", "V10 Pair2 A1+KNN"]
-    },
     "kep_consensus": {"required": "5/5", "status": "NO_CONSENSUS", "vote_applied": false},
-    "v5_0": {"numbers": ["98", "89"], "status": "PRE_DRAW_FROZEN_KEP5OF5", "freeze_at": "2026-08-22T00:50:00+07:00"},
-    "v5_1_shadow": {"numbers": [], "status": "A0"},
-    "v3_benchmark": {"numbers": ["18", "69", "20"]},
-    "v4_benchmark": {"numbers": ["78", "87"]}
+    "v5_0": {
+      "numbers_hidden": true,
+      "status": "PRE_DRAW_FROZEN_KEP5OF5",
+      "freeze_at": "2026-08-22T00:50:00+07:00"
+    },
+    "v5_1_shadow": {"numbers_hidden": true, "status": "A0"},
+    "v3_benchmark": {"numbers_hidden": true},
+    "v4_benchmark": {"numbers_hidden": true}
   },
   "production_context": {
     "project": "MB ALL",
-    "production_method": "V5.0_KEP5OF5",
-    "public_output_open": true,
-    "paid_output_hidden": false,
-    "numbers": ["98", "89"],
+    "production_method": "V5.0_DYNAMIC_HOT_COLD_31",
+    "public_output_open": false,
+    "paid_output_hidden": true,
+    "numbers_hidden": true,
     "status": "PRE_DRAW_FROZEN_KEP5OF5",
     "freeze_at": "2026-08-22T00:50:00+07:00"
   }

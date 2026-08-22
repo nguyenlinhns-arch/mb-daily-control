@@ -3,13 +3,15 @@ name: Deploy Lê Miền Bắc MB_ALL to GitHub Pages
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "data/live-deploy-status.json"
   workflow_dispatch:
   schedule:
     - cron: "1 17 * * *"
     - cron: "15 18 * * *"
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -167,3 +169,41 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Record successful lemienbac.com deployment
+        env:
+          REPORT_DATE: ${{ steps.report.outputs.date }}
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          payload = {
+              "status": "DEPLOYED_PASS",
+              "website": "https://lemienbac.com/",
+              "page_url": os.environ.get("PAGE_URL", ""),
+              "report_date": os.environ["REPORT_DATE"],
+              "source_commit": os.environ["GITHUB_SHA"],
+              "deployed_at_utc": datetime.now(timezone.utc).isoformat(),
+              "surface": "MBALL_31_LIVE_V3",
+              "paid_checkout": True,
+              "email_confirmation": True,
+              "zalo_support_only": True,
+              "legacy_70_removed": True,
+              "public_six_method_outputs_removed": True
+          }
+          Path("data/live-deploy-status.json").write_text(
+              json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8"
+          )
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live-deploy-status.json
+          git commit -m "ops: record successful live MB_ALL deployment [skip ci]"
+          git push

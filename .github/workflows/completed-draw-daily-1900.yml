@@ -15,6 +15,8 @@ on:
     - cron: "30 12 * * *"
     # Final recovery window: keep the completed-draw audit from remaining stale overnight.
     - cron: "0 13 * * *"
+    # Late recovery window for providers that finish publishing after 20:00 Vietnam.
+    - cron: "45 13 * * *"
   workflow_dispatch:
     inputs:
       draw_date:

@@ -1,0 +1,73 @@
+name: MN_ALL data build
+
+on:
+  push:
+    branches:
+      - mn-all-data-build-20260823
+    paths:
+      - .github/workflows/mn-all-data-build.yml
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  build-xsmn-history:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: mn-all-data-build-20260823
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install scraper dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4 lxml
+
+      - name: Build XSMN history 2020-01-01 to 2026-08-22
+        id: build
+        shell: bash
+        run: |
+          set +e
+          python tools/mn_all/build_xsmn_history.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xsmn-source-2020-20260822
+          path: mn_data/
+          if-no-files-found: warn
+          compression-level: 6
+
+      - name: Commit validated dataset to isolated branch
+        if: steps.build.outputs.rc == '0'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mn_data
+          if git diff --cached --quiet; then
+            echo "No data changes"
+          else
+            git commit -m "mn_all: build XSMN source through 2026-08-22 [skip ci]"
+            git push origin HEAD:mn-all-data-build-20260823
+          fi
+
+      - name: Enforce quality gate
+        if: steps.build.outputs.rc != '0'
+        run: |
+          echo "MN_ALL historical source quality gate failed (rc=${{ steps.build.outputs.rc }})"
+          exit 1

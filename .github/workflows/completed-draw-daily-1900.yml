@@ -57,6 +57,20 @@ jobs:
       - name: Install locked parser dependency
         run: python -m pip install --disable-pip-version-check openpyxl==3.1.5
 
+      - name: Refresh resilient Minh Ngoc mirror route
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("scripts/build_public_snapshot.py")
+          text = path.read_text(encoding="utf-8")
+          old = 'https://www.minhngoc.net.vn/ket-qua-xo-so/mien-bac/{dmy}.html'
+          new = 'https://www.minhngoc.com.vn/kqxs/mien-bac/{dmy}.html'
+          if old not in text:
+              raise SystemExit("Expected legacy Minh Ngoc route not found; review source routing before continuing")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
+
       - name: Resolve completed draw date
         env:
           MANUAL_DATE: ${{ github.event.inputs.draw_date || '' }}
@@ -95,6 +109,9 @@ jobs:
             echo "Nguồn chưa sẵn sàng; thử lại sau 5 phút ($attempt/6)."
             sleep 300
           done
+
+      - name: Restore source route after isolated audit stage
+        run: git restore --source=HEAD -- scripts/build_public_snapshot.py
 
       - name: Keep public history on the currently published lock
         run: |

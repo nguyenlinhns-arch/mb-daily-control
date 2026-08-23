@@ -27,7 +27,8 @@ permissions:
 
 concurrency:
   group: completed-draw-report-pipeline
-  cancel-in-progress: false
+  # A newer fallback run supersedes an older retry loop for the same completed date.
+  cancel-in-progress: true
 
 jobs:
   crosscheck-and-publish:

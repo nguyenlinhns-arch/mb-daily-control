@@ -13,6 +13,8 @@ on:
     - cron: "0 12 * * *"
     # Safe fallback in case the primary scheduled run is delayed or sources are not ready.
     - cron: "30 12 * * *"
+    # Final recovery window: keep the completed-draw audit from remaining stale overnight.
+    - cron: "0 13 * * *"
   workflow_dispatch:
     inputs:
       draw_date:

@@ -25,6 +25,19 @@ jobs:
           ref: mn-all-data-build-20260823
           fetch-depth: 1
 
+      - name: Record run id immediately
+        shell: bash
+        run: |
+          mkdir -p mn_data
+          printf '%s\n' "${GITHUB_RUN_ID}" > mn_data/run_id.txt
+          printf '%s\n' "${GITHUB_RUN_ATTEMPT}" > mn_data/run_attempt.txt
+          printf '%s\n' "${GITHUB_SHA}" > mn_data/workflow_trigger_sha.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mn_data/run_id.txt mn_data/run_attempt.txt mn_data/workflow_trigger_sha.txt
+          git commit -m "mn_all: record artifact run id [skip ci]" || true
+          git push origin HEAD:mn-all-data-build-20260823
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -43,15 +56,6 @@ jobs:
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Record workflow run metadata
-        if: always()
-        shell: bash
-        run: |
-          mkdir -p mn_data
-          printf '%s\n' "${GITHUB_RUN_ID}" > mn_data/run_id.txt
-          printf '%s\n' "${GITHUB_RUN_ATTEMPT}" > mn_data/run_attempt.txt
-          printf '%s\n' "${GITHUB_SHA}" > mn_data/workflow_trigger_sha.txt
-
       - name: Upload build artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -60,20 +64,6 @@ jobs:
           path: mn_data/
           if-no-files-found: warn
           compression-level: 6
-
-      - name: Commit validated dataset to isolated branch
-        if: steps.build.outputs.rc == '0'
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add mn_data
-          if git diff --cached --quiet; then
-            echo "No data changes"
-          else
-            git commit -m "mn_all: build XSMN source through 2026-08-22 [skip ci]"
-            git push origin HEAD:mn-all-data-build-20260823
-          fi
 
       - name: Enforce quality gate
         if: steps.build.outputs.rc != '0'

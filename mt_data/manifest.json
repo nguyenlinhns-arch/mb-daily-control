@@ -1,0 +1,22 @@
+{
+  "source": "xoso.com.vn date-specific XSMT archive",
+  "scope": [
+    "HUE",
+    "KON_TUM",
+    "KHANH_HOA"
+  ],
+  "period": [
+    "2020-01-01",
+    "2026-08-22"
+  ],
+  "rows": 1607,
+  "counts": {
+    "HUE": 584,
+    "KON_TUM": 341,
+    "KHANH_HOA": 682
+  },
+  "issues": 1402,
+  "repeat_signatures": 0,
+  "duplicate_conflicts": 0,
+  "quality_ok": true
+}

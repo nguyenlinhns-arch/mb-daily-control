@@ -43,6 +43,15 @@ jobs:
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Record workflow run metadata
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p mn_data
+          printf '%s\n' "${GITHUB_RUN_ID}" > mn_data/run_id.txt
+          printf '%s\n' "${GITHUB_RUN_ATTEMPT}" > mn_data/run_attempt.txt
+          printf '%s\n' "${GITHUB_SHA}" > mn_data/workflow_trigger_sha.txt
+
       - name: Upload build artifact
         if: always()
         uses: actions/upload-artifact@v4

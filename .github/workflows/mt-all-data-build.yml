@@ -1,0 +1,87 @@
+name: MT_ALL data build
+
+on:
+  push:
+    branches:
+      - mt-all-data-build-20260823
+    paths:
+      - .github/workflows/mt-all-data-build.yml
+      - tools/mt_all/**
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  build-xsmt-focus-history:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+        with:
+          ref: mt-all-data-build-20260823
+          fetch-depth: 1
+
+      - name: Record run id immediately
+        shell: bash
+        run: |
+          mkdir -p mt_data
+          echo "${GITHUB_RUN_ID}" > mt_data/run_id.txt
+          echo "${GITHUB_RUN_ATTEMPT}" > mt_data/run_attempt.txt
+          echo "${GITHUB_SHA}" > mt_data/workflow_trigger_sha.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mt_data/run_id.txt mt_data/run_attempt.txt mt_data/workflow_trigger_sha.txt
+          git commit -m "mt_all: record workflow run id [skip ci]" || true
+          git push origin HEAD:mt-all-data-build-20260823
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install scraper dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4 lxml
+
+      - name: Build focused XSMT history 2020-01-01 to 2026-08-22
+        id: build
+        shell: bash
+        run: |
+          set +e
+          python tools/mt_all/build_xsmt_focus_history.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xsmt-focus-source-2020-20260822
+          path: mt_data/
+          if-no-files-found: warn
+          compression-level: 6
+
+      - name: Commit validated dataset to isolated branch
+        if: steps.build.outputs.rc == '0'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mt_data
+          if git diff --cached --quiet; then
+            echo "No data changes"
+          else
+            git commit -m "mt_all: build focused XSMT source through 2026-08-22 [skip ci]"
+            git push origin HEAD:mt-all-data-build-20260823
+          fi
+
+      - name: Enforce quality gate
+        if: steps.build.outputs.rc != '0'
+        run: |
+          echo "MT_ALL focused historical source quality gate failed (rc=${{ steps.build.outputs.rc }})"
+          exit 1

@@ -146,6 +146,45 @@
       "status": "LOCKED_CROSSCHECKED_PUBLIC",
       "unique_code_count": 26
     },
+    "2026-08-22": {
+      "code_count": 27,
+      "codes_sha256": "7d7dfbeacb586e15ddd0d720d31ca6534b9f3fbcc44a3cad30649e70ef1a7251",
+      "repeated_code_count": 3,
+      "source_count": 3,
+      "sources": [
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 24
+    },
+    "2026-08-23": {
+      "code_count": 27,
+      "codes_sha256": "28dfaab866e065b54c7e4bcb873e19ca57a374c8a67832e1ed27d2687d12c731",
+      "repeated_code_count": 2,
+      "source_count": 3,
+      "sources": [
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 24
+    },
+    "2026-08-24": {
+      "code_count": 27,
+      "codes_sha256": "2b19cc6285e224b1a1ef8e9ed7215bdc57a3b86601ed1c3de740741d4d334b04",
+      "repeated_code_count": 4,
+      "source_count": 3,
+      "sources": [
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 21
+    },
     "2026-08-25": {
       "code_count": 27,
       "codes_sha256": "a623169c414394540296d579124629f46d2651c400536bb04b6f2aea547fdfc8",
@@ -162,8 +201,8 @@
       "unique_code_count": 23
     }
   },
-  "latest_completed_draw": "2026-08-25",
+  "latest_completed_draw": "2026-08-24",
   "policy": "POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL",
   "schema_version": "MB_COMPLETED_DRAW_AUDIT_V1",
-  "updated_at": "2026-08-25T20:21:08+07:00"
+  "updated_at": "2026-08-25T20:25:42+07:00"
 }

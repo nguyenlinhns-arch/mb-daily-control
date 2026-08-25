@@ -201,8 +201,8 @@
       "unique_code_count": 23
     }
   },
-  "latest_completed_draw": "2026-08-24",
+  "latest_completed_draw": "2026-08-25",
   "policy": "POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL",
   "schema_version": "MB_COMPLETED_DRAW_AUDIT_V1",
-  "updated_at": "2026-08-25T20:25:42+07:00"
+  "updated_at": "2026-08-25T20:27:12+07:00"
 }

@@ -113,29 +113,28 @@ jobs:
           source_end = date.fromisoformat(str(source['history_end']))
           start = target if target <= source_end else source_end + timedelta(days=1)
           draws = audit.get('draws', {})
-          missing = []
+          dates = []
           cursor = start
           while cursor <= target:
               key = cursor.isoformat()
               if key not in draws:
-                  missing.append(key)
+                  dates.append(key)
               cursor += timedelta(days=1)
-          print(' '.join(missing))
+          # Always verify the requested completed draw last. update_audit() records
+          # latest_completed_draw as the processed target, so this preserves the
+          # monotonic latest pointer after older gaps are backfilled.
+          target_key = target.isoformat()
+          dates = [key for key in dates if key != target_key]
+          dates.append(target_key)
+          print(' '.join(dates))
           PY
           )"
           echo "AUDIT_DATES=$AUDIT_DATES" >> "$GITHUB_ENV"
-          if [[ -z "$AUDIT_DATES" ]]; then
-            echo "Audit already contains every required completed date through $DRAW_DATE."
-          else
-            echo "Missing completed audit dates: $AUDIT_DATES"
-          fi
+          echo "Completed audit sequence: $AUDIT_DATES"
 
       - name: Cross-check completed draws into isolated audit stage
         run: |
           set -euo pipefail
-          if [[ -z "${AUDIT_DATES:-}" ]]; then
-            exit 0
-          fi
           for draw in $AUDIT_DATES; do
             completed=0
             for attempt in {1..6}; do

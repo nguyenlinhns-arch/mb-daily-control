@@ -99,19 +99,58 @@ jobs:
           python scripts/normalize_history_pack.py --self-test
           python scripts/normalize_history_pack.py
 
-      - name: Cross-check completed draw into isolated audit stage
+      - name: Resolve missing completed-draw audit dates
         run: |
           set -euo pipefail
-          for attempt in {1..6}; do
-            if python scripts/update_completed_draw_report.py --draw-date "$DRAW_DATE" --stage-only; then
-              exit 0
-            fi
-            if [[ "$attempt" -eq 6 ]]; then
-              echo "Không đủ nguồn đối chiếu sau 6 lần; giữ nguyên ngày đang hiển thị."
-              exit 1
-            fi
-            echo "Nguồn chưa sẵn sàng; thử lại sau 5 phút ($attempt/6)."
-            sleep 300
+          AUDIT_DATES="$(python - <<'PY'
+          import json
+          import os
+          from datetime import date, timedelta
+
+          target = date.fromisoformat(os.environ['DRAW_DATE'])
+          source = json.load(open('data/source-access.json', encoding='utf-8'))
+          audit = json.load(open('data/completed-draw-audit.json', encoding='utf-8'))
+          source_end = date.fromisoformat(str(source['history_end']))
+          start = target if target <= source_end else source_end + timedelta(days=1)
+          draws = audit.get('draws', {})
+          missing = []
+          cursor = start
+          while cursor <= target:
+              key = cursor.isoformat()
+              if key not in draws:
+                  missing.append(key)
+              cursor += timedelta(days=1)
+          print(' '.join(missing))
+          PY
+          )"
+          echo "AUDIT_DATES=$AUDIT_DATES" >> "$GITHUB_ENV"
+          if [[ -z "$AUDIT_DATES" ]]; then
+            echo "Audit already contains every required completed date through $DRAW_DATE."
+          else
+            echo "Missing completed audit dates: $AUDIT_DATES"
+          fi
+
+      - name: Cross-check completed draws into isolated audit stage
+        run: |
+          set -euo pipefail
+          if [[ -z "${AUDIT_DATES:-}" ]]; then
+            exit 0
+          fi
+          for draw in $AUDIT_DATES; do
+            completed=0
+            for attempt in {1..6}; do
+              if python scripts/update_completed_draw_report.py --draw-date "$draw" --stage-only; then
+                completed=1
+                break
+              fi
+              if [[ "$attempt" -eq 6 ]]; then
+                echo "Không đủ nguồn đối chiếu cho $draw sau 6 lần; giữ nguyên production."
+                exit 1
+              fi
+              echo "Nguồn $draw chưa sẵn sàng; thử lại sau 5 phút ($attempt/6)."
+              sleep 300
+            done
+            [[ "$completed" -eq 1 ]] || exit 1
           done
 
       - name: Restore source route after isolated audit stage
@@ -120,7 +159,7 @@ jobs:
       - name: Keep public history on the currently published lock
         run: |
           set -euo pipefail
-          # The 19:00 job proves the completed draw and records its audit only.
+          # The 19:00 job proves completed draws and records audits only.
           # Public history/source/report advance together in the 00:05 pipeline,
           # preventing a transient stats-ahead-of-report deployment mismatch.
           git restore --source=HEAD -- data/history-27.bz2.b64
@@ -146,6 +185,6 @@ jobs:
             echo "Completed draw audit already published."
             exit 0
           fi
-          git commit -m "auto: audit completed draw $DRAW_DATE"
+          git commit -m "auto: audit completed draws through $DRAW_DATE"
           git pull --rebase origin main
           git push origin HEAD:main

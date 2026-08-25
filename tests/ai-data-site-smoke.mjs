@@ -212,11 +212,12 @@ assert.match(conversionV2, /\.vietqr-panel/);
 assert.match(conversionV2, /\.ads-landing \.floating-zalo/);
 assert.match(conversionV2, /history-disclosure/);
 
-// Build pipeline must enforce the final conversion contract.
-assert.match(workflow, /cp site-v2\/conversion-v2\.css _site\//);
-assert.match(workflow, /cp site-v2\/checkout-enhance\.js _site\//);
-assert.match(workflow, /python scripts\/apply_conversion_v2\.py --output-root _site/);
-assert.match(workflow, /Expected exactly 2 home checkout buttons|len\(buttons\) != 2/);
+// Build pipeline must enforce the current final conversion contract.
+assert.match(workflow, /find site-v2 -maxdepth 1 -type f/);
+assert.match(workflow, /python scripts\/finalize_live_mball\.py --output-root _site/);
+assert.match(workflow, /python scripts\/fix_home_blank\.py --output-root _site/);
+assert.match(workflow, /python scripts\/sitewide_product_surface\.py --output-root _site/);
+assert.match(workflow, /page\.count\('data-open-checkout'\)>=2/);
 assert.match(applyConversionV2, /History contains a day outside the report month/);
 assert.match(applyConversionV2, /completed rows for the report month/);
 assert.match(applyConversionV2, /Historical rate is data/);

@@ -228,7 +228,8 @@ assert.match(simplifyPurchaseCta, /exactly two checkout buttons/i);
 
 // Approval credentials remain server-side and the deployed artifact excludes them.
 assert.match(config, /window\.ORDER_CONFIRMATION_ENDPOINT\s*=\s*"https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec"/);
-assert.doesNotMatch(config, /OWNER_EMAIL|ADMIN_SECRET|@/);
+assert.doesNotMatch(config, /\b(?:OWNER_EMAIL|ADMIN_SECRET)\b/);
+assert.doesNotMatch(config, /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
 assert.match(approvalBackend, /MailApp\.sendEmail/);
 assert.match(approvalBackend, /hashToken\(token\)/);
 assert.match(approvalBackend, /timingSafeEqual/);

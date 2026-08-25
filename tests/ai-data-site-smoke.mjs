@@ -226,7 +226,7 @@ assert.match(simplifyPurchaseCta, /filter_history_to_report_month/);
 assert.match(simplifyPurchaseCta, /Lịch sử đối chiếu trong tháng này/);
 assert.match(simplifyPurchaseCta, /exactly two checkout buttons/i);
 
-// Approval credentials remain server-side and the deployed artifact excludes them.
+// Approval credentials remain server-side and private data is not copied by the Pages build.
 assert.match(config, /window\.ORDER_CONFIRMATION_ENDPOINT\s*=\s*"https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec"/);
 assert.doesNotMatch(config, /\b(?:OWNER_EMAIL|ADMIN_SECRET)\b/);
 assert.doesNotMatch(config, /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
@@ -234,8 +234,9 @@ assert.match(approvalBackend, /MailApp\.sendEmail/);
 assert.match(approvalBackend, /hashToken\(token\)/);
 assert.match(approvalBackend, /timingSafeEqual/);
 assert.match(approvalBackend, /PAID_REPORT_SHEET_NAME = "Paid_Report"/);
-assert.match(workflow, /test ! -e _site\/approval-backend\.gs/);
-assert.match(workflow, /test ! -e _site\/ai-methods\/report-data\.json/);
+assert.doesNotMatch(workflow, /cp[^\n]*approval-backend\.gs/);
+assert.doesNotMatch(workflow, /cp[^\n]*ai-methods\/report-data\.json/);
+assert.doesNotMatch(workflow, /cp[^\n]*site-v2\/\*/);
 
 // Secondary-page checkout routing remains direct.
 assert.match(checkoutEntry, /checkout/);

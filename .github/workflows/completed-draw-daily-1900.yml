@@ -120,17 +120,25 @@ jobs:
               if key not in draws:
                   dates.append(key)
               cursor += timedelta(days=1)
-          # Always verify the requested completed draw last. update_audit() records
-          # latest_completed_draw as the processed target, so this preserves the
-          # monotonic latest pointer after older gaps are backfilled.
+
+          # update_audit() records latest_completed_draw as the processed target.
+          # When older gaps are backfilled, verify the requested target last so
+          # the pointer remains monotonic. If the audit is already complete and
+          # already points at the target, skip network re-checks and avoid churn.
           target_key = target.isoformat()
+          target_missing = target_key not in draws
           dates = [key for key in dates if key != target_key]
-          dates.append(target_key)
+          if target_missing or dates or audit.get('latest_completed_draw') != target_key:
+              dates.append(target_key)
           print(' '.join(dates))
           PY
           )"
           echo "AUDIT_DATES=$AUDIT_DATES" >> "$GITHUB_ENV"
-          echo "Completed audit sequence: $AUDIT_DATES"
+          if [[ -z "$AUDIT_DATES" ]]; then
+            echo "Audit already complete and current through $DRAW_DATE."
+          else
+            echo "Completed audit sequence: $AUDIT_DATES"
+          fi
 
       - name: Cross-check completed draws into isolated audit stage
         run: |

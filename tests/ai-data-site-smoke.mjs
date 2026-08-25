@@ -145,7 +145,7 @@ assert.deepEqual(
 );
 
 // Current paid readiness may be public, but the current paid Production codes must not be.
-assert.equal(paidReady.schema_version, "MB_PAID_REPORT_READINESS_V2_MAX2");
+assert.equal(paidReady.schema_version, "MB_PAID_REPORT_READINESS_V3_MB_ALL_31");
 assert.equal(paidReady.report_date, isoNextDay(paidReady.data_lock));
 assert.equal(paidReady.data_lock, sourceAccess.history_end);
 assert.equal(paidReady.outcome_known_at_selection, false);

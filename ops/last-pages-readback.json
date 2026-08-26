@@ -1,8 +1,8 @@
 {
   "schema_version": "PAGES_ARTIFACT_LIVE_READBACK_V1",
-  "checked_at_utc": "2026-08-26T13:33:56+00:00",
-  "pages_run_id": 32974910939,
-  "source_head_sha": "b5526928354fe1cc6d3538a51ae7aa6beaaa2f83",
+  "checked_at_utc": "2026-08-26T18:57:13+00:00",
+  "pages_run_id": 33002484930,
+  "source_head_sha": "a7abcdb8a5e27f1cc3098dc49d76a911c29a1601",
   "pages_conclusion": "failure",
   "verification_ok": false,
   "verification_rc": 1,

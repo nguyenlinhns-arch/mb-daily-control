@@ -40,11 +40,20 @@ assert.match(commerce, /ai_purchase_window_closed/);
 assert.match(commerce, /SALE_CUTOFF_MINUTES = 18 \* 60/);
 assert.match(commerce, /lemienbac_email_order_v1/);
 assert.match(commerce, /order\.status === "pending" \|\| order\.status === "approved"/);
+assert.match(commerce, /reportDate !== now\.date/);
+assert.match(commerce, /stale_report/);
+assert.match(commerce, /closeCheckoutForGate/);
 assert.match(commerce, /phân tích, thống kê và soi cầu/i);
 assert.doesNotMatch(commerce, /function\s+installAffiliateFallback/);
 assert.doesNotMatch(commerce, /affiliate-shopee-smartlink/);
 assert.doesNotMatch(commerce, /https?:\/\/(?:nguyenlinhtkv|go\.isclix)/i);
 assert.doesNotMatch(commerce, /Khi cần phần kết luận riêng cho ngày/);
+
+const checkoutEntry = read('site-v2/checkout-entry.js');
+assert.match(checkoutEntry, /Fail closed/);
+assert.match(checkoutEntry, /!button/);
+assert.doesNotMatch(checkoutEntry, /checkout\.hidden\s*=\s*false/);
+assert.doesNotMatch(checkoutEntry, /classList\.add\("modal-open",\s*"checkout-open"\)/);
 
 const checkout = read('site-v2/checkout-enhance.js');
 assert.match(checkout, /VietQR/);

@@ -21,22 +21,16 @@
     const button = Array.from(document.querySelectorAll("[data-open-checkout]"))
       .find((node) => !node.disabled && node.getAttribute("aria-disabled") !== "true");
 
-    if (button) {
+    if (!button) {
+      // Fail closed: a direct ?checkout=1/#checkout route must never bypass
+      // the commerce gate when today's report is stale or the sale window is closed.
       clearRoute();
-      button.click();
-      return true;
+      return false;
     }
 
-    const checkout = document.getElementById("checkout");
-    if (checkout) {
-      clearRoute();
-      checkout.hidden = false;
-      document.body.classList.add("modal-open", "checkout-open");
-      document.getElementById("checkout-close")?.focus();
-      return true;
-    }
-
-    return false;
+    clearRoute();
+    button.click();
+    return true;
   };
 
   const start = () => {

@@ -36,7 +36,10 @@ jobs:
           grep -q 'Sitemap: https://lemienbac.com/sitemap.xml' /tmp/lm-live/robots.txt
           grep -q '<loc>https://lemienbac.com/</loc>' /tmp/lm-live/sitemap.xml
           grep -q '<loc>https://lemienbac.com/thong-ke-xsmb/</loc>' /tmp/lm-live/sitemap.xml
-          grep -q '<loc>https://lemienbac.com/xsmb-30-ngay/</loc>' /tmp/lm-live/sitemap.xml
+          grep -q '<loc>https://lemienbac.com/tan-suat-xsmb/</loc>' /tmp/lm-live/sitemap.xml
+          grep -q '<loc>https://lemienbac.com/lo-gan-xsmb/</loc>' /tmp/lm-live/sitemap.xml
+          grep -q '<loc>https://lemienbac.com/cap-dao-xsmb/</loc>' /tmp/lm-live/sitemap.xml
+          grep -q '<loc>https://lemienbac.com/tra-cuu-xsmb/</loc>' /tmp/lm-live/sitemap.xml
 
       - name: Crawl sitemap with Googlebot mobile user agent
         shell: bash

@@ -23,7 +23,9 @@ assert.doesNotMatch(copyLock, /window\.open\(/);
 
 const checkoutEntry = read('site-v2/checkout-entry.js');
 assert.match(checkoutEntry, /button\.click\(\)/);
-assert.match(checkoutEntry, /checkout\.hidden = false/);
+assert.match(checkoutEntry, /\.find\(\(node\) => !node\.disabled && node\.getAttribute\("aria-disabled"\) !== "true"\)/);
+assert.match(checkoutEntry, /if \(!button\) \{[\s\S]*clearRoute\(\);[\s\S]*return false;/);
+assert.doesNotMatch(checkoutEntry, /checkout\.hidden = false/);
 assert.doesNotMatch(checkoutEntry, /ZALO_ROUTE/);
 assert.doesNotMatch(checkoutEntry, /location\.replace\(.*zalo/i);
 

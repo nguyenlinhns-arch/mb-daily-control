@@ -58,7 +58,9 @@ jobs:
           root = ET.fromstring(xml)
           ns = {'sm': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
           urls = [node.text.strip() for node in root.findall('sm:url/sm:loc', ns) if node.text]
-          if not 15 <= len(urls) <= 40:
+          # Keep a lower-bound regression guard while allowing the current canonical
+          # 12-route sitemap after legacy/special-prize routes were intentionally removed.
+          if not 10 <= len(urls) <= 40:
               raise SystemExit(f"Unexpected sitemap URL count: {len(urls)}")
           if len(urls) != len(set(urls)):
               raise SystemExit('Duplicate URLs found in sitemap')

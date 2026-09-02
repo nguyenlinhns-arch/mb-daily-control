@@ -39,6 +39,19 @@ def validate_public_methods() -> None:
         if not nums or any(not re.fullmatch(r'\d{2}',str(n)) for n in nums):
             raise ValueError(f'invalid public method numbers: {method.get("name")}')
 
+    mb_all=doc.get('mb_all') or {}
+    if mb_all.get('public_method_outputs_hidden') is not True:
+        raise ValueError('MB_ALL public method outputs must be marked hidden')
+    nested=mb_all.get('methods') or []
+    if int(mb_all.get('method_count_run') or 0)!=31 or len(nested)!=31:
+        raise ValueError('MB_ALL public method metadata must contain exactly 31 methods')
+    for method in nested:
+        name=str(method.get('name') or '').upper()
+        mid=str(method.get('id') or '').upper()
+        nums=method.get('numbers') or []
+        if ('4SO' in name or '4SO' in mid) and nums:
+            raise ValueError(f'4SO paid method output leaked into public repo: {method.get("name")}')
+
 
 def validate_report_templates() -> None:
     for rel in ('ai-methods/report-data.json','ai-methods/report-share-data.json'):

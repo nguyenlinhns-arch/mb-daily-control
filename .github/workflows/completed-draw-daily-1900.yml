@@ -112,12 +112,27 @@ jobs:
           audit = json.load(open('data/completed-draw-audit.json', encoding='utf-8'))
           source_end = date.fromisoformat(str(source['history_end']))
           start = target if target <= source_end else source_end + timedelta(days=1)
-          draws = audit.get('draws', {})
+
+          # Current audit schema stores completed dates in an `audits` array and
+          # `latest_completed_draw` as an object. Keep backward compatibility with
+          # the older optional `draws` mapping so recovery does not re-audit every
+          # date on each scheduled run.
+          audited_dates = set(str(k) for k in (audit.get('draws', {}) or {}).keys())
+          for item in (audit.get('audits') or []):
+              if isinstance(item, dict) and item.get('date'):
+                  audited_dates.add(str(item['date']))
+
+          latest_obj = audit.get('latest_completed_draw')
+          if isinstance(latest_obj, dict):
+              latest_date = str(latest_obj.get('date') or '')
+          else:
+              latest_date = str(latest_obj or '')
+
           dates = []
           cursor = start
           while cursor <= target:
               key = cursor.isoformat()
-              if key not in draws:
+              if key not in audited_dates:
                   dates.append(key)
               cursor += timedelta(days=1)
 
@@ -126,9 +141,9 @@ jobs:
           # the pointer remains monotonic. If the audit is already complete and
           # already points at the target, skip network re-checks and avoid churn.
           target_key = target.isoformat()
-          target_missing = target_key not in draws
+          target_missing = target_key not in audited_dates
           dates = [key for key in dates if key != target_key]
-          if target_missing or dates or audit.get('latest_completed_draw') != target_key:
+          if target_missing or dates or latest_date != target_key:
               dates.append(target_key)
           print(' '.join(dates))
           PY

@@ -9,6 +9,8 @@ on:
       - "scripts/update_completed_draw_report.py"
       - "scripts/build_public_snapshot.py"
       - "tests/ai-data-site-smoke.mjs"
+      # If Pages records a deploy outcome after a missed cron, give the completed-draw audit one recovery chance.
+      - "data/live-deploy-status.json"
   schedule:
     # GitHub cron uses UTC. 12:00 UTC = 19:00 Asia/Ho_Chi_Minh.
     - cron: "0 12 * * *"

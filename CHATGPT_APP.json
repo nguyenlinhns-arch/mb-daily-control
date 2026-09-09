@@ -1,0 +1,11 @@
+{
+  "schema": "chatgpt.app.v1",
+  "id": "mb-top2-app",
+  "role": "production",
+  "canonical": true,
+  "manager": "ChatGPT",
+  "codex": "fallback_only",
+  "current_scripts": {"test": "npm test"},
+  "required_safe_recipes": ["mbtop2.app.test", "mbtop2.app.build", "mbtop2.app.start"],
+  "secrets_policy": "external_only"
+}

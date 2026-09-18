@@ -17,6 +17,7 @@ from typing import Any
 from .governance import build_governance
 from .hashing import canonical_hash, sha256_file, sha256_tree
 from .io_utils import parse_pick_text, read_json, read_tsv, write_json
+from .ledger_guard import assert_route_authority
 from .validator import validate_generated_run
 
 VN_TZ = timezone(timedelta(hours=7))
@@ -169,6 +170,9 @@ class MBEngineService:
 
     def run_day(self, target_date: str) -> dict[str, Any]:
         target = self._parse_target(target_date)
+        # Safety fix effective 17/09/2026: this app still embeds the legacy FUSION67 route.
+        # It may remain readable/replayable historically, but it must never issue a current FINAL.
+        assert_route_authority(target_date=target.isoformat(), engine_or_policy="FUSION67 ALL67_NO_META")
         with FileMutex(self.lock_path):
             if self._freeze_path(target).exists():
                 frozen = read_json(self._freeze_path(target))
@@ -215,6 +219,8 @@ class MBEngineService:
 
     def freeze_day(self, target_date: str, run_id: str) -> dict[str, Any]:
         target = self._parse_target(target_date)
+        # Do not allow a legacy draft created outside this process to be frozen after the route cutover.
+        assert_route_authority(target_date=target.isoformat(), engine_or_policy="FUSION67 ALL67_NO_META")
         with FileMutex(self.lock_path):
             freeze_path = self._freeze_path(target)
             if freeze_path.exists():

@@ -1,0 +1,35 @@
+name: MB TOP2 Ledger Guard
+
+on:
+  push:
+    branches:
+      - main
+      - "fix/ledger-guard-v41-*"
+    paths:
+      - "chatgpt_app_v1/mb_engine/**"
+      - "tests/test_top2_ledger_guard.py"
+      - ".github/workflows/mb-top2-ledger-guard.yml"
+  pull_request:
+    paths:
+      - "chatgpt_app_v1/mb_engine/**"
+      - "tests/test_top2_ledger_guard.py"
+      - ".github/workflows/mb-top2-ledger-guard.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  ledger-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile guard and validator
+        run: |
+          python -m py_compile chatgpt_app_v1/mb_engine/ledger_guard.py
+          python -m py_compile chatgpt_app_v1/mb_engine/validator.py
+          python -m py_compile chatgpt_app_v1/mb_engine/service.py
+      - name: Run ledger guard tests
+        run: python -m unittest -v tests/test_top2_ledger_guard.py

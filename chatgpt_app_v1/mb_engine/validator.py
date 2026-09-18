@@ -1,12 +1,51 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
 from .hashing import sha256_file
 from .io_utils import read_tsv
+from .ledger_guard import validate_run
+
+
+def _ledger_guard_rows(methods: list[dict[str, str]], target: date, cutoff: date) -> list[dict[str, Any]]:
+    """Translate persisted TSV rows into the typed ledger contract without coercion."""
+    out: list[dict[str, Any]] = []
+    for row in methods:
+        method = (row.get("method") or "").strip()
+        status = (row.get("status") or "").strip().upper()
+        raw_pick = (row.get("pick") or "").strip()
+        native_raw = (row.get("native_k") or "").strip()
+        if status != "SUCCESS":
+            action = "RUN_INVALID_NO_BET"
+            codes: list[str] = []
+        else:
+            if native_raw not in {"0", "1", "2"}:
+                raise ValueError(f"{method}: native_k must be exact 0/1/2 text")
+            native_k = int(native_raw)
+            if native_k == 0:
+                if raw_pick.upper() != "A0":
+                    raise ValueError(f"{method}: zero-leg SUCCESS must be explicit A0")
+                action = "A0"
+                codes = []
+            else:
+                # Full-match only. Decimal/scalar corruption such as 5.0 or 50.0 is rejected.
+                if not re.fullmatch(r"[0-9]{2}(?:\\s*,\\s*[0-9]{2})?", raw_pick):
+                    raise ValueError(f"{method}: malformed pick serialization {raw_pick!r}")
+                codes = [part.strip() for part in raw_pick.split(",")]
+                action = "A1" if native_k == 1 else "A2"
+        out.append({
+            "method_id": method,
+            "target_date": target.isoformat(),
+            "data_lock": cutoff.isoformat(),
+            "action": action,
+            "codes": codes,
+            "evidence": f"method_results:{method}",
+        })
+    return out
 
 
 def validate_generated_run(runtime_root: Path, target: date) -> dict[str, Any]:
@@ -36,6 +75,17 @@ def validate_generated_run(runtime_root: Path, target: date) -> dict[str, Any]:
     check("source_width_27", summary.get("source", {}).get("cutoff_result_count") == 27)
     check("method_count_67", len(methods) == 67, str(len(methods)))
     check("method_unique_67", len({r.get("method") for r in methods}) == 67)
+    try:
+        guard_rows = _ledger_guard_rows(methods, target, cutoff)
+        validate_run(
+            guard_rows,
+            target_date=target.isoformat(),
+            data_lock=cutoff.isoformat(),
+            expected_method_ids=[str(r.get("method") or "").strip() for r in methods],
+        )
+        check("ledger_guard_67", True, "typed rows; exact T-1; 2-digit strings; A0/invalid separated")
+    except Exception as exc:
+        check("ledger_guard_67", False, str(exc))
     check("all_success", all(r.get("status") == "SUCCESS" for r in methods))
     check("coverage_registry", int(summary.get("coverage", {}).get("registry_rows", -1)) == 67)
     check("coverage_success", int(summary.get("coverage", {}).get("methods_success", -1)) == 67)

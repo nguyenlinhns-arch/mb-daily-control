@@ -886,10 +886,25 @@
       ],
       "status": "LOCKED_CROSSCHECKED_PUBLIC",
       "unique_code_count": 26
+    },
+    "2026-10-11": {
+      "code_count": 27,
+      "codes_sha256": "c9245eb5da17dbe39c32c14f54d4cdd687b8e66a49250cba746c73b7b57f1079",
+      "repeated_code_count": 4,
+      "source_count": 5,
+      "sources": [
+        "ketqua",
+        "kqxs",
+        "minhngoc",
+        "xosodaiphat",
+        "xosothienphu"
+      ],
+      "status": "LOCKED_CROSSCHECKED_PUBLIC",
+      "unique_code_count": 23
     }
   },
-  "latest_completed_draw": "2026-10-10",
+  "latest_completed_draw": "2026-10-11",
   "policy": "POST_DRAW_ONLY_NO_PREDICTIONS_NO_STAKES_NO_FINANCIAL_PNL",
   "schema_version": "MB_COMPLETED_DRAW_AUDIT_V1",
-  "updated_at": "2026-10-10T23:37:20+07:00"
+  "updated_at": "2026-10-12T00:03:05+07:00"
 }
